@@ -6,6 +6,7 @@
 \alias{LOCATION_TYPES}
 \alias{SIGNAL_TYPES}
 \alias{IMPORT_FORMATS}
+\alias{YAEL_IMAGE_TYPES}
 \title{'RAVE' constants}
 \format{
 An object of class \code{character} of length 5.
@@ -13,6 +14,8 @@ An object of class \code{character} of length 5.
 An object of class \code{character} of length 5.
 
 An object of class \code{list} of length 7.
+
+An object of class \code{character} of length 10.
 }
 \usage{
 LOCATION_TYPES
@@ -20,6 +23,8 @@ LOCATION_TYPES
 SIGNAL_TYPES
 
 IMPORT_FORMATS
+
+YAEL_IMAGE_TYPES
 }
 \description{
 Constant variables

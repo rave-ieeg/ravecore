@@ -73,7 +73,7 @@ LFP_reference <- R6::R6Class(
           refererence = self$reference_name,
           location_type = self$location,
           # epoch = epoch,
-          epoch_name = epoch,
+          epoch_name = epoch_name,
           stitch_events = self$stitch_events,
           trial_intervals = self$trial_intervals
         )

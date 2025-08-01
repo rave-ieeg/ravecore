@@ -31,4 +31,8 @@ IMPORT_FORMATS <- list(
   `Single BlackRock file (.nev+.nsx) per block` = "native_blackrock"
 )
 
-
+#' @rdname ravecore-constants
+#' @export
+YAEL_IMAGE_TYPES <- c(
+  "T1w", "T2w", "FLAIR", "preopCT", "T1wContrast", "fGATIR",
+  "postopT1w", "postopT2w", "postopFLAIR", "CT")

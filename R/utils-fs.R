@@ -67,15 +67,26 @@ path_to_nearest_file <- function(filename, start, root = NA, ignore_cases = FALS
 
 
 
-path_abs <- function(path) {
-  fs::path_abs(path)
+path_abs <- function(path, must_work = NA) {
+  # normalizePath(path, winslash = "/", mustWork = FALSE)
+  # path <- c(
+  #   "~/../asdad",
+  #   "../asd/./../../aa",
+  #   "./././a/.././"
+  # )
+  path <- unlist(lapply(fs::path_split(path), function(p) {
+    p[[1]] <- normalizePath(p[[1]], winslash = "/", mustWork = FALSE)
+    do.call(fs::path, as.list(p))
+  }))
+  path <- normalizePath(path, mustWork = must_work)
+  fs::path_norm(path)
 }
 
 path_expand <- function(path) {
   fs::path_norm(fs::path_expand(path))
 }
 
-path_norm <- function(path) {
+path_norm <- function(path, must_work = NA) {
   fs::path_norm(path)
 }
 

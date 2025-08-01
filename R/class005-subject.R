@@ -578,32 +578,34 @@ RAVESubject <- R6::R6Class(
                                    subset = FALSE, simplify = FALSE, warn = TRUE){
       preproc <- self$preprocess_settings
       all_electrodes <- self$electrodes
-
-      if(!missing(electrodes)){
-        # Get electrodes to be loaded
-        if(is.character(electrodes)){
-          load_electrodes <- parse_svec(electrodes)
-        } else {
-          load_electrodes <- electrodes
-        }
-        valid_electrodes <- self$valid_electrodes(reference_name = reference_name)
-        # 1. get electrodes to be truly loaded
-        load_electrodes <- load_electrodes[load_electrodes %in% valid_electrodes]
-        if(!length(load_electrodes)) {
-          stop("There is no valid electrodes to be loaded. The valid electrodes are: ", deparse_svec(valid_electrodes), ".")
-        }
-        imcomplete <- all_electrodes[
-          all_electrodes %in% load_electrodes &
-            !preproc$has_wavelet &
-            self$electrode_types %in% "LFP"
-        ]
-        if(length(imcomplete)){
-          stop("The following electrodes do not have power spectrum: \n  ", deparse_svec(imcomplete),
-               "\nPlease run wavelet module first.")
-        }
-        reference_table <- self$get_reference(reference_name, simplify = FALSE)
-      } else {
+      if(missing(reference_name) || !length(reference_name)) {
+        valid_electrodes <- all_electrodes
         reference_table <- NULL
+      } else {
+        valid_electrodes <- self$valid_electrodes(reference_name = reference_name)
+        reference_table <- self$get_reference(reference_name, simplify = FALSE)
+      }
+
+      if(missing(electrodes)){
+        load_electrodes <- valid_electrodes
+      } else {
+        # Get electrodes to be loaded
+        load_electrodes <- parse_svec(electrodes)
+      }
+
+      # 1. get electrodes to be truly loaded
+      load_electrodes <- load_electrodes[load_electrodes %in% valid_electrodes]
+      if(!length(load_electrodes)) {
+        stop("There is no valid electrodes to be loaded. The valid electrodes are: ", deparse_svec(valid_electrodes), ".")
+      }
+      imcomplete <- all_electrodes[
+        all_electrodes %in% load_electrodes &
+          !preproc$has_wavelet &
+          self$electrode_types %in% "LFP"
+      ]
+      if(length(imcomplete)){
+        stop("The following electrodes do not have power spectrum: \n  ", deparse_svec(imcomplete),
+             "\nPlease run wavelet module first.")
       }
 
       electrode_table <- self$meta_data("electrodes", strict = FALSE)
@@ -882,7 +884,10 @@ RAVESubject <- R6::R6Class(
       match_info <- regexec(regexp, fs)
       nms <- unlist(lapply(regmatches(fs, match_info), function(m) { m[[2]] }))
       nms <- sort(unique(nms))
-      nms[!startsWith(nms, "_")]
+      if(length(nms)) {
+        nms <- nms[!startsWith(nms, "_")]
+      }
+      nms
     },
 
     #' @field reference_names possible reference names
@@ -892,7 +897,10 @@ RAVESubject <- R6::R6Class(
       match_info <- regexec(regexp, fs)
       nms <- unlist(lapply(regmatches(fs, match_info), function(m) { m[[2]] }))
       nms <- sort(unique(nms))
-      nms[!startsWith(nms, "_")]
+      if(length(nms)) {
+        nms <- nms[!startsWith(nms, "_")]
+      }
+      nms
     },
 
     #' @field reference_path reference path under 'rave' folder

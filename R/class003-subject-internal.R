@@ -430,6 +430,28 @@ restore_subject_impl <- function(subject_id, strict = FALSE) {
   # }
 }
 
+#' Function to save meta data to 'RAVE' subject
+#' @param data data table
+#' @param meta_type see load meta
+#' @param project_name project name
+#' @param subject_code subject code
+#' @returns Either none if no meta matched or the absolute path of file saved.
+#' @examples
+#'
+#' subject <- as_rave_subject("demo/DemoSubject", strict = FALSE)
+#'
+#' if(interactive() && dir.exists(subject$meta_path)) {
+#'
+#'   electrode_table <- subject$get_electrode_table()
+#'
+#'   save_meta2(
+#'     "electrodes",
+#'     electrode_table,
+#'     project_name = subject$project_name,
+#'     subject_code = subject$subject_code
+#'   )
+#' }
+#'
 #' @export
 save_meta2 <- function(data, meta_type, project_name, subject_code){
   subject_code <- gsub('^sub-', "", x = subject_code, ignore.case = TRUE)

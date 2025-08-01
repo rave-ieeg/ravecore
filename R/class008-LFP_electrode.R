@@ -131,9 +131,10 @@ LFP_electrode <- R6::R6Class(
           subject = self$subject$`@marshal`(),
           number = self$number,
           refererence = self$reference_name,
+          signal_type = self$type,
           location_type = self$location,
           # epoch = epoch,
-          epoch_name = epoch,
+          epoch_name = epoch_name,
           stitch_events = self$stitch_events,
           trial_intervals = self$trial_intervals
         )

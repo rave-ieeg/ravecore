@@ -24,36 +24,39 @@ test_that("LFP_electrode", {
 
   private$check_dimensions("wavelet-coefficient")
 
-  testthat::expect_no_failure({
-    self$load_data("power")
-  })
+  raw <- serialize(self, NULL, refhook = ravepipeline::rave_serialize_refhook)
+  e14 <- unserialize(raw, refhook = ravepipeline::rave_unserialize_refhook)
 
-  testthat::expect_no_failure({
-    self$load_data("phase")
-  })
+  data <- self$load_data("power")
+  testthat::expect_equal(data[], e14$load_data("power")[])
 
-  testthat::expect_no_failure({
-    self$load_data("wavelet-coefficient")
-  })
+  data <- self$load_data("phase")
+  testthat::expect_equal(data[], e14$load_data("phase")[])
 
-  testthat::expect_no_failure({
-    self$load_data("voltage")
-  })
+  data <- self$load_data("wavelet-coefficient")
+  testthat::expect_equal(data[], e14$load_data("wavelet-coefficient")[])
 
-  testthat::expect_no_failure({
-    self$load_data("raw-voltage")
-  })
+  data <- self$load_data("voltage")
+  testthat::expect_equal(data[], e14$load_data("voltage")[])
 
-  testthat::expect_no_failure({
-    self$load_blocks("008", type = "power")
-    self$load_blocks("008", type = "phase")
-    self$load_blocks("008", type = "wavelet-coefficient")
-  })
+  data <- self$load_data("raw-voltage")
+  testthat::expect_equal(data[], e14$load_data("raw-voltage")[])
 
-  testthat::expect_no_failure({
-    self$load_blocks("008", type = "voltage")
-    self$load_blocks("008", type = "raw-voltage")
-  })
+  data <- self$load_blocks("008", type = "power")
+  testthat::expect_equal(data, e14$load_blocks("008", type = "power"))
+
+  data <- self$load_blocks("008", type = "phase")
+  testthat::expect_equal(data, e14$load_blocks("008", type = "phase"))
+
+  data <- self$load_blocks("008", type = "wavelet-coefficient")
+  testthat::expect_equal(data, e14$load_blocks("008", type = "wavelet-coefficient"))
+
+  data <- self$load_blocks("008", type = "voltage")
+  testthat::expect_equal(data, e14$load_blocks("008", type = "voltage"))
+
+  data <- self$load_blocks("008", type = "raw-voltage")
+  testthat::expect_equal(data, e14$load_blocks("008", type = "raw-voltage"))
+
 
   self$clear_cache()
 
