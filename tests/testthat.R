@@ -11,13 +11,3 @@ library(ravecore)
 
 test_check("ravecore")
 
-# Parallel test but do NOT run on CRAN since it requires at least two async workers
-if( !testthat:::on_cran() ) {
-  message("Test again with parallel workers")
-  ravepipeline::with_mirai_parallel(
-    worker = 2,
-    {
-      test_check("ravecore")
-    }
-  )
-}

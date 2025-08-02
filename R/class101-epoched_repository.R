@@ -71,23 +71,23 @@ RAVESubjectEpochRepository <- R6::R6Class(
     #' @param strict whether the mode should be strict; default is true and
     #' errors out when subject is missing
     #' @param lazy_load whether to delay (lazy) the evaluation \code{mount_data}
-    #' @param ... reserved, currently ignored
+    #' @param ... passed to \code{\link{RAVESubjectBaseRepository}} constructor
+    #' @param .class internally used, do not set, even if you know what this is
     initialize = function(subject, electrodes = NULL,
                           reference_name = NULL, epoch_name = NULL,
                           time_windows = NULL, stitch_events = NULL, ...,
                           quiet = FALSE, repository_id = NULL, strict = TRUE,
-                          lazy_load = FALSE) {
+                          lazy_load = FALSE, .class = NULL) {
+
+      .class <- c(.class, "rave_prepare_with_epoch", "RAVESubjectEpochRepository")
 
       subject <- as_rave_subject(subject, strict = strict)
       super$initialize(subject = subject, electrodes = electrodes,
                        reference_name = reference_name, quiet = quiet,
-                       repository_id = repository_id)
+                       repository_id = repository_id,
+                       .class = .class)
 
       private$.data <- fastmap2()
-
-      cls <- unique(c("rave_prepare_with_epoch", "RAVESubjectEpochRepository", "rave_repository", class(self)))
-      cls <- cls[!cls %in% "rave_prepare_subject_bare0"]
-      class(self) <- cls
 
       self$time_windows <- time_windows
       self$set_epoch(epoch_name, stitch_events)

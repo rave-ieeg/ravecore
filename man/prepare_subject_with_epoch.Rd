@@ -6,6 +6,8 @@
 \alias{prepare_subject_raw_voltage_with_epoch}
 \alias{prepare_subject_voltage_with_epoch}
 \alias{prepare_subject_time_frequency_coefficients}
+\alias{prepare_subject_power}
+\alias{prepare_subject_phase}
 \title{'RAVE' repository: with epochs (still basic)}
 \usage{
 prepare_subject_with_epoch(
@@ -47,6 +49,32 @@ prepare_subject_voltage_with_epoch(
 )
 
 prepare_subject_time_frequency_coefficients(
+  subject,
+  electrodes = NULL,
+  reference_name = NULL,
+  epoch_name = NULL,
+  time_windows = NULL,
+  stitch_events = NULL,
+  ...,
+  quiet = FALSE,
+  repository_id = NULL,
+  strict = TRUE
+)
+
+prepare_subject_power(
+  subject,
+  electrodes = NULL,
+  reference_name = NULL,
+  epoch_name = NULL,
+  time_windows = NULL,
+  stitch_events = NULL,
+  ...,
+  quiet = FALSE,
+  repository_id = NULL,
+  strict = TRUE
+)
+
+prepare_subject_phase(
   subject,
   electrodes = NULL,
   reference_name = NULL,

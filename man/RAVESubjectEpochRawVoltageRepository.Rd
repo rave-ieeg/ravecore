@@ -93,7 +93,8 @@ constructor
   repository_id = NULL,
   strict = TRUE,
   lazy_load = FALSE,
-  reference_name = "noref"
+  reference_name = "noref",
+  .class = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -113,7 +114,7 @@ and end of the trials, for example, \code{c(-1, 2)} means load
 \item{\code{stitch_events}}{events where the \code{time_windows} is based;
 default is trial onset (\code{NULL})}
 
-\item{\code{...}}{reserved, currently ignored}
+\item{\code{...}}{passed to \code{\link{RAVESubjectEpochRepository}} constructor}
 
 \item{\code{quiet}}{see field \code{quiet}}
 
@@ -127,6 +128,8 @@ default is false}
 
 \item{\code{reference_name}}{ignored, always \code{'noref'} for raw voltage
 data}
+
+\item{\code{.class}}{internally used, do not set, even if you know what this is}
 }
 \if{html}{\out{</div>}}
 }

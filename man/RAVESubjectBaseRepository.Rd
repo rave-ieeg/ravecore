@@ -128,7 +128,8 @@ constructor
   ...,
   quiet = TRUE,
   repository_id = NULL,
-  strict = TRUE
+  strict = TRUE,
+  .class = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -149,6 +150,8 @@ constructor
 
 \item{\code{strict}}{whether the mode should be strict; default is true and
 errors out when subject is missing}
+
+\item{\code{.class}}{internally used, do not set, even if you know what this is}
 }
 \if{html}{\out{</div>}}
 }

@@ -95,10 +95,14 @@ RAVESubjectBaseRepository <- R6::R6Class(
     #' @param strict whether the mode should be strict; default is true and
     #' errors out when subject is missing
     #' @param ... reserved, currently ignored
+    #' @param .class internally used, do not set, even if you know what this is
     initialize = function(subject, electrodes = NULL, reference_name = NULL, ...,
-                          quiet = TRUE, repository_id = NULL, strict = TRUE) {
+                          quiet = TRUE, repository_id = NULL, strict = TRUE, .class = NULL) {
 
-      class(self) <- unique(c('rave_prepare_subject_bare0', 'rave_repository', class(self)))
+      if(is.null(.class)) {
+        .class <- "rave_prepare_subject_bare0"
+      }
+      class(self) <- unique(c(.class, 'rave_repository', class(self)))
 
       self$quiet <- quiet
       repository_id <- paste(repository_id, collapse = "")

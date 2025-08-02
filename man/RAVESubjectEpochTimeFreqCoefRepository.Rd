@@ -4,32 +4,18 @@
 \alias{RAVESubjectEpochTimeFreqCoefRepository}
 \title{'RAVE' class for epoch repository - spectrogram}
 \description{
-The repository inherits \code{link{RAVESubjectEpochRepository}}, with epoch
+The repository inherits \code{link{RAVESubjectEpochTimeFreqBaseRepository}}, with epoch
 trials, and is intended for loading processed and referenced time-frequency
 coefficients.
 Use \code{\link{prepare_subject_time_frequency_coefficients}} to create an
 instance.
 }
 \section{Super classes}{
-\code{\link[ravepipeline:RAVESerializable]{ravepipeline::RAVESerializable}} -> \code{ravecore::RAVESubjectRepository} -> \code{\link[ravecore:RAVESubjectEpochRepository]{ravecore::RAVESubjectEpochRepository}} -> \code{RAVESubjectEpochTimeFreqCoefRepository}
+\code{\link[ravepipeline:RAVESerializable]{ravepipeline::RAVESerializable}} -> \code{ravecore::RAVESubjectRepository} -> \code{\link[ravecore:RAVESubjectEpochRepository]{ravecore::RAVESubjectEpochRepository}} -> \code{\link[ravecore:RAVESubjectEpochTimeFreqBaseRepository]{ravecore::RAVESubjectEpochTimeFreqBaseRepository}} -> \code{RAVESubjectEpochTimeFreqCoefRepository}
 }
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
-\item{\code{sample_rate}}{time-frequency coefficient sample rate}
-
-\item{\code{frequency}}{frequencies where the time-frequency coefficients
-are evaluated}
-
-\item{\code{time}}{time in seconds for each trial}
-
-\item{\code{time_points}}{see \code{time} field}
-
-\item{\code{signal_type}}{do not use}
-
-\item{\code{digest_key}}{a list of repository data used to generate
-repository signature}
-
 \item{\code{coefficients}}{a named map of time-frequency coefficient data,
 mounted by \code{mount_data}}
 
@@ -43,7 +29,6 @@ mounted by \code{mount_data}}
 \item \href{#method-RAVESubjectEpochTimeFreqCoefRepository-@marshal}{\code{RAVESubjectEpochTimeFreqCoefRepository$@marshal()}}
 \item \href{#method-RAVESubjectEpochTimeFreqCoefRepository-@unmarshal}{\code{RAVESubjectEpochTimeFreqCoefRepository$@unmarshal()}}
 \item \href{#method-RAVESubjectEpochTimeFreqCoefRepository-new}{\code{RAVESubjectEpochTimeFreqCoefRepository$new()}}
-\item \href{#method-RAVESubjectEpochTimeFreqCoefRepository-mount_data}{\code{RAVESubjectEpochTimeFreqCoefRepository$mount_data()}}
 \item \href{#method-RAVESubjectEpochTimeFreqCoefRepository-clone}{\code{RAVESubjectEpochTimeFreqCoefRepository$clone()}}
 }
 }
@@ -52,6 +37,7 @@ mounted by \code{mount_data}}
 <ul>
 <li><span class="pkg-link" data-pkg="ravepipeline" data-topic="RAVESerializable" data-id="@compare"><a href='../../ravepipeline/html/RAVESerializable.html#method-RAVESerializable-@compare'><code>ravepipeline::RAVESerializable$@compare()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectEpochRepository" data-id="set_epoch"><a href='../../ravecore/html/RAVESubjectEpochRepository.html#method-RAVESubjectEpochRepository-set_epoch'><code>ravecore::RAVESubjectEpochRepository$set_epoch()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectEpochTimeFreqBaseRepository" data-id="mount_data"><a href='../../ravecore/html/RAVESubjectEpochTimeFreqBaseRepository.html#method-RAVESubjectEpochTimeFreqBaseRepository-mount_data'><code>ravecore::RAVESubjectEpochTimeFreqBaseRepository$mount_data()</code></a></span></li>
 </ul>
 </details>
 }}
@@ -106,7 +92,8 @@ constructor
   quiet = FALSE,
   repository_id = NULL,
   strict = TRUE,
-  lazy_load = FALSE
+  lazy_load = FALSE,
+  .class = NULL
 )}\if{html}{\out{</div>}}
 }
 
@@ -128,7 +115,7 @@ and end of the trials, for example, \code{c(-1, 2)} means load
 \item{\code{stitch_events}}{events where the \code{time_windows} is based;
 default is trial onset (\code{NULL})}
 
-\item{\code{...}}{reserved, currently ignored}
+\item{\code{...}}{passed to \code{\link{RAVESubjectEpochTimeFreqBaseRepository}} constructor}
 
 \item{\code{quiet}}{see field \code{quiet}}
 
@@ -139,19 +126,11 @@ errors out when subject is missing}
 
 \item{\code{lazy_load}}{whether to delay \code{mount_data};
 default is false}
+
+\item{\code{.class}}{internally used, do not set, even if you know what this is}
 }
 \if{html}{\out{</div>}}
 }
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-RAVESubjectEpochTimeFreqCoefRepository-mount_data"></a>}}
-\if{latex}{\out{\hypertarget{method-RAVESubjectEpochTimeFreqCoefRepository-mount_data}{}}}
-\subsection{Method \code{mount_data()}}{
-function to mount processed and referenced voltage signals
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectEpochTimeFreqCoefRepository$mount_data()}\if{html}{\out{</div>}}
-}
-
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVESubjectEpochTimeFreqCoefRepository-clone"></a>}}

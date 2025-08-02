@@ -61,12 +61,13 @@ RAVESubjectEpochRawVoltageRepository <- R6::R6Class(
     #' default is false
     #' @param reference_name ignored, always \code{'noref'} for raw voltage
     #' data
-    #' @param ... reserved, currently ignored
-    initialize = function(subject, electrodes = NULL,
-                          epoch_name = NULL, time_windows = NULL,
-                          stitch_events = NULL, ..., quiet = FALSE,
-                          repository_id = NULL, strict = TRUE,
-                          lazy_load = FALSE, reference_name = "noref") {
+    #' @param ... passed to \code{\link{RAVESubjectEpochRepository}} constructor
+    #' @param .class internally used, do not set, even if you know what this is
+    initialize = function(subject, electrodes = NULL, epoch_name = NULL,
+                          time_windows = NULL, stitch_events = NULL, ...,
+                          quiet = FALSE, repository_id = NULL, strict = TRUE,
+                          lazy_load = FALSE, reference_name = "noref",
+                          .class = NULL) {
       subject <- as_rave_subject(subject, strict = strict)
       super$initialize(
         subject = subject,
@@ -78,13 +79,9 @@ RAVESubjectEpochRawVoltageRepository <- R6::R6Class(
         quiet = quiet,
         repository_id = repository_id,
         lazy_load = lazy_load,
+        .class = c(.class, "rave_prepare_subject_raw_voltage_with_epoch"),
         ...
       )
-
-      class(self) <- unique(c(
-        "rave_prepare_subject_raw_voltage_with_epoch",
-        class(self)
-      ))
 
     },
 
@@ -231,12 +228,13 @@ RAVESubjectEpochVoltageRepository <- R6::R6Class(
     #' errors out when subject is missing
     #' @param lazy_load whether to delay \code{mount_data};
     #' default is false
-    #' @param ... reserved, currently ignored
+    #' @param ... passed to \code{\link{RAVESubjectEpochRepository}} constructor
+    #' @param .class internally used, do not set, even if you know what this is
     initialize = function(subject, electrodes = NULL,
                           reference_name = NULL, epoch_name = NULL,
                           time_windows = NULL, stitch_events = NULL, ...,
                           quiet = FALSE, repository_id = NULL, strict = TRUE,
-                          lazy_load = FALSE) {
+                          lazy_load = FALSE, .class = NULL) {
       subject <- as_rave_subject(subject, strict = strict)
       super$initialize(
         subject = subject,
@@ -248,13 +246,9 @@ RAVESubjectEpochVoltageRepository <- R6::R6Class(
         quiet = quiet,
         repository_id = repository_id,
         lazy_load = lazy_load,
+        .class = c(.class, "rave_prepare_subject_voltage_with_epoch"),
         ...
       )
-
-      class(self) <- unique(c(
-        "rave_prepare_subject_voltage_with_epoch",
-        class(self)
-      ))
 
     },
 
