@@ -92,7 +92,8 @@ constructor
   quiet = FALSE,
   repository_id = NULL,
   strict = TRUE,
-  eager_load = TRUE
+  lazy_load = FALSE,
+  reference_name = "noref"
 )}\if{html}{\out{</div>}}
 }
 
@@ -121,8 +122,11 @@ default is trial onset (\code{NULL})}
 \item{\code{strict}}{whether the mode should be strict; default is true and
 errors out when subject is missing}
 
-\item{\code{eager_load}}{whether to call \code{mount_data} immediately;
-default is true}
+\item{\code{lazy_load}}{whether to delay calling \code{mount_data};
+default is false}
+
+\item{\code{reference_name}}{ignored, always \code{'noref'} for raw voltage
+data}
 }
 \if{html}{\out{</div>}}
 }

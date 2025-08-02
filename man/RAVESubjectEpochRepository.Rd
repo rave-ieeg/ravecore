@@ -125,7 +125,8 @@ constructor
   ...,
   quiet = FALSE,
   repository_id = NULL,
-  strict = TRUE
+  strict = TRUE,
+  lazy_load = FALSE
 )}\if{html}{\out{</div>}}
 }
 
@@ -155,6 +156,8 @@ default is trial onset (\code{NULL})}
 
 \item{\code{strict}}{whether the mode should be strict; default is true and
 errors out when subject is missing}
+
+\item{\code{lazy_load}}{whether to delay (lazy) the evaluation \code{mount_data}}
 }
 \if{html}{\out{</div>}}
 }

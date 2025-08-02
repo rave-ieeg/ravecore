@@ -39,7 +39,8 @@ RAVESubjectEpochRawVoltageRepository <- R6::R6Class(
         repository_id = object$data$repository_id,
         time_windows = object$data$time_windows,
         stitch_events = object$data$stitch_events,
-        strict = FALSE
+        strict = TRUE,
+        lazy_load = TRUE
       ))
     },
 
@@ -56,14 +57,16 @@ RAVESubjectEpochRawVoltageRepository <- R6::R6Class(
     #' @param repository_id see field \code{repository_id}
     #' @param strict whether the mode should be strict; default is true and
     #' errors out when subject is missing
-    #' @param eager_load whether to call \code{mount_data} immediately;
-    #' default is true
+    #' @param lazy_load whether to delay calling \code{mount_data};
+    #' default is false
+    #' @param reference_name ignored, always \code{'noref'} for raw voltage
+    #' data
     #' @param ... reserved, currently ignored
     initialize = function(subject, electrodes = NULL,
                           epoch_name = NULL, time_windows = NULL,
                           stitch_events = NULL, ..., quiet = FALSE,
                           repository_id = NULL, strict = TRUE,
-                          eager_load = TRUE) {
+                          lazy_load = FALSE, reference_name = "noref") {
       subject <- as_rave_subject(subject, strict = strict)
       super$initialize(
         subject = subject,
@@ -73,17 +76,15 @@ RAVESubjectEpochRawVoltageRepository <- R6::R6Class(
         stitch_events = stitch_events,
         reference_name = "noref",
         quiet = quiet,
-        repository_id = repository_id
+        repository_id = repository_id,
+        lazy_load = lazy_load,
+        ...
       )
 
       class(self) <- unique(c(
         "rave_prepare_subject_raw_voltage_with_epoch",
         class(self)
       ))
-
-      if( eager_load ) {
-        self$mount_data()
-      }
 
     },
 
@@ -128,7 +129,7 @@ RAVESubjectEpochRawVoltageRepository <- R6::R6Class(
 
       private$.data$`@mset`(
         data_list = data_list,
-        dim = dim,
+        dim = structure(dim, names = names(dimnames)),
         dimnames = dimnames,
         signature = self$signature
       )
@@ -157,6 +158,9 @@ RAVESubjectEpochRawVoltageRepository <- R6::R6Class(
     #' @field raw_voltage a named map of raw voltage data, mounted by
     #' \code{mount_data}
     raw_voltage = function() {
+      if(private$.data$`@size`() == 0) {
+        self$mount_data()
+      }
       private$.data
     }
 
@@ -205,7 +209,8 @@ RAVESubjectEpochVoltageRepository <- R6::R6Class(
         repository_id = object$data$repository_id,
         time_windows = object$data$time_windows,
         stitch_events = object$data$stitch_events,
-        strict = FALSE
+        strict = TRUE,
+        lazy_load = TRUE
       ))
     },
 
@@ -224,14 +229,14 @@ RAVESubjectEpochVoltageRepository <- R6::R6Class(
     #' @param repository_id see field \code{repository_id}
     #' @param strict whether the mode should be strict; default is true and
     #' errors out when subject is missing
-    #' @param eager_load whether to call \code{mount_data} immediately;
-    #' default is true
+    #' @param lazy_load whether to delay \code{mount_data};
+    #' default is false
     #' @param ... reserved, currently ignored
     initialize = function(subject, electrodes = NULL,
                           reference_name = NULL, epoch_name = NULL,
                           time_windows = NULL, stitch_events = NULL, ...,
                           quiet = FALSE, repository_id = NULL, strict = TRUE,
-                          eager_load = TRUE) {
+                          lazy_load = FALSE) {
       subject <- as_rave_subject(subject, strict = strict)
       super$initialize(
         subject = subject,
@@ -241,17 +246,15 @@ RAVESubjectEpochVoltageRepository <- R6::R6Class(
         stitch_events = stitch_events,
         reference_name = reference_name,
         quiet = quiet,
-        repository_id = repository_id
+        repository_id = repository_id,
+        lazy_load = lazy_load,
+        ...
       )
 
       class(self) <- unique(c(
         "rave_prepare_subject_voltage_with_epoch",
         class(self)
       ))
-
-      if( eager_load ) {
-        self$mount_data()
-      }
 
     },
 
@@ -308,7 +311,7 @@ RAVESubjectEpochVoltageRepository <- R6::R6Class(
 
       private$.data$`@mset`(
         data_list = data_list,
-        dim = dim,
+        dim = structure(dim, names = names(dimnames)),
         dimnames = dimnames,
         signature = self$signature
       )
@@ -339,6 +342,9 @@ RAVESubjectEpochVoltageRepository <- R6::R6Class(
     #' @field voltage a named map of voltage data, mounted by
     #' \code{mount_data}
     voltage = function() {
+      if(private$.data$`@size`() == 0) {
+        self$mount_data()
+      }
       private$.data
     }
 
@@ -362,7 +368,8 @@ prepare_subject_raw_voltage_with_epoch <- function(
     stitch_events = stitch_events,
     quiet = quiet,
     repository_id = repository_id,
-    strict = strict
+    strict = strict,
+    ...
   )
 }
 
@@ -383,6 +390,7 @@ prepare_subject_voltage_with_epoch <- function(
     stitch_events = stitch_events,
     quiet = quiet,
     repository_id = repository_id,
-    strict = strict
+    strict = strict,
+    ...
   )
 }

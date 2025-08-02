@@ -164,9 +164,14 @@ RAVEEpoch <- R6::R6Class(
           re <- re[, cnames, with = FALSE]
         })
 
-        self$table <- re
+        self$table <- as.data.frame(re)
       } else {
-        self$table <- data.table::data.table()
+        self$table <- data.frame(
+          Block = character(),
+          Time = numeric(),
+          Trial = integer(),
+          Condition = character()
+        )
       }
 
       re

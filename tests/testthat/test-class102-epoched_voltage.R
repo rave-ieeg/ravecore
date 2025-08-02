@@ -444,7 +444,9 @@ test_that("RAVESubjectEpochRawVoltageRepository", {
 
   testthat::expect_true(inherits(repo_new, "rave_prepare_subject_raw_voltage_with_epoch"))
 
-  testthat::expect_true(all(names(repo_old) %in% names(repo_new0)))
+  names_old <- names(repo_old)
+  names_old <- names_old[!names_old %in% names(repo_new)]
+  testthat::expect_equal(names_old, character(0L))
 
   testthat::expect_equal(repo_new$repository_id, repo_old$repository_id)
 
@@ -475,11 +477,13 @@ test_that("RAVESubjectEpochRawVoltageRepository", {
   # New attributes
   testthat::expect_equal(repo_new$sample_rate, repo_old$sample_rate)
 
-  testthat::expect_equal(repo_new$voltage$dim, repo_old$voltage$dim)
-  testthat::expect_equal(repo_new$voltage$dimnames, repo_old$voltage$dimnames)
+  testthat::expect_true(!is.null(repo_new$raw_voltage))
 
-  new_datalist <- repo_new$voltage$data_list
-  old_datalist <- repo_old$voltage$data_list
+  testthat::expect_equal(unname(repo_new$raw_voltage$dim), unname(repo_old$raw_voltage$dim))
+  testthat::expect_equal(repo_new$raw_voltage$dimnames, repo_old$raw_voltage$dimnames)
+
+  new_datalist <- repo_new$raw_voltage$data_list
+  old_datalist <- repo_old$raw_voltage$data_list
   testthat::expect_equal(names(new_datalist), names(old_datalist))
   testthat::expect_equal(lapply(new_datalist, "["), lapply(old_datalist, "["))
 })
@@ -515,7 +519,9 @@ test_that("RAVESubjectEpochVoltageRepository", {
 
   testthat::expect_true(inherits(repo_new, "rave_prepare_subject_voltage_with_epoch"))
 
-  testthat::expect_true(all(names(repo_old) %in% names(repo_new0)))
+  names_old <- names(repo_old)
+  names_old <- names_old[!names_old %in% names(repo_new)]
+  testthat::expect_equal(names_old, character(0L))
 
   testthat::expect_equal(repo_new$repository_id, repo_old$repository_id)
 
@@ -551,7 +557,9 @@ test_that("RAVESubjectEpochVoltageRepository", {
   # New attributes
   testthat::expect_equal(repo_new$sample_rate, repo_old$sample_rate)
 
-  testthat::expect_equal(repo_new$voltage$dim, repo_old$voltage$dim)
+  testthat::expect_true(!is.null(repo_new$voltage))
+
+  testthat::expect_equal(unname(repo_new$voltage$dim), unname(repo_old$voltage$dim))
   testthat::expect_equal(repo_new$voltage$dimnames, repo_old$voltage$dimnames)
 
   new_datalist <- repo_new$voltage$data_list

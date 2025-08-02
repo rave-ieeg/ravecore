@@ -50,7 +50,8 @@ RAVESubjectEpochRepository <- R6::R6Class(
         repository_id = object$data$repository_id,
         time_windows = object$data$time_windows,
         stitch_events = object$data$stitch_events,
-        strict = FALSE
+        strict = TRUE,
+        lazy_load = TRUE
       )
       return(repo)
     },
@@ -69,11 +70,13 @@ RAVESubjectEpochRepository <- R6::R6Class(
     #' @param repository_id see field \code{repository_id}
     #' @param strict whether the mode should be strict; default is true and
     #' errors out when subject is missing
+    #' @param lazy_load whether to delay (lazy) the evaluation \code{mount_data}
     #' @param ... reserved, currently ignored
     initialize = function(subject, electrodes = NULL,
                           reference_name = NULL, epoch_name = NULL,
                           time_windows = NULL, stitch_events = NULL, ...,
-                          quiet = FALSE, repository_id = NULL, strict = TRUE) {
+                          quiet = FALSE, repository_id = NULL, strict = TRUE,
+                          lazy_load = FALSE) {
 
       subject <- as_rave_subject(subject, strict = strict)
       super$initialize(subject = subject, electrodes = electrodes,
@@ -88,6 +91,10 @@ RAVESubjectEpochRepository <- R6::R6Class(
 
       self$time_windows <- time_windows
       self$set_epoch(epoch_name, stitch_events)
+
+      if(!lazy_load) {
+        self$mount_data()
+      }
     },
 
     #' @description change trial epoch profiles
