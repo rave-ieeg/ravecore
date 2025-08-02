@@ -180,8 +180,7 @@ RAVEAbstarctElectrode <- R6::R6Class(
     #' such as frequency, or frequency-time analyses;
     #' this usually requires transforming the electrode raw voltage signals
     #' using signal processing methods such as 'Fourier', 'wavelet', 'Hilbert',
-    #' 'multi-taper', etc. If an electrode has power data, then it's power data
-    #' can be loaded via \code{\link{prepare_subject_power}} method.
+    #' 'Multitaper', etc.
     power_enabled = function(){
       private$.power_enabled
     },
@@ -370,21 +369,8 @@ RAVEAbstarctElectrode <- R6::R6Class(
 #' names(dimnames(power))
 #'
 #' # Subset power
-#' subset(power, Time ~ Time < 0, Electrode ~ Electrode == 14)
-#'
-#' # Draw baseline
-#' tempfile <- tempfile()
-#' bl <- power_baseline(power, baseline_windows = c(-1, 0),
-#'                      method = "decibel", filebase = tempfile)
-#' collapsed_power <- collapse2(bl, keep = c(2,1))
-#' # Visualize
-#' dname <- dimnames(bl)
-#' image(collapsed_power, x = dname$Time, y = dname$Frequency,
-#'       xlab = "Time (s)", ylab = "Frequency (Hz)",
-#'       main = "Mean power over trial (Baseline: -1~0 seconds)",
-#'       sub = glue('Electrode {e$number} (Reference: {ref$number})'))
-#' abline(v = 0, lty = 2, col = 'blue')
-#' text(x = 0, y = 20, "Audio onset", col = "blue", cex = 0.6)
+#' power_array <- subset(power, Time ~ Time < 0,
+#'                       Electrode ~ Electrode == 14)
 #'
 #' # clear cache on hard disk
 #' e$clear_cache()
@@ -504,20 +490,6 @@ new_reference <- function(subject, number, signal_type, ...){
 #'
 #' # Subset power
 #' subset(power, Time ~ Time < 0, Electrode ~ Electrode == 14)
-#'
-#' # Draw baseline
-#' tempfile <- tempfile()
-#' bl <- power_baseline(power, baseline_windows = c(-1, 0),
-#'                      method = "decibel", filebase = tempfile)
-#' collapsed_power <- collapse2(bl, keep = c(2,1))
-#' # Visualize
-#' dname <- dimnames(bl)
-#' image(collapsed_power, x = dname$Time, y = dname$Frequency,
-#'       xlab = "Time (s)", ylab = "Frequency (Hz)",
-#'       main = "Mean power over trial (Baseline: -1~0 seconds)",
-#'       sub = glue('Electrode {e$number} (Reference: {ref$number})'))
-#' abline(v = 0, lty = 2, col = 'blue')
-#' text(x = 0, y = 20, "Audio onset", col = "blue", cex = 0.6)
 #'
 #' # clear cache on hard disk
 #' e$clear_cache()

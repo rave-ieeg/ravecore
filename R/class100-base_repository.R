@@ -333,9 +333,7 @@ RAVESubjectBaseRepository <- R6::R6Class(
 #' @param reference_name name of the reference table
 #' @param quiet see field \code{quiet}
 #' @param repository_id see field \code{repository_id}
-#' @param strict whether the mode should be strict; default is true and
-#' errors out when subject is missing
-#' @param ... reserved, currently ignored
+#' @param ... passed to \code{\link{RAVESubjectBaseRepository}} constructor
 #' @examples
 #'
 #' \dontrun{
@@ -378,7 +376,6 @@ prepare_subject_bare0 <- function(subject, electrodes = NULL,
     reference_name = reference_name,
     quiet = quiet,
     repository_id = repository_id,
-    strict = strict,
     ...
   )
 }

@@ -19,7 +19,6 @@ Image registration across different modals. Normalize brain 'T1'-weighted
 }
 \examples{
 
-library(raveio)
 process <- as_yael_process("test_subject")
 
 # This example requires extra demo data & settings.

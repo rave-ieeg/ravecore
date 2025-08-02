@@ -20,14 +20,11 @@ prepare_subject_bare0(
 
 \item{reference_name}{name of the reference table}
 
-\item{...}{reserved, currently ignored}
+\item{...}{passed to \code{\link{RAVESubjectBaseRepository}} constructor}
 
 \item{quiet}{see field \code{quiet}}
 
 \item{repository_id}{see field \code{repository_id}}
-
-\item{strict}{whether the mode should be strict; default is true and
-errors out when subject is missing}
 }
 \value{
 A \code{\link{RAVESubjectBaseRepository}} instance

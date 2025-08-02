@@ -319,6 +319,8 @@ RAVESubjectEpochRepository <- R6::R6Class(
 #' 1 second before the trial onset and 2 seconds after trial onset
 #' @param stitch_events events where the \code{time_windows} is based;
 #' default is trial onset (\code{NULL})
+#' @param strict whether to check existence of subject before loading data;
+#' default is true
 #' @examples
 #'
 #' \dontrun{

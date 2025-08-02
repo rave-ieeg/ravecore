@@ -7,6 +7,7 @@
 \alias{SIGNAL_TYPES}
 \alias{IMPORT_FORMATS}
 \alias{YAEL_IMAGE_TYPES}
+\alias{MNI305_to_MNI152}
 \title{'RAVE' constants}
 \format{
 An object of class \code{character} of length 5.
@@ -16,6 +17,8 @@ An object of class \code{character} of length 5.
 An object of class \code{list} of length 7.
 
 An object of class \code{character} of length 10.
+
+An object of class \code{matrix} (inherits from \code{array}) with 4 rows and 4 columns.
 }
 \usage{
 LOCATION_TYPES
@@ -25,6 +28,8 @@ SIGNAL_TYPES
 IMPORT_FORMATS
 
 YAEL_IMAGE_TYPES
+
+MNI305_to_MNI152
 }
 \description{
 Constant variables

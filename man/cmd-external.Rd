@@ -52,30 +52,6 @@ false}
 dry-run mode, and false otherwise}
 
 \item{log_file}{where should log file be stored}
-
-\item{subject}{characters or a \code{\link{RAVESubject}} instance}
-
-\item{src_path}{source of the 'DICOM' or 'Nifti' image (absolute path)}
-
-\item{type}{type of the 'DICOM' or 'Nifti' image; choices are \code{'MRI'}
-and \code{'CT'}}
-
-\item{merge, float, crop}{\code{'dcm2niix'} conversion arguments; ignored when
-the source is in 'Nifti' format}
-
-\item{overwrite}{whether to overwrite existing files; default is false}
-
-\item{command_path}{command line path if 'RAVE' cannot find the command
-binary files}
-
-\item{mri_path}{the absolute to 'MRI' volume; must in 'Nifti' format}
-
-\item{ct_path}{the absolute to 'CT' volume; must in 'Nifti' format}
-
-\item{work_path}{work path for 'FreeSurfer' command;}
-
-\item{dof, cost, search, searchcost}{parameters used by 'FSL' \code{'flirt'}
-command; see their documentation for details}
 }
 \value{
 A list of data containing the script details:
@@ -92,4 +68,5 @@ These shell commands are for importing 'DICOM' images to
 'Nifti' format, reconstructing cortical surfaces, and align' the CT' to
 'MRI'. The commands are only tested on 'MacOS' and 'Linux'. On 'Windows'
 machines, please use the 'WSL2' system.
+and \code{'CT'}
 }

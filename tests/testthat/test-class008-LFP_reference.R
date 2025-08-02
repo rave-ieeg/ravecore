@@ -83,8 +83,6 @@ test_that("LFP_reference - multi-channel", {
   })
   self$set_epoch(epoch = "auditory_onset")
   self$trial_intervals <- c(-1, 2)
-  e14$set_epoch(epoch = "auditory_onset")
-  e14$trial_intervals <- c(-1, 2)
 
   testthat::expect_true({
     data <- self$load_data("power")

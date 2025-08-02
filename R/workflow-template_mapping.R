@@ -20,8 +20,7 @@ transform_point_to_template_surface <- function(subject, scan_ras_mat, hemispher
   template_brain <- template_brain$template_object
 
   if(verbose) {
-    catgl("Using `{use_surface}` surface and template `{template}` to transform points to fsaverage (MNI305) space",
-          level = "INFO")
+    ravepipeline::logger("Using `{use_surface}` surface and template `{template}` to transform points to fsaverage (MNI305) space", level = "info", use_glue = TRUE)
   }
 
   if(length(scan_ras_mat) == 3) {
@@ -273,8 +272,7 @@ transform_point_to_template_volumetric <- function(subject, scan_ras_mat, method
 
   if( method == "nonlinear") {
     if(verbose) {
-      catgl("Using non-linear volumetric mapping to transform points to MNI152 space",
-            level = "INFO")
+      ravepipeline::logger("Using non-linear volumetric mapping to transform points to MNI152 space", level = "info", use_glue = FALSE)
     }
 
     # map to template using non-linear deformation
@@ -295,8 +293,7 @@ transform_point_to_template_volumetric <- function(subject, scan_ras_mat, method
     mni152_ras <- tmp
   } else {
     if(verbose) {
-      catgl("Using affine matrix (volumetric) for mapping points to MNI152 space",
-            level = "INFO")
+      ravepipeline::logger("Using affine matrix (volumetric) for mapping points to MNI152 space", level = "info", use_glue = FALSE)
     }
     mni152_ras <- native_brain$electrodes$apply_transform_points(
       positions = scan_ras_mat, from = "scannerRAS", to = "MNI152")
@@ -473,8 +470,20 @@ transform_thinfilm_to_mni152 <- function(
                                    template$template_subject)
   template_dset_rh_pial <- sprintf("free_vertices_FreeSurfer Right Hemisphere - pial (%s)",
                                    template$template_subject)
-  template_lh_pial <- freesurferformats::read.fs.surface(template_pial_group[[template_dset_lh_pial]]$absolute_path)
-  template_rh_pial <- freesurferformats::read.fs.surface(template_pial_group[[template_dset_rh_pial]]$absolute_path)
+  read_surface <- function(path) {
+    y <- ieegio::read_surface(path)
+    list(
+      vertices = t(y$geometry$vertices[1:3, , drop = FALSE]),
+      faces = t(y$geometry$faces) - as.integer(y$geometry$face_start - 1L)
+    )
+  }
+  # x <- freesurferformats::read.fs.surface(p)
+  # y <- read_surface(p)
+  # range(x$vertices - y$vertices)
+  # range(x$faces - y$faces)
+
+  template_lh_pial <- read_surface(template_pial_group[[template_dset_lh_pial]]$absolute_path)
+  template_rh_pial <- read_surface(template_pial_group[[template_dset_rh_pial]]$absolute_path)
 
   template_lh_pial_scan_ras <- template_tkr2scan %*% t(cbind(template_lh_pial$vertices, 1))
   template_lh_pial_face_index <- t(template_lh_pial$faces)
@@ -491,8 +500,8 @@ transform_thinfilm_to_mni152 <- function(
   template_spherereg_group <- template$template_object$surfaces$sphere.reg$group$group_data
   template_dset_lh_spherereg <- sprintf("free_vertices_FreeSurfer Left Hemisphere - sphere.reg (%s)", template$template_subject)
   template_dset_rh_spherereg <- sprintf("free_vertices_FreeSurfer Right Hemisphere - sphere.reg (%s)", template$template_subject)
-  template_lh_spherereg <- freesurferformats::read.fs.surface(template_spherereg_group[[template_dset_lh_spherereg]]$absolute_path)
-  template_rh_spherereg <- freesurferformats::read.fs.surface(template_spherereg_group[[template_dset_rh_spherereg]]$absolute_path)
+  template_lh_spherereg <- read_surface(template_spherereg_group[[template_dset_lh_spherereg]]$absolute_path)
+  template_rh_spherereg <- read_surface(template_spherereg_group[[template_dset_rh_spherereg]]$absolute_path)
 
   # get geometry configurations
   geometry_names_full <- sprintf("%s_%s", electrode_table$Prototype, electrode_table$LabelPrefix)

@@ -24,7 +24,7 @@ test_that("YAEL_process", {
   ct_path <- "~/rave_data/raw_dir/yael_demo_001/rave-imaging/coregistration/CT_RAW.nii.gz"
 
   testthat::skip_if_not(
-    identical(testthat::Sys.getenv("RAVE_TEST_ALL", ''), "true")
+    identical(Sys.getenv("RAVE_TEST_ALL", ''), "true")
   )
 
   self$set_input_image(path = mr_path, type = "T1w", overwrite = TRUE)

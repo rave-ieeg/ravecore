@@ -138,7 +138,7 @@ Spike_electrode <- R6::R6Class(
       super$initialize(subject, number)
       has_volt <- file.exists(self$voltage_file) || file.exists(self$preprocess_file)
       if( !has_volt && !quiet ) {
-        catgl("Spike channel {self$number} is missing {ifelse(has_volt, '', ', voltage')} data\n", level = "WARNING")
+        ravepipeline::logger("Spike channel {self$number} is missing {ifelse(has_volt, '', ', voltage')} data", level = "warning", use_glue = TRUE)
       }
     },
 
@@ -249,11 +249,11 @@ Spike_electrode <- R6::R6Class(
     #' @param reload whether to reload cache
     .load_raw_voltage = function(reload = FALSE){
 
-      # subject <- raveio::as_rave_subject("devel/PAV007")
-      # self <- raveio::new_electrode(subject, 14)
+      # subject <- as_rave_subject("devel/PAV007")
+      # self <- new_electrode(subject, 14)
       # private <- self$.__enclos_env__$private
       # self$trial_intervals <- c(-1, 2)
-      # self$epoch <- raveio:::RAVEEpoch$new(subject, "stimulation")
+      # self$epoch <- :RAVEEpoch$new(subject, "stimulation")
 
       check_res <- private$check_dimensions(type = "voltage")
 

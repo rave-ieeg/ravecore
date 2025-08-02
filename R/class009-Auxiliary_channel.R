@@ -130,7 +130,7 @@ Auxiliary_electrode <- R6::R6Class(
       super$initialize(subject, number)
       has_volt <- file.exists(self$voltage_file) || file.exists(self$preprocess_file)
       if( !has_volt && !quiet ) {
-        catgl("Auxiliary channel {self$number} is missing {ifelse(has_volt, '', ', voltage')} data\n", level = "WARNING")
+        ravepipeline::logger("Auxiliary channel {self$number} is missing {ifelse(has_volt, '', ', voltage')} data", level = "warning", use_glue = TRUE)
       }
     },
 
@@ -242,11 +242,11 @@ Auxiliary_electrode <- R6::R6Class(
     .load_raw_voltage = function(reload = FALSE){
 
       # DIPSAUS DEBUG START
-      # subject <- raveio::as_rave_subject("test/DemoSubject")
-      # self <- raveio::new_electrode(subject, 13)
+      # subject <- as_rave_subject("test/DemoSubject")
+      # self <- new_electrode(subject, 13)
       # private <- self$.__enclos_env__$private
       # self$trial_intervals <- c(-1, 2)
-      # self$epoch <- raveio:::RAVEEpoch$new(subject, "auditory_onset")
+      # self$epoch <- RAVEEpoch$new(subject, "auditory_onset")
 
       check_res <- private$check_dimensions(type = "voltage")
 

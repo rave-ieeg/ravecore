@@ -17,14 +17,14 @@ NULL
 # self$set_input_image(ct_path, "CT")
 
 # dipsaus::rs_exec({
-#   self <- raveio:::YAELProcess$new(subject_code)
+#   self <- YAELProcess$new(subject_code)
 #   print(self)
 #   self$register_to_T1w("CT", reverse = TRUE, verbose = TRUE)
 # })
 # dipsaus::rs_exec({
 #   devtools::load_all("/Users/dipterix/Dropbox (Personal)/projects/raveio")
 #   subject_code <- "testtest3"
-#   self <- raveio:::YAELProcess$new(subject_code)
+#   self <- YAELProcess$new(subject_code)
 #   print(self)
 #   self$map_to_template(template_name = "mni_icbm152_nlin_asym_09a")
 # })
@@ -320,8 +320,8 @@ YAELProcess <- R6::R6Class(
       template_info <- call_rpyants("template_urls")[[template_name]]
       template_name2 <- template_info$name
       template_folder <- call_rpyants("ensure_template", template_name)
-      template_path <- path_abs(file.path(template_folder, "T1.nii.gz"))
-      template_mask <- path_abs(file.path(template_folder, "T1_brainmask.nii.gz"))
+      template_path <- path_abs(file.path(template_folder, "T1.nii.gz"), must_work = TRUE)
+      template_mask <- path_abs(file.path(template_folder, "T1_brainmask.nii.gz"), must_work = FALSE)
       if(!file.exists(template_mask)) { template_mask <- NULL }
       use_images <- unique(use_images)
       if(any(use_images %in% "all")) {
@@ -445,12 +445,12 @@ YAELProcess <- R6::R6Class(
                                            verbose = TRUE
     ) {
       stopifnot(file.exists(native_roi_path))
-      native_roi_path <- path_abs(native_roi_path)
+      native_roi_path <- path_abs(native_roi_path, must_work = TRUE)
       native_type <- match.arg(native_type)
       interpolator <- match.arg(interpolator)
       template_name <- match.arg(template_name)
       template_folder <- call_rpyants("ensure_template", template_name)
-      template_path <- path_abs(file.path(template_folder, "T1.nii.gz"))
+      template_path <- path_abs(file.path(template_folder, "T1.nii.gz"), must_work = TRUE)
       template_name2 <- camel_template_name(template_name)
       yael_py <- private$.impl()
 
@@ -458,8 +458,8 @@ YAELProcess <- R6::R6Class(
       # template_name <- "mni_icbm152_nlin_asym_09a"
       # native_type <- "T1w"
       # interpolator <- "auto"
-      # self <- raveio::as_yael_process(subject = "PAV042"); yael_py <- self$.__enclos_env__$private$.impl()
-      # template_name2 <- raveio:::camel_template_name(template_name)
+      # self <- as_yael_process(subject = "PAV042"); yael_py <- self$.__enclos_env__$private$.impl()
+      # template_name2 <- camel_template_name(template_name)
       # verbose <- T
       # template_path <- call_rpyants("ensure_template", name = template_name)
 
@@ -685,8 +685,7 @@ YAELProcess <- R6::R6Class(
         arr[arr < 0] <- 0
         skullstrip <- skullstrip$astype("uint8")
         skullstrip[] <- floor(arr / max(arr) * 255)
-        skullstrip$to_file(path_abs(file.path(mri_dir, "brain.finalsurfs.nii.gz"),
-                                          must_work = FALSE))
+        skullstrip$to_file(path_abs(file.path(mri_dir, "brain.finalsurfs.nii.gz"), must_work = FALSE))
       } else {
         nu$to_file(path_abs(file.path(mri_dir, "brain.finalsurfs.nii.gz"), must_work = FALSE))
       }
@@ -861,7 +860,6 @@ YAELProcess <- R6::R6Class(
 #' @returns A processing instance, see \code{\link{YAELProcess}}
 #' @examples
 #'
-#' library(raveio)
 #' process <- as_yael_process("test_subject")
 #'
 #' # This example requires extra demo data & settings.

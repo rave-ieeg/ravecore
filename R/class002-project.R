@@ -72,7 +72,7 @@ RAVEProjectImpl <- S7::new_class(
             }
           }
         )
-        return(file_path(path_abs(path = parent_path), self@name))
+        return(file_path(path_abs(path = parent_path, must_work = FALSE), self@name))
       }
     )
   ),
@@ -293,7 +293,7 @@ RAVEProject <- R6::R6Class(
       if(must_work){
         dir_create2(path, check = FALSE)
       }
-      path_abs(path)
+      path_abs(path, must_work = FALSE)
     },
 
     #' @description list saved pipelines

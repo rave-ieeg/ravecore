@@ -57,13 +57,13 @@ RAVESubjectRawImpl <- S7::new_class(
             if(S7::S7_inherits(parent_path, bidsr::BIDSProject)) {
               parent_path <- file_path(format(parent_path, storage = "derivative"), "rave", "raw_dir")
             }
-            path <- file_path(path_abs(path = parent_path), sprintf("sub-%s", self@code))
+            path <- file_path(path_abs(path = parent_path, must_work = FALSE), sprintf("sub-%s", self@code))
           },
           {
             if(is.null(parent_path)) {
               parent_path <- ravepipeline::raveio_getopt(key = "raw_data_dir")
             }
-            path <- file_path(path_abs(path = parent_path), self@code)
+            path <- file_path(path_abs(path = parent_path, must_work = FALSE), self@code)
           }
         )
         return(path)
@@ -430,12 +430,16 @@ restore_subject_impl <- function(subject_id, strict = FALSE) {
   # }
 }
 
-#' Function to save meta data to 'RAVE' subject
+#' @name meta-data
+#' @title Load or save meta data to 'RAVE' subject
 #' @param data data table
 #' @param meta_type see load meta
 #' @param project_name project name
 #' @param subject_code subject code
-#' @returns Either none if no meta matched or the absolute path of file saved.
+#' @param subject_id subject identified, alternative way to specify the project
+#' and subject in one string
+#' @param meta_name for epoch and reference only, the name the of the table
+#' @returns The corresponding metadata
 #' @examples
 #'
 #' subject <- as_rave_subject("demo/DemoSubject", strict = FALSE)
@@ -450,6 +454,8 @@ restore_subject_impl <- function(subject_id, strict = FALSE) {
 #'     project_name = subject$project_name,
 #'     subject_code = subject$subject_code
 #'   )
+#'
+#'  load_meta2("electrodes", subject_id = subject)
 #' }
 #'
 #' @export
@@ -496,4 +502,61 @@ save_meta2 <- function(data, meta_type, project_name, subject_code){
   }
 
 
+}
+
+#' @rdname meta-data
+#' @export
+load_meta2 <- function(
+    meta_type = c(
+      'electrodes',
+      'frequencies',
+      'time_points',
+      'epoch',
+      'references',
+      'time_excluded',
+      'info'
+    ),
+    project_name,
+    subject_code,
+    subject_id,
+    meta_name
+) {
+  meta_type <- match.arg(meta_type)
+  if(missing(subject_id)){
+    subject_id <- sprintf("%s/%s", project_name, subject_code)
+  }
+  subject <- as_rave_subject(subject_id)
+  if(missing(meta_name)) {
+    meta_name <- NULL
+  }
+
+  if(meta_type %in% c('electrodes', 'frequencies', 'time_points', 'epoch', 'references')) {
+    return(subject$meta_data(meta_type = meta_type, meta_name = meta_name, strict = FALSE))
+  }
+
+  switch (
+    meta_type,
+    "time_excluded" = {
+      # Read time_excluded.csv if exists
+      time_excluded_path <- file.path(subject$meta_path, 'time_excluded.csv')
+      if(file.exists(time_excluded_path)){
+        return(safe_read_csv(time_excluded_path, colClasses = c(Block = 'character')))
+      }else{
+        return(data.frame(
+          Block = NULL,
+          Electrode = NULL,
+          Start = NULL,
+          End = NULL
+        ))
+      }
+    },
+    "info" = {
+      info_file <- file.path(subject$meta_path, 'info.yaml')
+      if(file.exists(info_file)){
+        info <- load_yaml(info_file)
+        return(as.list(info))
+      }
+    }
+  )
+  return(NULL)
 }

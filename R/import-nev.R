@@ -234,7 +234,7 @@ import_from_nevnsx <- function(subject, blocks, electrodes, sample_rate, add = F
 
       # Try to import
       if( brain_model_exists ) {
-        raveio::import_electrode_table(
+        import_electrode_table(
           path = file.path(subject$meta_path, 'electrodes.csv'),
           subject = subject, use_fs = brain_model_exists)
       }

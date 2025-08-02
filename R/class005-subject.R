@@ -995,12 +995,12 @@ restore_subject_instance <- function(subject_id, strict = FALSE) {
                  msg = "`as_rave_subject`: Cannot find subject ID from the given input")
       subject_id <- subject_id$id
     }
-    if(startsWith(subject_id, "@meta_analysis")) {
-      subject_id <- gsub("^@meta_analysis/", "", subject_id)
-      return( RAVEMetaSubject$new(subject_id) )
-    } else {
+    # if(startsWith(subject_id, "@meta_analysis")) {
+    #   subject_id <- gsub("^@meta_analysis/", "", subject_id)
+    #   return( RAVEMetaSubject$new(subject_id) )
+    # } else {
       return( RAVESubject$new(subject_id, strict = strict) )
-    }
+    # }
   }
 }
 
@@ -1061,7 +1061,7 @@ get_bids_electrodes_table <- function(subject) {
     Label = content$name,
     Radius = content$size / 2
   )
-  brain <- raveio::rave_brain(subject, include_electrodes = FALSE)
+  brain <- rave_brain(subject, include_electrodes = FALSE)
   if(length(brain)) {
     brain$set_electrodes(electrodes = tbl, coord_sys = "scannerRAS")
     tbl <- brain$electrodes$raw_table

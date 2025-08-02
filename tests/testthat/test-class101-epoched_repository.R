@@ -1,8 +1,9 @@
+digest <- ravepipeline::digest
 prepare_subject_bare_legacy <- function(subject, electrodes, reference_name, ...,
                                  repository_id = NULL) {
 
   # electrode_list, reference_name, reference_table, electrode_table, subject, references_list, electrode_signal_types, electrode_instances
-  re <- dipsaus::fastmap2()
+  re <- list()
   subject <- as_rave_subject(subject)
 
   # ----- project -----
@@ -14,10 +15,10 @@ prepare_subject_bare_legacy <- function(subject, electrodes, reference_name, ...
   if(missing(electrodes)){
     electrodes <- subject$get_default(
       "electrodes", default_if_missing = subject$electrodes)
-    message("No electrodes specified, loading all electrodes: ", dipsaus::deparse_svec(electrodes))
+    message("No electrodes specified, loading all electrodes: ", deparse_svec(electrodes))
   }
   if(length(electrodes) == 1 && is.character(electrodes)) {
-    electrodes <- sort(dipsaus::parse_svec(electrodes))
+    electrodes <- sort(parse_svec(electrodes))
   }
 
 
@@ -70,7 +71,7 @@ prepare_subject_bare_legacy <- function(subject, electrodes, reference_name, ...
     electrodes <- as.integer(reference_table$Electrode[reference_table$Reference != ''])
     electrodes <- old_electrodes[old_electrodes %in% electrodes]
     if(!setequal(electrodes, old_electrodes)){
-      old_electrodes <- dipsaus::deparse_svec(old_electrodes[!old_electrodes %in% electrodes])
+      old_electrodes <- deparse_svec(old_electrodes[!old_electrodes %in% electrodes])
       message("The following electrodes are removed because they are either missing or marked as `excluded`: ", old_electrodes)
     }
   }
@@ -117,7 +118,7 @@ prepare_subject_bare_legacy <- function(subject, electrodes, reference_name, ...
     }),
     names = sprintf("%s_%s", ref_mat[, 1], ref_mat[, 2])
   )
-  re$reference_instances <- dipsaus::drop_nulls(reference_instances)
+  re$reference_instances <- drop_nulls(reference_instances)
 
   # ----- electrode_instances -----
   electrode_instances <- structure(lapply(seq_along(electrode_list), function(ii){
@@ -139,14 +140,14 @@ prepare_subject_bare_legacy <- function(subject, electrodes, reference_name, ...
     electrodes = re$electrode_list,
     electrode_signal_types = re$electrode_signal_types
   )
-  digest_string <- dipsaus::digest(digest_key)
+  digest_string <- digest(digest_key)
   re$signature <- structure(digest_string, contents = names(digest_key))
   if(!length(repository_id)) {
     repository_id <- rand_string(4)
   }
   re$repository_id <- repository_id
 
-  class(re) <- c("rave_prepare_subject", "rave_repository", "fastmap2", "list")
+  class(re) <- c("rave_prepare_subject", "rave_repository", "list")
   re
 
 }
@@ -247,13 +248,13 @@ prepare_subject_with_epoch_legacy <- function(subject, electrodes, reference_nam
     time_windows = re$time_windows,
     stitch_events = re$stitch_events
   )
-  digest_string <- dipsaus::digest(digest_key)
+  digest_string <- digest(digest_key)
   re$signature <- structure(digest_string, contents = names(digest_key))
 
   class(re) <- c(
     "rave_prepare_with_epoch",
     "rave_prepare_subject", "rave_repository",
-    "fastmap2", "list"
+    "list"
   )
   re
 }

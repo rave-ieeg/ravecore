@@ -80,8 +80,7 @@ to trial onset; must be \code{NULL} or a character vector of length 2}
 such as frequency, or frequency-time analyses;
 this usually requires transforming the electrode raw voltage signals
 using signal processing methods such as 'Fourier', 'wavelet', 'Hilbert',
-'multi-taper', etc. If an electrode has power data, then it's power data
-can be loaded via \code{\link{prepare_subject_power}} method.}
+'Multitaper', etc.}
 
 \item{\code{is_reference}}{whether this instance is a reference electrode}
 

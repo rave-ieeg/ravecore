@@ -346,3 +346,43 @@ RAVESubjectEpochVoltageRepository <- R6::R6Class(
 
 )
 
+
+#' @rdname prepare_subject_with_epoch
+#' @export
+prepare_subject_raw_voltage_with_epoch <- function(
+    subject, electrodes = NULL,
+    epoch_name = NULL, time_windows = NULL,
+    stitch_events = NULL, ..., quiet = TRUE,
+    repository_id = NULL, strict = TRUE) {
+  RAVESubjectEpochRawVoltageRepository$new(
+    subject = subject,
+    electrodes = electrodes,
+    epoch_name = epoch_name,
+    time_windows = time_windows,
+    stitch_events = stitch_events,
+    quiet = quiet,
+    repository_id = repository_id,
+    strict = strict
+  )
+}
+
+
+#' @rdname prepare_subject_with_epoch
+#' @export
+prepare_subject_voltage_with_epoch <- function(
+    subject, electrodes = NULL, reference_name = NULL,
+    epoch_name = NULL, time_windows = NULL,
+    stitch_events = NULL, ..., quiet = FALSE,
+    repository_id = NULL, strict = TRUE) {
+  RAVESubjectEpochVoltageRepository$new(
+    subject = subject,
+    electrodes = electrodes,
+    reference_name = reference_name,
+    epoch_name = epoch_name,
+    time_windows = time_windows,
+    stitch_events = stitch_events,
+    quiet = quiet,
+    repository_id = repository_id,
+    strict = strict
+  )
+}

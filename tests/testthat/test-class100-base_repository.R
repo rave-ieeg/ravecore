@@ -1,5 +1,6 @@
+digest <- ravepipeline::digest
 prepare_subject_bare0_legcy <- function(subject, electrodes, reference_name, ..., quiet = TRUE, repository_id = NULL) {
-  re <- dipsaus::fastmap2()
+  re <- list()
   subject <- as_rave_subject(subject)
 
   # ----- project -----
@@ -11,10 +12,10 @@ prepare_subject_bare0_legcy <- function(subject, electrodes, reference_name, ...
   if(missing(electrodes)){
     electrodes <- subject$get_default(
       "electrodes", default_if_missing = subject$electrodes)
-    message("No electrodes specified, loading all electrodes: ", dipsaus::deparse_svec(electrodes))
+    message("No electrodes specified, loading all electrodes: ", deparse_svec(electrodes))
   }
   if(length(electrodes) == 1 && is.character(electrodes)) {
-    electrodes <- sort(dipsaus::parse_svec(electrodes))
+    electrodes <- sort(parse_svec(electrodes))
   }
 
   if(missing(reference_name) || !length(reference_name) || !all(reference_name %in% subject$reference_names)) {
@@ -66,7 +67,7 @@ prepare_subject_bare0_legcy <- function(subject, electrodes, reference_name, ...
     electrodes <- as.integer(reference_table$Electrode[reference_table$Reference != ''])
     electrodes <- old_electrodes[old_electrodes %in% electrodes]
     if(!setequal(electrodes, old_electrodes)){
-      old_electrodes <- dipsaus::deparse_svec(old_electrodes[!old_electrodes %in% electrodes])
+      old_electrodes <- deparse_svec(old_electrodes[!old_electrodes %in% electrodes])
       message("The following electrodes are removed because they are either missing or marked as `excluded`: ", old_electrodes)
     }
   }
@@ -109,7 +110,7 @@ prepare_subject_bare0_legcy <- function(subject, electrodes, reference_name, ...
     }),
     names = sprintf("%s_%s", ref_mat[, 1], ref_mat[, 2])
   )
-  re$reference_instances <- dipsaus::drop_nulls(reference_instances)
+  re$reference_instances <- drop_nulls(reference_instances)
 
   # ----- electrode_instances -----
   electrode_instances <- structure(lapply(seq_along(electrode_list), function(ii){
@@ -132,14 +133,14 @@ prepare_subject_bare0_legcy <- function(subject, electrodes, reference_name, ...
     electrode_signal_types = re$electrode_signal_types
   )
   re$digest_key <- digest_key
-  digest_string <- dipsaus::digest(digest_key)
+  digest_string <- digest(digest_key)
   re$signature <- structure(digest_string, contents = names(digest_key))
   if(!length(repository_id)) {
     repository_id <- rand_string(4)
   }
   re$repository_id <- repository_id
 
-  class(re) <- c("rave_prepare_subject_bare0", "rave_repository", "fastmap2", "list")
+  class(re) <- c("rave_prepare_subject_bare0", "rave_repository", "list")
   re
 }
 test_that("RAVESubjectBaseRepository", {
@@ -161,7 +162,9 @@ test_that("RAVESubjectBaseRepository", {
 
   testthat::expect_true(inherits(repo_new, "rave_repository"))
 
-  testthat::expect_true(all(names(repo_old) %in% names(repo_new)))
+  names_old <- names(repo_old)
+  names_old <- names_old[!names_old %in% names(repo_new)]
+  testthat::expect_equal(names_old, character(0L))
 
   testthat::expect_equal(repo_new$repository_id, repo_old$repository_id)
   testthat::expect_equal(repo_new$digest_key, repo_old$digest_key)

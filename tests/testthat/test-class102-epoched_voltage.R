@@ -1,7 +1,8 @@
+digest <- ravepipeline::digest
 prepare_subject_raw_voltage_with_epoch_legacy <- function(
     subject, electrodes, epoch_name, time_windows, stitch_events = NULL,
     ..., quiet = TRUE, repository_id = NULL) {
-  re <- dipsaus::fastmap2()
+  re <- list()
   subject <- as_rave_subject(subject)
 
   # ----- project -----
@@ -13,10 +14,10 @@ prepare_subject_raw_voltage_with_epoch_legacy <- function(
   if(missing(electrodes)){
     electrodes <- subject$get_default(
       "electrodes", default_if_missing = subject$electrodes)
-    message("No electrodes specified, loading all electrodes: ", dipsaus::deparse_svec(electrodes))
+    message("No electrodes specified, loading all electrodes: ", deparse_svec(electrodes))
   }
   if(length(electrodes) == 1 && is.character(electrodes)) {
-    electrodes <- sort(dipsaus::parse_svec(electrodes))
+    electrodes <- sort(parse_svec(electrodes))
   }
 
   # ----- epoch -----
@@ -140,21 +141,21 @@ prepare_subject_raw_voltage_with_epoch_legacy <- function(
     time_windows = time_windows,
     stitch_events = stitch_events
   )
-  digest_string <- dipsaus::digest(digest_key)
+  digest_string <- digest(digest_key)
   re$signature <- structure(digest_string, contents = names(digest_key))
   if(!length(repository_id)) {
     repository_id <- rand_string(4)
   }
   re$repository_id <- repository_id
 
-  re$raw_voltage <- dipsaus::list_to_fastmap2(list(
+  re$raw_voltage <- list_to_fastmap2(list(
     dim = dim,
     data_list = data_list,
     dimnames = dimnames,
     signature = re$signature
   ))
 
-  class(re) <- c("rave_prepare_subject_raw_voltage_with_epoch", "rave_repository", "fastmap2", "list")
+  class(re) <- c("rave_prepare_subject_raw_voltage_with_epoch", "rave_repository", "list")
   re
 }
 prepare_subject_voltage_with_epoch_lagacy <- function(
@@ -169,12 +170,12 @@ prepare_subject_voltage_with_epoch_lagacy <- function(
   # time_windows <- c(-1,2)
   # quiet = TRUE
   # repository_id <- NULL
-  # re <- dipsaus::fastmap2()
+  # re <- fastmap2()
   # subject <- as_rave_subject(subject)
   # re$project <- subject$project
   # re$subject <- subject
 
-  re <- dipsaus::fastmap2()
+  re <- list()
   subject <- as_rave_subject(subject)
 
   if(!all(subject$notch_filtered)) {
@@ -190,10 +191,10 @@ prepare_subject_voltage_with_epoch_lagacy <- function(
   if(missing(electrodes)){
     electrodes <- subject$get_default(
       "electrodes", default_if_missing = subject$electrodes)
-    message("No electrodes specified, loading all electrodes: ", dipsaus::deparse_svec(electrodes))
+    message("No electrodes specified, loading all electrodes: ", deparse_svec(electrodes))
   }
   if(length(electrodes) == 1 && is.character(electrodes)) {
-    electrodes <- sort(dipsaus::parse_svec(electrodes))
+    electrodes <- sort(parse_svec(electrodes))
   }
 
   # ----- reference -----
@@ -230,7 +231,7 @@ prepare_subject_voltage_with_epoch_lagacy <- function(
     electrodes <- as.integer(reference_table$Electrode[reference_table$Reference != ''])
     electrodes <- old_electrodes[old_electrodes %in% electrodes]
     if(!setequal(electrodes, old_electrodes)){
-      old_electrodes <- dipsaus::deparse_svec(old_electrodes[!old_electrodes %in% electrodes])
+      old_electrodes <- deparse_svec(old_electrodes[!old_electrodes %in% electrodes])
       message("The following electrodes are removed because they are either missing or marked as `excluded`: ", old_electrodes)
     }
   }
@@ -338,7 +339,7 @@ prepare_subject_voltage_with_epoch_lagacy <- function(
     }),
     names = sprintf("%s_%s", ref_mat[, 1], ref_mat[, 2])
   )
-  re$reference_instances <- dipsaus::drop_nulls(reference_instances)
+  re$reference_instances <- drop_nulls(reference_instances)
 
   # ----- electrode_instances -----
   electrode_instances <- structure(lapply(seq_along(electrodes), function(ii){
@@ -362,7 +363,7 @@ prepare_subject_voltage_with_epoch_lagacy <- function(
 
   # ----- load_data -----
   ref_mat <- unique(sprintf("%s_%s", re$reference_table[re$reference_table$Electrode %in% re$electrode_list, "Reference"], electrode_signal_types))
-  ref_instances <- dipsaus::drop_nulls(re$reference_instances[ref_mat])
+  ref_instances <- drop_nulls(re$reference_instances[ref_mat])
   if(length(ref_instances) < 4) {
     refs <- lapply(ref_instances, function(ref){
       ref$load_data(type = "voltage")
@@ -396,21 +397,21 @@ prepare_subject_voltage_with_epoch_lagacy <- function(
     time_windows = time_windows,
     stitch_events = stitch_events
   )
-  digest_string <- dipsaus::digest(digest_key)
+  digest_string <- digest(digest_key)
   re$signature <- structure(digest_string, contents = names(digest_key))
   if(!length(repository_id)) {
     repository_id <- rand_string(4)
   }
   re$repository_id <- repository_id
 
-  re$voltage <- dipsaus::list_to_fastmap2(list(
+  re$voltage <- list_to_fastmap2(list(
     dim = dim,
     data_list = data_list,
     dimnames = dimnames,
     signature = re$signature
   ))
 
-  class(re) <- c("rave_prepare_subject_voltage_with_epoch", "rave_repository", "fastmap2", "list")
+  class(re) <- c("rave_prepare_subject_voltage_with_epoch", "rave_repository", "list")
   re
 }
 
@@ -476,7 +477,11 @@ test_that("RAVESubjectEpochRawVoltageRepository", {
 
   testthat::expect_equal(repo_new$voltage$dim, repo_old$voltage$dim)
   testthat::expect_equal(repo_new$voltage$dimnames, repo_old$voltage$dimnames)
-  testthat::expect_equal(repo_new$voltage$data_list, repo_old$voltage$data_list)
+
+  new_datalist <- repo_new$voltage$data_list
+  old_datalist <- repo_old$voltage$data_list
+  testthat::expect_equal(names(new_datalist), names(old_datalist))
+  testthat::expect_equal(lapply(new_datalist, "["), lapply(old_datalist, "["))
 })
 
 test_that("RAVESubjectEpochVoltageRepository", {
@@ -548,7 +553,11 @@ test_that("RAVESubjectEpochVoltageRepository", {
 
   testthat::expect_equal(repo_new$voltage$dim, repo_old$voltage$dim)
   testthat::expect_equal(repo_new$voltage$dimnames, repo_old$voltage$dimnames)
-  testthat::expect_equal(repo_new$voltage$data_list, repo_old$voltage$data_list)
+
+  new_datalist <- repo_new$voltage$data_list
+  old_datalist <- repo_old$voltage$data_list
+  testthat::expect_equal(names(new_datalist), names(old_datalist))
+  testthat::expect_equal(lapply(new_datalist, "["), lapply(old_datalist, "["))
 })
 
 
