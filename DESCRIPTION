@@ -1,13 +1,32 @@
 Package: ravecore
-Title: What the Package Does (One Line, Title Case)
+Title: Core File Structures and Workflows for 'RAVE'
 Version: 0.0.0.9000
-Authors@R: 
-    person("Zhengjia", "Wang", email = "dipterix.wang@gmail.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Authors@R: c(
+    person("Zhengjia", "Wang", email = "dipterix.wang@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-5629-1116")),
+    person("John", "Magnotti", email = "john.magnotti@pennmedicine.upenn.edu", role = c("aut")),
+    person("Xiang", "Zhang", email = "xiang.zhang@pennmedicine.upenn.edu", role = c("aut")),
+    person("Michael", "Beauchamp", email = "michael.beauchamp@pennmedicine.upenn.edu", role = c("aut")),
+    person("Trustees of the University of Pennsylvania", role = "cph",
+            comment = "All files in this package unless explicitly stated in the file")
+    )
+Description: Read, process, and analyze intracranial
+    electroencephalography and deep-brain stimulation with 'RAVE', a
+    reproducible framework for analysis and visualization of 'iEEG' 
+    by Magnotti, Wang, and Beauchamp, (2020, <doi:10.1016/j.neuroimage.2020.117341>). 
+    Supports 'BIDS' <https://bids.neuroimaging.io> or native file conventions to
+    ingest signals in 'HDF5', 'Matlab', 'EDF', 'BrainVision', or 'BlackRock'
+    formats; process images in 'NIfTI' and 'FreeSurfer' formats, providing
+    brain imaging normalization to template brain, facilitate 'threeBrain'
+    package for comprehensive electrode localization, see "your advanced
+    electrode localizer" ('YAEL') by Wang, Magnotti, Zhang, and Beauchamp 
+    (2023, <doi:10.1523/ENEURO.0328-23.2023>).
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+Language: en-US
+URL: https://rave.wiki
+BugReports: https://github.com/orgs/rave-ieeg/discussions
 Imports: 
     tools,
     utils,
