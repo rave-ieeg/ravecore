@@ -211,7 +211,7 @@ import_from_h5_mat_per_channel <- function(
 
 
   if(!saved) {
-    # catgl("Cannot import from existing electrodes.csv, creating a new one", level = "INFO")
+    ravepipeline::logger("Cannot import from existing electrodes.csv, creating a new one", level = "info")
     tbl <- data.frame(
       Electrode = subject$electrodes,
       Coord_x = 0, Coord_y = 0, Coord_z = 0,

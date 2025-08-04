@@ -522,18 +522,18 @@ YAELProcess <- R6::R6Class(
         full.names = TRUE
       )
       if(isFALSE(surfaces)) { return(invisible()) }
-      lapply_async(volume_files, function(path) {
+      ravepipeline::lapply_jobs(volume_files, function(path) {
         dname <- dirname(path)
         fname <- gsub("\\.(nii|nii\\.gz)$", '', basename(path), ignore.case = TRUE)
         fname <- sprintf("%s.gii", fname)
         dst_path <- file.path(dname, fname)
-        if(isTRUE(surfaces) || !file.exists(dst_path)) {
+        if (isTRUE(surfaces) || !file.exists(dst_path)) {
           mesh <- threeBrain::volume_to_surf(path, save_to = dst_path)
         }
         NULL
-      }, callback = function(path) {
+      }, .globals = list(surfaces = surfaces), callback = function(path) {
         fname <- gsub("\\.(nii|nii\\.gz)$", '', basename(path), ignore.case = TRUE)
-        sprintf("Generating surfaces|%s", fname)
+        sprintf("Generating surfaces | %s", fname)
       })
       invisible()
     },

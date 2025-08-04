@@ -144,6 +144,55 @@ RAVEPreprocessSettings <- R6::R6Class(
       invisible(blocks)
     },
 
+    #' @description get block-related files
+    #' @param block block names (for all available blocks, see \code{all_blocks})
+    #' @param force_native whether to ignore the format standard, such as 'BIDS'
+    #' and force return the native paths; default is false
+    #' @param check whether to check the file paths to make sure the returned
+    #' paths are valid; default is true
+    get_block_paths = function(block, force_native = FALSE, check = TRUE) {
+      paths <- character(0L)
+      if(force_native) {
+        format_standard <- "native"
+      } else {
+        format_standard <- self$raw_path_type
+      }
+      switch(
+        format_standard,
+        "bids" = {
+          if(dir_exists(self$raw_path)) {
+            bids_subject <- as_bids_subject(self$subject, strict = FALSE)
+            query_results <- bidsr::query_bids(
+              bids_subject,
+              search_params = list(
+                storage = "raw",
+                sidecars = FALSE,
+                data_types = "ieeg"
+              )
+            )
+            sel <- block_names_from_bids_entities(query_results$parsed) %in% block
+            paths <- unlist(lapply(query_results$parsed[sel], function(parsed) {
+              file_path(
+                bidsr::resolve_bids_path(bids_subject@project, storage = "raw"),
+                format(parsed)
+              )
+            }))
+          }
+        },
+        {
+          paths <- file_path(self$raw_rave_path, block)
+        }
+      )
+      paths <- unlist(paths)
+      if(check) {
+        paths <- paths[file_exists(paths)]
+      }
+      if(length(paths)) {
+        paths <- path_abs(paths, must_work = FALSE)
+      }
+      paths
+    },
+
     #' @description set electrodes
     #' @param electrodes integer vectors
     #' @param type signal type of electrodes, see \code{\link{SIGNAL_TYPES}}
@@ -581,6 +630,15 @@ RAVEPreprocessSettings <- R6::R6Class(
     #' @field raw_path_type raw data path type, 'native' or 'bids'
     raw_path_type = function(){
       self$subject$`@impl`@project@format_standard
+    },
+
+    #' @field raw_rave_path raw data path for 'RAVE', regardless of
+    #' \code{raw_path_type}; used for format conversion (for example, when
+    #' converting from native to 'BIDS') and storing processed imaging files.
+    #' This path equals to \code{raw_path} under the 'native' format, but
+    #' differs in other \code{raw_path_type} values
+    raw_rave_path = function() {
+      rave_path(self$subject$`@impl`, 'rave_raw')
     }
 
   )

@@ -74,6 +74,7 @@ path_abs <- function(path, must_work = NA) {
   #   "../asd/./../../aa",
   #   "./././a/.././"
   # )
+  if(!length(path)) { return(character(0L)) }
   path <- unlist(lapply(fs::path_split(path), function(p) {
     p[[1]] <- normalizePath(p[[1]], winslash = "/", mustWork = FALSE)
     do.call(fs::path, as.list(p))
@@ -312,4 +313,118 @@ backup_file <- function(path, remove = FALSE, quiet = FALSE) {
 
   return(invisible(path2))
 
+}
+
+
+
+#' @name cache_path
+#' @title Manipulate cached data on the file systems
+#' @param check whether to ensure the cache root path
+#' @param quiet whether to suppress the message
+#' @param subject_code subject code to remove; default is missing. If
+#' \code{subject_code} is provided, then only this subject-related cache
+#' files will be removed.
+#' @returns \code{cache_root} returns the root path that stores the 'RAVE'
+#' cache data; \code{clear_cached_files} returns nothing
+#' @details 'RAVE' intensively uses cache files. If running on personal
+#' computers, the disk space might be filled up very quickly. These cache
+#' files are safe to remove if there is no 'RAVE' instance running.
+#' Function \code{clear_cached_files} is designed to remove these cache files.
+#' To run this function, please make sure that all 'RAVE' instances
+#' are shutdown.
+#'
+#' @examples
+#'
+#' cache_root()
+#'
+#' @export
+cache_root <- function(check = FALSE){
+  re <- ravepipeline::raveio_getopt(key = 'tensor_temp_path', default = NULL)
+  if(!length(re)){
+    re <- '~/rave_data/cache_dir/'
+    ravepipeline::raveio_setopt(key = 'tensor_temp_path', value = re)
+  }
+  if(check){
+    re <- dir_create2(re)
+  }
+  re
+}
+
+#' @rdname cache_path
+#' @export
+clear_cached_files <- function(subject_code, quiet = FALSE){
+
+  miss_subject <- missing(subject_code)
+  if(miss_subject) {
+    clear_dir <- function(dir) {
+      if(!dir.exists(dir)) { return() }
+      if(!quiet){
+        ravepipeline::logger("Clearing ", dir, level = "trace")
+      }
+      unlink(dir, recursive = TRUE)
+    }
+  } else {
+
+    stopifnot2(grepl("^[a-zA-Z0-9_-]{1,}$", subject_code), msg = "clear_cached_files: Invalid subject_code, only letter, digits, _, - are allowed. Subject code cannot be blank as well.")
+
+    clear_dir <- function(dir) {
+      if(!dir.exists(dir)) { return() }
+
+      blpath <- file.path(dir, "_baselined_arrays_")
+      if(dir.exists(blpath)) {
+        if(!quiet){ ravepipeline::logger("Clearing ", blpath, level = "info") }
+        unlink(blpath, recursive = TRUE)
+      }
+
+      rdirs <- list.files(
+        path = dir,
+        pattern = sprintf("(^|/)%s$", subject_code),
+        recursive = TRUE,
+        all.files = FALSE,
+        include.dirs = TRUE,
+        full.names = TRUE,
+        no.. = TRUE
+      )
+      rfiles <- rdirs[dir.exists(rdirs)]
+      rdirs <- rdirs[dir.exists(rdirs)]
+
+      if(length(rfiles)) {
+        if(!quiet){ ravepipeline::logger("Clearing {length(rfiles)} files with name {subject_code}",
+                          level = "trace", use_glue = TRUE) }
+        unlink(rfiles)
+      }
+      if(length(rdirs)) {
+        if(!quiet){ ravepipeline::logger("Clearing {length(rdirs)} directories with name {subject_code}",
+                          level = "trace", use_glue = TRUE) }
+        unlink(rdirs, recursive = TRUE)
+      }
+
+    }
+
+
+  }
+
+  clear_dir('~/rave_data/cache_dir/')
+  clear_dir(tools::R_user_dir('raveio', "cache"))
+  clear_dir(cache_root())
+
+  # ravetools_path <- file.path(
+  #   getOption(
+  #     x = "ravetools.tempdir",
+  #     default = Sys.getenv(
+  #       x ="RAVETOOLS_TEMPDIR",
+  #       unset = tempdir(check = FALSE)
+  #     )
+  #   ),
+  #   "ravetools"
+  # )
+  #
+  # if(isTRUE(dir.exists(ravetools_path))) {
+  #   if(!quiet){ catgl("Clearing ", ravetools_path, level = "DEFAULT") }
+  #   unlink(ravetools_path, recursive = TRUE)
+  # }
+
+  if(!quiet){
+    ravepipeline::logger("Done", level = "trace")
+  }
 }

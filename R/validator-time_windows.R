@@ -1,3 +1,36 @@
+#' @title Validate time windows to be used
+#' @description Make sure the time windows are valid intervals and returns
+#' a reshaped window list
+#' @param time_windows vectors or a list of time intervals
+#' @returns A list of time intervals (ordered, length of 2)
+#' @examples
+#'
+#'
+#' # Simple time window
+#' validate_time_window(c(-1, 2))
+#'
+#' # Multiple windows
+#' validate_time_window(c(-1, 2, 3, 5))
+#'
+#' # alternatively
+#' validate_time_window(list(c(-1, 2), c(3, 5)))
+#' validate_time_window(list(list(-1, 2), list(3, 5)))
+#'
+#'
+#' \dontrun{
+#'
+#' # Incorrect usage (will raise errors)
+#'
+#'   # Invalid interval (length must be two for each intervals)
+#'   validate_time_window(list(c(-1, 2, 3, 5)))
+#'
+#'   # Time intervals must be in ascending order
+#'   validate_time_window(c(2, 1))
+#'
+#' }
+#'
+#'
+#' @export
 validate_time_window <- function(time_windows){
   if(!is.list(time_windows)){
     time_windows <- unlist(time_windows)

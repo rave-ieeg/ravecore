@@ -42,10 +42,7 @@ validate_raw_nevnsx <- function(subject, blocks, electrodes, check_content = TRU
         # Parse block
         with_validation({
 
-          bids_subject <- bidsr::bids_subject(
-            project = subject$`@impl`@project@parent_path,
-            subject_code = subject$subject_code
-          )
+          bids_subject <- as_bids_subject(subject, strict = FALSE)
 
           query_results <- bidsr::query_bids(
             bids_subject,

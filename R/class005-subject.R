@@ -1005,12 +1005,12 @@ restore_subject_instance <- function(subject_id, strict = FALSE) {
 }
 
 
-as_bids_subject <- function(subject) {
-  subject <- restore_subject_instance(subject)
+as_bids_subject <- function(subject, strict = FALSE) {
+  subject <- restore_subject_instance(subject, strict = strict)
   bids_subject <- bidsr::bids_subject(
     project = subject$`@impl`@project@parent_path,
     subject_code = subject$subject_code,
-    strict = FALSE
+    strict = strict
   )
   bids_subject
 }

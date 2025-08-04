@@ -75,10 +75,7 @@ validate_raw_h5_mat_per_channel <- function(subject, blocks, electrodes, check_c
         # Parse block
         with_validation({
 
-          bids_subject <- bidsr::bids_subject(
-            project = subject$`@impl`@project@parent_path,
-            subject_code = subject$subject_code
-          )
+          bids_subject <- as_bids_subject(subject, strict = FALSE)
 
           query_results <- bidsr::query_bids(
             bids_subject,

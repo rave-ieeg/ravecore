@@ -105,6 +105,12 @@ some projects}
 \item{\code{raw_path}}{raw data path}
 
 \item{\code{raw_path_type}}{raw data path type, 'native' or 'bids'}
+
+\item{\code{raw_rave_path}}{raw data path for 'RAVE', regardless of
+\code{raw_path_type}; used for format conversion (for example, when
+converting from native to 'BIDS') and storing processed imaging files.
+This path equals to \code{raw_path} under the 'native' format, but
+differs in other \code{raw_path_type} values}
 }
 \if{html}{\out{</div>}}
 }
@@ -117,6 +123,7 @@ some projects}
 \item \href{#method-RAVEPreprocessSettings-valid}{\code{RAVEPreprocessSettings$valid()}}
 \item \href{#method-RAVEPreprocessSettings-has_raw}{\code{RAVEPreprocessSettings$has_raw()}}
 \item \href{#method-RAVEPreprocessSettings-set_blocks}{\code{RAVEPreprocessSettings$set_blocks()}}
+\item \href{#method-RAVEPreprocessSettings-get_block_paths}{\code{RAVEPreprocessSettings$get_block_paths()}}
 \item \href{#method-RAVEPreprocessSettings-set_electrodes}{\code{RAVEPreprocessSettings$set_electrodes()}}
 \item \href{#method-RAVEPreprocessSettings-set_sample_rates}{\code{RAVEPreprocessSettings$set_sample_rates()}}
 \item \href{#method-RAVEPreprocessSettings-migrate}{\code{RAVEPreprocessSettings$migrate()}}
@@ -222,6 +229,33 @@ set blocks
 
 \item{\code{force}}{whether to ignore checking. Only used when data
 structure is not native, for example, 'BIDS' format}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-RAVEPreprocessSettings-get_block_paths"></a>}}
+\if{latex}{\out{\hypertarget{method-RAVEPreprocessSettings-get_block_paths}{}}}
+\subsection{Method \code{get_block_paths()}}{
+get block-related files
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{RAVEPreprocessSettings$get_block_paths(
+  block,
+  force_native = FALSE,
+  check = TRUE
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{block}}{block names (for all available blocks, see \code{all_blocks})}
+
+\item{\code{force_native}}{whether to ignore the format standard, such as 'BIDS'
+and force return the native paths; default is false}
+
+\item{\code{check}}{whether to check the file paths to make sure the returned
+paths are valid; default is true}
 }
 \if{html}{\out{</div>}}
 }

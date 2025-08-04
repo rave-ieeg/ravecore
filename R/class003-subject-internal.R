@@ -105,7 +105,7 @@ S7::method(rave_path, RAVESubjectRawImpl) <- function(x, ..., storage = NULL) {
   if(startsWith(storage, "bids")) {
     if( x@format_standard != "bids" ) { return(NA_character_) }
 
-    bids_subject <- bidsr::bids_subject(x@parent_path, x@code)
+    bids_subject <- bidsr::bids_subject(x@parent_path, x@code, strict = FALSE)
     path <- switch (
       storage,
       "bids_raw" = bidsr::resolve_bids_path(bids_subject, storage = "raw"),
