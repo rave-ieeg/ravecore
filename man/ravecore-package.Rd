@@ -4,12 +4,32 @@
 \name{ravecore-package}
 \alias{ravecore}
 \alias{ravecore-package}
-\title{ravecore: What the Package Does (One Line, Title Case)}
+\title{ravecore: Core File Structures and Workflows for 'RAVE'}
 \description{
-What the package does (one paragraph).
+Read, process, and analyze intracranial electroencephalography and deep-brain stimulation with 'RAVE', a reproducible framework for analysis and visualization of 'iEEG' by Magnotti, Wang, and Beauchamp, (2020, \doi{10.1016/j.neuroimage.2020.117341}). Supports 'BIDS' \url{https://bids.neuroimaging.io} or native file conventions to ingest signals in 'HDF5', 'Matlab', 'EDF', 'BrainVision', or 'BlackRock' formats; process images in 'NIfTI' and 'FreeSurfer' formats, providing brain imaging normalization to template brain, facilitate 'threeBrain' package for comprehensive electrode localization, see "your advanced electrode localizer" ('YAEL') by Wang, Magnotti, Zhang, and Beauchamp (2023, \doi{10.1523/ENEURO.0328-23.2023}).
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://rave.wiki}
+  \item Report bugs at \url{https://github.com/orgs/rave-ieeg/discussions}
+}
+
 }
 \author{
-\strong{Maintainer}: Zhengjia Wang \email{dipterix.wang@gmail.com}
+\strong{Maintainer}: Zhengjia Wang \email{dipterix.wang@gmail.com} (\href{https://orcid.org/0000-0001-5629-1116}{ORCID})
+
+Authors:
+\itemize{
+  \item John Magnotti \email{john.magnotti@pennmedicine.upenn.edu}
+  \item Xiang Zhang \email{xiang.zhang@pennmedicine.upenn.edu}
+  \item Michael Beauchamp \email{michael.beauchamp@pennmedicine.upenn.edu}
+}
+
+Other contributors:
+\itemize{
+  \item Trustees of the University of Pennsylvania (All files in this package unless explicitly stated in the file) [copyright holder]
+}
 
 }
 \keyword{internal}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/class012-rave_brain.R
 \name{rave_brain}
 \alias{rave_brain}
-\title{Load 'FreeSurfer' or 'AFNI/SUMA' brain from 'RAVE'}
+\title{Load 'FreeSurfer' brain from 'RAVE'}
 \usage{
 rave_brain(
   subject,

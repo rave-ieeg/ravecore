@@ -127,7 +127,6 @@ archive_subject <- function(
   root_dir <- dir_create2(root_dir)
   current_wd <- getwd()
   on.exit({
-    setwd(current_wd)
     unlink(root_dir, recursive = TRUE, force = TRUE)
   }, add = TRUE, after = FALSE)
   meta_info <- list(
@@ -408,6 +407,10 @@ archive_subject <- function(
 
   # zip
   setwd(dirname(root_dir))
+  on.exit({
+    setwd(current_wd)
+  }, add = TRUE, after = FALSE)
+
   zipfile_name <- sprintf("./%s.zip", rand_string(10))
 
   if(length(zip_flags)) {
@@ -418,6 +421,8 @@ archive_subject <- function(
 
   zipfile_name <- normalizePath(zipfile_name)
 
+  # This is to make sure the work directory is set back to current directory
+  # hence no on.exit is needed, see Line 410
   setwd(current_wd)
 
   if(!missing(path) && !is.na(path) && length(path) == 1) {

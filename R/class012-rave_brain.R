@@ -1,4 +1,4 @@
-#' Load 'FreeSurfer' or 'AFNI/SUMA' brain from 'RAVE'
+#' Load 'FreeSurfer' brain from 'RAVE'
 #' @description Create 3D visualization of the brain and visualize with
 #' modern web browsers
 #' @param subject character, list, or \code{\link{RAVESubject}} instance; for

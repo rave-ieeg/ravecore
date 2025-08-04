@@ -64,9 +64,7 @@ A list of data containing the script details:
 }
 }
 \description{
-These shell commands are for importing 'DICOM' images to
-'Nifti' format, reconstructing cortical surfaces, and align' the CT' to
-'MRI'. The commands are only tested on 'MacOS' and 'Linux'. On 'Windows'
-machines, please use the 'WSL2' system.
+These shell commands are only tested on 'MacOS' and 'Linux'.
+On 'Windows' machines, please use the 'WSL2' system.
 and \code{'CT'}
 }
