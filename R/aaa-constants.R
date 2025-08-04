@@ -7,6 +7,8 @@ HDF5_EAGERLOAD <- TRUE
 
 BASIC_EPOCH_TABLE_COLUMNS <- c("Block", "Time", "Trial", "Condition")
 
+RAVEIO_FILEARRAY_VERSION <- 1
+
 #' @name ravecore-constants
 #' @title 'RAVE' constants
 #' @description

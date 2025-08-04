@@ -385,7 +385,6 @@ RAVESubjectEpochPowerRepository <- R6::R6Class(
       ))
     },
 
-
     #' @description constructor
     #' @param subject 'RAVE' subject
     #' @param electrodes string or integers indicating electrodes to load

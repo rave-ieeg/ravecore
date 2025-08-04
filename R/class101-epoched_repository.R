@@ -199,7 +199,7 @@ RAVESubjectEpochRepository <- R6::R6Class(
       ))
       structure(
         names = df$type,
-        as.list(df$sample_rate)
+        as.list(as.double(df$sample_rate))
       )
     },
 
