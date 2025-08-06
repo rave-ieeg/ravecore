@@ -627,7 +627,7 @@ install_subject <- function(
 
           if(dry_run) {
             if(!is.na(src_root)) {
-              from <- fs::path("/", fs::path_rel(from, start = src_root))
+              from <- file_path("/", path_rel(from, start = src_root))
             }
             ravepipeline::logger(
               level = "info",
@@ -652,7 +652,7 @@ install_subject <- function(
 
           if(dry_run) {
             if(!is.na(src_root)) {
-              from <- fs::path("/", fs::path_rel(from, start = src_root))
+              from <- file_path("/", path_rel(from, start = src_root))
             }
             ravepipeline::logger(
               level = "info",

@@ -20,111 +20,24 @@ correct_filepath <- function(path) {
   return(files[sel][[1]])
 }
 
-path_to_nearest_file <- function(filename, start, root = NA, ignore_cases = FALSE) {
-
-  # filename <- "rave"
-  # start = "."
-
-  if( ignore_cases ) {
-    filename <- tolower(filename)
-    start <- tolower(start)
-  }
-
-  if(file_exists(start)) {
-    if(fs::is_file(start)) {
-      if( basename(start) == filename ) {
-        # start is a file and is the filename
-        return(start)
-      }
-      start <- fs::path_dir(start)
-    }
-    # now start is a folder
-    tmp <- fs::path(start, filename)
-    if( file_exists(tmp) ) {
-      return(tmp)
-    }
-    # folder does not have this file
-  }
-  if(!fs::is_absolute_path(start)) {
-    start <- fs::path_abs(start)
-  }
-  start_ <- fs::path_dir(start)
-
-  if(!is.na(root)) {
-    if(!fs::is_absolute_path(root)) {
-      root <- fs::path_abs(root)
-    }
-    if(!fs::path_has_parent(start_, root)) {
-      return(NA_character_)
-    }
-  } else {
-    if(start_ == start) {
-      return(NA_character_)
-    }
-  }
-  Recall(filename = filename, start = start_, root = root)
-}
-
-
-
-path_abs <- function(path, must_work = NA) {
-  # normalizePath(path, winslash = "/", mustWork = FALSE)
-  # path <- c(
-  #   "~/../asdad",
-  #   "../asd/./../../aa",
-  #   "./././a/.././"
-  # )
-  if(!length(path)) { return(character(0L)) }
-  path <- unlist(lapply(fs::path_split(path), function(p) {
-    p[[1]] <- normalizePath(p[[1]], winslash = "/", mustWork = FALSE)
-    do.call(fs::path, as.list(p))
-  }))
-  path <- normalizePath(path, mustWork = must_work)
-  fs::path_norm(path)
-}
-
 path_expand <- function(path) {
-  fs::path_norm(fs::path_expand(path))
+  fs::path_norm(fs::path_expand_r(path))
 }
 
-path_norm <- function(path, must_work = NA) {
-  fs::path_norm(path)
+is_file <- function(path, follow = TRUE) {
+  fs::is_file(path_expand(path))
 }
 
-path_rel <- function(path, start = ".") {
-  fs::path_rel(path, start = start)
+path_dir <- function(path) {
+  fs::path_norm(dirname(path))
 }
 
 file_path <- function(..., ext = "") {
   fs::path(..., ext = ext)
 }
 
-file_exists <- function(path) {
-  fs::file_exists(as.character(path))
-}
-
-file_assert <- function(path, dir_ok = FALSE, follow = TRUE) {
-  if(length(path) != 1 || is.na(path)) {
-    stop("File path must be length of 1 and cannot be N/A")
-  }
-  if( dir_ok ) {
-    if(!fs::file_exists(path)) {
-      stop("File or directory `", path, "` is missing.")
-    }
-  } else {
-    if( !fs::is_file(path, follow = follow) ) {
-      stop("File `", path, "` is missing.")
-    }
-  }
-  invisible(TRUE)
-}
-
-dir_exists <- function(path) {
-  fs::dir_exists(path)
-}
-
-path_has_parent <- function(path, parent) {
-  fs::path_has_parent(path = path, parent = parent)
+is_absolute_path <- function(path) {
+  fs::is_absolute_path(path_expand(path))
 }
 
 path_split <- function(path) {
@@ -135,11 +48,44 @@ path_join <- function(parts) {
   fs::path_join(parts)
 }
 
-is_absolute_path <- function(path) {
-  fs::is_absolute_path(path)
+path_has_parent <- function(path, parent) {
+  fs::path_has_parent(path = path_expand(path), parent = path_expand(parent))
+}
+
+
+path_rel <- function(path, start = ".") {
+  fs::path_rel(path_expand(path), start = path_expand(start))
+}
+
+path_abs <- function(path, must_work = NA) {
+  # normalizePath(path, winslash = "/", mustWork = FALSE)
+  # path <- c(
+  #   "~/../asdad",
+  #   "../asd/./../../aa",
+  #   "././../../../../../../../..//a/.././",
+  #   "C://system32"
+  # )
+  if(!length(path)) { return(character(0L)) }
+  path <- path_expand(path)
+
+  path <- unlist(lapply(path_split(path), function(p) {
+    p[[1]] <- normalizePath(sprintf("%s/", p[[1]]), winslash = "/", mustWork = FALSE)
+    path_join(p)
+  }))
+  path <- normalizePath(path, winslash = "/", mustWork = must_work)
+  fs::path_norm(path)
+}
+
+file_exists <- function(path) {
+  fs::file_exists(path_expand(path))
+}
+
+dir_exists <- function(path) {
+  fs::dir_exists(path_expand(path))
 }
 
 file_delete <- function(path, use_base_r = FALSE, ...) {
+  path <- path_expand(path)
   if( use_base_r ) {
     if( dir_exists(path) ) {
       unlink(x = path, recursive = TRUE, ...)
@@ -155,9 +101,71 @@ file_size <- function(path, fail = TRUE) {
   fs::file_size(path, fail = fail)
 }
 
-ARCHIVE_EXTENSIONS <- c("zip", "rar", "7z", "tar", "tar.gz", "tar.bz2", "gz", "bz2", "xz", "iso")
+path_to_nearest_file <- function(filename, start, root = NA, ignore_cases = FALSE) {
+
+  # filename <- "rave"
+  # start = "."
+
+  if( ignore_cases ) {
+    filename <- tolower(filename)
+    start <- tolower(start)
+  }
+
+  if(file_exists(start)) {
+    if(is_file(start)) {
+      if( basename(start) == filename ) {
+        # start is a file and is the filename
+        return(start)
+      }
+      start <- path_dir(start)
+    }
+    # now start is a folder
+    tmp <- file_path(start, filename)
+    if( file_exists(tmp) ) {
+      return(tmp)
+    }
+    # folder does not have this file
+  }
+  if(!is_absolute_path(start)) {
+    start <- path_abs(start)
+  }
+  start_ <- path_dir(start)
+
+  if(!is.na(root)) {
+    if(!is_absolute_path(root)) {
+      root <- path_abs(root)
+    }
+    if(!path_has_parent(start_, root)) {
+      return(NA_character_)
+    }
+  } else {
+    if(start_ == start) {
+      return(NA_character_)
+    }
+  }
+  Recall(filename = filename, start = start_, root = root)
+}
+
+
+file_assert <- function(path, dir_ok = FALSE, follow = TRUE) {
+  if(length(path) != 1 || is.na(path)) {
+    stop("File path must be length of 1 and cannot be N/A")
+  }
+  if( dir_ok ) {
+    if(!file_exists(path)) {
+      stop("File or directory `", path, "` is missing.")
+    }
+  } else {
+    if( !is_file(path, follow = follow) ) {
+      stop("File `", path, "` is missing.")
+    }
+  }
+  invisible(TRUE)
+}
+
 
 path_ext_remove <- function(path, archive_ext = ARCHIVE_EXTENSIONS) {
+  path <- path_expand(path)
   ext <- path_ext(path, archive_ext = archive_ext)
   fs::path_ext_remove(path)
 
@@ -208,6 +216,8 @@ path_ext <- function(path, archive_ext = ARCHIVE_EXTENSIONS) {
 }
 
 file_move <- function(path, new_path) {
+  path <- path_expand(path)
+  new_path <- path_expand(new_path)
   fs::file_move(path = path, new_path = new_path)
 }
 

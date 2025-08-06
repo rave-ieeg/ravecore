@@ -4,7 +4,7 @@ test_that("RAVEProject - native", {
   extected_path <- file.path(ravepipeline::raveio_getopt("data_dir"), "demo")
   actual_path <- project$path
 
-  testthat::expect_true(fs::path_rel(extected_path, actual_path) == ".")
+  testthat::expect_true(path_rel(extected_path, actual_path) == ".")
   testthat::expect_equal(format(project), "demo")
   reconstructed <- unserialize(
     serialize(
@@ -25,7 +25,7 @@ test_that("RAVEProject - native", {
   extected_path <- normalizePath(file.path(tdir, "demo"), mustWork = FALSE)
   actual_path <- normalizePath(project$path, mustWork = FALSE)
 
-  testthat::expect_true(fs::path_rel(extected_path, actual_path) == ".")
+  testthat::expect_true(path_rel(extected_path, actual_path) == ".")
   testthat::expect_equal(format(project), "demo")
 })
 
@@ -37,7 +37,7 @@ test_that("RAVEProject - BIDS", {
                              "ds001", "derivatives", "rave", "data_dir", "demo")
   actual_path <- project$path
 
-  testthat::expect_true(fs::path_rel(extected_path, actual_path) == ".")
+  testthat::expect_true(path_rel(extected_path, actual_path) == ".")
   testthat::expect_equal(format(project), "demo@bids:ds001")
 
   # With parent path
@@ -50,7 +50,7 @@ test_that("RAVEProject - BIDS", {
   )
   actual_path <- normalizePath(project$path, mustWork = FALSE)
 
-  testthat::expect_true(fs::path_rel(extected_path, actual_path) == ".")
+  testthat::expect_true(path_rel(extected_path, actual_path) == ".")
   testthat::expect_equal(format(project), "demo@bids:ds001")
 
   # With parent path and dataset indicator
@@ -67,6 +67,6 @@ test_that("RAVEProject - BIDS", {
   )
   actual_path <- normalizePath(project$path, mustWork = FALSE)
 
-  testthat::expect_true(fs::path_rel(extected_path, actual_path) == ".")
+  testthat::expect_true(path_rel(extected_path, actual_path) == ".")
   testthat::expect_equal(format(project), "demo@bids:ds002")
 })

@@ -9,6 +9,8 @@ BASIC_EPOCH_TABLE_COLUMNS <- c("Block", "Time", "Trial", "Condition")
 
 RAVEIO_FILEARRAY_VERSION <- 1
 
+ARCHIVE_EXTENSIONS <- c("zip", "rar", "7z", "tar", "tar.gz", "tar.bz2", "gz", "bz2", "xz", "iso")
+
 #' @name ravecore-constants
 #' @title 'RAVE' constants
 #' @description

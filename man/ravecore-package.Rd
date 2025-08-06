@@ -12,6 +12,7 @@ Read, process, and analyze intracranial electroencephalography and deep-brain st
 Useful links:
 \itemize{
   \item \url{https://rave.wiki}
+  \item \url{http://rave.wiki/ravecore/}
   \item Report bugs at \url{https://github.com/orgs/rave-ieeg/discussions}
 }
 
