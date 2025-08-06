@@ -82,6 +82,8 @@ RAVESubjectEpochRawVoltageRepository <- R6::R6Class(
         .class = c(.class, "rave_prepare_subject_raw_voltage_with_epoch"),
         ...
       )
+      # reinforce
+      private$.reference_name <- "noref"
 
     },
 
@@ -159,6 +161,32 @@ RAVESubjectEpochRawVoltageRepository <- R6::R6Class(
         self$mount_data()
       }
       private$.data
+    },
+
+    #' @field reference_table reference table, all channels will be marked as no reference
+    reference_table = function() {
+      subject <- private$.subject
+      if(!length(subject$electrodes)) {
+        stop("No electrode/channel found under this subject. Please import data first.")
+      }
+      reference_name <- "noref"
+      if(!isTRUE(reference_name %in% subject$reference_names)) {
+        if(identical(tolower(self$reference_name), "noref")) {
+          reference_table <- data.frame(
+            Electrode = subject$electrodes,
+            Group = "default",
+            Reference = "noref",
+            Type = "No Reference"
+          )
+          safe_write_csv(
+            reference_table,
+            file = file.path(subject$meta_path, "reference_noref.csv"),
+            row.names = FALSE
+          )
+        }
+      }
+      reference_table <- subject$get_reference(reference_name)
+      return(reference_table)
     }
 
   )

@@ -132,19 +132,27 @@ RAVESubjectBaseRepository <- R6::R6Class(
         reference_name <- "default"
       }
       reference_name <- as.character(reference_name[[1]])
-      if(!isTRUE(reference_name %in% available_reference_names)) {
+      if(!isTRUE(reference_name %in% available_reference_names) && !identical(reference_name, "noref")) {
+        reference_warn <- TRUE
         if(length(available_reference_names)) {
           reference_name <- available_reference_names[[1]]
         } else {
           reference_name <- "noref"
         }
-        reference_warn <- TRUE
       }
+
+      private$.reference_name <- reference_name
+
       if(reference_warn) {
         ravepipeline::logger("No reference specified, using `{reference_name}`",
                              use_glue = TRUE)
+
       }
-      private$.reference_name <- reference_name
+
+      # revisit: this is when reference_name is noref but noref is missing
+      # if(!isTRUE(reference_name %in% available_reference_names)) {
+      #   force(self$reference_table)
+      # }
 
       private$update_electrode_list()
 

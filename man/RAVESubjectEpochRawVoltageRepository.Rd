@@ -21,6 +21,8 @@ repository signature}
 
 \item{\code{raw_voltage}}{a named map of raw voltage data, mounted by
 \code{mount_data}}
+
+\item{\code{reference_table}}{reference table, all channels will be marked as no reference}
 }
 \if{html}{\out{</div>}}
 }

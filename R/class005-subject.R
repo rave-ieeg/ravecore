@@ -582,8 +582,18 @@ RAVESubject <- R6::R6Class(
         valid_electrodes <- all_electrodes
         reference_table <- NULL
       } else {
-        valid_electrodes <- self$valid_electrodes(reference_name = reference_name)
-        reference_table <- self$get_reference(reference_name, simplify = FALSE)
+        reference_table <- tryCatch({
+          self$get_reference(reference_name, simplify = FALSE)
+        }, error = function(e) {
+          ravepipeline::logger("Unable to load reference table `{reference_name}`",
+                               level = "warning", use_glue = TRUE)
+          NULL
+        })
+        if(is.data.frame(reference_table)) {
+          valid_electrodes <- self$valid_electrodes(reference_name = reference_name)
+        } else {
+          valid_electrodes <- NULL
+        }
       }
 
       if(missing(electrodes)){

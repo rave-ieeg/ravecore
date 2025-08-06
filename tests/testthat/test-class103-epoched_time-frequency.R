@@ -761,10 +761,10 @@ test_that("RAVESubjectEpochPhaseRepository", {
 test_that("RAVESubjectEpochTimeFreqCoefRepository - parallel", {
 
   testthat::skip_on_cran()
-  testthat::skip_if(ravepipeline::raveio_getopt("max_worker") < 2)
   testthat::skip_if_not({
     dir.exists(as_rave_subject("demo/DemoSubject", strict = FALSE)$path)
   })
+  ravepipeline::raveio_setopt("max_worker", asNamespace('parallel')$detectCores())
 
   repository_id <- rand_string(4)
   repo_old <- prepare_subject_wavelet_legacy(
@@ -850,10 +850,10 @@ test_that("RAVESubjectEpochTimeFreqCoefRepository - parallel", {
 test_that("RAVESubjectEpochPowerRepository - parallel", {
 
   testthat::skip_on_cran()
-  testthat::skip_if(ravepipeline::raveio_getopt("max_worker") < 2)
   testthat::skip_if_not({
     dir.exists(as_rave_subject("demo/DemoSubject", strict = FALSE)$path)
   })
+  ravepipeline::raveio_setopt("max_worker", asNamespace('parallel')$detectCores())
 
   repository_id <- rand_string(4)
   repo_old <- prepare_subject_power(
@@ -940,10 +940,10 @@ test_that("RAVESubjectEpochPowerRepository - parallel", {
 test_that("RAVESubjectEpochPhaseRepository - parallel", {
 
   testthat::skip_on_cran()
-  testthat::skip_if(ravepipeline::raveio_getopt("max_worker") < 2)
   testthat::skip_if_not({
     dir.exists(as_rave_subject("demo/DemoSubject", strict = FALSE)$path)
   })
+  ravepipeline::raveio_setopt("max_worker", asNamespace('parallel')$detectCores())
 
   repository_id <- rand_string(4)
   repo_old <- prepare_subject_phase(

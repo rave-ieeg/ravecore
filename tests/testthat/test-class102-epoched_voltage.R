@@ -572,10 +572,10 @@ test_that("RAVESubjectEpochVoltageRepository", {
 test_that("RAVESubjectEpochRawVoltageRepository - parallel", {
 
   testthat::skip_on_cran()
-  testthat::skip_if(ravepipeline::raveio_getopt("max_worker") < 2)
   testthat::skip_if_not({
     dir.exists(as_rave_subject("demo/DemoSubject", strict = FALSE)$path)
   })
+  ravepipeline::raveio_setopt("max_worker", asNamespace('parallel')$detectCores())
 
   repository_id <- rand_string(4)
   repo_old <- prepare_subject_raw_voltage_with_epoch_legacy(
@@ -649,10 +649,10 @@ test_that("RAVESubjectEpochRawVoltageRepository - parallel", {
 test_that("RAVESubjectEpochVoltageRepository - parallel", {
 
   testthat::skip_on_cran()
-  testthat::skip_if(ravepipeline::raveio_getopt("max_worker") < 2)
   testthat::skip_if_not({
     dir.exists(as_rave_subject("demo/DemoSubject", strict = FALSE)$path)
   })
+  ravepipeline::raveio_setopt("max_worker", asNamespace('parallel')$detectCores())
 
 
   repository_id <- rand_string(4)
