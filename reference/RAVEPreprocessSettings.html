@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ravecore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9003</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -158,20 +158,26 @@ physically contacts, but is generated from those physically ones</p></dd>
 some projects</p></dd>
 
 
-<dt><code>raw_path</code></dt>
-<dd><p>raw data path</p></dd>
+<dt><code>raw_path2</code></dt>
+<dd><p>raw data path, based on the format standard; for native,
+this is equivalent to <code>raw_path</code>; for 'BIDS', this is subject raw
+directory in <code>'BIDS'</code> project</p></dd>
 
 
-<dt><code>raw_path_type</code></dt>
+<dt><code>raw_path2_type</code></dt>
 <dd><p>raw data path type, 'native' or 'bids'</p></dd>
 
 
-<dt><code>raw_rave_path</code></dt>
-<dd><p>raw data path for 'RAVE', regardless of
-<code>raw_path_type</code>; used for format conversion (for example, when
-converting from native to 'BIDS') and storing processed imaging files.
-This path equals to <code>raw_path</code> under the 'native' format, but
-differs in other <code>raw_path_type</code> values</p></dd>
+<dt><code>raw_path</code></dt>
+<dd><p>legacy raw data path for 'RAVE', regardless of
+<code>raw_path2_type</code>. This field exists for compatibility support
+the legacy scripts. Please use <code>raw_path2</code> combined with
+<code>raw_path2_type</code> for supporting 'BIDS' format</p></dd>
+
+
+<dt><code>raw_path_type</code></dt>
+<dd><p>legacy type for <code>raw_path</code>, always returns
+<code>'native'</code></p></dd>
 
 
 </dl><p></p></div>
