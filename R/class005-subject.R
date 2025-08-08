@@ -578,7 +578,8 @@ RAVESubject <- R6::R6Class(
                                    subset = FALSE, simplify = FALSE, warn = TRUE){
       preproc <- self$preprocess_settings
       all_electrodes <- self$electrodes
-      if(missing(reference_name) || !length(reference_name)) {
+      if(missing(reference_name) || !length(reference_name) ||
+         is.na(reference_name) || identical(reference_name, ".fake")) {
         valid_electrodes <- all_electrodes
         reference_table <- NULL
       } else {
@@ -592,7 +593,7 @@ RAVESubject <- R6::R6Class(
         if(is.data.frame(reference_table)) {
           valid_electrodes <- self$valid_electrodes(reference_name = reference_name)
         } else {
-          valid_electrodes <- NULL
+          valid_electrodes <- all_electrodes
         }
       }
 
@@ -608,15 +609,15 @@ RAVESubject <- R6::R6Class(
       if(!length(load_electrodes)) {
         stop("There is no valid electrodes to be loaded. The valid electrodes are: ", deparse_svec(valid_electrodes), ".")
       }
-      imcomplete <- all_electrodes[
-        all_electrodes %in% load_electrodes &
-          !preproc$has_wavelet &
-          self$electrode_types %in% "LFP"
-      ]
-      if(length(imcomplete)){
-        stop("The following electrodes do not have power spectrum: \n  ", deparse_svec(imcomplete),
-             "\nPlease run wavelet module first.")
-      }
+      # imcomplete <- all_electrodes[
+      #   all_electrodes %in% load_electrodes &
+      #     !preproc$has_wavelet &
+      #     self$electrode_types %in% "LFP"
+      # ]
+      # if(length(imcomplete)){
+      #   stop("The following electrodes do not have power spectrum: \n  ", deparse_svec(imcomplete),
+      #        "\nPlease run wavelet module first.")
+      # }
 
       electrode_table <- self$meta_data("electrodes", strict = FALSE)
 
