@@ -137,7 +137,7 @@ cmd_run_r <- function(
   }
 
   # work_path <- normalizePath(
-  #   file.path(subject$preprocess_settings$raw_path, "rave-imaging"),
+  #   file.path(subject$preprocess_settings$raw_path2, "rave-imaging"),
   #   winslash = "/", mustWork = FALSE
   # )
   log_path <- normalizePath(dirname(log_file), mustWork = FALSE, winslash = "/")

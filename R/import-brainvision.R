@@ -1,3 +1,5 @@
+#' @rdname import-signals
+#' @export
 import_from_brainvis <- function(subject, blocks, electrodes, sample_rate, add = FALSE, data_type = 'LFP', ...) {
 
   # DIPSAUS DEBUG START
@@ -11,7 +13,7 @@ import_from_brainvis <- function(subject, blocks, electrodes, sample_rate, add =
   subject <- restore_subject_instance(subject, strict = FALSE)
   pretools <- subject$preprocess_settings
   electrodes <- parse_svec(electrodes)
-  format_standard <- subject$preprocess_settings$raw_path_type
+  format_standard <- subject$preprocess_settings$raw_path2_type
 
   # ---- Validation ---------------------------------------------
 

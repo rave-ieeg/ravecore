@@ -122,7 +122,7 @@ S7::method(rave_path, RAVESubjectRawImpl) <- function(x, ..., storage = NULL) {
     storage,
 
     # re$root_raw <- normalizePath(raveio_getopt('raw_data_dir'), mustWork = FALSE)
-    # re$raw_path <- file.path(re$root_raw, subject_code)
+    # re$raw_path2 <- file.path(re$root_raw, subject_code)
     "rave_raw" = x@path,
     "rave_imaging" = file_path(x@path, "rave-imaging"),
 

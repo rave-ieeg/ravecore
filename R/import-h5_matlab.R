@@ -2,6 +2,8 @@
 
 # ravecore:::import_h5_matlab(subject, blocks, electrodes, sample_rate, skip_validation = T)
 
+#' @rdname import-signals
+#' @export
 import_from_h5_mat_per_channel <- function(
     subject, blocks, electrodes, sample_rate, add = FALSE,
     data_type = 'LFP', skip_validation = FALSE, ...) {
@@ -18,7 +20,7 @@ import_from_h5_mat_per_channel <- function(
   subject <- restore_subject_instance(subject, strict = FALSE)
   pretools <- subject$preprocess_settings
   electrodes <- parse_svec(electrodes)
-  format_standard <- subject$preprocess_settings$raw_path_type
+  format_standard <- subject$preprocess_settings$raw_path2_type
 
   # ---- Validation ---------------------------------------------
 

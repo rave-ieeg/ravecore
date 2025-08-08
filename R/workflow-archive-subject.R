@@ -286,7 +286,7 @@ archive_subject <- function(
   if("rave_imaging" %in% includes) {
     # get rave-imaging folder
     path_imaging <- dir_create2(file.path(root_dir, "rave_imaging"))
-    subject_imaging_path <- file.path(subject$preprocess_settings$raw_rave_path, "rave-imaging")
+    subject_imaging_path <- file.path(subject$preprocess_settings$raw_path, "rave-imaging")
 
     meta_info$paths$rave_imaging <- list(
       type = "raw_data_dir",
@@ -575,7 +575,7 @@ install_subject <- function(
   # check if this subject exists
   subject <- RAVESubject$new(project_name = project_name, subject_code = subject_code, strict = FALSE)
 
-  if(file.exists(subject$path) || file.exists(subject$preprocess_settings$raw_rave_path)) {
+  if(file.exists(subject$path) || file.exists(subject$preprocess_settings$raw_path)) {
     if(dry_run) {
       ravepipeline::logger(
         level = "info",
@@ -607,8 +607,8 @@ install_subject <- function(
       }
 
       if( backup ) {
-        if(file.exists(subject$preprocess_settings$raw_rave_path)) {
-          new_path <- backup_file(subject$preprocess_settings$raw_rave_path, remove = FALSE)
+        if(file.exists(subject$preprocess_settings$raw_path)) {
+          new_path <- backup_file(subject$preprocess_settings$raw_path, remove = FALSE)
         }
         if(file.exists(subject$path)) {
           file_move(subject$path, file.path(dirname(subject$path), basename(new_path)))
@@ -693,7 +693,7 @@ install_subject <- function(
       root_path <- switch(
         item$type,
         "data_dir" = subject$path,
-        subject$preprocess_settings$raw_rave_path
+        subject$preprocess_settings$raw_path
       )
       dst_path <- file.path(root_path, item$dst)
 
@@ -707,14 +707,14 @@ install_subject <- function(
       )
 
       # exceptions for BIDS
-      if(subject$preprocess_settings$raw_path_type == "bids") {
+      if(subject$preprocess_settings$raw_path2_type == "bids") {
 
         file_copied <- FALSE
         switch (
           paste(item$src, collapse = ""),
           "orignal_signals" = {
 
-            target_folder <- file_path(subject$preprocess_settings$raw_path, "ieeg")
+            target_folder <- file_path(subject$preprocess_settings$raw_path2, "ieeg")
             for(f in fs) {
               try(
                 silent = TRUE, {
@@ -760,7 +760,7 @@ install_subject <- function(
   #   root_path <- switch(
   #     item$type,
   #     "data_dir" = subject$path,
-  #     subject$preprocess_settings$raw_path
+  #     subject$preprocess_settings$raw_path2
   #   )
   #   dst_path <- file.path(root_path, item$dst)
   #   src_path <- file.path(path, item$src)

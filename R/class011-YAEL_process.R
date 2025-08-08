@@ -127,6 +127,17 @@ YAELProcess <- R6::R6Class(
     #' serialization. Please do not set it manually unless you know what you
     #' are doing
     initialize = function(subject_code, image_types, imaging_path = NULL) {
+
+      # On windows, throw a warning if running with rstudioapi
+      if( rstudio_main_session(os = "windows") ) {
+        if(shiny_is_running()) {
+          level <- "fatal"
+        } else {
+          level <- "warning"
+        }
+        ravepipeline::logger("Avoid running YAELProcess directly in RStudio interactive sessions. Try to save the script and run it in a separate R session (e.g. from terminal or the native R GUI). RStudio has a bug that might crash when launching the process. There is nothing I can do about it :/", level = level)
+      }
+
       if(!is.character(subject_code) || grepl("/", subject_code, fixed = TRUE)) {
         # user passed a subject ID
         subject <- as_rave_subject(subject_code, strict = FALSE)

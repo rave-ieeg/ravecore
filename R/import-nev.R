@@ -1,5 +1,6 @@
 
-# validate_raw_nevnsx(subject, blocks, electrodes, check_content = TRUE, ...)
+#' @rdname import-signals
+#' @export
 import_from_nevnsx <- function(subject, blocks, electrodes, sample_rate, add = FALSE, data_type = 'LFP', skip_validation = FALSE, ...) {
 
   # DIPSAUS DEBUG START
@@ -13,7 +14,7 @@ import_from_nevnsx <- function(subject, blocks, electrodes, sample_rate, add = F
   subject <- restore_subject_instance(subject, strict = FALSE)
   pretools <- subject$preprocess_settings
   electrodes <- parse_svec(electrodes)
-  format_standard <- subject$preprocess_settings$raw_path_type
+  format_standard <- subject$preprocess_settings$raw_path2_type
 
   # ---- Validation ---------------------------------------------
 

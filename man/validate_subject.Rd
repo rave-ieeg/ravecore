@@ -22,7 +22,8 @@ consists of the following parts in order:
 \item{\strong{Data paths} (\code{paths})}{}
 \item{\code{path}}{the subject's root folder}
 \item{\code{path}}{the subject's 'RAVE' folder (the \code{'rave'} folder under the root directory)}
-\item{\code{raw_path}}{the subject's raw data folder}
+\item{\code{raw_path}}{the subject's legacy raw data folder}
+\item{\code{raw_path}}{the subject's raw data folder based on format standard}
 \item{\code{data_path}}{a directory storing all the voltage, power, phase data (before reference)}
 \item{\code{meta_path}}{meta directory containing all the electrode coordinates, reference table, epoch information, etc.}
 \item{\code{reference_path}}{a directory storing calculated reference signals}

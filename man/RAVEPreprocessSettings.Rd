@@ -102,15 +102,19 @@ physically contacts, but is generated from those physically ones}
 \item{\code{all_blocks}}{characters, all possible blocks even not included in
 some projects}
 
-\item{\code{raw_path}}{raw data path}
+\item{\code{raw_path2}}{raw data path, based on the format standard; for native,
+this is equivalent to \code{raw_path}; for 'BIDS', this is subject raw
+directory in \code{'BIDS'} project}
 
-\item{\code{raw_path_type}}{raw data path type, 'native' or 'bids'}
+\item{\code{raw_path2_type}}{raw data path type, 'native' or 'bids'}
 
-\item{\code{raw_rave_path}}{raw data path for 'RAVE', regardless of
-\code{raw_path_type}; used for format conversion (for example, when
-converting from native to 'BIDS') and storing processed imaging files.
-This path equals to \code{raw_path} under the 'native' format, but
-differs in other \code{raw_path_type} values}
+\item{\code{raw_path}}{legacy raw data path for 'RAVE', regardless of
+\code{raw_path2_type}. This field exists for compatibility support
+the legacy scripts. Please use \code{raw_path2} combined with
+\code{raw_path2_type} for supporting 'BIDS' format}
+
+\item{\code{raw_path_type}}{legacy type for \code{raw_path}, always returns
+\code{'native'}}
 }
 \if{html}{\out{</div>}}
 }

@@ -31,7 +31,7 @@ validate_raw_edf <- function(subject, blocks, electrodes, check_content = TRUE, 
     subject <- restore_subject_instance(subject, strict = FALSE)
 
     # native or bids
-    format_standard <- subject$preprocess_settings$raw_path_type
+    format_standard <- subject$preprocess_settings$raw_path2_type
 
   })
 
@@ -61,7 +61,7 @@ validate_raw_edf <- function(subject, blocks, electrodes, check_content = TRUE, 
       })
     }, {
 
-      raw_root <- subject$preprocess_settings$raw_path
+      raw_root <- subject$preprocess_settings$raw_path2
 
       # Parse block
       lapply(blocks, function(block) {

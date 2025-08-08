@@ -25,7 +25,7 @@ validate_raw_brainvision <- function(subject, blocks, electrodes, check_content 
     subject <- restore_subject_instance(subject, strict = FALSE)
 
     # native or bids
-    format_standard <- subject$preprocess_settings$raw_path_type
+    format_standard <- subject$preprocess_settings$raw_path2_type
 
   })
 
@@ -72,7 +72,7 @@ validate_raw_brainvision <- function(subject, blocks, electrodes, check_content 
       })
     }, {
 
-      raw_root <- subject$preprocess_settings$raw_path
+      raw_root <- subject$preprocess_settings$raw_path2
 
       lapply(blocks, function(block) {
         # Parse block

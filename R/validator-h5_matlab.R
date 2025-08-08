@@ -64,7 +64,7 @@ validate_raw_h5_mat_per_channel <- function(subject, blocks, electrodes, check_c
     subject <- restore_subject_instance(subject, strict = FALSE)
 
     # native or bids
-    format_standard <- subject$preprocess_settings$raw_path_type
+    format_standard <- subject$preprocess_settings$raw_path2_type
 
   })
 
@@ -111,7 +111,7 @@ validate_raw_h5_mat_per_channel <- function(subject, blocks, electrodes, check_c
       })
     }, {
 
-      raw_root <- subject$preprocess_settings$raw_path
+      raw_root <- subject$preprocess_settings$raw_path2
 
       # Parse block
       lapply(blocks, function(block) {

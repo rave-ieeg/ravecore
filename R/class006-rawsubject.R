@@ -120,7 +120,7 @@ RAVEPreprocessSettings <- R6::R6Class(
 
     #' @description whether raw data folder exists
     has_raw = function(){
-      dir.exists(self$raw_path)
+      dir.exists(self$raw_path2)
     },
 
     #' @description set blocks
@@ -155,12 +155,12 @@ RAVEPreprocessSettings <- R6::R6Class(
       if(force_native) {
         format_standard <- "native"
       } else {
-        format_standard <- self$raw_path_type
+        format_standard <- self$raw_path2_type
       }
       switch(
         format_standard,
         "bids" = {
-          if(dir_exists(self$raw_path)) {
+          if(dir_exists(self$raw_path2)) {
             bids_subject <- as_bids_subject(self$subject, strict = FALSE)
             query_results <- bidsr::query_bids(
               bids_subject,
@@ -180,7 +180,7 @@ RAVEPreprocessSettings <- R6::R6Class(
           }
         },
         {
-          paths <- file_path(self$raw_rave_path, block)
+          paths <- file_path(self$raw_path, block)
         }
       )
       paths <- unlist(paths)
@@ -590,7 +590,7 @@ RAVEPreprocessSettings <- R6::R6Class(
     #' some projects
     all_blocks = function(){
       switch (
-        self$raw_path_type,
+        self$raw_path2_type,
         "bids" = {
           bids_subject <- bidsr::bids_subject(
             project = self$subject$`@impl`@project@parent_path,
@@ -610,7 +610,7 @@ RAVEPreprocessSettings <- R6::R6Class(
           re <- unique(unlist(block_names))
         },
         {
-          blk <- list.dirs(self$raw_path, full.names = FALSE, recursive = FALSE)
+          blk <- list.dirs(self$raw_path2, full.names = FALSE, recursive = FALSE)
           re <- sort(unique(c(self$blocks, blk)))
           re <- re[!re %in% c("rave-imaging")]
         }
@@ -618,28 +618,33 @@ RAVEPreprocessSettings <- R6::R6Class(
       re
     },
 
-    #' @field raw_path raw data path
-    raw_path = function(){
+    #' @field raw_path2 raw data path, based on the format standard; for native,
+    #' this is equivalent to \code{raw_path}; for 'BIDS', this is subject raw
+    #' directory in \code{'BIDS'} project
+    raw_path2 = function(){
       switch (
-        self$raw_path_type,
+        self$raw_path2_type,
         "bids" = rave_path(self$subject$`@impl`, 'bids_raw'),
         rave_path(self$subject$`@impl`, 'rave_raw')
       )
     },
 
-    #' @field raw_path_type raw data path type, 'native' or 'bids'
-    raw_path_type = function(){
+    #' @field raw_path2_type raw data path type, 'native' or 'bids'
+    raw_path2_type = function(){
       self$subject$`@impl`@project@format_standard
     },
 
-    #' @field raw_rave_path raw data path for 'RAVE', regardless of
-    #' \code{raw_path_type}; used for format conversion (for example, when
-    #' converting from native to 'BIDS') and storing processed imaging files.
-    #' This path equals to \code{raw_path} under the 'native' format, but
-    #' differs in other \code{raw_path_type} values
-    raw_rave_path = function() {
+    #' @field raw_path legacy raw data path for 'RAVE', regardless of
+    #' \code{raw_path2_type}. This field exists for compatibility support
+    #' the legacy scripts. Please use \code{raw_path2} combined with
+    #' \code{raw_path2_type} for supporting 'BIDS' format
+    raw_path = function() {
       rave_path(self$subject$`@impl`, 'rave_raw')
-    }
+    },
+
+    #' @field raw_path_type legacy type for \code{raw_path}, always returns
+    #' \code{'native'}
+    raw_path_type = function() { 'native' }
 
   )
 )
