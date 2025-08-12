@@ -20,7 +20,7 @@
 generate_reference <- function(subject, electrodes) {
 
   # DIPSAUS DEBUG START
-  # subject <- "demo/DemoSubject"
+  # subject <- "test/DemoSubject"
   # electrodes <- c(13,16)
 
   subject <- restore_subject_instance(subject, strict = FALSE)
@@ -95,7 +95,7 @@ generate_reference <- function(subject, electrodes) {
     sarray$.mode <- "readonly"
 
     # perform wavelet
-    if (is.list(wavelet_params)) {
+    if (has_wavelet && is.list(wavelet_params)) {
       # wavelet
       coef <- 0
       for (e in electrodes) {
