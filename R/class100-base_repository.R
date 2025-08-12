@@ -16,6 +16,7 @@ RAVESubjectBaseRepository <- R6::R6Class(
   cloneable = TRUE,
 
   private = list(
+    .auto_exclude = TRUE,
     .project = NULL,
     .subject = NULL,
     .intended_electrode_list = integer(),
@@ -26,7 +27,12 @@ RAVESubjectBaseRepository <- R6::R6Class(
     update_electrode_list = function() {
       reference_table <- self$reference_table
       electrodes <- private$.intended_electrode_list
-      included_electrodes <- as.integer(reference_table$Electrode[reference_table$Reference != ''])
+
+      if(private$.auto_exclude) {
+        included_electrodes <- as.integer(reference_table$Electrode[reference_table$Reference != ''])
+      } else {
+        included_electrodes <- as.integer(reference_table$Electrode)
+      }
       included_electrodes <- included_electrodes[included_electrodes %in% electrodes]
       included_electrodes <- sort(unique(included_electrodes))
 
@@ -90,6 +96,7 @@ RAVESubjectBaseRepository <- R6::R6Class(
     #' @param subject 'RAVE' subject
     #' @param electrodes string or integers indicating electrodes to load
     #' @param reference_name name of the reference table
+    #' @param auto_exclude whether to automatically discard bad channels
     #' @param quiet see field \code{quiet}
     #' @param repository_id see field \code{repository_id}
     #' @param strict whether the mode should be strict; default is true and
@@ -97,12 +104,14 @@ RAVESubjectBaseRepository <- R6::R6Class(
     #' @param ... reserved, currently ignored
     #' @param .class internally used, do not set, even if you know what this is
     initialize = function(subject, electrodes = NULL, reference_name = NULL, ...,
-                          quiet = TRUE, repository_id = NULL, strict = TRUE, .class = NULL) {
+                          auto_exclude = TRUE, quiet = TRUE,
+                          repository_id = NULL, strict = TRUE, .class = NULL) {
 
       if(is.null(.class)) {
         .class <- "rave_prepare_subject_bare0"
       }
       class(self) <- unique(c(.class, 'rave_repository', class(self)))
+      private$.auto_exclude <- isTRUE(as.logical(auto_exclude))
 
       self$quiet <- quiet
       repository_id <- paste(repository_id, collapse = "")
@@ -132,7 +141,15 @@ RAVESubjectBaseRepository <- R6::R6Class(
         reference_name <- "default"
       }
       reference_name <- as.character(reference_name[[1]])
-      if(!isTRUE(reference_name %in% available_reference_names) && !identical(reference_name, "noref")) {
+
+      exception_list <- "noref"
+      if(identical(reference_name, "_unsaved")) {
+        # for reference module
+        if(file_exists(file_path(subject$meta_path, "reference__unsaved.csv"))) {
+          exception_list <- c("noref", "_unsaved")
+        }
+      }
+      if(!isTRUE(reference_name %in% available_reference_names) && !isTRUE(reference_name %in% exception_list)) {
         reference_warn <- TRUE
         if(length(available_reference_names)) {
           reference_name <- available_reference_names[[1]]
@@ -160,6 +177,17 @@ RAVESubjectBaseRepository <- R6::R6Class(
 
   ),
   active = list(
+
+    #' @field auto_exclude whether to automatically discard channels that are
+    #' marked as "excluded" (such as bad channels or channels that should
+    #' not be analyzed); default is often true
+    auto_exclude = function(v) {
+      if(!missing(v)) {
+        private$.auto_exclude <- isTRUE(as.logical(v))
+      }
+      private$update_electrode_list()
+      private$.auto_exclude
+    },
 
     #' @field needs_update write-only attribute when subject needs to be
     #' reloaded from the disk and reference table needs to be updated, use
@@ -253,7 +281,7 @@ RAVESubjectBaseRepository <- R6::R6Class(
       if(!length(subject$electrodes)) {
         stop("No electrode/channel found under this subject. Please import data first.")
       }
-      if(!isTRUE(reference_name %in% subject$reference_names)) {
+      if(!isTRUE(reference_name %in% c(subject$reference_names, "_unsaved"))) {
         if(identical(tolower(self$reference_name), "noref")) {
           reference_table <- data.frame(
             Electrode = subject$electrodes,
@@ -343,6 +371,7 @@ RAVESubjectBaseRepository <- R6::R6Class(
 #' @param subject 'RAVE' subject
 #' @param electrodes string or integers indicating electrodes to load
 #' @param reference_name name of the reference table
+#' @param auto_exclude whether to automatically discard bad channels
 #' @param quiet see field \code{quiet}
 #' @param repository_id see field \code{repository_id}
 #' @param ... passed to \code{\link{RAVESubjectBaseRepository}} constructor
@@ -380,6 +409,7 @@ RAVESubjectBaseRepository <- R6::R6Class(
 #' @export
 prepare_subject_bare0 <- function(subject, electrodes = NULL,
                                   reference_name = NULL, ...,
+                                  auto_exclude = TRUE,
                                   quiet = TRUE, repository_id = NULL) {
 
   RAVESubjectBaseRepository$new(
@@ -388,6 +418,7 @@ prepare_subject_bare0 <- function(subject, electrodes = NULL,
     reference_name = reference_name,
     quiet = quiet,
     repository_id = repository_id,
+    auto_exclude = auto_exclude,
     ...
   )
 }
