@@ -546,7 +546,7 @@ RAVESubject <- R6::R6Class(
       if(length(reference_name) != 1){
         stop("Only one reference is allowed at a time.")
       }
-      if(!isTRUE(reference_name %in% self$reference_names)){
+      if(!isTRUE(reference_name %in% c(self$reference_names, "_unsaved"))){
         stop("Subject ", self$subject_id, " has no reference name called: ", sQuote(reference_name), "\n  Please check folder\n    ", self$meta_path, "\n  and make sure ", sQuote(sprintf("reference_%s.csv", reference_name)), " exists.")
       }
 
@@ -880,7 +880,12 @@ RAVESubject <- R6::R6Class(
 
     #' @field pipeline_path path to pipeline scripts under subject's folder
     pipeline_path = function(){
-      rave_path(private$impl, storage = "pipeline")
+      rave_path(private$impl, storage = "pipelines")
+    },
+
+    #' @field report_path path to pipeline scripts under subject's folder
+    report_path = function(){
+      rave_path(private$impl, storage = "reports")
     },
 
     #' @field note_path path that stores 'RAVE' related subject notes

@@ -187,8 +187,9 @@ S7::method(rave_path, RAVESubjectDerivativeImpl) <- function(x, storage = NULL, 
   # 'source' path: where
 
   # for project-based paths
-  project_based_storages <- c("project_subject", "project_parent", "project", "project_groupdata",
-                              "notes", "preprocess", "meta", "pipeline", "signals", "cache", "reference", "freesurfer")
+  project_based_storages <- c(
+    "project_subject", "project_parent", "project", "project_groupdata",
+    "notes", "preprocess", "meta", "pipelines", "reports", "signals", "cache", "reference", "freesurfer")
   # For metadata
   metadata_storages <- c('electrodes', 'frequencies', 'time_points', 'time_excluded', 'epoch', 'references')
   # For subject-only paths
@@ -211,7 +212,8 @@ S7::method(rave_path, RAVESubjectDerivativeImpl) <- function(x, storage = NULL, 
       "notes" = file_path(x@project@path, format(x@subject_raw), "notes"),
       "preprocess" = file_path(x@project@path, format(x@subject_raw), "rave", "preprocess"),
       "meta" = file_path(x@project@path, format(x@subject_raw), "rave", "meta"),
-      "pipeline" = file_path(x@project@path, format(x@subject_raw), "pipeline"),
+      "pipelines" = file_path(x@project@path, format(x@subject_raw), "pipelines"),
+      "reports" = file_path(x@project@path, format(x@subject_raw), "reports"),
       "signals" = file_path(x@project@path, format(x@subject_raw), "rave", "data"),
       "cache" = file_path(x@project@path, format(x@subject_raw), "cache"),
       "reference" = file_path(x@project@path, format(x@subject_raw), "rave", "data", "reference"),

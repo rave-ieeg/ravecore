@@ -274,11 +274,27 @@ archive_subject <- function(
       )
     }
 
+    pipeline_folders <-
+      list.files(
+        subject$pipeline_path,
+        all.files = FALSE,
+        full.names = FALSE,
+        recursive = FALSE,
+        include.dirs = TRUE,
+        no.. = TRUE
+      )
+    for(f in pipeline_folders) {
+      copy_file(
+        from = file.path(subject$pipeline_path, f),
+        to = path_pipelines
+      )
+    }
+
     meta_info$paths$pipelines <- list(
       type = "data_dir",
       level = "subject",
       src = "pipelines",
-      dst = "/rave/pipeline"
+      dst = "/rave/pipelines"
     )
 
   }

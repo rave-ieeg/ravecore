@@ -330,7 +330,7 @@ RAVEProject <- R6::R6Class(
 
     #' @field pipeline_path path to pipeline scripts under project's folder
     pipeline_path = function(){
-      file_path(private$impl@path, "_project_pipeline")
+      file_path(private$impl@path, "_project_pipelines")
     },
 
     #' @field format_standard storage format, can be either \code{'native'} or
