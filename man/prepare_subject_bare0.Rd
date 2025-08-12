@@ -9,6 +9,7 @@ prepare_subject_bare0(
   electrodes = NULL,
   reference_name = NULL,
   ...,
+  auto_exclude = TRUE,
   quiet = TRUE,
   repository_id = NULL
 )
@@ -21,6 +22,8 @@ prepare_subject_bare0(
 \item{reference_name}{name of the reference table}
 
 \item{...}{passed to \code{\link{RAVESubjectBaseRepository}} constructor}
+
+\item{auto_exclude}{whether to automatically discard bad channels}
 
 \item{quiet}{see field \code{quiet}}
 

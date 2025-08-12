@@ -27,6 +27,10 @@ requested electrodes are not fully processed or excluded}
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
+\item{\code{auto_exclude}}{whether to automatically discard channels that are
+marked as "excluded" (such as bad channels or channels that should
+not be analyzed); default is often true}
+
 \item{\code{needs_update}}{write-only attribute when subject needs to be
 reloaded from the disk and reference table needs to be updated, use
 \code{repo$needs_update <- TRUE}}
@@ -126,6 +130,7 @@ constructor
   electrodes = NULL,
   reference_name = NULL,
   ...,
+  auto_exclude = TRUE,
   quiet = TRUE,
   repository_id = NULL,
   strict = TRUE,
@@ -143,6 +148,8 @@ constructor
 \item{\code{reference_name}}{name of the reference table}
 
 \item{\code{...}}{reserved, currently ignored}
+
+\item{\code{auto_exclude}}{whether to automatically discard bad channels}
 
 \item{\code{quiet}}{see field \code{quiet}}
 
