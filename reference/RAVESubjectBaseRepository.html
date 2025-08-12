@@ -64,7 +64,13 @@ requested electrodes are not fully processed or excluded</p></dd>
     </div>
     <div class="section level2">
     <h2 id="active-bindings">Active bindings<a class="anchor" aria-label="anchor" href="#active-bindings"></a></h2>
-    <p></p><div class="r6-active-bindings"><dl><dt><code>needs_update</code></dt>
+    <p></p><div class="r6-active-bindings"><dl><dt><code>auto_exclude</code></dt>
+<dd><p>whether to automatically discard channels that are
+marked as "excluded" (such as bad channels or channels that should
+not be analyzed); default is often true</p></dd>
+
+
+<dt><code>needs_update</code></dt>
 <dd><p>write-only attribute when subject needs to be
 reloaded from the disk and reference table needs to be updated, use
 <code>repo$needs_update &lt;- TRUE</code></p></dd>
@@ -180,6 +186,7 @@ different identifiers); generated from <code>digest_key</code></p></dd>
 <span>  electrodes <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  reference_name <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span>,</span>
+<span>  auto_exclude <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  quiet <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  repository_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  strict <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -203,6 +210,10 @@ different identifiers); generated from <code>digest_key</code></p></dd>
 
 <dt><code>...</code></dt>
 <dd><p>reserved, currently ignored</p></dd>
+
+
+<dt><code>auto_exclude</code></dt>
+<dd><p>whether to automatically discard bad channels</p></dd>
 
 
 <dt><code>quiet</code></dt>
