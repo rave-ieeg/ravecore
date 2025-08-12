@@ -587,7 +587,7 @@ test_that("RAVESubjectEpochRawVoltageRepository - parallel", {
     repository_id = repository_id
   )
 
-  ravepipeline::with_mirai_parallel(workers = 2, {
+  ravepipeline::with_rave_parallel(.workers = 2, {
     repo_new0 <- RAVESubjectEpochRawVoltageRepository$new(
       subject = "demo/DemoSubject",
       electrodes = 13:16,
@@ -666,8 +666,8 @@ test_that("RAVESubjectEpochVoltageRepository - parallel", {
     repository_id = repository_id
   )
 
-  ravepipeline::with_mirai_parallel(
-    workers = 2,
+  ravepipeline::with_rave_parallel(
+    .workers = 2,
     {
       repo_new0 <- RAVESubjectEpochVoltageRepository$new(
         subject = "demo/DemoSubject",

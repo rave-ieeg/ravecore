@@ -776,8 +776,8 @@ test_that("RAVESubjectEpochTimeFreqCoefRepository - parallel", {
     stitch_events = NULL,
     repository_id = repository_id
   )
-  ravepipeline::with_mirai_parallel(
-    workers = 2,
+  ravepipeline::with_rave_parallel(
+    .workers = 2,
     {
       repo_new0 <- RAVESubjectEpochTimeFreqCoefRepository$new(
         subject = "demo/DemoSubject",
@@ -866,8 +866,8 @@ test_that("RAVESubjectEpochPowerRepository - parallel", {
     repository_id = repository_id
   )
 
-  ravepipeline::with_mirai_parallel(
-    workers = 2,
+  ravepipeline::with_rave_parallel(
+    .workers = 2,
     {
       repo_new0 <- RAVESubjectEpochPowerRepository$new(
         subject = "demo/DemoSubject",
@@ -956,8 +956,8 @@ test_that("RAVESubjectEpochPhaseRepository - parallel", {
     repository_id = repository_id
   )
 
-  ravepipeline::with_mirai_parallel(
-    workers = 2,
+  ravepipeline::with_rave_parallel(
+    .workers = 2,
     {
       repo_new0 <- RAVESubjectEpochPhaseRepository$new(
         subject = "demo/DemoSubject",
