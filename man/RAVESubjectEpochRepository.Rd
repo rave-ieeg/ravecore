@@ -3,6 +3,9 @@
 \name{RAVESubjectEpochRepository}
 \alias{RAVESubjectEpochRepository}
 \title{'RAVE' class for epoch repository}
+\value{
+The root directory where the files are stored.
+}
 \description{
 Compared to \code{\link{RAVESubjectBaseRepository}}, this repository
 requires epoch information. please use
@@ -63,6 +66,7 @@ repository signature}
 \item \href{#method-RAVESubjectEpochRepository-@marshal}{\code{RAVESubjectEpochRepository$@marshal()}}
 \item \href{#method-RAVESubjectEpochRepository-@unmarshal}{\code{RAVESubjectEpochRepository$@unmarshal()}}
 \item \href{#method-RAVESubjectEpochRepository-new}{\code{RAVESubjectEpochRepository$new()}}
+\item \href{#method-RAVESubjectEpochRepository-export_matlab}{\code{RAVESubjectEpochRepository$export_matlab()}}
 \item \href{#method-RAVESubjectEpochRepository-set_epoch}{\code{RAVESubjectEpochRepository$set_epoch()}}
 \item \href{#method-RAVESubjectEpochRepository-mount_data}{\code{RAVESubjectEpochRepository$mount_data()}}
 \item \href{#method-RAVESubjectEpochRepository-clone}{\code{RAVESubjectEpochRepository$clone()}}
@@ -161,6 +165,25 @@ errors out when subject is missing}
 \item{\code{lazy_load}}{whether to delay (lazy) the evaluation \code{mount_data}}
 
 \item{\code{.class}}{internally used, do not set, even if you know what this is}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-RAVESubjectEpochRepository-export_matlab"></a>}}
+\if{latex}{\out{\hypertarget{method-RAVESubjectEpochRepository-export_matlab}{}}}
+\subsection{Method \code{export_matlab()}}{
+Export the repository to 'Matlab' for future analysis
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectEpochRepository$export_matlab(..., verbose = TRUE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{reserved for child classes}
+
+\item{\code{verbose}}{print progresses}
 }
 \if{html}{\out{</div>}}
 }

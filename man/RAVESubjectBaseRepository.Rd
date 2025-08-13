@@ -3,6 +3,9 @@
 \name{RAVESubjectBaseRepository}
 \alias{RAVESubjectBaseRepository}
 \title{'RAVE' class for base repository}
+\value{
+The root directory where the files are stored.
+}
 \description{
 The class is for creating child classes, to instantiate the class,
 please use \code{\link{prepare_subject_bare0}} to create base repository.
@@ -75,6 +78,7 @@ different identifiers); generated from \code{digest_key}}
 \item \href{#method-RAVESubjectRepository-@marshal}{\code{RAVESubjectBaseRepository$@marshal()}}
 \item \href{#method-RAVESubjectRepository-@unmarshal}{\code{RAVESubjectBaseRepository$@unmarshal()}}
 \item \href{#method-RAVESubjectRepository-new}{\code{RAVESubjectBaseRepository$new()}}
+\item \href{#method-RAVESubjectRepository-export_matlab}{\code{RAVESubjectBaseRepository$export_matlab()}}
 \item \href{#method-RAVESubjectRepository-clone}{\code{RAVESubjectBaseRepository$clone()}}
 }
 }
@@ -159,6 +163,25 @@ constructor
 errors out when subject is missing}
 
 \item{\code{.class}}{internally used, do not set, even if you know what this is}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-RAVESubjectRepository-export_matlab"></a>}}
+\if{latex}{\out{\hypertarget{method-RAVESubjectRepository-export_matlab}{}}}
+\subsection{Method \code{export_matlab()}}{
+Export the repository to 'Matlab' for future analysis
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectBaseRepository$export_matlab(..., verbose = TRUE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{reserved for child classes}
+
+\item{\code{verbose}}{print progresses}
 }
 \if{html}{\out{</div>}}
 }

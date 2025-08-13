@@ -3,6 +3,9 @@
 \name{RAVESubjectEpochVoltageRepository}
 \alias{RAVESubjectEpochVoltageRepository}
 \title{'RAVE' class for epoch repository - voltage}
+\value{
+The root directory where the files are stored.
+}
 \description{
 The repository inherits \code{link{RAVESubjectEpochRepository}}, with epoch
 trials, and is intended for loading processed and referenced voltage
@@ -31,6 +34,7 @@ repository signature}
 \item \href{#method-RAVESubjectEpochVoltageRepository-@unmarshal}{\code{RAVESubjectEpochVoltageRepository$@unmarshal()}}
 \item \href{#method-RAVESubjectEpochVoltageRepository-new}{\code{RAVESubjectEpochVoltageRepository$new()}}
 \item \href{#method-RAVESubjectEpochVoltageRepository-mount_data}{\code{RAVESubjectEpochVoltageRepository$mount_data()}}
+\item \href{#method-RAVESubjectEpochVoltageRepository-export_matlab}{\code{RAVESubjectEpochVoltageRepository$export_matlab()}}
 \item \href{#method-RAVESubjectEpochVoltageRepository-clone}{\code{RAVESubjectEpochVoltageRepository$clone()}}
 }
 }
@@ -142,6 +146,25 @@ function to mount processed and referenced voltage signals
 \if{html}{\out{<div class="r">}}\preformatted{RAVESubjectEpochVoltageRepository$mount_data()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-RAVESubjectEpochVoltageRepository-export_matlab"></a>}}
+\if{latex}{\out{\hypertarget{method-RAVESubjectEpochVoltageRepository-export_matlab}{}}}
+\subsection{Method \code{export_matlab()}}{
+Export the repository to 'Matlab' for future analysis
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectEpochVoltageRepository$export_matlab(..., verbose = TRUE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{reserved for child classes}
+
+\item{\code{verbose}}{print progresses}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVESubjectEpochVoltageRepository-clone"></a>}}

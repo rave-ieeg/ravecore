@@ -158,6 +158,83 @@ RAVESubjectEpochTimeFreqBaseRepository <- R6::R6Class(
       )
 
       self
+    },
+
+    #' @description Export the repository to 'Matlab' for future analysis
+    #' @param ... reserved for child classes
+    #' @param verbose print progresses
+    #' @returns The root directory where the files are stored.
+    export_matlab = function(..., verbose = TRUE) {
+      # self <- prepare_subject_time_frequency_coefficients(
+      #     "demo/DemoSubject", electrodes = 14:16,
+      #     reference_name = "default", epoch_name = "auditory_onset",
+      #     time_windows = c(-1, 2))
+      # root_path <- self$export_matlab()
+      # private <- self$.__enclos_env__$private
+
+      root_path <- super$export_matlab(..., verbose = verbose)
+      summary_path <- file_path(root_path, "summary.yaml")
+      summary <- load_yaml(summary_path)
+
+      data_type <- private$.data_type
+
+      if(verbose) {
+        callback <- function(ii) {
+          sprintf("Exporting %s|Electrode channel %d", data_type, self$electrode_list[[ii]])
+        }
+      } else {
+        callback <- NULL
+      }
+
+      data_path <- file.path(root_path, data_type)
+      dir_create2(data_path)
+
+      data_list <- private$.data$data_list
+
+      ravepipeline::lapply_jobs(
+        seq_along(data_list),
+        function(ii) {
+          # ii <- 1
+          nm <- names(data_list)[[ii]]
+          electrode_instance <- self$electrode_instances[[nm]]
+          ref_name <- electrode_instance$reference_name
+          if(length(ref_name)) {
+            ravecore <- asNamespace("ravecore")
+            ref_name <- ravecore$parse_svec(gsub("^ref_", "", ref_name))
+          }
+          ref_name <- as.matrix(as.integer(ref_name))
+
+          arr <- data_list[[nm]]
+          dnames <- dimnames(arr)
+          arr <- arr[dimnames = FALSE]
+          ch <- as.integer(dnames$Electrode)
+          ieegio::io_write_mat(
+            list(
+              description = sprintf("Time-frequency %s: frequency x time x trial", data_type),
+              electrode = as.matrix(dnames$Electrode),
+              trial_number = as.matrix(dnames$Trial),
+              time_in_secs = as.matrix(dnames$Time),
+              frequency = as.matrix(dnames$Frequency),
+              reference = ref_name,
+              data = arr
+            ),
+            con = file.path(data_path, sprintf("ch%04d.mat", ch))
+          )
+        },
+        .globals = list(self = self,
+                        data_path = data_path,
+                        data_type = data_type,
+                        data_list = data_list),
+        callback = callback
+      )
+
+      summary$time_frequency_shape <- as.integer(private$.data$dim)
+      summary$time_frequency_margin <- paste(names(private$.data$dimnames), collapse = " x ")
+      summary$contains[["Time frequency"]] <- data_type
+
+      save_yaml(summary, file = summary_path, sorted = TRUE)
+
+      return(root_path)
     }
 
   ),

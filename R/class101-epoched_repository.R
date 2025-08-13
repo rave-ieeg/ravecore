@@ -97,6 +97,33 @@ RAVESubjectEpochRepository <- R6::R6Class(
       }
     },
 
+    #' @description Export the repository to 'Matlab' for future analysis
+    #' @param ... reserved for child classes
+    #' @param verbose print progresses
+    #' @returns The root directory where the files are stored.
+    export_matlab = function(..., verbose = TRUE) {
+      # self <- prepare_subject_with_epoch(
+      #     "demo/DemoSubject", electrodes = 14:16,
+      #     reference_name = "default", epoch_name = "auditory_onset",
+      #     time_windows = c(-1, 2))
+      root_path <- super$export_matlab(..., verbose = verbose)
+      summary_path <- file_path(root_path, "summary.yaml")
+      summary <- load_yaml(summary_path)
+
+      summary$epoch_name <- self$epoch_name
+      summary$time_windows <- self$time_windows
+      summary$stitch_events <- self$stitch_events
+      summary$sample_rates <- self$sample_rates
+
+      epoch_path <- file.path(root_path, "epoch.csv")
+      export_table(x = self$epoch_table, file = epoch_path)
+      summary$contains[["Epoch table"]] <- "epoch.csv"
+
+      save_yaml(summary, file = summary_path, sorted = TRUE)
+
+      return(root_path)
+    },
+
     #' @description change trial epoch profiles
     #' @param epoch_name name of epoch table
     #' @param stitch_events events to stitch

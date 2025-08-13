@@ -35,6 +35,7 @@ mounted by \code{mount_data}}
 <ul>
 <li><span class="pkg-link" data-pkg="ravepipeline" data-topic="RAVESerializable" data-id="@compare"><a href='../../ravepipeline/html/RAVESerializable.html#method-RAVESerializable-@compare'><code>ravepipeline::RAVESerializable$@compare()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectEpochRepository" data-id="set_epoch"><a href='../../ravecore/html/RAVESubjectEpochRepository.html#method-RAVESubjectEpochRepository-set_epoch'><code>ravecore::RAVESubjectEpochRepository$set_epoch()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectEpochTimeFreqBaseRepository" data-id="export_matlab"><a href='../../ravecore/html/RAVESubjectEpochTimeFreqBaseRepository.html#method-RAVESubjectEpochTimeFreqBaseRepository-export_matlab'><code>ravecore::RAVESubjectEpochTimeFreqBaseRepository$export_matlab()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectEpochTimeFreqBaseRepository" data-id="mount_data"><a href='../../ravecore/html/RAVESubjectEpochTimeFreqBaseRepository.html#method-RAVESubjectEpochTimeFreqBaseRepository-mount_data'><code>ravecore::RAVESubjectEpochTimeFreqBaseRepository$mount_data()</code></a></span></li>
 </ul>
 </details>

@@ -3,6 +3,9 @@
 \name{RAVESubjectEpochTimeFreqBaseRepository}
 \alias{RAVESubjectEpochTimeFreqBaseRepository}
 \title{'RAVE' class for epoch repository - time-frequency (internal)}
+\value{
+The root directory where the files are stored.
+}
 \description{
 The repository inherits \code{link{RAVESubjectEpochRepository}}, with epoch
 trials, and is intended for loading processed and referenced time-frequency
@@ -40,6 +43,7 @@ repository signature}
 \item \href{#method-RAVESubjectEpochTimeFreqBaseRepository-@unmarshal}{\code{RAVESubjectEpochTimeFreqBaseRepository$@unmarshal()}}
 \item \href{#method-RAVESubjectEpochTimeFreqBaseRepository-new}{\code{RAVESubjectEpochTimeFreqBaseRepository$new()}}
 \item \href{#method-RAVESubjectEpochTimeFreqBaseRepository-mount_data}{\code{RAVESubjectEpochTimeFreqBaseRepository$mount_data()}}
+\item \href{#method-RAVESubjectEpochTimeFreqBaseRepository-export_matlab}{\code{RAVESubjectEpochTimeFreqBaseRepository$export_matlab()}}
 \item \href{#method-RAVESubjectEpochTimeFreqBaseRepository-clone}{\code{RAVESubjectEpochTimeFreqBaseRepository$clone()}}
 }
 }
@@ -155,6 +159,25 @@ function to mount processed and referenced voltage signals
 \if{html}{\out{<div class="r">}}\preformatted{RAVESubjectEpochTimeFreqBaseRepository$mount_data()}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-RAVESubjectEpochTimeFreqBaseRepository-export_matlab"></a>}}
+\if{latex}{\out{\hypertarget{method-RAVESubjectEpochTimeFreqBaseRepository-export_matlab}{}}}
+\subsection{Method \code{export_matlab()}}{
+Export the repository to 'Matlab' for future analysis
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectEpochTimeFreqBaseRepository$export_matlab(..., verbose = TRUE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{reserved for child classes}
+
+\item{\code{verbose}}{print progresses}
+}
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVESubjectEpochTimeFreqBaseRepository-clone"></a>}}

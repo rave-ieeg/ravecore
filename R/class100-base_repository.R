@@ -16,13 +16,13 @@ RAVESubjectBaseRepository <- R6::R6Class(
   cloneable = TRUE,
 
   private = list(
-    .auto_exclude = TRUE,
     .project = NULL,
     .subject = NULL,
     .intended_electrode_list = integer(),
     .electrode_list = integer(),
     .reference_name = character(),
 
+    .auto_exclude = TRUE,
 
     update_electrode_list = function() {
       reference_table <- self$reference_table
@@ -173,6 +173,49 @@ RAVESubjectBaseRepository <- R6::R6Class(
 
       private$update_electrode_list()
 
+    },
+
+    #' @description Export the repository to 'Matlab' for future analysis
+    #' @param ... reserved for child classes
+    #' @param verbose print progresses
+    #' @returns The root directory where the files are stored.
+    export_matlab = function(..., verbose = TRUE) {
+      # self <- ravecore::prepare_subject_bare0("demo/DemoSubject")
+      subject <- self$subject
+      date_str <- strftime(Sys.time(), "%y%m%dT%H%M%S")
+      dname <- sprintf("export-%s", date_str)
+
+      # everything is stored here
+      root_path <- file_path(subject$rave_path, "exports", "rave-repository", dname)
+
+      dir_create2(root_path, check = TRUE)
+
+      # self$epoch_name
+      # as.double(unlist(x$time_windows))
+      electrode_path <- file.path(root_path, "electrodes.csv")
+      export_table(x = self$electrode_table, file = electrode_path)
+
+      reference_path <- file.path(root_path, "reference.csv")
+      export_table(x = self$reference_table, file = reference_path)
+
+      summary_path <- file.path(root_path, "summary.yaml")
+      save_yaml(
+        file = summary_path,
+        sorted = TRUE,
+        list(
+          timestamp = date_str,
+          project_name = subject$project_name,
+          subject_code = subject$subject_code,
+          loaded_electrodes = self$electrode_list,
+          reference_name = self$reference_name,
+          contains = list(
+            "Summary YAML" = "summary.yaml",
+            "Electrode table" = "electrodes.csv",
+            "Reference tale" = "reference.csv")
+        )
+      )
+
+      return(root_path)
     }
 
   ),
@@ -361,7 +404,6 @@ RAVESubjectBaseRepository <- R6::R6Class(
         contents = names(digest_key)
       )
     }
-
   )
 
 )
