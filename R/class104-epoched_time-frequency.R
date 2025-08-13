@@ -3,9 +3,6 @@
 #' The repository inherits \code{link{RAVESubjectEpochRepository}}, with epoch
 #' trials, and is intended for loading processed and referenced time-frequency
 #' coefficients.
-#' Use \code{\link{prepare_subject_time_frequency_coefficients}} to create an
-#' instance.
-#'
 RAVESubjectEpochTimeFreqBaseRepository <- R6::R6Class(
   classname = "RAVESubjectEpochTimeFreqBaseRepository",
   portable = TRUE,
@@ -209,7 +206,7 @@ RAVESubjectEpochTimeFreqBaseRepository <- R6::R6Class(
     #' @param verbose print progresses
     #' @returns The root directory where the files are stored.
     export_matlab = function(..., verbose = TRUE) {
-      # self <- prepare_subject_power(
+      # self <- prepare_subject_power_with_epoch(
       #     "demo/DemoSubject", electrodes = 14:16,
       #     reference_name = "default", epoch_name = "auditory_onset",
       #     time_windows = c(-1, 2))
@@ -362,7 +359,7 @@ RAVESubjectEpochTimeFreqBaseRepository <- R6::R6Class(
 #' The repository inherits \code{link{RAVESubjectEpochTimeFreqBaseRepository}}, with epoch
 #' trials, and is intended for loading processed and referenced time-frequency
 #' coefficients.
-#' Use \code{\link{prepare_subject_time_frequency_coefficients}} to create an
+#' Use \code{\link{prepare_subject_time_frequency_coefficients_with_epoch}} to create an
 #' instance.
 #'
 #' @export
@@ -470,7 +467,7 @@ RAVESubjectEpochTimeFreqCoefRepository <- R6::R6Class(
 
 #' @rdname prepare_subject_with_epoch
 #' @export
-prepare_subject_time_frequency_coefficients <- function(
+prepare_subject_time_frequency_coefficients_with_epoch <- function(
     subject, electrodes = NULL, reference_name = NULL,
     epoch_name = NULL, time_windows = NULL,
     stitch_events = NULL, ..., quiet = FALSE,
