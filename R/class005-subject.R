@@ -663,6 +663,9 @@ RAVESubject <- R6::R6Class(
         if(subset){
           electrode_table <- electrode_table[electrode_table$isLoaded, ]
         }
+        if(length(electrode_table$Reference)) {
+          electrode_table$Reference[is.na(electrode_table$Reference)] <- "noref"
+        }
       }
 
       if(simplify){
