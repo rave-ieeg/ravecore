@@ -232,17 +232,6 @@ dir_create2 <- function(x, showWarnings = FALSE, recursive = TRUE, check = TRUE,
   invisible(path_abs(x))
 }
 
-fileexts <- function(file){
-  call_pkg_fun("ieegio", "path_ext", file)
-  # x <- filenames(file)
-  # sapply(strsplit(x = file, split = '\\.'), function(x){
-  #   l <- length(x)
-  #   ifelse(l > 1, x[[l]], '')
-  # })
-}
-
-
-
 #' @title Back up and rename the file or directory
 #' @param path path to a file or a directory
 #' @param remove whether to remove the original path; default is false
@@ -273,7 +262,7 @@ backup_file <- function(path, remove = FALSE, quiet = FALSE) {
   is_dir <- dir.exists(path)
 
   # find the extension
-  ext <- fileexts(path)
+  ext <- path_ext(path)
 
   bname <- basename(path)
   dname <- dirname(path)

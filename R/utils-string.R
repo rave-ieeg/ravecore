@@ -100,6 +100,7 @@ rand_string <- function(length = 50){
   ))
   now <- rev(as.integer(now))
 
+  # uuid::UUIDgenerate(use.time = TRUE, output = "string")
   dict0 <- ravepipeline::digest(paste(pid, now), algo = "xxhash32", seed = pid)
   dict1 <- ravepipeline::digest(paste(pid, now, dict0), algo = "xxhash32", seed = now[[1]])
   dict2 <- ravepipeline::digest(paste(pid, now, dict1), algo = "murmur32", seed = sum(now))

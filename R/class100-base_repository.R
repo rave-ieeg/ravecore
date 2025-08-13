@@ -366,6 +366,7 @@ RAVESubjectBaseRepository <- R6::R6Class(
 
 )
 
+#' @name prepare_subject_bare
 #' @title 'RAVE' repository: basic
 #' @returns A \code{\link{RAVESubjectBaseRepository}} instance
 #' @param subject 'RAVE' subject
@@ -407,9 +408,27 @@ RAVESubjectBaseRepository <- R6::R6Class(
 #' }
 #'
 #' @export
+prepare_subject_bare <- function(subject, electrodes = NULL,
+                                 reference_name = NULL, ...,
+                                 auto_exclude = FALSE,
+                                 quiet = TRUE, repository_id = NULL) {
+
+  RAVESubjectBaseRepository$new(
+    subject = subject,
+    electrodes = electrodes,
+    reference_name = reference_name,
+    quiet = quiet,
+    repository_id = repository_id,
+    auto_exclude = auto_exclude,
+    ...
+  )
+}
+
+#' @rdname prepare_subject_bare
+#' @export
 prepare_subject_bare0 <- function(subject, electrodes = NULL,
                                   reference_name = NULL, ...,
-                                  auto_exclude = TRUE,
+                                  auto_exclude = FALSE,
                                   quiet = TRUE, repository_id = NULL) {
 
   RAVESubjectBaseRepository$new(
