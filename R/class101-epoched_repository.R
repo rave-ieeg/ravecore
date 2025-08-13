@@ -192,7 +192,11 @@ RAVESubjectEpochRepository <- R6::R6Class(
 
     #' @description function to mount data, not doing anything in this
     #' class, but may be used by child classes
-    mount_data = function() {
+    #' @param force force update data; default is true
+    #' @param electrodes electrodes to update; default is \code{NULL} (all
+    #' electrode channels)
+    #' @param ... reserved
+    mount_data = function(..., force = TRUE, electrodes = NULL) {
 
     }
   ),

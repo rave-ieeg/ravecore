@@ -94,23 +94,62 @@ RAVESubjectEpochTimeFreqBaseRepository <- R6::R6Class(
       )
     },
 
-    #' @description function to mount processed and referenced voltage signals
-    mount_data = function() {
+    #' @description function to mount processed and referenced 'spectrogram'
+    #' @param force force update data; default is true
+    #' @param electrodes electrodes to update for expert-use use; default is
+    #' \code{NULL} (all electrode channels will be mounted)
+    #' @param ... reserved
+    mount_data = function(..., force = TRUE, electrodes = NULL) {
 
-      data_type <- private$.data_type
-      if(length(data_type) == 0) { return(self) }
-
-      # self <- RAVESubjectEpochTimeFreqBaseRepository$new(
+      # self <- RAVESubjectEpochPowerRepository$new(
       #   subject = "demo/DemoSubject",
       #   electrodes = 13:16,
       #   reference_name = "default",
       #   epoch_name = "auditory_onset",
       #   time_windows = c(-1, 2),
-      #   stitch_events = NULL
+      #   stitch_events = NULL,
+      #   lazy_load = TRUE
       # )
+      # private <- self$.__enclos_env__$private
+      # private$.data
+      # private$.data$`@reset`()
+      # self$mount_data(electrodes = 13)
+      # private$.data$data_list
+      # private$.data$`@reset`()
+      # force = FALSE
+      # electrodes <- 13
 
-      reference_instances <- self$reference_instances
-      electrode_instances <- self$electrode_instances
+      data_type <- private$.data_type
+      if(length(data_type) == 0) { return(self) }
+
+      # determine electrodes to load
+      electrodes <- parse_svec(electrodes)
+      electrodes <- electrodes[electrodes %in% self$electrode_list]
+      if(!length(electrodes)) {
+        electrodes <- self$electrode_list
+      }
+
+      # check data_list
+      nms <- sprintf("e_%d", electrodes)
+
+      if( !force ) {
+        exist_list <- names(private$.data$data_list)
+        if(all(nms %in% exist_list)) { return(self) }
+      }
+
+      electrode_instances <- self$electrode_instances[nms]
+
+      # fine references to load
+      ref_names <- lapply(electrode_instances, function(inst) {
+        if(isTRUE(inst$reference_name %in% c("noref", ""))) { return(NULL) }
+        sprintf("%s_%s", inst$reference_name, inst$type)
+      })
+      ref_names <- unlist(unique(ref_names))
+      ref_names <- ref_names[ref_names %in% names(self$reference_instances)]
+
+      reference_instances <- self$reference_instances[ref_names]
+
+      # Load reference first
       if(length(reference_instances)) {
         ravepipeline::lapply_jobs(
           reference_instances,
@@ -124,6 +163,7 @@ RAVESubjectEpochTimeFreqBaseRepository <- R6::R6Class(
         )
       }
 
+      # Load data next
       data_list <- ravepipeline::lapply_jobs(
         electrode_instances,
         function(inst) {
@@ -138,24 +178,28 @@ RAVESubjectEpochTimeFreqBaseRepository <- R6::R6Class(
       # Clear progress finish line
       cat("          \r")
 
+      # Construct dataset
       data_list <- structure(
-        names = names(electrode_instances),
+        names = nms,
         lapply(data_list, "[[", "@impl")
       )
 
       # construct dim and dimnames
       dim <- dim(data_list[[1]])
-      dim[[4]] <- length(data_list)
+      dim[[4]] <- length(self$electrode_list)
 
       dimnames <- dimnames(data_list[[1]])
       dimnames[[4]] <- self$electrode_list
 
       private$.data$`@mset`(
-        data_list = data_list,
+        # data_list = data_list,
         dim = structure(dim, names = names(dimnames)),
         dimnames = dimnames,
         signature = self$signature
       )
+
+      private$.data$data_list <- as.list(private$.data$data_list)
+      private$.data$data_list[nms] <- data_list[nms]
 
       self
     },
