@@ -358,8 +358,8 @@ RAVESubjectEpochRepository <- R6::R6Class(
 
 )
 
-#' @title 'RAVE' repository: with epochs (still basic)
-#' @returns A \code{\link{RAVESubjectBaseRepository}} instance
+#' @title 'RAVE' repository: with epochs
+#' @returns A \code{\link{RAVESubjectEpochRepository}} instance
 #' @inheritParams prepare_subject_bare0
 #' @param epoch_name name of the epoch trial table
 #' @param time_windows numeric vector with even lengths, the time start

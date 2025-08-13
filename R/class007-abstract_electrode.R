@@ -252,6 +252,8 @@ RAVEAbstarctElectrode <- R6::R6Class(
     #' intervals are missing
     cache_root = function(){
       if(!length(self$epoch_name)){
+        # return(file.path(cache_path, self$subject$project_name,
+        #                  self$subject$subject_code, "_whole_block_", nb))
         stop("No epoch assigned. Please use `$set_epoch` method to set epoch.")
       }
       if(!length(self$trial_intervals)){
