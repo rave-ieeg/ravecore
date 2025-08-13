@@ -187,22 +187,24 @@ RAVESubjectEpochRawVoltageRepository <- R6::R6Class(
       }
 
       ravepipeline::lapply_jobs(
-        seq_along(self$raw_voltage$data_list),
+        seq_along(self$electrode_list),
         function(ii) {
+          electrode_channel <- self$electrode_list[[ii]]
+          self$mount_data(force = FALSE, electrodes = electrode_channel)
+          nm <- sprintf("e_%d", electrode_channel)
           arr <- self$raw_voltage$data_list[[ii]]
           dnames <- dimnames(arr)
-          arr <- arr[dimnames = FALSE]
-          ch <- as.integer(dnames$Electrode)
+          arr <- arr[dimnames = FALSE, drop = FALSE]
           ieegio::io_write_mat(
             list(
               description = "Raw voltage: no reference, time x trial",
               electrode = as.matrix(dnames$Electrode),
               trial_number = as.matrix(dnames$Trial),
               time_in_secs = as.matrix(dnames$Time),
-              reference = as.matrix(integer()),
+              reference_channels = as.matrix(integer()),
               data = arr
             ),
-            con = file.path(data_path, sprintf("ch%04d.mat", ch))
+            con = file.path(data_path, sprintf("ch%04d.mat", electrode_channel))
           )
         },
         .globals = list(self = self, data_path = data_path),
@@ -237,12 +239,9 @@ RAVESubjectEpochRawVoltageRepository <- R6::R6Class(
     },
 
     #' @field raw_voltage a named map of raw voltage data, mounted by
-    #' \code{mount_data}
+    #' \code{mount_data}, alias of \code{get_container}
     raw_voltage = function() {
-      if(private$.data$`@size`() == 0) {
-        self$mount_data()
-      }
-      private$.data
+      self$get_container()
     },
 
     #' @field reference_table reference table, all channels will be marked as no reference

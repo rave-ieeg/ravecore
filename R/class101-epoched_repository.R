@@ -198,6 +198,16 @@ RAVESubjectEpochRepository <- R6::R6Class(
     #' @param ... reserved
     mount_data = function(..., force = TRUE, electrodes = NULL) {
 
+    },
+
+    #' @description get container where loaded data are stored
+    #' @returns A named map, typically with data arrays, shape/dimension
+    #' information
+    get_container = function() {
+      if(private$.data$`@size`() == 0) {
+        self$mount_data()
+      }
+      private$.data
     }
   ),
   active = list(

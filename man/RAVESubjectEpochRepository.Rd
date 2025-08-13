@@ -5,6 +5,9 @@
 \title{'RAVE' class for epoch repository}
 \value{
 The root directory where the files are stored.
+
+A named map, typically with data arrays, shape/dimension
+information
 }
 \description{
 Compared to \code{\link{RAVESubjectBaseRepository}}, this repository
@@ -69,6 +72,7 @@ repository signature}
 \item \href{#method-RAVESubjectEpochRepository-export_matlab}{\code{RAVESubjectEpochRepository$export_matlab()}}
 \item \href{#method-RAVESubjectEpochRepository-set_epoch}{\code{RAVESubjectEpochRepository$set_epoch()}}
 \item \href{#method-RAVESubjectEpochRepository-mount_data}{\code{RAVESubjectEpochRepository$mount_data()}}
+\item \href{#method-RAVESubjectEpochRepository-get_container}{\code{RAVESubjectEpochRepository$get_container()}}
 \item \href{#method-RAVESubjectEpochRepository-clone}{\code{RAVESubjectEpochRepository$clone()}}
 }
 }
@@ -214,7 +218,29 @@ change trial epoch profiles
 function to mount data, not doing anything in this
 class, but may be used by child classes
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectEpochRepository$mount_data()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectEpochRepository$mount_data(..., force = TRUE, electrodes = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{reserved}
+
+\item{\code{force}}{force update data; default is true}
+
+\item{\code{electrodes}}{electrodes to update; default is \code{NULL} (all
+electrode channels)}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-RAVESubjectEpochRepository-get_container"></a>}}
+\if{latex}{\out{\hypertarget{method-RAVESubjectEpochRepository-get_container}{}}}
+\subsection{Method \code{get_container()}}{
+get container where loaded data are stored
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectEpochRepository$get_container()}\if{html}{\out{</div>}}
 }
 
 }

@@ -208,9 +208,12 @@ RAVESubjectEpochVoltageRepository <- R6::R6Class(
       }
 
       ravepipeline::lapply_jobs(
-        seq_along(self$voltage$data_list),
+        seq_along(self$electrode_list),
         function(ii) {
-          nm <- names(self$voltage$data_list)[[ii]]
+          electrode_channel <- self$electrode_list[[ii]]
+          self$mount_data(force = FALSE, electrodes = electrode_channel)
+          nm <- sprintf("e_%d", electrode_channel)
+
           electrode_instance <- self$electrode_instances[[nm]]
           ref_name <- electrode_instance$reference_name
           if(length(ref_name)) {
@@ -221,19 +224,24 @@ RAVESubjectEpochVoltageRepository <- R6::R6Class(
 
           arr <- self$voltage$data_list[[nm]]
           dnames <- dimnames(arr)
-          arr <- arr[dimnames = FALSE]
-          ch <- as.integer(dnames$Electrode)
-          ieegio::io_write_mat(
-            list(
-              description = "Re-referenced voltage: time x trial",
-              electrode = as.matrix(dnames$Electrode),
-              trial_number = as.matrix(dnames$Trial),
-              time_in_secs = as.matrix(dnames$Time),
-              reference = ref_name,
-              data = arr
-            ),
-            con = file.path(data_path, sprintf("ch%04d.mat", ch))
+          arr <- arr[dimnames = FALSE, drop = FALSE]
+
+          data <- list(
+            description = "Re-referenced voltage: time x trial",
+            electrode = as.matrix(dnames$Electrode),
+            trial_number = as.matrix(dnames$Trial),
+            time_in_secs = as.matrix(dnames$Time),
+            reference_channels = ref_name,
+            data = arr
           )
+          if(length(electrode_instance$reference)) {
+            reference <- electrode_instance$reference$load_data("voltage")
+            data$reference <- reference[dimnames = FALSE, drop = FALSE]
+          } else {
+            data$reference <- as.matrix(0)
+          }
+
+          ieegio::io_write_mat(data, con = file.path(data_path, sprintf("ch%04d.mat", electrode_channel)))
         },
         .globals = list(self = self, data_path = data_path),
         callback = callback
@@ -250,7 +258,6 @@ RAVESubjectEpochVoltageRepository <- R6::R6Class(
 
   ),
   active = list(
-
 
     #' @field digest_key a list of repository data used to generate
     #' repository signature
@@ -271,10 +278,7 @@ RAVESubjectEpochVoltageRepository <- R6::R6Class(
     #' @field voltage a named map of voltage data, mounted by
     #' \code{mount_data}
     voltage = function() {
-      if(private$.data$`@size`() == 0) {
-        self$mount_data()
-      }
-      private$.data
+      self$get_container()
     }
 
   )

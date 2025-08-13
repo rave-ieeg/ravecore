@@ -209,18 +209,20 @@ RAVESubjectEpochTimeFreqBaseRepository <- R6::R6Class(
     #' @param verbose print progresses
     #' @returns The root directory where the files are stored.
     export_matlab = function(..., verbose = TRUE) {
-      # self <- prepare_subject_time_frequency_coefficients(
+      # self <- prepare_subject_power(
       #     "demo/DemoSubject", electrodes = 14:16,
       #     reference_name = "default", epoch_name = "auditory_onset",
       #     time_windows = c(-1, 2))
-      # root_path <- self$export_matlab()
+      # # root_path <- self$export_matlab()
       # private <- self$.__enclos_env__$private
 
       root_path <- super$export_matlab(..., verbose = verbose)
-      summary_path <- file_path(root_path, "summary.yaml")
-      summary <- load_yaml(summary_path)
 
       data_type <- private$.data_type
+      if(!length(data_type)) { return(root_path) }
+
+      summary_path <- file_path(root_path, "summary.yaml")
+      summary <- load_yaml(summary_path)
 
       if(verbose) {
         callback <- function(ii) {
@@ -233,13 +235,14 @@ RAVESubjectEpochTimeFreqBaseRepository <- R6::R6Class(
       data_path <- file.path(root_path, data_type)
       dir_create2(data_path)
 
-      data_list <- private$.data$data_list
-
       ravepipeline::lapply_jobs(
-        seq_along(data_list),
+        seq_along(self$electrode_list),
         function(ii) {
           # ii <- 1
-          nm <- names(data_list)[[ii]]
+          electrode_channel <- self$electrode_list[[ii]]
+          self$mount_data(force = FALSE, electrodes = electrode_channel)
+          nm <- sprintf("e_%d", electrode_channel)
+
           electrode_instance <- self$electrode_instances[[nm]]
           ref_name <- electrode_instance$reference_name
           if(length(ref_name)) {
@@ -248,10 +251,17 @@ RAVESubjectEpochTimeFreqBaseRepository <- R6::R6Class(
           }
           ref_name <- as.matrix(as.integer(ref_name))
 
-          arr <- data_list[[nm]]
+          container <- self$get_container()
+          arr <- container$data_list[[nm]]
           dnames <- dimnames(arr)
-          arr <- arr[dimnames = FALSE]
-          ch <- as.integer(dnames$Electrode)
+          arr <- arr[dimnames = FALSE, drop = FALSE]
+
+          if(length(electrode_instance$reference)) {
+            reference <- electrode_instance$reference$load_data(type = data_type)
+            reference <- reference[dimnames = FALSE, drop = FALSE]
+          } else {
+            reference <- as.matrix(0)
+          }
           ieegio::io_write_mat(
             list(
               description = sprintf("Time-frequency %s: frequency x time x trial", data_type),
@@ -259,16 +269,16 @@ RAVESubjectEpochTimeFreqBaseRepository <- R6::R6Class(
               trial_number = as.matrix(dnames$Trial),
               time_in_secs = as.matrix(dnames$Time),
               frequency = as.matrix(dnames$Frequency),
-              reference = ref_name,
+              reference_channels = ref_name,
+              reference = reference,
               data = arr
             ),
-            con = file.path(data_path, sprintf("ch%04d.mat", ch))
+            con = file.path(data_path, sprintf("ch%04d.mat", electrode_channel))
           )
         },
         .globals = list(self = self,
                         data_path = data_path,
-                        data_type = data_type,
-                        data_list = data_list),
+                        data_type = data_type),
         callback = callback
       )
 
@@ -441,10 +451,7 @@ RAVESubjectEpochTimeFreqCoefRepository <- R6::R6Class(
     #' @field coefficients a named map of time-frequency coefficient data,
     #' mounted by \code{mount_data}
     coefficients = function() {
-      if(private$.data$`@size`() == 0) {
-        self$mount_data()
-      }
-      private$.data
+      self$get_container()
     },
 
     #' @field wavelet not used anymore, see \code{coefficients}
@@ -553,10 +560,7 @@ RAVESubjectEpochPowerRepository <- R6::R6Class(
     #' @field power a named map of time-frequency power spectrogram,
     #' mounted by \code{mount_data}
     power = function() {
-      if(private$.data$`@size`() == 0) {
-        self$mount_data()
-      }
-      private$.data
+      self$get_container()
     }
 
   )
@@ -658,10 +662,7 @@ RAVESubjectEpochPhaseRepository <- R6::R6Class(
     #' @field phase a named map of time-frequency coefficient phase,
     #' mounted by \code{mount_data}
     phase = function() {
-      if(private$.data$`@size`() == 0) {
-        self$mount_data()
-      }
-      private$.data
+      self$get_container()
     }
 
   )
