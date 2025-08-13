@@ -502,259 +502,6 @@ prepare_subject_phase_legacy <- function(subject, electrodes, reference_name, ep
 
 }
 
-test_that("RAVESubjectEpochTimeFreqCoefRepository", {
-
-  testthat::skip_on_cran()
-  testthat::skip_if_not({
-    dir.exists(as_rave_subject("demo/DemoSubject", strict = FALSE)$path)
-  })
-
-  repository_id <- rand_string(4)
-  repo_old <- prepare_subject_wavelet_legacy(
-    subject = "demo/DemoSubject",
-    electrodes = 13:16,
-    reference_name = "default",
-    epoch_name = "auditory_onset",
-    time_windows = c(-1, 2),
-    stitch_events = NULL,
-    repository_id = repository_id
-  )
-  repo_new0 <- RAVESubjectEpochTimeFreqCoefRepository$new(
-    subject = "demo/DemoSubject",
-    electrodes = 13:16,
-    reference_name = "default",
-    epoch_name = "auditory_onset",
-    time_windows = c(-1, 2),
-    stitch_events = NULL,
-    repository_id = repository_id
-  )
-  raw <- serialize(repo_new0, NULL, refhook = ravepipeline::rave_serialize_refhook)
-  repo_new <- unserialize(raw, refhook = ravepipeline::rave_unserialize_refhook)
-
-  testthat::expect_true(inherits(repo_new, "rave_prepare_time_frequency_coefficients"))
-
-  names_old <- names(repo_old)
-  names_old <- names_old[!names_old %in% names(repo_new)]
-  testthat::expect_equal(names_old, character(0L))
-
-  testthat::expect_equal(repo_new$repository_id, repo_old$repository_id)
-
-  testthat::expect_equal(repo_new$project, repo_old$project)
-  testthat::expect_equal(repo_new$subject, repo_old$subject)
-
-  testthat::expect_equal(repo_new$electrode_list, repo_old$electrode_list)
-
-  testthat::expect_equal(repo_new$reference_name, repo_old$reference_name)
-  testthat::expect_equal(repo_new$reference_table, repo_old$reference_table)
-
-  nms <- names(repo_old$electrode_table)
-  testthat::expect_equal(repo_new$electrode_table[, nms], repo_old$electrode_table)
-  testthat::expect_equal(unname(repo_new$electrode_signal_types),
-                         unname(repo_old$electrode_signal_types))
-
-  testthat::expect_equal(repo_new$references_list, repo_old$references_list)
-
-  einst_new <- lapply(repo_new$reference_instances, function(x) { x$`@marshal`() })
-  einst_old <- lapply(repo_old$reference_instances, function(x) { x$`@marshal`() })
-
-  testthat::expect_equal(einst_new, einst_old)
-
-  einst_new <- lapply(repo_new$electrode_instances, function(x) { x$`@marshal`() })
-  einst_old <- lapply(repo_old$electrode_instances, function(x) { x$`@marshal`() })
-
-  testthat::expect_equal(einst_new, einst_old)
-
-  testthat::expect_equal(repo_new$epoch_name, repo_old$epoch_name)
-  testthat::expect_equal(repo_new$epoch$`@marshal`(), repo_old$epoch$`@marshal`())
-  testthat::expect_equal(repo_new$time_windows, repo_old$time_windows)
-
-  # testthat::expect_equal(repo_new$sample_rate, repo_old$sample_rate)
-
-  # New attributes
-  testthat::expect_equal(repo_new$time, repo_old$time_points)
-
-  testthat::expect_true(!is.null(repo_new$coefficients))
-
-  testthat::expect_equal(repo_new$coefficients$dim, repo_old$wavelet$dim)
-  testthat::expect_equal(repo_new$coefficients$dimnames, repo_old$wavelet$dimnames)
-
-  new_datalist <- repo_new$coefficients$data_list
-  old_datalist <- repo_old$wavelet$data_list
-  testthat::expect_equal(names(new_datalist), names(old_datalist))
-  testthat::expect_equal(lapply(new_datalist, "["), lapply(old_datalist, "["))
-})
-
-
-test_that("RAVESubjectEpochPowerRepository", {
-
-  testthat::skip_on_cran()
-  testthat::skip_if_not({
-    dir.exists(as_rave_subject("demo/DemoSubject", strict = FALSE)$path)
-  })
-
-  repository_id <- rand_string(4)
-  repo_old <- prepare_subject_power(
-    subject = "demo/DemoSubject",
-    electrodes = 13:16,
-    reference_name = "default",
-    epoch_name = "auditory_onset",
-    time_windows = c(-1, 2),
-    stitch_events = NULL,
-    repository_id = repository_id
-  )
-  repo_new0 <- RAVESubjectEpochPowerRepository$new(
-    subject = "demo/DemoSubject",
-    electrodes = 13:16,
-    reference_name = "default",
-    epoch_name = "auditory_onset",
-    time_windows = c(-1, 2),
-    stitch_events = NULL,
-    repository_id = repository_id
-  )
-  raw <- serialize(repo_new0, NULL, refhook = ravepipeline::rave_serialize_refhook)
-  repo_new <- unserialize(raw, refhook = ravepipeline::rave_unserialize_refhook)
-
-  testthat::expect_true(inherits(repo_new, "rave_prepare_power"))
-
-  names_old <- names(repo_old)
-  names_old <- names_old[!names_old %in% names(repo_new)]
-  testthat::expect_equal(names_old, character(0L))
-
-  testthat::expect_equal(repo_new$repository_id, repo_old$repository_id)
-
-  testthat::expect_equal(repo_new$project, repo_old$project)
-  testthat::expect_equal(repo_new$subject, repo_old$subject)
-
-  testthat::expect_equal(repo_new$electrode_list, repo_old$electrode_list)
-
-  testthat::expect_equal(repo_new$reference_name, repo_old$reference_name)
-  testthat::expect_equal(repo_new$reference_table, repo_old$reference_table)
-
-  nms <- names(repo_old$electrode_table)
-  testthat::expect_equal(repo_new$electrode_table[, nms], repo_old$electrode_table)
-  testthat::expect_equal(unname(repo_new$electrode_signal_types),
-                         unname(repo_old$electrode_signal_types))
-
-  testthat::expect_equal(repo_new$references_list, repo_old$references_list)
-
-  einst_new <- lapply(repo_new$reference_instances, function(x) { x$`@marshal`() })
-  einst_old <- lapply(repo_old$reference_instances, function(x) { x$`@marshal`() })
-
-  testthat::expect_equal(einst_new, einst_old)
-
-  einst_new <- lapply(repo_new$electrode_instances, function(x) { x$`@marshal`() })
-  einst_old <- lapply(repo_old$electrode_instances, function(x) { x$`@marshal`() })
-
-  testthat::expect_equal(einst_new, einst_old)
-
-  testthat::expect_equal(repo_new$epoch_name, repo_old$epoch_name)
-  testthat::expect_equal(repo_new$epoch$`@marshal`(), repo_old$epoch$`@marshal`())
-  testthat::expect_equal(repo_new$time_windows, repo_old$time_windows)
-
-  # testthat::expect_equal(repo_new$sample_rate, repo_old$sample_rate)
-
-  # New attributes
-  testthat::expect_equal(repo_new$time, repo_old$time_points)
-
-  testthat::expect_true(!is.null(repo_new$power))
-
-  testthat::expect_equal(repo_new$power$dim, repo_old$power$dim)
-  testthat::expect_equal(repo_new$power$dimnames, repo_old$power$dimnames)
-
-  new_datalist <- repo_new$power$data_list
-  old_datalist <- repo_old$power$data_list
-  testthat::expect_equal(names(new_datalist), names(old_datalist))
-  testthat::expect_equal(lapply(new_datalist, "["), lapply(old_datalist, "["))
-})
-
-
-test_that("RAVESubjectEpochPhaseRepository", {
-
-  testthat::skip_on_cran()
-  testthat::skip_if_not({
-    dir.exists(as_rave_subject("demo/DemoSubject", strict = FALSE)$path)
-  })
-
-  repository_id <- rand_string(4)
-  repo_old <- prepare_subject_phase(
-    subject = "demo/DemoSubject",
-    electrodes = 13:16,
-    reference_name = "default",
-    epoch_name = "auditory_onset",
-    time_windows = c(-1, 2),
-    stitch_events = NULL,
-    repository_id = repository_id
-  )
-  repo_new0 <- RAVESubjectEpochPhaseRepository$new(
-    subject = "demo/DemoSubject",
-    electrodes = 13:16,
-    reference_name = "default",
-    epoch_name = "auditory_onset",
-    time_windows = c(-1, 2),
-    stitch_events = NULL,
-    repository_id = repository_id
-  )
-  raw <- serialize(repo_new0, NULL, refhook = ravepipeline::rave_serialize_refhook)
-  repo_new <- unserialize(raw, refhook = ravepipeline::rave_unserialize_refhook)
-
-  testthat::expect_true(inherits(repo_new, "rave_prepare_phase"))
-
-  names_old <- names(repo_old)
-  names_old <- names_old[!names_old %in% names(repo_new)]
-  testthat::expect_equal(names_old, character(0L))
-
-  testthat::expect_equal(repo_new$repository_id, repo_old$repository_id)
-
-  testthat::expect_equal(repo_new$project, repo_old$project)
-  testthat::expect_equal(repo_new$subject, repo_old$subject)
-
-  testthat::expect_equal(repo_new$electrode_list, repo_old$electrode_list)
-
-  testthat::expect_equal(repo_new$reference_name, repo_old$reference_name)
-  testthat::expect_equal(repo_new$reference_table, repo_old$reference_table)
-
-  nms <- names(repo_old$electrode_table)
-  testthat::expect_equal(repo_new$electrode_table[, nms], repo_old$electrode_table)
-  testthat::expect_equal(unname(repo_new$electrode_signal_types),
-                         unname(repo_old$electrode_signal_types))
-
-  testthat::expect_equal(repo_new$references_list, repo_old$references_list)
-
-  einst_new <- lapply(repo_new$reference_instances, function(x) { x$`@marshal`() })
-  einst_old <- lapply(repo_old$reference_instances, function(x) { x$`@marshal`() })
-
-  testthat::expect_equal(einst_new, einst_old)
-
-  einst_new <- lapply(repo_new$electrode_instances, function(x) { x$`@marshal`() })
-  einst_old <- lapply(repo_old$electrode_instances, function(x) { x$`@marshal`() })
-
-  testthat::expect_equal(einst_new, einst_old)
-
-  testthat::expect_equal(repo_new$epoch_name, repo_old$epoch_name)
-  testthat::expect_equal(repo_new$epoch$`@marshal`(), repo_old$epoch$`@marshal`())
-  testthat::expect_equal(repo_new$time_windows, repo_old$time_windows)
-
-  # testthat::expect_equal(repo_new$sample_rate, repo_old$sample_rate)
-
-  # New attributes
-  testthat::expect_equal(repo_new$time, repo_old$time_points)
-
-  testthat::expect_true(!is.null(repo_new$phase))
-
-  testthat::expect_equal(repo_new$phase$dim, repo_old$phase$dim)
-  testthat::expect_equal(repo_new$phase$dimnames, repo_old$phase$dimnames)
-
-  new_datalist <- repo_new$phase$data_list
-  old_datalist <- repo_old$phase$data_list
-  testthat::expect_equal(names(new_datalist), names(old_datalist))
-  testthat::expect_equal(lapply(new_datalist, "["), lapply(old_datalist, "["))
-})
-
-
-
-
-
-
 
 
 
@@ -1025,3 +772,262 @@ test_that("RAVESubjectEpochPhaseRepository - parallel", {
   testthat::expect_equal(names(new_datalist), names(old_datalist))
   testthat::expect_equal(lapply(new_datalist, "["), lapply(old_datalist, "["))
 })
+
+
+
+
+
+
+test_that("RAVESubjectEpochTimeFreqCoefRepository", {
+
+  testthat::skip_on_cran()
+  testthat::skip_if_not({
+    dir.exists(as_rave_subject("demo/DemoSubject", strict = FALSE)$path)
+  })
+
+  repository_id <- rand_string(4)
+  repo_old <- prepare_subject_wavelet_legacy(
+    subject = "demo/DemoSubject",
+    electrodes = 13:16,
+    reference_name = "default",
+    epoch_name = "auditory_onset",
+    time_windows = c(-1, 2),
+    stitch_events = NULL,
+    repository_id = repository_id
+  )
+  repo_new0 <- RAVESubjectEpochTimeFreqCoefRepository$new(
+    subject = "demo/DemoSubject",
+    electrodes = 13:16,
+    reference_name = "default",
+    epoch_name = "auditory_onset",
+    time_windows = c(-1, 2),
+    stitch_events = NULL,
+    repository_id = repository_id
+  )
+  raw <- serialize(repo_new0, NULL, refhook = ravepipeline::rave_serialize_refhook)
+  repo_new <- unserialize(raw, refhook = ravepipeline::rave_unserialize_refhook)
+
+  testthat::expect_true(inherits(repo_new, "rave_prepare_time_frequency_coefficients"))
+
+  names_old <- names(repo_old)
+  names_old <- names_old[!names_old %in% names(repo_new)]
+  testthat::expect_equal(names_old, character(0L))
+
+  testthat::expect_equal(repo_new$repository_id, repo_old$repository_id)
+
+  testthat::expect_equal(repo_new$project, repo_old$project)
+  testthat::expect_equal(repo_new$subject, repo_old$subject)
+
+  testthat::expect_equal(repo_new$electrode_list, repo_old$electrode_list)
+
+  testthat::expect_equal(repo_new$reference_name, repo_old$reference_name)
+  testthat::expect_equal(repo_new$reference_table, repo_old$reference_table)
+
+  nms <- names(repo_old$electrode_table)
+  testthat::expect_equal(repo_new$electrode_table[, nms], repo_old$electrode_table)
+  testthat::expect_equal(unname(repo_new$electrode_signal_types),
+                         unname(repo_old$electrode_signal_types))
+
+  testthat::expect_equal(repo_new$references_list, repo_old$references_list)
+
+  einst_new <- lapply(repo_new$reference_instances, function(x) { x$`@marshal`() })
+  einst_old <- lapply(repo_old$reference_instances, function(x) { x$`@marshal`() })
+
+  testthat::expect_equal(einst_new, einst_old)
+
+  einst_new <- lapply(repo_new$electrode_instances, function(x) { x$`@marshal`() })
+  einst_old <- lapply(repo_old$electrode_instances, function(x) { x$`@marshal`() })
+
+  testthat::expect_equal(einst_new, einst_old)
+
+  testthat::expect_equal(repo_new$epoch_name, repo_old$epoch_name)
+  testthat::expect_equal(repo_new$epoch$`@marshal`(), repo_old$epoch$`@marshal`())
+  testthat::expect_equal(repo_new$time_windows, repo_old$time_windows)
+
+  # testthat::expect_equal(repo_new$sample_rate, repo_old$sample_rate)
+
+  # New attributes
+  testthat::expect_equal(repo_new$time, repo_old$time_points)
+
+  testthat::expect_true(!is.null(repo_new$coefficients))
+
+  testthat::expect_equal(repo_new$coefficients$dim, repo_old$wavelet$dim)
+  testthat::expect_equal(repo_new$coefficients$dimnames, repo_old$wavelet$dimnames)
+
+  new_datalist <- repo_new$coefficients$data_list
+  old_datalist <- repo_old$wavelet$data_list
+  testthat::expect_equal(names(new_datalist), names(old_datalist))
+  testthat::expect_equal(lapply(new_datalist, "["), lapply(old_datalist, "["))
+})
+
+
+test_that("RAVESubjectEpochPowerRepository", {
+
+  testthat::skip_on_cran()
+  testthat::skip_if_not({
+    dir.exists(as_rave_subject("demo/DemoSubject", strict = FALSE)$path)
+  })
+
+  repository_id <- rand_string(4)
+  repo_old <- prepare_subject_power(
+    subject = "demo/DemoSubject",
+    electrodes = 13:16,
+    reference_name = "default",
+    epoch_name = "auditory_onset",
+    time_windows = c(-1, 2),
+    stitch_events = NULL,
+    repository_id = repository_id
+  )
+  repo_new0 <- RAVESubjectEpochPowerRepository$new(
+    subject = "demo/DemoSubject",
+    electrodes = 13:16,
+    reference_name = "default",
+    epoch_name = "auditory_onset",
+    time_windows = c(-1, 2),
+    stitch_events = NULL,
+    repository_id = repository_id
+  )
+  raw <- serialize(repo_new0, NULL, refhook = ravepipeline::rave_serialize_refhook)
+  repo_new <- unserialize(raw, refhook = ravepipeline::rave_unserialize_refhook)
+
+  testthat::expect_true(inherits(repo_new, "rave_prepare_power"))
+
+  names_old <- names(repo_old)
+  names_old <- names_old[!names_old %in% names(repo_new)]
+  testthat::expect_equal(names_old, character(0L))
+
+  testthat::expect_equal(repo_new$repository_id, repo_old$repository_id)
+
+  testthat::expect_equal(repo_new$project, repo_old$project)
+  testthat::expect_equal(repo_new$subject, repo_old$subject)
+
+  testthat::expect_equal(repo_new$electrode_list, repo_old$electrode_list)
+
+  testthat::expect_equal(repo_new$reference_name, repo_old$reference_name)
+  testthat::expect_equal(repo_new$reference_table, repo_old$reference_table)
+
+  nms <- names(repo_old$electrode_table)
+  testthat::expect_equal(repo_new$electrode_table[, nms], repo_old$electrode_table)
+  testthat::expect_equal(unname(repo_new$electrode_signal_types),
+                         unname(repo_old$electrode_signal_types))
+
+  testthat::expect_equal(repo_new$references_list, repo_old$references_list)
+
+  einst_new <- lapply(repo_new$reference_instances, function(x) { x$`@marshal`() })
+  einst_old <- lapply(repo_old$reference_instances, function(x) { x$`@marshal`() })
+
+  testthat::expect_equal(einst_new, einst_old)
+
+  einst_new <- lapply(repo_new$electrode_instances, function(x) { x$`@marshal`() })
+  einst_old <- lapply(repo_old$electrode_instances, function(x) { x$`@marshal`() })
+
+  testthat::expect_equal(einst_new, einst_old)
+
+  testthat::expect_equal(repo_new$epoch_name, repo_old$epoch_name)
+  testthat::expect_equal(repo_new$epoch$`@marshal`(), repo_old$epoch$`@marshal`())
+  testthat::expect_equal(repo_new$time_windows, repo_old$time_windows)
+
+  # testthat::expect_equal(repo_new$sample_rate, repo_old$sample_rate)
+
+  # New attributes
+  testthat::expect_equal(repo_new$time, repo_old$time_points)
+
+  testthat::expect_true(!is.null(repo_new$power))
+
+  testthat::expect_equal(repo_new$power$dim, repo_old$power$dim)
+  testthat::expect_equal(repo_new$power$dimnames, repo_old$power$dimnames)
+
+  new_datalist <- repo_new$power$data_list
+  old_datalist <- repo_old$power$data_list
+  testthat::expect_equal(names(new_datalist), names(old_datalist))
+  testthat::expect_equal(lapply(new_datalist, "["), lapply(old_datalist, "["))
+})
+
+
+test_that("RAVESubjectEpochPhaseRepository", {
+
+  testthat::skip_on_cran()
+  testthat::skip_if_not({
+    dir.exists(as_rave_subject("demo/DemoSubject", strict = FALSE)$path)
+  })
+
+  repository_id <- rand_string(4)
+  repo_old <- prepare_subject_phase(
+    subject = "demo/DemoSubject",
+    electrodes = 13:16,
+    reference_name = "default",
+    epoch_name = "auditory_onset",
+    time_windows = c(-1, 2),
+    stitch_events = NULL,
+    repository_id = repository_id
+  )
+  repo_new0 <- RAVESubjectEpochPhaseRepository$new(
+    subject = "demo/DemoSubject",
+    electrodes = 13:16,
+    reference_name = "default",
+    epoch_name = "auditory_onset",
+    time_windows = c(-1, 2),
+    stitch_events = NULL,
+    repository_id = repository_id
+  )
+  raw <- serialize(repo_new0, NULL, refhook = ravepipeline::rave_serialize_refhook)
+  repo_new <- unserialize(raw, refhook = ravepipeline::rave_unserialize_refhook)
+
+  testthat::expect_true(inherits(repo_new, "rave_prepare_phase"))
+
+  names_old <- names(repo_old)
+  names_old <- names_old[!names_old %in% names(repo_new)]
+  testthat::expect_equal(names_old, character(0L))
+
+  testthat::expect_equal(repo_new$repository_id, repo_old$repository_id)
+
+  testthat::expect_equal(repo_new$project, repo_old$project)
+  testthat::expect_equal(repo_new$subject, repo_old$subject)
+
+  testthat::expect_equal(repo_new$electrode_list, repo_old$electrode_list)
+
+  testthat::expect_equal(repo_new$reference_name, repo_old$reference_name)
+  testthat::expect_equal(repo_new$reference_table, repo_old$reference_table)
+
+  nms <- names(repo_old$electrode_table)
+  testthat::expect_equal(repo_new$electrode_table[, nms], repo_old$electrode_table)
+  testthat::expect_equal(unname(repo_new$electrode_signal_types),
+                         unname(repo_old$electrode_signal_types))
+
+  testthat::expect_equal(repo_new$references_list, repo_old$references_list)
+
+  einst_new <- lapply(repo_new$reference_instances, function(x) { x$`@marshal`() })
+  einst_old <- lapply(repo_old$reference_instances, function(x) { x$`@marshal`() })
+
+  testthat::expect_equal(einst_new, einst_old)
+
+  einst_new <- lapply(repo_new$electrode_instances, function(x) { x$`@marshal`() })
+  einst_old <- lapply(repo_old$electrode_instances, function(x) { x$`@marshal`() })
+
+  testthat::expect_equal(einst_new, einst_old)
+
+  testthat::expect_equal(repo_new$epoch_name, repo_old$epoch_name)
+  testthat::expect_equal(repo_new$epoch$`@marshal`(), repo_old$epoch$`@marshal`())
+  testthat::expect_equal(repo_new$time_windows, repo_old$time_windows)
+
+  # testthat::expect_equal(repo_new$sample_rate, repo_old$sample_rate)
+
+  # New attributes
+  testthat::expect_equal(repo_new$time, repo_old$time_points)
+
+  testthat::expect_true(!is.null(repo_new$phase))
+
+  testthat::expect_equal(repo_new$phase$dim, repo_old$phase$dim)
+  testthat::expect_equal(repo_new$phase$dimnames, repo_old$phase$dimnames)
+
+  new_datalist <- repo_new$phase$data_list
+  old_datalist <- repo_old$phase$data_list
+  testthat::expect_equal(names(new_datalist), names(old_datalist))
+  testthat::expect_equal(lapply(new_datalist, "["), lapply(old_datalist, "["))
+})
+
+
+
+
+
+

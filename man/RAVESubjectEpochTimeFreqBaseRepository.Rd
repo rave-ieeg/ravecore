@@ -10,8 +10,6 @@ The root directory where the files are stored.
 The repository inherits \code{link{RAVESubjectEpochRepository}}, with epoch
 trials, and is intended for loading processed and referenced time-frequency
 coefficients.
-Use \code{\link{prepare_subject_time_frequency_coefficients}} to create an
-instance.
 }
 \section{Super classes}{
 \code{\link[ravepipeline:RAVESerializable]{ravepipeline::RAVESerializable}} -> \code{ravecore::RAVESubjectRepository} -> \code{\link[ravecore:RAVESubjectEpochRepository]{ravecore::RAVESubjectEpochRepository}} -> \code{RAVESubjectEpochTimeFreqBaseRepository}

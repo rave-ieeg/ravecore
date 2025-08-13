@@ -1,0 +1,439 @@
+#' 'RAVE' class for loading entire recording block repository
+#' @description
+#' Compared to \code{\link{RAVESubjectBaseRepository}}, this repository
+#' requires specifying block information. please use
+#' \code{\link{prepare_subject_with_blocks}} to instantiate this repository.
+#'
+#' @seealso \code{\link{prepare_subject_with_blocks}}
+#' @export
+RAVESubjectRecordingBlockRepository <- R6::R6Class(
+  classname = "RAVESubjectRecordingBlockRepository",
+  portable = TRUE,
+  inherit = RAVESubjectBaseRepository,
+  lock_objects = FALSE,
+  lock_class = TRUE,
+  cloneable = TRUE,
+
+  private = list(
+    .blocks = character(),
+    .data = NULL,
+    .data_type = character()
+  ),
+  public = list(
+
+
+    #' @description Internal method
+    #' @param ... internal arguments
+    `@marshal` = function(...) {
+      object <- super$`@marshal`()
+      object$r6_generator <- "RAVESubjectRecordingBlockRepository"
+      object$data$blocks <- private$.blocks
+      class(object$data) <- c("RAVESubjectRecordingBlockRepository_marshal", class(object$data))
+      object
+    },
+
+    #' @description Internal method
+    #' @param object,... internal arguments
+    `@unmarshal` = function(object, ...) {
+      stopifnot(identical(object$namespace, "ravecore"))
+      stopifnot(inherits(object$data, "RAVESubjectRecordingBlockRepository_marshal"))
+      repo <- RAVESubjectRecordingBlockRepository$new(
+        subject = RAVESubject$public_methods$`@unmarshal`(object$data$subject),
+        electrodes = object$data$intended_electrode_list,
+        reference_name = object$data$reference_name,
+        blocks = object$data$blocks,
+        quiet = TRUE,
+        repository_id = object$data$repository_id,
+        strict = TRUE,
+        lazy_load = TRUE
+      )
+      return(repo)
+    },
+
+    #' @description constructor
+    #' @param subject 'RAVE' subject
+    #' @param electrodes string or integers indicating electrodes to load
+    #' @param blocks name of the recording blocks to load
+    #' @param reference_name name of the reference table
+    #' @param quiet see field \code{quiet}
+    #' @param repository_id see field \code{repository_id}
+    #' @param strict whether the mode should be strict; default is true and
+    #' errors out when subject is missing
+    #' @param lazy_load whether to delay (lazy) the evaluation \code{mount_data}
+    #' @param ... passed to \code{\link{RAVESubjectBaseRepository}} constructor
+    #' @param .class internally used, do not set, even if you know what this is
+    initialize = function(subject, electrodes = NULL,
+                          reference_name = NULL, blocks = NULL, ...,
+                          quiet = FALSE, repository_id = NULL, strict = TRUE,
+                          lazy_load = FALSE, .class = NULL) {
+
+      .class <- c(.class, "prepare_subject_with_blocks", "RAVESubjectRecordingBlockRepository")
+
+      subject <- as_rave_subject(subject, strict = strict)
+
+      if(is.null(blocks)) { blocks <- subject$blocks }
+      blocks <- blocks[blocks %in% subject$blocks]
+      if(!length(blocks)) {
+        stop("No block is chosen. Please load one or more blocks: ", paste(sQuote(subject$blocks), collapse = ", "))
+      }
+
+      super$initialize(subject = subject, electrodes = electrodes,
+                       reference_name = reference_name, quiet = quiet,
+                       repository_id = repository_id,
+                       .class = .class)
+
+      private$.data <- fastmap2()
+
+      private$.blocks <- blocks
+
+      if(!lazy_load) {
+        self$mount_data()
+      }
+    },
+
+    #' @description Export the repository to 'Matlab' for future analysis
+    #' @param ... reserved for child classes
+    #' @param verbose print progresses
+    #' @returns The root directory where the files are stored.
+    export_matlab = function(..., verbose = TRUE) {
+      # self <- prepare_subject_with_blocks(
+      #     "demo/DemoSubject", electrodes = 14:16,
+      #     reference_name = "default", epoch_name = "auditory_onset",
+      #     time_windows = c(-1, 2))
+      root_path <- super$export_matlab(..., verbose = verbose)
+      summary_path <- file_path(root_path, "summary.yaml")
+      summary <- load_yaml(summary_path)
+
+      summary$blocks <- self$blocks
+      summary$sample_rates <- self$sample_rates
+
+      save_yaml(summary, file = summary_path, sorted = TRUE)
+
+      return(root_path)
+    },
+
+    #' @description function to mount data, not doing anything in this
+    #' class, but may be used by child classes
+    #' @param force force update data; default is true
+    #' @param electrodes electrodes to update; default is \code{NULL} (all
+    #' electrode channels)
+    #' @param ... reserved
+    mount_data = function(..., force = TRUE, electrodes = NULL) {
+
+      # # self <- RAVESubjectRecordingBlockRepository$new(subject = "demo/DemoSubject")
+      # # private <- self$.__enclos_env__$private
+      # # data_type <- "voltage"
+      # # electrodes <- 13
+      #
+      # data_type <- private$.data_type
+      # if(!length(data_type)) { return(self) }
+      #
+      # blocks <- self$blocks
+      # subject <- self$subject
+      #
+      # # determine electrodes to load
+      # electrodes <- parse_svec(electrodes)
+      # electrodes <- electrodes[electrodes %in% self$electrode_list]
+      # if(!length(electrodes)) {
+      #   electrodes <- self$electrode_list
+      # }
+      #
+      # # check data_list
+      # nms <- sprintf("e_%d", electrodes)
+      #
+      # if( !force ) {
+      #   exist_list <- names(private$.data$data_list)
+      #   if(all(nms %in% exist_list)) { return(self) }
+      # }
+      #
+      # electrode_instances <- self$electrode_instances[nms]
+      #
+      # # fine references to load
+      # ref_names <- lapply(electrode_instances, function(inst) {
+      #   if(isTRUE(inst$reference_name %in% c("noref", ""))) { return(NULL) }
+      #   sprintf("%s_%s", inst$reference_name, inst$type)
+      # })
+      # ref_names <- unlist(unique(ref_names))
+      # ref_names <- ref_names[ref_names %in% names(self$reference_instances)]
+      #
+      # reference_instances <- self$reference_instances[ref_names]
+      #
+      # # Load references
+      # if(length(reference_instances)) {
+      #   ravepipeline::lapply_jobs(
+      #     reference_instances,
+      #     function(inst) {
+      #       inst$load_blocks(blocks = blocks, type = data_type, simplify = FALSE)
+      #       return()
+      #     }, callback = function(inst) {
+      #       sprintf("Loading Reference | %s", inst$number)
+      #     },
+      #     .globals = list(data_type = data_type, blocks = blocks)
+      #   )
+      # }
+      #
+      # # cache path
+      # cache_base <- file_path(
+      #   cache_root(),
+      #   subject$project_name,
+      #   subject$subject_code,
+      #   "__whole_block__",
+      #   data_type,
+      #   self$reference_name
+      # )
+      # cache_base <- dir_create2(cache_base)
+      #
+      # lapply(blocks, function(block) {
+      #   # block <- blocks[[1]]
+      #   filebase <- file_path(cache_base, block)
+      #   sample_inst <- electrode_instances[[1]]
+      #   sample_signal <- sample_inst$load_blocks(blocks = block, type = data_type, simplify = TRUE)
+      #   dm <- dim(sample_signal)
+      #   if(!length(dm)) {
+      #     dm <- length(sample_signal)
+      #   }
+      #   array_dim <- c(dm, length(self$electrode_list))
+      #   dnames <-
+      #
+      #   filearray::filearray_load_or_create(
+      #     filebase = filebase,
+      #     dimension = ,
+      #     type = storage.mode(sample_signal),
+      #     mode = "readwrite",
+      #     symlink_ok = FALSE,
+      #     initialize = FALSE,
+      #     partition_size = 1L,
+      #     on_missing =
+      #   )
+      # })
+      #
+      # data_list <- fastmap2()
+      #
+      # # Load data next
+      # data_list <- ravepipeline::lapply_jobs(
+      #   electrode_instances,
+      #   function(inst) {
+      #     ravepipeline::RAVEFileArray$new(
+      #       inst$load_blocks(blocks = blocks, type = data_type, simplify = FALSE)
+      #     )
+      #   }, callback = function(inst) {
+      #     sprintf("Loading Time-Frequency Components | Electrode %s", inst$number)
+      #   },
+      #   .globals = list(data_type = data_type)
+      # )
+      # # Clear progress finish line
+      # cat("          \r")
+      #
+      # # Construct dataset
+      # data_list <- structure(
+      #   names = nms,
+      #   lapply(data_list, "[[", "@impl")
+      # )
+      #
+      # # construct dim and dimnames
+      # dim <- dim(data_list[[1]])
+      # dim[[4]] <- length(self$electrode_list)
+      #
+      # dimnames <- dimnames(data_list[[1]])
+      # dimnames[[4]] <- self$electrode_list
+      #
+      # private$.data$`@mset`(
+      #   # data_list = data_list,
+      #   dim = structure(dim, names = names(dimnames)),
+      #   dimnames = dimnames,
+      #   signature = self$signature
+      # )
+      #
+      # private$.data$data_list <- as.list(private$.data$data_list)
+      # private$.data$data_list[nms] <- data_list[nms]
+      #
+      # self
+    },
+
+    #' @description get container where loaded data are stored
+    #' @returns A named map, typically with data arrays, shape/dimension
+    #' information
+    get_container = function() {
+      if(private$.data$`@size`() == 0) {
+        self$mount_data()
+      }
+      private$.data
+    }
+  ),
+  active = list(
+
+    #' @field needs_update write-only attribute when subject needs to be
+    #' reloaded from the disk and reference table needs to be updated, use
+    #' \code{repo$needs_update <- TRUE}
+    needs_update = function(v) {
+      if(!missing(v) && v) {
+        private$update_subject()
+        self$mount_data()
+      }
+      invisible()
+    },
+
+    # field sample_rates a named list of sampling frequencies; the names
+    # are signal types (\code{'LFP'}, \code{'Auxiliary'}, or \code{'Spike'})
+    # and the values are the sampling frequencies
+    # sample_rates = function() {
+    #   electrodes <- self$subject$electrodes
+    #   sel <- electrodes %in% self$electrode_list
+    #   electrodes <- electrodes[sel]
+    #   raw_sample_rates <- self$subject$raw_sample_rates[sel]
+    #   electrode_types <- self$subject$electrode_types[sel]
+    #
+    #   df <- unique(data.frame(
+    #     type = electrode_types,
+    #     sample_rate = raw_sample_rates
+    #   ))
+    #   structure(
+    #     names = df$type,
+    #     as.list(as.double(df$sample_rate))
+    #   )
+    # },
+
+    #' @field blocks names of recording blocks
+    blocks = function() {
+      private$.blocks
+    },
+
+    #' @field electrode_table the entire electrode table with reference information
+    electrode_table = function() {
+      self$subject$get_electrode_table(
+        electrodes = self$electrode_list,
+        reference_name = self$reference_name)
+    },
+
+
+    #' @field digest_key a list of repository data used to generate
+    #' repository signature
+    digest_key = function() {
+      list(
+        subject_id = self$subject$subject_id,
+        blocks = self$blocks,
+        rave_data_type = private$.data_type,
+        reference_table = self$reference_table,
+        electrode_list = self$electrode_list,
+        electrode_signal_types = unname(self$electrode_signal_types)
+      )
+    }
+
+  )
+
+)
+
+#' @name prepare_subject_with_blocks
+#' @title 'RAVE' repository: with entire recording blocks
+#' @description
+#' Loads recording blocks - continuous recording chunks, typically a run
+#' of minutes.
+#' @returns A \code{\link{RAVESubjectRecordingBlockRepository}} instance
+#' @inheritParams prepare_subject_bare0
+#' @param blocks names of the recording blocks to load, can be queried via
+#' \code{subject$blocks}
+#' @param strict whether to check existence of subject before loading data;
+#' default is true
+#'
+#' @details
+#' \code{prepare_subject_with_blocks} does not actually load any signal data.
+#' Its existence is simply for backward compatibility. It instantiates a
+#' super-class of the rest of methods. Therefore, please refer to the rest of
+#' the methods for loading specific data types.
+#'
+#' Due to the large-data nature of blocks of signals, the repository will
+#' prepare cache files for all the channels, allowing users to load the
+#' cached data
+#'
+#' @examples
+#'
+#' \dontrun{
+#'
+#'
+#' # ---- An use-case example ------------------------------------------------
+#' # Install subject via install_subject("DemoSubject")
+#' subject <- as_rave_subject("demo/DemoSubject")
+#'
+#' # list all blocks
+#' subject$blocks
+#'
+#' repository <- prepare_subject_with_voltage_blocks(
+#'   subject,
+#'   electrodes = 13:16,
+#'   blocks = "008",
+#'   reference = "default"
+#' )
+#'
+#' print(repository)
+#'
+#' repository$blocks
+#'
+#' # get data
+#' container <- repository$get_container()
+#'
+#' # block data
+#' container$`008`
+#' lfp_list <- container$`008`$LFP
+#' channel_sample_rate <- lfp_list$sample_rate
+#'
+#' # Even we only load channels 14-16, all the channels are here for
+#' # in case we want to use the cache for future purposes
+#' lfp_list$dimnames$Electrode
+#'
+#' # Plot all loaded channels
+#' channel_sel <- lfp_list$dimnames$Electrode %in% c(14, 15, 16)
+#' channel_signals <- lfp_list$data[, channel_sel,
+#'                                  drop = FALSE,
+#'                                  dimnames = FALSE]
+#'
+#' ravetools::plot_signals(t(channel_signals),
+#'                         sample_rate = channel_sample_rate,
+#'                         channel_names = 14:16)
+#'
+#' # Load channel 14 and plot pwelch
+#' channel_sel <- lfp_list$dimnames$Electrode == 14
+#'
+#' channel_signals <- lfp_list$data[, channel_sel,
+#'                                  drop = TRUE,
+#'                                  dimnames = FALSE]
+#'
+#' ravetools::diagnose_channel(channel_signals,
+#'                             srate = channel_sample_rate,
+#'                             name = "Channel 14",
+#'                             nclass = 30)
+#'
+#' # ---- Use cache ---------------------------------------------------
+#'
+#' subject <- as_rave_subject("demo/DemoSubject")
+#'
+#' # Lazy-load block 008
+#' repository <- prepare_subject_with_voltage_blocks(
+#'   subject,
+#'   electrodes = 13:16,
+#'   blocks = "008",
+#'   reference = "default",
+#'   lazy_load = TRUE  # <-- trick
+#' )
+#'
+#' # Immediately load data with force=FALSE to use cache if exists
+#' repository$mount_data(force = FALSE)
+#'
+#'
+#' }
+#' @export
+prepare_subject_with_blocks <- function(
+    subject, electrodes = NULL, blocks = NULL,
+    reference_name = NULL, ...,
+    quiet = FALSE, repository_id = NULL, strict = TRUE) {
+  ravepipeline::logger("Function `prepare_subject_with_blocks` is for backward compatibility considerations. Please use other functions instead; see `?prepare_subject_with_blocks` for more information.", level = "warning")
+  RAVESubjectRecordingBlockRepository$new(
+    subject = subject, electrodes = electrodes,
+    reference_name = reference_name, blocks = blocks, ...,
+    quiet = quiet, repository_id = repository_id, strict = strict)
+}
+
+
+
+
+
+

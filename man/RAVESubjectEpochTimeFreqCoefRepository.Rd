@@ -7,7 +7,7 @@
 The repository inherits \code{link{RAVESubjectEpochTimeFreqBaseRepository}}, with epoch
 trials, and is intended for loading processed and referenced time-frequency
 coefficients.
-Use \code{\link{prepare_subject_time_frequency_coefficients}} to create an
+Use \code{\link{prepare_subject_time_frequency_coefficients_with_epoch}} to create an
 instance.
 }
 \section{Super classes}{
