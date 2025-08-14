@@ -5,7 +5,6 @@
 #' \code{\link{prepare_subject_with_blocks}} to instantiate this repository.
 #'
 #' @seealso \code{\link{prepare_subject_with_blocks}}
-#' @export
 RAVESubjectRecordingBlockRepository <- R6::R6Class(
   classname = "RAVESubjectRecordingBlockRepository",
   portable = TRUE,
@@ -96,16 +95,89 @@ RAVESubjectRecordingBlockRepository <- R6::R6Class(
     #' @param verbose print progresses
     #' @returns The root directory where the files are stored.
     export_matlab = function(..., verbose = TRUE) {
-      # self <- prepare_subject_with_blocks(
+      # self <- prepare_subject_voltage_with_blocks(
       #     "demo/DemoSubject", electrodes = 14:16,
-      #     reference_name = "default", epoch_name = "auditory_onset",
-      #     time_windows = c(-1, 2))
+      #     reference_name = "default")
+      # private <- self$.__enclos_env__$private
+
       root_path <- super$export_matlab(..., verbose = verbose)
       summary_path <- file_path(root_path, "summary.yaml")
       summary <- load_yaml(summary_path)
 
-      summary$blocks <- self$blocks
+      blocks <- self$blocks
+      summary$recording_blocks <- blocks
       summary$sample_rates <- self$sample_rates
+
+      block_root <- dir_create2(file_path(root_path, "with_blocks"))
+
+      # save data
+      data_type <- private$.data_type
+
+      if(length(data_type)) {
+        electrode_list <- self$electrode_list
+        data_path <- file_path(block_root, data_type)
+
+        if(verbose) {
+          callback <- function(block) {
+            sprintf("Exporting %s with blocks|Block %s", data_type, block)
+          }
+        } else {
+          callback <- NULL
+        }
+
+        self$mount_data(force = FALSE)
+        container <- self$get_container()
+
+        ravepipeline::lapply_jobs(
+          x = blocks,
+          fun = function(block) {
+            # block <- blocks[[1]]
+            block_path <- dir_create2(file_path(data_path, block))
+            block_data <- container[[block]]
+
+            for (stype in names(block_data)) {
+              stype_path <- file_path(block_path, sprintf("%s.mat", stype))
+              stype_data <- block_data[[stype]]
+              signal_data <- subset(stype_data$data,
+                                    Electrode ~ Electrode %in% electrode_list,
+                                    drop = FALSE)
+              dimnames(signal_data) <- NULL
+
+              data <- list(
+                description = sprintf("RAVE repository type: %s (recording blocks)", data_type),
+                electrode = as.matrix(stype_data$dimnames$Electrode),
+                block_name = block,
+                time_in_secs = as.matrix(stype_data$dimnames$Time),
+                # reference_channels =
+                # reference =
+                data = signal_data
+              )
+
+              if ("Frequency" %in% names(stype_data$dimnames)) {
+                data$frequency <- stype_data$dimnames$Frequency
+              }
+
+              ieegio::io_write_mat(data, con = stype_path)
+
+            }
+          },
+          .globals = list(
+            data_path = data_path,
+            container = container,
+            data_type = data_type,
+            electrode_list = electrode_list
+          ),
+          callback = callback,
+          # Main session, no parallel
+          .workers = 1L,
+          .always = FALSE
+        )
+
+        summary[[data_type]] <- list(
+          path = sprintf('with_blocks/%s', data_type)
+        )
+        summary$contains[["RAVE Repository Types"]] <- c(summary$contains[["RAVE Repository Types"]], data_type)
+      }
 
       save_yaml(summary, file = summary_path, sorted = TRUE)
 
@@ -417,6 +489,39 @@ RAVESubjectRecordingBlockRepository <- R6::R6Class(
 #'
 #' # Immediately load data with force=FALSE to use cache if exists
 #' repository$mount_data(force = FALSE)
+#'
+#' # ---- More examples ---------------------------------------------
+#'
+#'
+#' subject <- as_rave_subject("demo/DemoSubject")
+#' repository <- prepare_subject_power_with_blocks(
+#'   subject,
+#'   electrodes = 14,
+#'   blocks = "008",
+#'   reference_name = "default"
+#' )
+#'
+#' block_008 <- repository$power$`008`$LFP
+#'
+#' channel_sel <- block_008$dimnames$Electrode == 14
+#'
+#' # Drop electrode margin
+#' power <- block_008$data[, , channel_sel,
+#'                         drop = TRUE, dimnames = FALSE]
+#'
+#' # global baseline
+#' power_baselined_t <- 10 * log10(t(power))
+#' power_baselined_t <- power_baselined_t - rowMeans(power_baselined_t)
+#'
+#' ravetools::plot_signals(
+#'   power_baselined_t,
+#'   sample_rate = block_008$sample_rate,
+#'   channel_names = block_008$dimnames$Frequency,
+#'   space = 1,
+#'   start_time = 20,
+#'   duration = 30, ylab = "Frequency",
+#'   main = "Channel 14 - Power with Global Baseline (20-50 sec)"
+#' )
 #'
 #'
 #' }
