@@ -36,6 +36,7 @@
 <url><loc>http://rave.wiki/ravecore/reference/backup_file.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/cache_path.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/cmd-external.html</loc></url>
+<url><loc>http://rave.wiki/ravecore/reference/cmd_run_3dAllineate.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/cmd_run_ants_coreg.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/cmd_run_dcm2niix.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/cmd_run_freesurfer_recon_all.html</loc></url>
@@ -44,6 +45,7 @@
 <url><loc>http://rave.wiki/ravecore/reference/collapse2.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/collapse_power.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/compose_channel.html</loc></url>
+<url><loc>http://rave.wiki/ravecore/reference/convert_electrode_table_to_bids.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/export_table.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/generate_reference.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/get_projects.html</loc></url>
@@ -57,6 +59,7 @@
 <url><loc>http://rave.wiki/ravecore/reference/prepare_subject_bare.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/prepare_subject_with_blocks.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/prepare_subject_with_epochs.html</loc></url>
+<url><loc>http://rave.wiki/ravecore/reference/py_nipy_coreg.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/rave_brain.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/rave_cmd_tools.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/rave_path.html</loc></url>
