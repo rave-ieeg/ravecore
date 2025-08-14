@@ -21,6 +21,7 @@
 #' prior to running the script
 #' @param dry_run avoid running the code, but print the process instead
 #' @param verbose print messages
+#' @param ... ignored
 #' @returns A list of shell command set.
 #'
 #' @examples
@@ -30,20 +31,16 @@
 #'
 #' \dontrun{
 #'
-#' library(ravecore)
-#'
-#' # Install subject: `install_subject("yael_demo_001")`
-#'
 #' # Create subject instance; strict=FALSE means it's OK if the subject
 #' # is missing
 #' subject <- as_rave_subject("YAEL/s01", strict = FALSE)
 #'
-#' cmd_freesurfer_recon_all(subject = subject,
+#' cmd_run_freesurfer_recon_all(subject = subject,
 #'                          mri_path = "/path/to/T1.nii.gz")
 #'
 #' }
 #' @export
-cmd_freesurfer_recon_all <- function(
+cmd_run_freesurfer_recon_all <- function(
     subject, mri_path,
     args = c(
       "-all", "-autorecon1", "-autorecon2", "-autorecon3",
@@ -69,17 +66,17 @@ cmd_freesurfer_recon_all <- function(
   if('-all' %in% args) {
     args <- '-all'
   } else if(!length(args)) {
-    stop("`cmd_freesurfer_recon_all`: recon-all flag is invalid")
+    stop("`cmd_run_freesurfer_recon_all`: recon-all flag is invalid")
   }
 
   if(missing(mri_path) || length(mri_path) != 1 || is.na(mri_path) || !file.exists(mri_path) ||
      dir.exists(mri_path)) {
-    stop("`cmd_freesurfer_recon_all`: `mri_path` is not a valid path.")
+    stop("`cmd_run_freesurfer_recon_all`: `mri_path` is not a valid path.")
   }
   mri_path <- normalizePath(mri_path, winslash = "/", mustWork = TRUE)
 
   if(!grepl("\\.nii($|\\.gz$)", mri_path, ignore.case = TRUE)) {
-    stop("`cmd_freesurfer_recon_all`: `mri_path` is not a valid NifTi file.")
+    stop("`cmd_run_freesurfer_recon_all`: `mri_path` is not a valid NifTi file.")
   }
 
   subject <- restore_subject_instance(subject, strict = FALSE)
@@ -107,7 +104,7 @@ cmd_freesurfer_recon_all <- function(
   cmd_recon <- "recon-all"
 
   log_path <- normalizePath(
-    file.path(subject$preprocess_settings$raw_path, "rave-imaging", "log"),
+    file.path(subject$imaging_path, "log"),
     mustWork = FALSE, winslash = "/"
   )
   log_file <- strftime(Sys.time(), "log-recon-all-%y%m%d-%H%M%S.log")
@@ -130,7 +127,7 @@ cmd_freesurfer_recon_all <- function(
   cmd <- ravepipeline::glue(paste(template, collapse = "\n"), .sep = "\n", .open = "{{", .close = "}}", .trim = FALSE)
 
   script_path <- normalizePath(
-    file.path(subject$preprocess_settings$raw_path, "rave-imaging", "scripts", "cmd-fs-recon.sh"),
+    file.path(subject$imaging_path, "scripts", "cmd-fs-recon.sh"),
     mustWork = FALSE, winslash = "/"
   )
   execute <- function(...) {
@@ -159,5 +156,103 @@ cmd_freesurfer_recon_all <- function(
 
   return(invisible(re))
 
-  # cmd_freesurfer_recon_all(subject = "devel/YCQ", mri_path = "/Volumes/PennRAID/Dropbox (PENN Neurotrauma)/BeauchampServe/rave_data/raw/YCQ/rave-imaging/inputs/MRI/YCQ_MRI.nii", args = "-autorecon1", verbose = TRUE)
+  # cmd_run_freesurfer_recon_all(subject = "devel/YCQ", mri_path = "/Volumes/PennRAID/Dropbox (PENN Neurotrauma)/BeauchampServe/rave_data/raw/YCQ/rave-imaging/inputs/MRI/YCQ_MRI.nii", args = "-autorecon1", verbose = TRUE)
 }
+
+
+#' @rdname cmd_run_freesurfer_recon_all
+#' @export
+cmd_run_freesurfer_recon_all_clinical <- function(
+    subject, mri_path,
+    work_path = NULL,
+    overwrite = FALSE, command_path = NULL,
+    dry_run = FALSE, verbose = dry_run, ...) {
+
+  ncores <- ravepipeline::raveio_getopt("max_worker", default = 1L)
+
+  if(missing(mri_path) || length(mri_path) != 1 || is.na(mri_path) || !file.exists(mri_path) ||
+     dir.exists(mri_path)) {
+    stop("`cmd_run_freesurfer_recon_all_clinical`: `mri_path` is not a valid path.")
+  }
+  mri_path <- normalizePath(mri_path, winslash = "/")
+
+  if(!grepl("\\.nii($|\\.gz$)", mri_path, ignore.case = TRUE)) {
+    stop("`cmd_run_freesurfer_recon_all_clinical`: `mri_path` is not a valid `NIfTI` file.")
+  }
+
+  subject <- restore_subject_instance(subject, strict = FALSE)
+
+  default_fs_path <- cmd_freesurfer_home(error_on_missing = FALSE)
+  freesurfer_home <- tryCatch({
+    freesurfer <- normalize_commandline_path(
+      path = command_path,
+      unset = default_fs_path,
+      type = "freesurfer"
+    )
+    if(length(freesurfer) != 1 || is.na(freesurfer) || !isTRUE(dir.exists(freesurfer))) {
+      freesurfer <- NULL
+    } else if(!identical(default_fs_path, freesurfer)) {
+      ravepipeline::raveio_setopt("freesurfer_path", freesurfer)
+    }
+    freesurfer
+  }, error = function(e){ NULL })
+
+  has_freesurfer <- !is.null(freesurfer_home)
+  if(has_freesurfer) {
+    freesurfer_home <- normalizePath(freesurfer_home, winslash = "/")
+  }
+  cmd_recon <- "recon-all-clinical.sh"
+
+  log_path <- normalizePath(
+    file.path(subject$imaging_path, "log"),
+    mustWork = FALSE, winslash = "/"
+  )
+  log_file <- strftime(Sys.time(), "log-recon-all-clinical-%y%m%d-%H%M%S.log")
+
+  # Always use a temporary working path since the target directory might contain spaces
+  if(length(work_path) != 1 || is.na(work_path) || !dir.exists(work_path)) {
+    work_path_symlink <- file.path(
+      tools::R_user_dir("ravecore", which = "cache"),
+      "FreeSurfer", subject$subject_code, fsep = "/")
+  } else {
+    work_path_symlink <- file.path(work_path, subject$subject_code, fsep = "/")
+  }
+
+  work_path_actual <- subject$preprocess_settings$raw_path
+
+  template <- c(readLines(system.file('shell-templates/recon-all-clinical.sh', package = "ravecore")), "")
+  cmd <- ravepipeline::glue(paste(template, collapse = "\n"), .sep = "\n", .open = "{{", .close = "}}", .trim = FALSE)
+
+  script_path <- normalizePath(
+    file.path(subject$imaging_path, "scripts", "cmd-fs-recon-clinical.sh"),
+    mustWork = FALSE, winslash = "/"
+  )
+  execute <- function(...) {
+    initialize_imaging_paths(subject)
+    cmd_execute(script = cmd, script_path = script_path, command = "bash", ...)
+  }
+  re <- list(
+    script = cmd,
+    script_path = script_path,
+    dry_run = dry_run,
+    freesurfer_home = freesurfer_home,
+    log_file = file.path(log_path, log_file, fsep = "/"),
+    src_path = mri_path,
+    dest_path = file.path(work_path_actual, "rave-imaging", "fs", fsep = "/"),
+    execute = execute,
+    command = "bash"
+  )
+  if( verbose ) {
+    message(cmd)
+  }
+  if(dry_run) {
+    return(invisible(re))
+  }
+
+  execute()
+
+  return(invisible(re))
+
+  # cmd_run_freesurfer_recon_all_clinical(subject = "devel/TMP", mri_path = "~/Dropbox (PennNeurosurgery)/RAVE/Samples/raw/TMP/IMG/T1.nii.gz", verbose = TRUE)
+}
+

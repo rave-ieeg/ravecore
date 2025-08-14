@@ -100,7 +100,7 @@ if( !run_recon_all ) {
     add_surfaces = FALSE
   )
   # Prepare for the FreeSurfer
-  ravecore::cmd_freesurfer_recon_all(
+  ravecore::cmd_run_freesurfer_recon_all(
     subject = subject,
     mri_path = file.path(wdir_actual, "rave-imaging", "inputs", "MRI", "MRI_RAW.nii.gz"),
     args = "-all",

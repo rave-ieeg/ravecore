@@ -48,7 +48,7 @@ mkdir -p "$wdir_actual/rave-imaging/derivative"
 #   log_file="/dev/null"
 # fi
 # wdir_actual="/Users/dipterix/Dropbox (PennNeurosurgery)/RAVE/Samples/raw/YAH"
-# wdir_fs="/Users/dipterix/Library/Caches/org.R-project.R/R/raveio/FreeSurfer/YAH"
+# wdir_fs="/Users/dipterix/Library/Caches/org.R-project.R/R/ravecore/FreeSurfer/YAH"
 # mri_path="/Users/dipterix/Dropbox (PennNeurosurgery)/RAVE/Samples/raw/YAH/rave-imaging/inputs/MRI/MRI_RAW.nii"
 # input_name="MRI.nii"
 # mri_ext=".nii"
@@ -131,7 +131,7 @@ SUBJECTS_DIR="$wdir_fs/rave-imaging"
   } else { "" }
 }}
 
-# rm /Users/dipterix/Library/Caches/org.R-project.R/R/raveio/FreeSurfer/YAH/rave-imaging/fs/scripts/IsRunning.lh+rh
+# rm /Users/dipterix/Library/Caches/org.R-project.R/R/ravecore/FreeSurfer/YAH/rave-imaging/fs/scripts/IsRunning.lh+rh
 # arch -x86_64 /bin/tcsh ./inst/shell-templates/recon-all-clinical-core.sh "$wdir_fs/$input_name" fs 7 "$SUBJECTS_DIR"
 
 # Copy Nifti input

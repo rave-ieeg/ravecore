@@ -302,7 +302,7 @@ archive_subject <- function(
   if("rave_imaging" %in% includes) {
     # get rave-imaging folder
     path_imaging <- dir_create2(file.path(root_dir, "rave_imaging"))
-    subject_imaging_path <- file.path(subject$preprocess_settings$raw_path, "rave-imaging")
+    subject_imaging_path <- subject$imaging_path
 
     meta_info$paths$rave_imaging <- list(
       type = "raw_data_dir",

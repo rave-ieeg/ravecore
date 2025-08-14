@@ -326,7 +326,7 @@ cmd_run_yael_preprocess <- function(
   # cmd_recon <- "recon-all"
 
   log_path <- normalizePath(
-    file.path(subject$preprocess_settings$raw_path, "rave-imaging", "log"),
+    file.path(subject$imaging_path, "log"),
     mustWork = FALSE, winslash = "/"
   )
   log_file <- strftime(Sys.time(), "log-yael-preprocess-%y%m%d-%H%M%S.log")
@@ -346,7 +346,7 @@ cmd_run_yael_preprocess <- function(
   }
 
   script_path <- normalizePath(
-    file.path(subject$preprocess_settings$raw_path, "rave-imaging", "scripts", script_name),
+    file.path(subject$imaging_path, "scripts", script_name),
     mustWork = FALSE, winslash = "/"
   )
   execute <- function(...) {
