@@ -90,7 +90,6 @@ repository signature</p></dd>
 <li><p><a href="#method-RAVESubjectRecordingBlockRepository-@unmarshal"><code>RAVESubjectRecordingBlockRepository$@unmarshal()</code></a></p></li>
 <li><p><a href="#method-RAVESubjectRecordingBlockRepository-new"><code>RAVESubjectRecordingBlockRepository$new()</code></a></p></li>
 <li><p><a href="#method-RAVESubjectRecordingBlockRepository-export_matlab"><code>RAVESubjectRecordingBlockRepository$export_matlab()</code></a></p></li>
-<li><p><a href="#method-RAVESubjectRecordingBlockRepository-mount_data"><code>RAVESubjectRecordingBlockRepository$mount_data()</code></a></p></li>
 <li><p><a href="#method-RAVESubjectRecordingBlockRepository-get_container"><code>RAVESubjectRecordingBlockRepository$get_container()</code></a></p></li>
 <li><p><a href="#method-RAVESubjectRecordingBlockRepository-clone"><code>RAVESubjectRecordingBlockRepository$clone()</code></a></p></li>
 </ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="ravepipeline" data-topic="RAVESerializable" data-id="@compare"><a href="http://dipterix.org/ravepipeline/reference/RAVESerializable.html#method-@compare"><code>ravepipeline::RAVESerializable$@compare()</code></a></span></li>
@@ -210,40 +209,10 @@ errors out when subject is missing</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-RAVESubjectRecordingBlockRepository-mount_data"></a><div class="section">
-<h3 id="method-mount-data-">Method <code>mount_data()</code><a class="anchor" aria-label="anchor" href="#method-mount-data-"></a></h3>
-<p>function to mount data, not doing anything in this
-class, but may be used by child classes</p><div class="section">
-<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RAVESubjectRecordingBlockRepository</span><span class="op">$</span><span class="fu">mount_data</span><span class="op">(</span></span>
-<span>  <span class="va">...</span>,</span>
-<span>  force <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  electrodes <span class="op">=</span> <span class="cn">NULL</span></span>
-<span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
-<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>...</code></dt>
-<dd><p>reserved</p></dd>
-
-
-<dt><code>force</code></dt>
-<dd><p>force update data; default is true</p></dd>
-
-
-<dt><code>electrodes</code></dt>
-<dd><p>electrodes to update; default is <code>NULL</code> (all
-electrode channels)</p></dd>
-
-
-</dl><p></p></div>
-</div>
-
 </div><p></p><hr><a id="method-RAVESubjectRecordingBlockRepository-get_container"></a><div class="section">
 <h3 id="method-get-container-">Method <code>get_container()</code><a class="anchor" aria-label="anchor" href="#method-get-container-"></a></h3>
 <p>get container where loaded data are stored</p><div class="section">
-<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
+<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RAVESubjectRecordingBlockRepository</span><span class="op">$</span><span class="fu">get_container</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -251,12 +220,12 @@ electrode channels)</p></dd>
 </div><p></p><hr><a id="method-RAVESubjectRecordingBlockRepository-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
+<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RAVESubjectRecordingBlockRepository</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
+<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 
