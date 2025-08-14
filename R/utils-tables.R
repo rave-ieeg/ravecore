@@ -55,7 +55,7 @@ export_table <- function(x, file, format = c("auto", "csv", "csv.zip", "tsv", "h
   if(format == "auto") {
     format <- path_ext(tolower(file))
     if(!format %in% c("csv", "zip", "csv.zip", "tsv", "h5", "fst", "json", "rds", "yaml", "yml")) {
-      stop("raveio::export_table: cannot infer `format` from file name: ", basename(file))
+      stop("ravecore::export_table: cannot infer `format` from file name: ", basename(file))
     }
     if(format == "zip") {
       format <- "csv.zip"
@@ -184,7 +184,7 @@ import_table <- function(file, format = c("auto", "csv", "csv.zip", "tsv", "h5",
   if(format == "auto") {
     format <- path_ext(tolower(file))
     if(!format %in% c("csv", "zip", "csv.zip", "tsv", "h5", "fst", "json", "rds", "yaml", "yml")) {
-      stop("raveio::import_table: cannot infer `format` from file name: ", basename(file))
+      stop("ravecore::import_table: cannot infer `format` from file name: ", basename(file))
     }
     if(format == "zip") {
       format <- "csv.zip"
@@ -204,7 +204,7 @@ import_table <- function(file, format = c("auto", "csv", "csv.zip", "tsv", "h5",
       utils::unzip(zipfile = file, exdir = td, overwrite = TRUE)
       f <- list.files(td, pattern = "\\.csv$", ignore.case = TRUE)
       if(length(f) != 1) {
-        stop("raveio::import_table: csv.zip file contains no csv or more than one csv files.")
+        stop("ravecore::import_table: csv.zip file contains no csv or more than one csv files.")
       }
       data.table::fread(file = file.path(td, f), ...)
     },

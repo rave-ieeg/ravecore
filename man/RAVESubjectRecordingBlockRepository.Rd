@@ -43,7 +43,6 @@ repository signature}
 \item \href{#method-RAVESubjectRecordingBlockRepository-@unmarshal}{\code{RAVESubjectRecordingBlockRepository$@unmarshal()}}
 \item \href{#method-RAVESubjectRecordingBlockRepository-new}{\code{RAVESubjectRecordingBlockRepository$new()}}
 \item \href{#method-RAVESubjectRecordingBlockRepository-export_matlab}{\code{RAVESubjectRecordingBlockRepository$export_matlab()}}
-\item \href{#method-RAVESubjectRecordingBlockRepository-mount_data}{\code{RAVESubjectRecordingBlockRepository$mount_data()}}
 \item \href{#method-RAVESubjectRecordingBlockRepository-get_container}{\code{RAVESubjectRecordingBlockRepository$get_container()}}
 \item \href{#method-RAVESubjectRecordingBlockRepository-clone}{\code{RAVESubjectRecordingBlockRepository$clone()}}
 }
@@ -151,33 +150,6 @@ Export the repository to 'Matlab' for future analysis
 \item{\code{...}}{reserved for child classes}
 
 \item{\code{verbose}}{print progresses}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-RAVESubjectRecordingBlockRepository-mount_data"></a>}}
-\if{latex}{\out{\hypertarget{method-RAVESubjectRecordingBlockRepository-mount_data}{}}}
-\subsection{Method \code{mount_data()}}{
-function to mount data, not doing anything in this
-class, but may be used by child classes
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectRecordingBlockRepository$mount_data(
-  ...,
-  force = TRUE,
-  electrodes = NULL
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{reserved}
-
-\item{\code{force}}{force update data; default is true}
-
-\item{\code{electrodes}}{electrodes to update; default is \code{NULL} (all
-electrode channels)}
 }
 \if{html}{\out{</div>}}
 }

@@ -116,7 +116,7 @@ cmd_dcm2niix <- function(error_on_missing = TRUE, unset = NA) {
            "Please go to the following website to install it:\n\n",
            "  https://github.com/rordenlab/dcm2niix#install\n\n",
            "If you have installed `dcm2niix`, please use\n\n",
-           '  raveio::raveio_setopt("dcm2niix_path", <path to dcm2niix>)\n\n',
+           '  ravepipeline::raveio_setopt("dcm2niix_path", <path to dcm2niix>)\n\n',
            "to set the path. Remember to replace and quote <path to dcm2niix>")
     } else {
       path <- unset
@@ -163,7 +163,7 @@ cmd_freesurfer_home <- function(error_on_missing = TRUE, unset = NA) {
            "Please go to the following website to install it:\n\n",
            "  https://surfer.nmr.mgh.harvard.edu/fswiki/DownloadAndInstall\n\n",
            "If you have installed FreeSurfer, please use\n\n",
-           '  raveio::raveio_setopt("freesurfer_path", <path to FREESURFER_HOME>)\n\n',
+           '  ravepipeline::raveio_setopt("freesurfer_path", <path to FREESURFER_HOME>)\n\n',
            "to set the FreeSurfer home directory. ",
            "Remember to replace and quote <path to FREESURFER_HOME>")
     }
@@ -195,7 +195,7 @@ cmd_fsl_home <- function(error_on_missing = TRUE, unset = NA) {
            "Please go to the following website to install it:\n\n",
            "  https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FslInstallation\n\n",
            "If you have installed FSL-FLIRT, please use\n\n",
-           '  raveio::raveio_setopt("fsl_path", <path to FSL>)\n\n',
+           '  ravepipeline::raveio_setopt("fsl_path", <path to FSL>)\n\n',
            "to set the path. Remember to replace and quote <path to FSL>")
     }
   } else {
@@ -225,7 +225,7 @@ cmd_afni_home <- function(error_on_missing = TRUE, unset = NA) {
            "Please go to the following website to install it:\n\n",
            "  https://afni.nimh.nih.gov/pub/dist/doc/htmldoc/background_install/install_instructs/index.html\n\n",
            "If you have installed AFNI, please use\n\n",
-           '  raveio::raveio_setopt("afni_path", <path to AFNI>)\n\n',
+           '  ravepipeline::raveio_setopt("afni_path", <path to AFNI>)\n\n',
            "to set the path. Remember to replace and quote <path to AFNI>")
     }
   } else {
@@ -259,7 +259,7 @@ cmd_homebrew <- function(error_on_missing = TRUE, unset = NA) {
            "Please open terminal and run the following shell command:\n\n",
            '  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"\n\n',
            "If you have installed brew, please use\n\n",
-           '  raveio::raveio_setopt("homebrew_path", <path to brew>)\n\n',
+           '  ravepipeline::raveio_setopt("homebrew_path", <path to brew>)\n\n',
            "to set the path. Remember to replace and quote <path to brew>")
     }
   } else {

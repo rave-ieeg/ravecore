@@ -15,7 +15,8 @@ A processing instance, see \code{\link{YAELProcess}}
 }
 \description{
 Image registration across different modals. Normalize brain 'T1'-weighted
-'MRI' to template brain and generate subject-level atlas files.
+'MRI' to template brain and generate subject-level atlas files. See
+\code{\link{cmd_run_yael_preprocess}} to see how to run a built-in workflow
 }
 \examples{
 
