@@ -405,6 +405,7 @@ clear_cached_files <- function(subject_code, quiet = FALSE){
 
   clear_dir('~/rave_data/cache_dir/')
   clear_dir(tools::R_user_dir('raveio', "cache"))
+  clear_dir(tools::R_user_dir('ravepipeline', "cache"))
   clear_dir(cache_root())
 
   # ravetools_path <- file.path(

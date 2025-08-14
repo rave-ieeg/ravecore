@@ -16,7 +16,7 @@ prepare_subject_with_blocks_legacy <- function(
 
   raw <- as.logical(raw)
 
-  re <- dipsaus::fastmap2()
+  re <- new.env(parent = emptyenv())
   re$signal_type <- signal_type
   re$raw_signal <- raw
   subject <- as_rave_subject(subject)
@@ -35,9 +35,9 @@ prepare_subject_with_blocks_legacy <- function(
   if(missing(electrodes)){
     electrodes <- subject$get_default(
       "electrodes", default_if_missing = subject$electrodes)
-    message("No electrodes specified, trying to get electrodes: ", dipsaus::deparse_svec(electrodes))
+    message("No electrodes specified, trying to get electrodes: ", deparse_svec(electrodes))
   }
-  electrodes <- sort(dipsaus::parse_svec(electrodes))
+  electrodes <- sort(parse_svec(electrodes))
   potential_elecs <- subject$electrodes[subject$electrode_types == signal_type]
   electrodes <- electrodes[electrodes %in% potential_elecs]
 
@@ -187,7 +187,7 @@ prepare_subject_with_blocks_legacy <- function(
   # prepare placeholder data
   block_data <- structure(lapply(blocks, function(block) {
 
-    block_data <- dipsaus::fastmap2()
+    block_data <- fastmap2()
 
     voltage_ntps <- voltage_ntimepoints[[block]]
     if( raw ) {
@@ -200,7 +200,7 @@ prepare_subject_with_blocks_legacy <- function(
       Time = seq(0, by = 1 / voltage_srate, length.out = voltage_ntps),
       Electrode = subject$electrodes
     )
-    voltage_signature <- dipsaus::digest(list(
+    voltage_signature <- ravepipeline::digest(list(
       subject_id = subject$subject_id,
       reference_table = re$reference_table,
       all_electrodes = subject$electrodes,
@@ -245,7 +245,7 @@ prepare_subject_with_blocks_legacy <- function(
         Time = seq(0, by = 1 / wavelet_srate, length.out = wavelet_ntps),
         Electrode = subject$electrodes
       )
-      wavelet_signature <- dipsaus::digest(list(
+      wavelet_signature <- ravepipeline::digest(list(
         subject_id = subject$subject_id,
         reference_table = re$reference_table,
         all_electrodes = subject$electrodes,
@@ -351,7 +351,7 @@ prepare_subject_with_blocks_legacy <- function(
     time_frequency = time_frequency,
     raw = raw
   )
-  digest_string <- dipsaus::digest(digest_key)
+  digest_string <- ravepipeline::digest(digest_key)
   re$signature <- structure(digest_string, contents = names(digest_key))
   if(!length(repository_id)) {
     repository_id <- ravecore:::rand_string(4)
