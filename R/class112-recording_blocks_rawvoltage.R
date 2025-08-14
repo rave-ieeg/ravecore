@@ -2,13 +2,13 @@
 #' @description
 #' Compared to \code{\link{RAVESubjectBaseRepository}}, this repository
 #' loads the entire voltage traces for selected blocks; use
-#' \code{\link{prepare_subject_voltage_with_blocks}} to instantiate this
+#' \code{\link{prepare_subject_raw_voltage_with_blocks}} to instantiate this
 #' repository.
 #'
-#' @seealso \code{\link{prepare_subject_voltage_with_blocks}}
+#' @seealso \code{\link{prepare_subject_raw_voltage_with_blocks}}
 #' @export
-RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
-  classname = "RAVESubjectRecordingBlockVoltageRepository",
+RAVESubjectRecordingBlockRawVoltageRepository <- R6::R6Class(
+  classname = "RAVESubjectRecordingBlockRawVoltageRepository",
   portable = TRUE,
   inherit = RAVESubjectRecordingBlockRepository,
   lock_objects = FALSE,
@@ -16,7 +16,7 @@ RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
   cloneable = TRUE,
 
   private = list(
-    .data_type = "voltage"
+    .data_type = "raw-voltage"
   ),
   public = list(
 
@@ -25,8 +25,8 @@ RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
     #' @param ... internal arguments
     `@marshal` = function(...) {
       object <- super$`@marshal`()
-      object$r6_generator <- "RAVESubjectRecordingBlockVoltageRepository"
-      class(object$data) <- c("RAVESubjectRecordingBlockVoltageRepository_marshal", class(object$data))
+      object$r6_generator <- "RAVESubjectRecordingBlockRawVoltageRepository"
+      class(object$data) <- c("RAVESubjectRecordingBlockRawVoltageRepository_marshal", class(object$data))
       object
     },
 
@@ -34,8 +34,8 @@ RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
     #' @param object,... internal arguments
     `@unmarshal` = function(object, ...) {
       stopifnot(identical(object$namespace, "ravecore"))
-      stopifnot(inherits(object$data, "RAVESubjectRecordingBlockVoltageRepository_marshal"))
-      repo <- RAVESubjectRecordingBlockVoltageRepository$new(
+      stopifnot(inherits(object$data, "RAVESubjectRecordingBlockRawVoltageRepository_marshal"))
+      repo <- RAVESubjectRecordingBlockRawVoltageRepository$new(
         subject = RAVESubject$public_methods$`@unmarshal`(object$data$subject),
         electrodes = object$data$intended_electrode_list,
         reference_name = object$data$reference_name,
@@ -51,8 +51,9 @@ RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
     #' @description constructor
     #' @param subject 'RAVE' subject
     #' @param electrodes string or integers indicating electrodes to load
+    #' @param reference_name always \code{'noref'} (no reference); trying to
+    #' set to other volues will result in a warning
     #' @param blocks name of the recording blocks to load
-    #' @param reference_name name of the reference table
     #' @param quiet see field \code{quiet}
     #' @param repository_id see field \code{repository_id}
     #' @param strict whether the mode should be strict; default is true and
@@ -61,18 +62,23 @@ RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
     #' @param ... passed to \code{\link{RAVESubjectBaseRepository}} constructor
     #' @param .class internally used, do not set, even if you know what this is
     initialize = function(subject, electrodes = NULL,
-                          reference_name = NULL, blocks = NULL, ...,
-                          quiet = FALSE, repository_id = NULL, strict = TRUE,
+                          reference_name = "noref", blocks = NULL, ...,
+                          quiet = TRUE, repository_id = NULL, strict = TRUE,
                           lazy_load = FALSE, .class = NULL) {
 
-      .class <- c(.class, "prepare_subject_voltage_with_blocks", "RAVESubjectRecordingBlockVoltageRepository")
+      .class <- c(.class, "prepare_subject_raw_voltage_with_blocks", "RAVESubjectRecordingBlockRawVoltageRepository")
+
+      if(!identical(reference_name, "noref")) {
+        ravepipeline::logger("RAVESubjectRecordingBlockRawVoltageRepository: `reference_name` must be 'noref', coerce this setting", level = "warning")
+        reference_name <- "noref"
+      }
 
       subject <- as_rave_subject(subject, strict = strict)
       super$initialize(subject = subject, electrodes = electrodes,
-                       reference_name = reference_name, quiet = quiet,
+                       reference_name = "noref", quiet = quiet,
                        repository_id = repository_id, blocks = blocks,
                        lazy_load = lazy_load,
-                       .class = .class)
+                       .class = .class, ...)
     },
 
     #' @description function to mount data
@@ -87,7 +93,7 @@ RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
       self$quiet <- TRUE
       on.exit({ self$quiet <- quiet_old })
 
-      # self <- RAVESubjectRecordingBlockVoltageRepository$new(subject = "demo/DemoSubject", lazy_load = TRUE)
+      # self <- RAVESubjectRecordingBlockRawVoltageRepository$new(subject = "test/PAV058", lazy_load = TRUE)
       # private <- self$.__enclos_env__$private
       # private$.data
       # data_type <- "voltage"
@@ -147,13 +153,6 @@ RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
 
           stype <- inst$type
 
-          if(stype == "LFP") {
-            data_type <- "voltage"
-          } else {
-            # Special treatment: Spike and Aux channels dont need reference
-            data_type <- "raw-voltage"
-          }
-
           if(is.null(cached_arrays[[stype]])) {
             # this is a sample electrode channel, load anyway
             sample_signal <- inst$load_blocks(blocks = block, type = data_type, simplify = TRUE)
@@ -181,7 +180,7 @@ RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
                 project = inst$subject$project_name,
                 subject = inst$subject$subject_code,
                 block = block,
-                rave_data_type = "voltage",
+                rave_data_type = data_type,
                 channels = all_electrodes,
                 initialize = FALSE,
                 verbose = FALSE,
@@ -217,6 +216,7 @@ RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
       }, .globals = list(
         cache_path = cache_path,
         electrode_instances = electrode_instances,
+        data_type = data_type,
         sample_rates = sample_rates,
         all_electrodes = all_electrodes,
         reference_table = reference_table,
@@ -248,6 +248,36 @@ RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
   ),
   active = list(
 
+    #' @field reference_name name of reference table; always \code{'noref'}
+    reference_name = function(v) {
+      if(identical(private$.reference_name, "noref")) {
+        private$.reference_name <- "noref"
+      }
+      "noref"
+    },
+
+    #' @field reference_table reference table; a reference table with
+    #' \code{'noref'} on all channels
+    reference_table = function() {
+      subject <- private$.subject
+      data.frame(
+        Electrode = subject$electrodes,
+        Group = "default",
+        Reference = "noref",
+        Type = "No Reference"
+      )
+    },
+
+    #' @field references_list a vector of reference channel names;
+    #' always \code{'noref'}
+    references_list = function() {
+      "noref"
+    },
+
+    #' @field reference_instances instances of reference channels, empty
+    #' in this type of repositories
+    reference_instances = function() { list() },
+
     #' @field sample_rates a named list of sampling frequencies; the names
     #' are signal types (\code{'LFP'}, \code{'Auxiliary'}, or \code{'Spike'})
     #' and the values are the sampling frequencies
@@ -268,8 +298,8 @@ RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
       )
     },
 
-    #' @field voltage data container, alias of \code{get_container}
-    voltage = function() {
+    #' @field raw_voltage data container, alias of \code{get_container}
+    raw_voltage = function() {
       self$get_container()
     }
 
@@ -279,13 +309,13 @@ RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
 
 #' @rdname prepare_subject_with_blocks
 #' @export
-prepare_subject_voltage_with_blocks <- function(
+prepare_subject_raw_voltage_with_blocks <- function(
     subject, electrodes = NULL, blocks = NULL,
-    reference_name = NULL, ...,
+    reference_name = "noref", ...,
     quiet = FALSE, repository_id = NULL, strict = TRUE) {
-  RAVESubjectRecordingBlockVoltageRepository$new(
+  RAVESubjectRecordingBlockRawVoltageRepository$new(
     subject = subject, electrodes = electrodes,
-    reference_name = reference_name, blocks = blocks, ...,
+    reference_name = "noref", blocks = blocks, ...,
     quiet = quiet, repository_id = repository_id, strict = strict)
 }
 
