@@ -19,7 +19,8 @@ RAVESubjectEpochRepository <- R6::R6Class(
     .epoch = NULL,
     .stitch_events = NULL,
     .time_windows = NULL,
-    .data = NULL
+    .data = NULL,
+    .data_type = character()
   ),
   public = list(
 
@@ -115,9 +116,85 @@ RAVESubjectEpochRepository <- R6::R6Class(
       summary$stitch_events <- self$stitch_events
       summary$sample_rates <- self$sample_rates
 
-      epoch_path <- file.path(root_path, "epoch.csv")
+      epoch_root <- dir_create2(file_path(root_path, "with_epochs"))
+
+      epoch_path <- file.path(epoch_root, "epoch.csv")
       export_table(x = self$epoch_table, file = epoch_path)
-      summary$contains[["Epoch table"]] <- "epoch.csv"
+      summary$contains[["Epoch table"]] <- "with_epochs/epoch.csv"
+
+
+      # ---- save data
+      # self <- prepare_subject_raw_voltage_with_epoch(
+      #     "demo/DemoSubject", electrodes = 14:16,
+      #     reference_name = "default", epoch_name = "auditory_onset",
+      #     time_windows = c(-1, 2))
+      data_type <- private$.data_type
+      if(length(data_type)) {
+        data_path <- dir_create2(file_path(epoch_root, data_type))
+
+        if(verbose) {
+          callback <- function(ii) {
+            sprintf("Exporting %s with epochs|Electrode channel %d", data_type, self$electrode_list[[ii]])
+          }
+        } else {
+          callback <- NULL
+        }
+
+        ravepipeline::lapply_jobs(
+          seq_along(self$electrode_list),
+          function(ii) {
+            electrode_channel <- self$electrode_list[[ii]]
+            self$mount_data(force = FALSE, electrodes = electrode_channel)
+            nm <- sprintf("e_%d", electrode_channel)
+
+            electrode_instance <- self$electrode_instances[[nm]]
+            ref_name <- electrode_instance$reference_name
+            if(length(ref_name)) {
+              ravecore <- asNamespace("ravecore")
+              ref_name <- ravecore$parse_svec(gsub("^ref_", "", ref_name))
+            }
+            ref_name <- as.matrix(as.integer(ref_name))
+
+            container <- self$get_container()
+            arr <- container$data_list[[nm]]
+            dnames <- dimnames(arr)
+            arr <- arr[dimnames = FALSE, drop = FALSE]
+
+            if(length(electrode_instance$reference)) {
+              reference <- electrode_instance$reference$load_data(data_type)
+              reference <- reference[dimnames = FALSE, drop = FALSE]
+            } else {
+              reference <- as.matrix(0)
+            }
+            data <- list(
+              description = sprintf("RAVE repository type: %s (epoched)", data_type),
+              electrode = as.matrix(dnames$Electrode),
+              trial_number = as.matrix(dnames$Trial),
+              time_in_secs = as.matrix(dnames$Time),
+              reference_channels = ref_name,
+              data = arr,
+              reference = reference
+            )
+            if("Frequency" %in% names(dnames)) {
+              data$frequency <- dnames$Frequency
+            }
+
+            ieegio::io_write_mat(data, con = file.path(data_path, sprintf("ch%04d.mat", electrode_channel)))
+          },
+          .globals = list(self = self, data_path = data_path, data_type = data_type),
+          callback = callback
+        )
+
+        container <- self$get_container()
+        dames <- container$dimnames
+        summary[[data_type]] <- list(
+          path = sprintf('with_epochs/%s', data_type),
+          names = names(container$dimnames),
+          shape = as.integer(unname(container$dim))
+        )
+        summary$contains[["RAVE Repository Types"]] <- c(summary$contains[["RAVE Repository Types"]], data_type)
+
+      }
 
       save_yaml(summary, file = summary_path, sorted = TRUE)
 

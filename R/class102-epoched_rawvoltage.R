@@ -15,6 +15,10 @@ RAVESubjectEpochRawVoltageRepository <- R6::R6Class(
   lock_class = TRUE,
   cloneable = TRUE,
 
+  private = list(
+    .data_type = "raw_voltage"
+  ),
+
   public = list(
     #' @description Internal method
     #' @param ... internal arguments
@@ -160,65 +164,8 @@ RAVESubjectEpochRawVoltageRepository <- R6::R6Class(
       private$.data$data_list[nms] <- data_list[nms]
 
       self
-    },
-
-    #' @description Export the repository to 'Matlab' for future analysis
-    #' @param ... reserved for child classes
-    #' @param verbose print progresses
-    #' @returns The root directory where the files are stored.
-    export_matlab = function(..., verbose = TRUE) {
-      # self <- prepare_subject_raw_voltage_with_epoch(
-      #     "demo/DemoSubject", electrodes = 14:16,
-      #     reference_name = "default", epoch_name = "auditory_onset",
-      #     time_windows = c(-1, 2))
-      root_path <- super$export_matlab(..., verbose = verbose)
-      summary_path <- file_path(root_path, "summary.yaml")
-      summary <- load_yaml(summary_path)
-
-      data_path <- file.path(root_path, "raw_voltage")
-      dir_create2(data_path)
-
-      if(verbose) {
-        callback <- function(ii) {
-          sprintf("Exporting raw voltage|Electrode channel %d", self$electrode_list[[ii]])
-        }
-      } else {
-        callback <- NULL
-      }
-
-      ravepipeline::lapply_jobs(
-        seq_along(self$electrode_list),
-        function(ii) {
-          electrode_channel <- self$electrode_list[[ii]]
-          self$mount_data(force = FALSE, electrodes = electrode_channel)
-          nm <- sprintf("e_%d", electrode_channel)
-          arr <- self$raw_voltage$data_list[[ii]]
-          dnames <- dimnames(arr)
-          arr <- arr[dimnames = FALSE, drop = FALSE]
-          ieegio::io_write_mat(
-            list(
-              description = "Raw voltage: no reference, time x trial",
-              electrode = as.matrix(dnames$Electrode),
-              trial_number = as.matrix(dnames$Trial),
-              time_in_secs = as.matrix(dnames$Time),
-              reference_channels = as.matrix(integer()),
-              data = arr
-            ),
-            con = file.path(data_path, sprintf("ch%04d.mat", electrode_channel))
-          )
-        },
-        .globals = list(self = self, data_path = data_path),
-        callback = callback
-      )
-
-      summary$raw_voltage_shape <- as.integer(self$raw_voltage$dim)
-      summary$raw_voltage_margin <- paste(names(self$raw_voltage$dimnames), collapse = " x ")
-      summary$contains[["Raw voltage"]] <- "raw_voltage"
-
-      save_yaml(summary, file = summary_path, sorted = TRUE)
-
-      return(root_path)
     }
+
 
   ),
   active = list(

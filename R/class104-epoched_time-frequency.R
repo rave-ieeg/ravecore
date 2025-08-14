@@ -199,93 +199,6 @@ RAVESubjectEpochTimeFreqBaseRepository <- R6::R6Class(
       private$.data$data_list[nms] <- data_list[nms]
 
       self
-    },
-
-    #' @description Export the repository to 'Matlab' for future analysis
-    #' @param ... reserved for child classes
-    #' @param verbose print progresses
-    #' @returns The root directory where the files are stored.
-    export_matlab = function(..., verbose = TRUE) {
-      # self <- prepare_subject_power_with_epoch(
-      #     "demo/DemoSubject", electrodes = 14:16,
-      #     reference_name = "default", epoch_name = "auditory_onset",
-      #     time_windows = c(-1, 2))
-      # # root_path <- self$export_matlab()
-      # private <- self$.__enclos_env__$private
-
-      root_path <- super$export_matlab(..., verbose = verbose)
-
-      data_type <- private$.data_type
-      if(!length(data_type)) { return(root_path) }
-
-      summary_path <- file_path(root_path, "summary.yaml")
-      summary <- load_yaml(summary_path)
-
-      if(verbose) {
-        callback <- function(ii) {
-          sprintf("Exporting %s|Electrode channel %d", data_type, self$electrode_list[[ii]])
-        }
-      } else {
-        callback <- NULL
-      }
-
-      data_path <- file.path(root_path, data_type)
-      dir_create2(data_path)
-
-      ravepipeline::lapply_jobs(
-        seq_along(self$electrode_list),
-        function(ii) {
-          # ii <- 1
-          electrode_channel <- self$electrode_list[[ii]]
-          self$mount_data(force = FALSE, electrodes = electrode_channel)
-          nm <- sprintf("e_%d", electrode_channel)
-
-          electrode_instance <- self$electrode_instances[[nm]]
-          ref_name <- electrode_instance$reference_name
-          if(length(ref_name)) {
-            ravecore <- asNamespace("ravecore")
-            ref_name <- ravecore$parse_svec(gsub("^ref_", "", ref_name))
-          }
-          ref_name <- as.matrix(as.integer(ref_name))
-
-          container <- self$get_container()
-          arr <- container$data_list[[nm]]
-          dnames <- dimnames(arr)
-          arr <- arr[dimnames = FALSE, drop = FALSE]
-
-          if(length(electrode_instance$reference)) {
-            reference <- electrode_instance$reference$load_data(type = data_type)
-            reference <- reference[dimnames = FALSE, drop = FALSE]
-          } else {
-            reference <- as.matrix(0)
-          }
-          ieegio::io_write_mat(
-            list(
-              description = sprintf("Time-frequency %s: frequency x time x trial", data_type),
-              electrode = as.matrix(dnames$Electrode),
-              trial_number = as.matrix(dnames$Trial),
-              time_in_secs = as.matrix(dnames$Time),
-              frequency = as.matrix(dnames$Frequency),
-              reference_channels = ref_name,
-              reference = reference,
-              data = arr
-            ),
-            con = file.path(data_path, sprintf("ch%04d.mat", electrode_channel))
-          )
-        },
-        .globals = list(self = self,
-                        data_path = data_path,
-                        data_type = data_type),
-        callback = callback
-      )
-
-      summary$time_frequency_shape <- as.integer(private$.data$dim)
-      summary$time_frequency_margin <- paste(names(private$.data$dimnames), collapse = " x ")
-      summary$contains[["Time frequency"]] <- data_type
-
-      save_yaml(summary, file = summary_path, sorted = TRUE)
-
-      return(root_path)
     }
 
   ),
@@ -487,3 +400,8 @@ prepare_subject_time_frequency_coefficients_with_epoch <- function(
 }
 
 
+# self <- prepare_subject_power_with_epoch(
+#     "demo/DemoSubject", electrodes = 14:16,
+#     reference_name = "default", epoch_name = "auditory_onset",
+#     time_windows = c(-1, 2))
+# self$export_matlab()
