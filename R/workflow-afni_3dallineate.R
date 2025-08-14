@@ -61,7 +61,14 @@ cmd_run_3dAllineate <- function(
     file.path(subject$imaging_path, "coregistration"),
     mustWork = FALSE, winslash = "/"
   )
-  cmd <- glue(paste(template, collapse = "\n"), .sep = "\n", .open = "{{", .close = "}}", .trim = FALSE, .null = "")
+  cmd <- ravepipeline::glue(
+    paste(template, collapse = "\n"),
+    .sep = "\n",
+    .open = "{{",
+    .close = "}}",
+    .trim = FALSE,
+    .null = ""
+  )
 
   script_path <- normalizePath(
     file.path(subject$imaging_path, "scripts", "cmd-afni-3dallineate.sh"),
