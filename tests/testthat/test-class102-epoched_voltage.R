@@ -447,7 +447,7 @@ test_that("RAVESubjectEpochRawVoltageRepository - parallel", {
     repo_new <- unserialize(raw, refhook = ravepipeline::rave_unserialize_refhook)
   })
 
-  testthat::expect_true(inherits(repo_new, "rave_prepare_subject_raw_voltage_with_epoch"))
+  testthat::expect_true(inherits(repo_new, "rave_prepare_subject_raw_voltage_with_epochs"))
 
   names_old <- names(repo_old)
   names_old <- names_old[!names_old %in% names(repo_new)]
@@ -530,7 +530,7 @@ test_that("RAVESubjectEpochVoltageRepository - parallel", {
     }
   )
 
-  testthat::expect_true(inherits(repo_new, "rave_prepare_subject_voltage_with_epoch"))
+  testthat::expect_true(inherits(repo_new, "rave_prepare_subject_voltage_with_epochs"))
 
   names_old <- names(repo_old)
   names_old <- names_old[!names_old %in% names(repo_new)]
@@ -609,7 +609,7 @@ test_that("RAVESubjectEpochRawVoltageRepository", {
   raw <- serialize(repo_new0, NULL, refhook = ravepipeline::rave_serialize_refhook)
   repo_new <- unserialize(raw, refhook = ravepipeline::rave_unserialize_refhook)
 
-  testthat::expect_true(inherits(repo_new, "rave_prepare_subject_raw_voltage_with_epoch"))
+  testthat::expect_true(inherits(repo_new, "rave_prepare_subject_raw_voltage_with_epochs"))
 
   names_old <- names(repo_old)
   names_old <- names_old[!names_old %in% names(repo_new)]
@@ -684,7 +684,7 @@ test_that("RAVESubjectEpochVoltageRepository", {
   raw <- serialize(repo_new0, NULL, refhook = ravepipeline::rave_serialize_refhook)
   repo_new <- unserialize(raw, refhook = ravepipeline::rave_unserialize_refhook)
 
-  testthat::expect_true(inherits(repo_new, "rave_prepare_subject_voltage_with_epoch"))
+  testthat::expect_true(inherits(repo_new, "rave_prepare_subject_voltage_with_epochs"))
 
   names_old <- names(repo_old)
   names_old <- names_old[!names_old %in% names(repo_new)]

@@ -603,7 +603,7 @@ test_that("RAVESubjectEpochPowerRepository - parallel", {
   ravepipeline::raveio_setopt("max_worker", asNamespace('parallel')$detectCores())
 
   repository_id <- rand_string(4)
-  repo_old <- prepare_subject_power(
+  repo_old <- prepare_subject_power_legacy(
     subject = "demo/DemoSubject",
     electrodes = 13:16,
     reference_name = "default",
@@ -693,7 +693,7 @@ test_that("RAVESubjectEpochPhaseRepository - parallel", {
   ravepipeline::raveio_setopt("max_worker", asNamespace('parallel')$detectCores())
 
   repository_id <- rand_string(4)
-  repo_old <- prepare_subject_phase(
+  repo_old <- prepare_subject_phase_legacy(
     subject = "demo/DemoSubject",
     electrodes = 13:16,
     reference_name = "default",
@@ -869,7 +869,7 @@ test_that("RAVESubjectEpochPowerRepository", {
   })
 
   repository_id <- rand_string(4)
-  repo_old <- prepare_subject_power(
+  repo_old <- prepare_subject_power_legacy(
     subject = "demo/DemoSubject",
     electrodes = 13:16,
     reference_name = "default",
@@ -952,7 +952,7 @@ test_that("RAVESubjectEpochPhaseRepository", {
   })
 
   repository_id <- rand_string(4)
-  repo_old <- prepare_subject_phase(
+  repo_old <- prepare_subject_phase_legacy(
     subject = "demo/DemoSubject",
     electrodes = 13:16,
     reference_name = "default",
