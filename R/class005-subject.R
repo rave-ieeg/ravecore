@@ -1023,6 +1023,20 @@ restore_subject_instance <- function(subject_id, strict = FALSE) {
   }
 }
 
+initialize_imaging_paths <- function(subject) {
+  # subject <- 'demo/DemoSubject'
+  subject <- restore_subject_instance(subject, strict = FALSE)
+  root_path <- subject$imaging_path
+  if(length(root_path) != 1 || is.na(root_path)) {
+    root_path <- file.path(subject$preprocess_settings$raw_path, "rave-imaging")
+  }
+  dir_create2(file.path(root_path, "coregistration"))
+  dir_create2(file.path(root_path, "log"))
+  dir_create2(file.path(root_path, "scripts"))
+  dir_create2(file.path(root_path, "inputs"))
+  invisible()
+}
+
 
 as_bids_subject <- function(subject, strict = FALSE) {
   subject <- restore_subject_instance(subject, strict = strict)
