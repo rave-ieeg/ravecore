@@ -3,7 +3,7 @@
 #' The repository inherits \code{link{RAVESubjectEpochRepository}}, with epoch
 #' trials, and is intended for loading processed and referenced voltage
 #' signals.
-#' Use \code{\link{prepare_subject_voltage_with_epoch}} to create an
+#' Use \code{\link{prepare_subject_voltage_with_epochs}} to create an
 #' instance.
 #'
 #' @export
@@ -83,7 +83,7 @@ RAVESubjectEpochVoltageRepository <- R6::R6Class(
         quiet = quiet,
         repository_id = repository_id,
         lazy_load = lazy_load,
-        .class = c(.class, "rave_prepare_subject_voltage_with_epoch"),
+        .class = c(.class, "rave_prepare_subject_voltage_with_epochs"),
         ...
       )
 
@@ -215,9 +215,9 @@ RAVESubjectEpochVoltageRepository <- R6::R6Class(
 )
 
 
-#' @rdname prepare_subject_with_epoch
+#' @rdname prepare_subject_with_epochs
 #' @export
-prepare_subject_voltage_with_epoch <- function(
+prepare_subject_voltage_with_epochs <- function(
     subject, electrodes = NULL, reference_name = NULL,
     epoch_name = NULL, time_windows = NULL,
     stitch_events = NULL, ..., quiet = FALSE,

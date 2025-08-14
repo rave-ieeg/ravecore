@@ -3,14 +3,11 @@
 \name{RAVESubjectEpochRawVoltageRepository}
 \alias{RAVESubjectEpochRawVoltageRepository}
 \title{'RAVE' class for epoch repository - raw voltage}
-\value{
-The root directory where the files are stored.
-}
 \description{
 The repository inherits \code{link{RAVESubjectEpochRepository}}, with epoch
 trials, and is intended for loading raw (without any processing or reference)
 voltage signals.
-Use \code{\link{prepare_subject_raw_voltage_with_epoch}} to create an
+Use \code{\link{prepare_subject_raw_voltage_with_epochs}} to create an
 instance.
 }
 \section{Super classes}{
@@ -36,7 +33,6 @@ repository signature}
 \item \href{#method-RAVESubjectEpochRawVoltageRepository-@unmarshal}{\code{RAVESubjectEpochRawVoltageRepository$@unmarshal()}}
 \item \href{#method-RAVESubjectEpochRawVoltageRepository-new}{\code{RAVESubjectEpochRawVoltageRepository$new()}}
 \item \href{#method-RAVESubjectEpochRawVoltageRepository-mount_data}{\code{RAVESubjectEpochRawVoltageRepository$mount_data()}}
-\item \href{#method-RAVESubjectEpochRawVoltageRepository-export_matlab}{\code{RAVESubjectEpochRawVoltageRepository$export_matlab()}}
 \item \href{#method-RAVESubjectEpochRawVoltageRepository-clone}{\code{RAVESubjectEpochRawVoltageRepository$clone()}}
 }
 }
@@ -44,6 +40,7 @@ repository signature}
 <details open><summary>Inherited methods</summary>
 <ul>
 <li><span class="pkg-link" data-pkg="ravepipeline" data-topic="RAVESerializable" data-id="@compare"><a href='../../ravepipeline/html/RAVESerializable.html#method-RAVESerializable-@compare'><code>ravepipeline::RAVESerializable$@compare()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectEpochRepository" data-id="export_matlab"><a href='../../ravecore/html/RAVESubjectEpochRepository.html#method-RAVESubjectEpochRepository-export_matlab'><code>ravecore::RAVESubjectEpochRepository$export_matlab()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectEpochRepository" data-id="get_container"><a href='../../ravecore/html/RAVESubjectEpochRepository.html#method-RAVESubjectEpochRepository-get_container'><code>ravecore::RAVESubjectEpochRepository$get_container()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectEpochRepository" data-id="set_epoch"><a href='../../ravecore/html/RAVESubjectEpochRepository.html#method-RAVESubjectEpochRepository-set_epoch'><code>ravecore::RAVESubjectEpochRepository$set_epoch()</code></a></span></li>
 </ul>
@@ -163,25 +160,6 @@ function to mount raw voltage signals
 
 \item{\code{electrodes}}{electrodes to update for expert-use use; default is
 \code{NULL} (all electrode channels will be mounted)}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-RAVESubjectEpochRawVoltageRepository-export_matlab"></a>}}
-\if{latex}{\out{\hypertarget{method-RAVESubjectEpochRawVoltageRepository-export_matlab}{}}}
-\subsection{Method \code{export_matlab()}}{
-Export the repository to 'Matlab' for future analysis
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectEpochRawVoltageRepository$export_matlab(..., verbose = TRUE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{reserved for child classes}
-
-\item{\code{verbose}}{print progresses}
 }
 \if{html}{\out{</div>}}
 }

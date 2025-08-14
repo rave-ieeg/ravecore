@@ -2,9 +2,9 @@
 #' @description
 #' Compared to \code{\link{RAVESubjectBaseRepository}}, this repository
 #' requires epoch information. please use
-#' \code{\link{prepare_subject_with_epoch}} to instantiate this repository.
+#' \code{\link{prepare_subject_with_epochs}} to instantiate this repository.
 #'
-#' @seealso \code{\link{prepare_subject_with_epoch}}
+#' @seealso \code{\link{prepare_subject_with_epochs}}
 #' @export
 RAVESubjectEpochRepository <- R6::R6Class(
   classname = "RAVESubjectEpochRepository",
@@ -103,7 +103,7 @@ RAVESubjectEpochRepository <- R6::R6Class(
     #' @param verbose print progresses
     #' @returns The root directory where the files are stored.
     export_matlab = function(..., verbose = TRUE) {
-      # self <- prepare_subject_with_epoch(
+      # self <- prepare_subject_with_epochs(
       #     "demo/DemoSubject", electrodes = 14:16,
       #     reference_name = "default", epoch_name = "auditory_onset",
       #     time_windows = c(-1, 2))
@@ -124,7 +124,7 @@ RAVESubjectEpochRepository <- R6::R6Class(
 
 
       # ---- save data
-      # self <- prepare_subject_raw_voltage_with_epoch(
+      # self <- prepare_subject_raw_voltage_with_epochs(
       #     "demo/DemoSubject", electrodes = 14:16,
       #     reference_name = "default", epoch_name = "auditory_onset",
       #     time_windows = c(-1, 2))
@@ -451,7 +451,7 @@ RAVESubjectEpochRepository <- R6::R6Class(
 #' \dontrun{
 #'
 #'
-#' repository <- prepare_subject_with_epoch(
+#' repository <- prepare_subject_with_epochs(
 #'   "demo/DemoSubject", electrodes = 14:16,
 #'   reference_name = "default", epoch_name = "auditory_onset",
 #'   time_windows = c(-1, 2))
@@ -480,7 +480,7 @@ RAVESubjectEpochRepository <- R6::R6Class(
 #'
 #' }
 #' @export
-prepare_subject_with_epoch <- function(
+prepare_subject_with_epochs <- function(
     subject, electrodes = NULL,
     reference_name = NULL, epoch_name = NULL,
     time_windows = NULL, stitch_events = NULL, ...,

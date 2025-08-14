@@ -3,17 +3,17 @@
 %   R/class102-epoched_rawvoltage.R, R/class103-epoched_voltage.R,
 %   R/class104-epoched_time-frequency.R, R/class105-epoched_power.R,
 %   R/class106-epoched_phase.R
-\name{prepare_subject_with_epoch}
-\alias{prepare_subject_with_epoch}
-\alias{prepare_subject_raw_voltage_with_epoch}
-\alias{prepare_subject_voltage_with_epoch}
-\alias{prepare_subject_time_frequency_coefficients_with_epoch}
-\alias{prepare_subject_power_with_epoch}
+\name{prepare_subject_with_epochs}
+\alias{prepare_subject_with_epochs}
+\alias{prepare_subject_raw_voltage_with_epochs}
+\alias{prepare_subject_voltage_with_epochs}
+\alias{prepare_subject_time_frequency_coefficients_with_epochs}
+\alias{prepare_subject_power_with_epochs}
 \alias{prepare_subject_power}
-\alias{prepare_subject_phase_with_epoch}
+\alias{prepare_subject_phase_with_epochs}
 \title{'RAVE' repository: with epochs}
 \usage{
-prepare_subject_with_epoch(
+prepare_subject_with_epochs(
   subject,
   electrodes = NULL,
   reference_name = NULL,
@@ -26,7 +26,7 @@ prepare_subject_with_epoch(
   strict = TRUE
 )
 
-prepare_subject_raw_voltage_with_epoch(
+prepare_subject_raw_voltage_with_epochs(
   subject,
   electrodes = NULL,
   epoch_name = NULL,
@@ -38,7 +38,7 @@ prepare_subject_raw_voltage_with_epoch(
   strict = TRUE
 )
 
-prepare_subject_voltage_with_epoch(
+prepare_subject_voltage_with_epochs(
   subject,
   electrodes = NULL,
   reference_name = NULL,
@@ -51,7 +51,7 @@ prepare_subject_voltage_with_epoch(
   strict = TRUE
 )
 
-prepare_subject_time_frequency_coefficients_with_epoch(
+prepare_subject_time_frequency_coefficients_with_epochs(
   subject,
   electrodes = NULL,
   reference_name = NULL,
@@ -64,7 +64,7 @@ prepare_subject_time_frequency_coefficients_with_epoch(
   strict = TRUE
 )
 
-prepare_subject_power_with_epoch(
+prepare_subject_power_with_epochs(
   subject,
   electrodes = NULL,
   reference_name = NULL,
@@ -90,7 +90,7 @@ prepare_subject_power(
   strict = TRUE
 )
 
-prepare_subject_phase_with_epoch(
+prepare_subject_phase_with_epochs(
   subject,
   electrodes = NULL,
   reference_name = NULL,
@@ -139,7 +139,7 @@ A \code{\link{RAVESubjectEpochRepository}} instance
 \dontrun{
 
 
-repository <- prepare_subject_with_epoch(
+repository <- prepare_subject_with_epochs(
   "demo/DemoSubject", electrodes = 14:16,
   reference_name = "default", epoch_name = "auditory_onset",
   time_windows = c(-1, 2))

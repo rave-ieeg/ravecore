@@ -7,7 +7,7 @@
 The repository inherits \code{link{RAVESubjectEpochTimeFreqBaseRepository}}, with epoch
 trials, and is intended for loading processed and referenced time-frequency
 coefficients.
-Use \code{\link{prepare_subject_time_frequency_coefficients_with_epoch}} to create an
+Use \code{\link{prepare_subject_time_frequency_coefficients_with_epochs}} to create an
 instance.
 }
 \section{Super classes}{
@@ -36,9 +36,9 @@ mounted by \code{mount_data}}
 <details open><summary>Inherited methods</summary>
 <ul>
 <li><span class="pkg-link" data-pkg="ravepipeline" data-topic="RAVESerializable" data-id="@compare"><a href='../../ravepipeline/html/RAVESerializable.html#method-RAVESerializable-@compare'><code>ravepipeline::RAVESerializable$@compare()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectEpochRepository" data-id="export_matlab"><a href='../../ravecore/html/RAVESubjectEpochRepository.html#method-RAVESubjectEpochRepository-export_matlab'><code>ravecore::RAVESubjectEpochRepository$export_matlab()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectEpochRepository" data-id="get_container"><a href='../../ravecore/html/RAVESubjectEpochRepository.html#method-RAVESubjectEpochRepository-get_container'><code>ravecore::RAVESubjectEpochRepository$get_container()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectEpochRepository" data-id="set_epoch"><a href='../../ravecore/html/RAVESubjectEpochRepository.html#method-RAVESubjectEpochRepository-set_epoch'><code>ravecore::RAVESubjectEpochRepository$set_epoch()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectEpochTimeFreqBaseRepository" data-id="export_matlab"><a href='../../ravecore/html/RAVESubjectEpochTimeFreqBaseRepository.html#method-RAVESubjectEpochTimeFreqBaseRepository-export_matlab'><code>ravecore::RAVESubjectEpochTimeFreqBaseRepository$export_matlab()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectEpochTimeFreqBaseRepository" data-id="mount_data"><a href='../../ravecore/html/RAVESubjectEpochTimeFreqBaseRepository.html#method-RAVESubjectEpochTimeFreqBaseRepository-mount_data'><code>ravecore::RAVESubjectEpochTimeFreqBaseRepository$mount_data()</code></a></span></li>
 </ul>
 </details>

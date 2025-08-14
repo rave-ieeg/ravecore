@@ -12,10 +12,10 @@ information
 \description{
 Compared to \code{\link{RAVESubjectBaseRepository}}, this repository
 requires epoch information. please use
-\code{\link{prepare_subject_with_epoch}} to instantiate this repository.
+\code{\link{prepare_subject_with_epochs}} to instantiate this repository.
 }
 \seealso{
-\code{\link{prepare_subject_with_epoch}}
+\code{\link{prepare_subject_with_epochs}}
 }
 \section{Super classes}{
 \code{\link[ravepipeline:RAVESerializable]{ravepipeline::RAVESerializable}} -> \code{ravecore::RAVESubjectRepository} -> \code{RAVESubjectEpochRepository}

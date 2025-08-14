@@ -5,7 +5,7 @@
 #' The repository inherits \code{link{RAVESubjectEpochTimeFreqBaseRepository}}, with epoch
 #' trials, and is intended for loading processed and referenced time-frequency
 #' coefficients.
-#' Use \code{\link{prepare_subject_phase_with_epoch}} to create an
+#' Use \code{\link{prepare_subject_phase_with_epochs}} to create an
 #' instance.
 #' @export
 RAVESubjectEpochPhaseRepository <- R6::R6Class(
@@ -101,9 +101,9 @@ RAVESubjectEpochPhaseRepository <- R6::R6Class(
 )
 
 
-#' @rdname prepare_subject_with_epoch
+#' @rdname prepare_subject_with_epochs
 #' @export
-prepare_subject_phase_with_epoch <- function(
+prepare_subject_phase_with_epochs <- function(
     subject, electrodes = NULL, reference_name = NULL,
     epoch_name = NULL, time_windows = NULL,
     stitch_events = NULL, ..., quiet = FALSE,
@@ -127,7 +127,7 @@ prepare_subject_phase <- function(subject, electrodes = NULL, reference_name = N
                                   epoch_name = NULL, time_windows = NULL,
                                   stitch_events = NULL, ..., quiet = FALSE,
                                   repository_id = NULL, strict = TRUE) {
-  ravepipeline::logger("Function name `prepare_subject_phase` is no longer recommended for its ambiguity. Use `prepare_subject_phase_with_epoch` (same implementation) instead.", level = "warning")
+  ravepipeline::logger("Function name `prepare_subject_phase` is no longer recommended for its ambiguity. Use `prepare_subject_phase_with_epochs` (same implementation) instead.", level = "warning")
 
   RAVESubjectEpochPhaseRepository$new(
     subject = subject,

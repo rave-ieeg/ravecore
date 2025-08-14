@@ -44,7 +44,7 @@ power_baseline(
 \arguments{
 \item{x}{R array, \code{\link[filearray]{filearray}}, or
 \code{'rave_prepare_power'} object created by
-\code{\link{prepare_subject_power_with_epoch}}.}
+\code{\link{prepare_subject_power_with_epochs}}.}
 
 \item{baseline_windows}{list of baseline window (intervals)}
 
@@ -58,7 +58,7 @@ power_baseline(
 
 \item{electrodes}{the electrodes to be included in baseline calculation;
 for power repository object produced by
-\code{\link{prepare_subject_power_with_epoch}} only; default is all
+\code{\link{prepare_subject_power_with_epochs}} only; default is all
 available electrodes}
 
 \item{filebase}{where to store the output; default is \code{NULL} and is
@@ -98,7 +98,7 @@ be shared across electrodes (e.g. in some mini-electrodes), remove
 # The following code need to download additional demo data
 # Please see https://rave.wiki/ for more details
 
-repo <- prepare_subject_power_with_epoch(
+repo <- prepare_subject_power_with_epochs(
   subject = "demo/DemoSubject",
   time_windows = c(-1, 3),
   electrodes = c(14, 15))

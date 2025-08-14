@@ -3,9 +3,6 @@
 \name{RAVESubjectEpochTimeFreqBaseRepository}
 \alias{RAVESubjectEpochTimeFreqBaseRepository}
 \title{'RAVE' class for epoch repository - time-frequency (internal)}
-\value{
-The root directory where the files are stored.
-}
 \description{
 The repository inherits \code{link{RAVESubjectEpochRepository}}, with epoch
 trials, and is intended for loading processed and referenced time-frequency
@@ -41,7 +38,6 @@ repository signature}
 \item \href{#method-RAVESubjectEpochTimeFreqBaseRepository-@unmarshal}{\code{RAVESubjectEpochTimeFreqBaseRepository$@unmarshal()}}
 \item \href{#method-RAVESubjectEpochTimeFreqBaseRepository-new}{\code{RAVESubjectEpochTimeFreqBaseRepository$new()}}
 \item \href{#method-RAVESubjectEpochTimeFreqBaseRepository-mount_data}{\code{RAVESubjectEpochTimeFreqBaseRepository$mount_data()}}
-\item \href{#method-RAVESubjectEpochTimeFreqBaseRepository-export_matlab}{\code{RAVESubjectEpochTimeFreqBaseRepository$export_matlab()}}
 \item \href{#method-RAVESubjectEpochTimeFreqBaseRepository-clone}{\code{RAVESubjectEpochTimeFreqBaseRepository$clone()}}
 }
 }
@@ -49,6 +45,7 @@ repository signature}
 <details open><summary>Inherited methods</summary>
 <ul>
 <li><span class="pkg-link" data-pkg="ravepipeline" data-topic="RAVESerializable" data-id="@compare"><a href='../../ravepipeline/html/RAVESerializable.html#method-RAVESerializable-@compare'><code>ravepipeline::RAVESerializable$@compare()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectEpochRepository" data-id="export_matlab"><a href='../../ravecore/html/RAVESubjectEpochRepository.html#method-RAVESubjectEpochRepository-export_matlab'><code>ravecore::RAVESubjectEpochRepository$export_matlab()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectEpochRepository" data-id="get_container"><a href='../../ravecore/html/RAVESubjectEpochRepository.html#method-RAVESubjectEpochRepository-get_container'><code>ravecore::RAVESubjectEpochRepository$get_container()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectEpochRepository" data-id="set_epoch"><a href='../../ravecore/html/RAVESubjectEpochRepository.html#method-RAVESubjectEpochRepository-set_epoch'><code>ravecore::RAVESubjectEpochRepository$set_epoch()</code></a></span></li>
 </ul>
@@ -171,25 +168,6 @@ function to mount processed and referenced 'spectrogram'
 
 \item{\code{electrodes}}{electrodes to update for expert-use use; default is
 \code{NULL} (all electrode channels will be mounted)}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-RAVESubjectEpochTimeFreqBaseRepository-export_matlab"></a>}}
-\if{latex}{\out{\hypertarget{method-RAVESubjectEpochTimeFreqBaseRepository-export_matlab}{}}}
-\subsection{Method \code{export_matlab()}}{
-Export the repository to 'Matlab' for future analysis
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectEpochTimeFreqBaseRepository$export_matlab(..., verbose = TRUE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{reserved for child classes}
-
-\item{\code{verbose}}{print progresses}
 }
 \if{html}{\out{</div>}}
 }
