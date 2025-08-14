@@ -35,7 +35,10 @@
 <url><loc>http://rave.wiki/ravecore/reference/backup_file.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/cache_path.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/cmd-external.html</loc></url>
+<url><loc>http://rave.wiki/ravecore/reference/cmd_run_ants_coreg.html</loc></url>
+<url><loc>http://rave.wiki/ravecore/reference/cmd_run_dcm2niix.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/cmd_run_freesurfer_recon_all.html</loc></url>
+<url><loc>http://rave.wiki/ravecore/reference/cmd_run_fsl_flirt.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/collapse2.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/collapse_power.html</loc></url>
@@ -48,6 +51,7 @@
 <url><loc>http://rave.wiki/ravecore/reference/install_subject.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/meta-data.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/new_electrode.html</loc></url>
+<url><loc>http://rave.wiki/ravecore/reference/niftyreg_coreg.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/power_baseline.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/prepare_subject_bare.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/prepare_subject_with_blocks.html</loc></url>
