@@ -1,8 +1,7 @@
 #' 'RAVE' class for loading entire block of 'spectrogram' coefficients
 #' @seealso \code{\link{prepare_subject_with_blocks}}
-#' @export
-RAVESubjectRecordingBlockTimeFreqCoefRepository <- R6::R6Class(
-  classname = "RAVESubjectRecordingBlockTimeFreqCoefRepository",
+RAVESubjectRecordingBlockTimeFreqBaseRepository <- R6::R6Class(
+  classname = "RAVESubjectRecordingBlockTimeFreqBaseRepository",
   portable = TRUE,
   inherit = RAVESubjectRecordingBlockRepository,
   lock_objects = FALSE,
@@ -10,8 +9,7 @@ RAVESubjectRecordingBlockTimeFreqCoefRepository <- R6::R6Class(
   cloneable = TRUE,
 
   private = list(
-    .data = NULL,
-    .data_type = "wavelet-coefficient"
+    .data_type = character()
   ),
   public = list(
 
@@ -20,8 +18,8 @@ RAVESubjectRecordingBlockTimeFreqCoefRepository <- R6::R6Class(
     #' @param ... internal arguments
     `@marshal` = function(...) {
       object <- super$`@marshal`()
-      object$r6_generator <- "RAVESubjectRecordingBlockTimeFreqCoefRepository"
-      class(object$data) <- c("RAVESubjectRecordingBlockTimeFreqCoefRepository_marshal", class(object$data))
+      object$r6_generator <- "RAVESubjectRecordingBlockTimeFreqBaseRepository"
+      class(object$data) <- c("RAVESubjectRecordingBlockTimeFreqBaseRepository_marshal", class(object$data))
       object
     },
 
@@ -29,8 +27,8 @@ RAVESubjectRecordingBlockTimeFreqCoefRepository <- R6::R6Class(
     #' @param object,... internal arguments
     `@unmarshal` = function(object, ...) {
       stopifnot(identical(object$namespace, "ravecore"))
-      stopifnot(inherits(object$data, "RAVESubjectRecordingBlockTimeFreqCoefRepository_marshal"))
-      repo <- RAVESubjectRecordingBlockTimeFreqCoefRepository$new(
+      stopifnot(inherits(object$data, "RAVESubjectRecordingBlockTimeFreqBaseRepository_marshal"))
+      repo <- RAVESubjectRecordingBlockTimeFreqBaseRepository$new(
         subject = RAVESubject$public_methods$`@unmarshal`(object$data$subject),
         electrodes = object$data$intended_electrode_list,
         reference_name = object$data$reference_name,
@@ -60,10 +58,6 @@ RAVESubjectRecordingBlockTimeFreqCoefRepository <- R6::R6Class(
                           quiet = FALSE, repository_id = NULL, strict = TRUE,
                           lazy_load = FALSE, .class = NULL) {
 
-      .class <- c(.class,
-                  "prepare_subject_time_frequency_coefficients_with_blocks",
-                  "RAVESubjectRecordingBlockTimeFreqCoefRepository")
-
       subject <- as_rave_subject(subject, strict = strict)
       super$initialize(subject = subject, electrodes = electrodes,
                        reference_name = reference_name, quiet = quiet,
@@ -72,29 +66,7 @@ RAVESubjectRecordingBlockTimeFreqCoefRepository <- R6::R6Class(
                        .class = .class)
     },
 
-    #' @description Export the repository to 'Matlab' for future analysis
-    #' @param ... reserved for child classes
-    #' @param verbose print progresses
-    #' @returns The root directory where the files are stored.
-    export_matlab = function(..., verbose = TRUE) {
-      # self <- prepare_subject_with_blocks(
-      #     "demo/DemoSubject", electrodes = 14:16,
-      #     reference_name = "default", epoch_name = "auditory_onset",
-      #     time_windows = c(-1, 2))
-      root_path <- super$export_matlab(..., verbose = verbose)
-      summary_path <- file_path(root_path, "summary.yaml")
-      summary <- load_yaml(summary_path)
-
-      summary$blocks <- self$blocks
-      summary$sample_rates <- self$sample_rates
-
-      save_yaml(summary, file = summary_path, sorted = TRUE)
-
-      return(root_path)
-    },
-
-    #' @description function to mount data, not doing anything in this
-    #' class, but may be used by child classes
+    #' @description function to mount data
     #' @param force force update data; default is true; set to false
     #' to use cache
     #' @param electrodes electrodes to update; default is \code{NULL} (all
@@ -102,7 +74,7 @@ RAVESubjectRecordingBlockTimeFreqCoefRepository <- R6::R6Class(
     #' @param ... reserved
     mount_data = function(..., force = TRUE, electrodes = NULL) {
 
-      # self <- RAVESubjectRecordingBlockTimeFreqCoefRepository$new(subject = "demo/DemoSubject", lazy_load = TRUE)
+      # self <- RAVESubjectRecordingBlockTimeFreqBaseRepository$new(subject = "demo/DemoSubject", lazy_load = TRUE)
       # private <- self$.__enclos_env__$private
       # private$.data
       # electrodes <- 13
@@ -113,7 +85,7 @@ RAVESubjectRecordingBlockTimeFreqCoefRepository <- R6::R6Class(
 
       blocks <- self$blocks
       subject <- self$subject
-      sample_rates <- self$sample_rates
+      sample_rate <- as.double(self$sample_rate)
       signal_types <- unique(self$electrode_signal_types)
       reference_table <- self$reference_table
       reference_table <- reference_table[order(reference_table$Electrode), ]
@@ -149,7 +121,7 @@ RAVESubjectRecordingBlockTimeFreqCoefRepository <- R6::R6Class(
 
       if(force || length(electrode_instances) * length(blocks) > 10) {
         callback <- function(block) {
-          sprintf("Loading Recording Blocks | Recording block %s", block)
+          sprintf("Loading %s | Recording block %s", data_type, block)
         }
       } else {
         callback <- NULL
@@ -174,7 +146,7 @@ RAVESubjectRecordingBlockTimeFreqCoefRepository <- R6::R6Class(
 
             # length(array_dimension) is 2 for voltage
             dnames <- list(
-              Time = seq(0, by = 1 / sample_rates[[stype]], length.out = array_dimension[[1]]),
+              Time = seq(0, by = 1 / sample_rate, length.out = array_dimension[[1]]),
               Frequency = frequencies,
               Electrode = all_electrodes
             )
@@ -182,7 +154,7 @@ RAVESubjectRecordingBlockTimeFreqCoefRepository <- R6::R6Class(
             cached_arrays[[stype]] <<- list(
               dim = structure(array_dimension, names = names(dnames)),
               dimnames = dnames,
-              sample_rate = sample_rates[[stype]],
+              sample_rate = sample_rate,
               data = filearray::filearray_load_or_create(
                 filebase = file.path(cache_path, block, stype),
                 dimension = array_dimension,
@@ -230,7 +202,7 @@ RAVESubjectRecordingBlockTimeFreqCoefRepository <- R6::R6Class(
         cache_path = cache_path,
         electrode_instances = electrode_instances,
         data_type = data_type,
-        sample_rates = sample_rates,
+        sample_rate = sample_rate,
         all_electrodes = all_electrodes,
         reference_table = reference_table,
         force = force,
@@ -272,28 +244,11 @@ RAVESubjectRecordingBlockTimeFreqCoefRepository <- R6::R6Class(
     #' @field sample_rate numeric sample rate for 'spectrogram'
     sample_rate = function() {
       self$subject$power_sample_rate
-    },
-
-    #' @field coefficients data container, alias of \code{get_container}
-    coefficients = function() {
-      self$get_container()
     }
 
   )
 
 )
-
-#' @rdname prepare_subject_with_blocks
-#' @export
-prepare_subject_time_frequency_coefficients_with_blocks <- function(
-    subject, electrodes = NULL, blocks = NULL,
-    reference_name = NULL, ...,
-    quiet = FALSE, repository_id = NULL, strict = TRUE) {
-  RAVESubjectRecordingBlockTimeFreqCoefRepository$new(
-    subject = subject, electrodes = electrodes,
-    reference_name = reference_name, blocks = blocks, ...,
-    quiet = quiet, repository_id = repository_id, strict = strict)
-}
 
 
 

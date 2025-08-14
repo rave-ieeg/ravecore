@@ -1,10 +1,11 @@
-#' 'RAVE' class for loading entire block of voltage repository
+#' 'RAVE' class for blocks of voltage repository
 #' @description
 #' Compared to \code{\link{RAVESubjectBaseRepository}}, this repository
-#' requires epoch information. please use
-#' \code{\link{prepare_subject_with_blocks}} to instantiate this repository.
+#' loads the entire voltage traces for selected blocks; use
+#' \code{\link{prepare_subject_voltage_with_blocks}} to instantiate this
+#' repository.
 #'
-#' @seealso \code{\link{prepare_subject_with_blocks}}
+#' @seealso \code{\link{prepare_subject_voltage_with_blocks}}
 #' @export
 RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
   classname = "RAVESubjectRecordingBlockVoltageRepository",
@@ -15,7 +16,6 @@ RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
   cloneable = TRUE,
 
   private = list(
-    .data = NULL,
     .data_type = "voltage"
   ),
   public = list(
@@ -75,29 +75,7 @@ RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
                        .class = .class)
     },
 
-    #' @description Export the repository to 'Matlab' for future analysis
-    #' @param ... reserved for child classes
-    #' @param verbose print progresses
-    #' @returns The root directory where the files are stored.
-    export_matlab = function(..., verbose = TRUE) {
-      # self <- prepare_subject_with_blocks(
-      #     "demo/DemoSubject", electrodes = 14:16,
-      #     reference_name = "default", epoch_name = "auditory_onset",
-      #     time_windows = c(-1, 2))
-      root_path <- super$export_matlab(..., verbose = verbose)
-      summary_path <- file_path(root_path, "summary.yaml")
-      summary <- load_yaml(summary_path)
-
-      summary$blocks <- self$blocks
-      summary$sample_rates <- self$sample_rates
-
-      save_yaml(summary, file = summary_path, sorted = TRUE)
-
-      return(root_path)
-    },
-
-    #' @description function to mount data, not doing anything in this
-    #' class, but may be used by child classes
+    #' @description function to mount data
     #' @param force force update data; default is true; set to false
     #' to use cache
     #' @param electrodes electrodes to update; default is \code{NULL} (all
