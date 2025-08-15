@@ -143,13 +143,15 @@ invalid rows will be filled with <code>NA</code>)</p>
 <h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
 <p>Constructor to instantiate the class</p><div class="section">
 <h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/YAELProcess.html">YAELProcess</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">subject_code</span>, <span class="va">image_types</span>, imaging_path <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/YAELProcess.html">YAELProcess</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">subject</span>, <span class="va">image_types</span>, imaging_path <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-2">Arguments<a class="anchor" aria-label="anchor" href="#arguments-2"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>subject_code</code></dt>
-<dd><p>character code representing the subject</p></dd>
+<p></p><div class="arguments"><dl><dt><code>subject</code></dt>
+<dd><p>'RAVE' subject or subject ID; for native standard,
+this can be character code without project names, but for 'BIDS'
+subjects, this must be a full subject ID with project information</p></dd>
 
 
 <dt><code>image_types</code></dt>
@@ -165,6 +167,10 @@ implantation (for example, <code>'postopT1w'</code>)</p></dd>
 if not default); internally used to set the work path during
 serialization. Please do not set it manually unless you know what you
 are doing</p></dd>
+
+
+<dt><code>...</code></dt>
+<dd><p>reserved for legacy code</p></dd>
 
 
 </dl><p></p></div>
