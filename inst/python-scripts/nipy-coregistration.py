@@ -53,10 +53,10 @@ def coregistrate_image(
   mr_cmap = mrimg.coordmap
   
   # remove negative values from CT as they are less likely to be bones
-  if clean_source:
-    # ctimg._data[ctimg._data < 0] = 0
-    ctdata = ctimg.get_data()
-    ctdata[ ctdata < 0 ] = 0
+  # if clean_source:
+  #   # ctimg._data[ctimg._data < 0] = 0
+  #   ctdata = ctimg.get_data()
+  #   ctdata[ ctdata < 0 ] = 0
   
   if inverse_target:
     # mrimg._data = numpy.max(mrimg._data) - mrimg._data
