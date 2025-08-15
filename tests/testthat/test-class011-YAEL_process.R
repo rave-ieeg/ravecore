@@ -1,5 +1,5 @@
 test_that("YAEL_process", {
-  self <- YAELProcess$new(subject_code = "demo@bids:ds005953/ecog03")
+  self <- YAELProcess$new(subject = "demo@bids:ds005953/ecog03")
 
   raw <- serialize(self, NULL, refhook = ravepipeline::rave_serialize_refhook)
   self2 <- unserialize(raw, refhook = ravepipeline::rave_unserialize_refhook)

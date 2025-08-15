@@ -121,13 +121,15 @@ Internal method
 \subsection{Method \code{new()}}{
 Constructor to instantiate the class
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{YAELProcess$new(subject_code, image_types, imaging_path = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{YAELProcess$new(subject, image_types, imaging_path = NULL, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{subject_code}}{character code representing the subject}
+\item{\code{subject}}{'RAVE' subject or subject ID; for native standard,
+this can be character code without project names, but for 'BIDS'
+subjects, this must be a full subject ID with project information}
 
 \item{\code{image_types}}{vector of image types, such as \code{'T1w'},
 \code{'CT'}, \code{'fGATIR'}. All images except \code{'CT'} will be
@@ -139,6 +141,8 @@ implantation (for example, \code{'postopT1w'})}
 if not default); internally used to set the work path during
 serialization. Please do not set it manually unless you know what you
 are doing}
+
+\item{\code{...}}{reserved for legacy code}
 }
 \if{html}{\out{</div>}}
 }

@@ -7,7 +7,7 @@
 #' to template brain, creating subject-level brain atlas from inverse
 #' normalization.
 #'
-#' @param subject_code character of subject code
+#' @param subject subject ID
 #' @param t1w_path path to 'T1'-weighted preoperative 'MRI', used as underlay
 #' and base image. If you want to have 'ACPC' aligned scanner coordinate
 #' system. Please align the image before feeding into this function. All images
@@ -44,6 +44,7 @@
 #' @param verbose whether to print out the information; default is \code{TRUE}
 #' @param run_recon_all whether to run 'FreeSurfer'; default is true
 #' @param dry_run whether to dry-run
+#' @param ... reserved for legacy code and deprecated arguments
 #' @returns Nothing, a subject imaging folder will be created under 'RAVE'
 #' raw folder. It will take a while to run the workflow.
 #' @examples
@@ -52,7 +53,7 @@
 #'
 #' # For T1 normalization only; add ct_path to include coregistration
 #' cmd_run_yael_preprocess(
-#'   subject_code = "pt01",
+#'   subject = "pt01",
 #'   t1w_path = "/path/to/T1w.nii.gz",
 #'
 #'   # normalize T1 to MNI152
@@ -67,7 +68,7 @@ NULL
 #' @rdname cmd_run_yael_preprocess
 #' @export
 yael_preprocess <- function(
-    subject_code, t1w_path = NULL, ct_path = NULL,
+    subject, t1w_path = NULL, ct_path = NULL,
     t2w_path = NULL, fgatir_path = NULL, preopct_path = NULL,
     flair_path = NULL, t1w_contrast_path = NULL,
     register_policy = c("auto", "all"), register_reversed = FALSE,
@@ -76,8 +77,19 @@ yael_preprocess <- function(
     normalize_images = c("T1w", "T2w", "T1wContrast", "fGATIR", "preopCT"),
     normalize_back = ifelse(length(normalize_template) >= 1, normalize_template[[1]], NA),
     atlases = list(),
-    add_surfaces = FALSE, verbose = TRUE
+    add_surfaces = FALSE, verbose = TRUE, ...
 ) {
+  if(missing(subject)) {
+    subject <- list(...)$subject_code
+    if(!length(subject)) {
+      stop("yael_preprocess: `subject` is missing. Please provide a RAVE subject ID")
+    }
+    ravepipeline::logger(
+      level = "warning",
+      "yael_preprocess: initializing with argument `subject_code` is no longer ",
+      "appropriate. Use argument `subject` instead"
+    )
+  }
 
   register_policy <- match.arg(register_policy)
   normalize_policy <- match.arg(normalize_policy)
@@ -119,7 +131,11 @@ yael_preprocess <- function(
   # normalize_back <- normalize_template[[1]]
   # add_surfaces <- TRUE
 
-  yael_process <- YAELProcess$new(subject_code = subject_code)
+  yael_process <- as_yael_process(subject = subject)
+  subject <- yael_process$get_subject()
+  project_name <- subject$project_name
+  subject_code <- subject$subject_code
+
   if(length(t1w_path) && !is.na(t1w_path) && nzchar(t1w_path)) {
     ravepipeline::logger("Migrating T1w image: ", t1w_path, level = "trace")
     yael_process$set_input_image(path = t1w_path, type = "T1w", overwrite = TRUE)
@@ -242,7 +258,7 @@ yael_preprocess <- function(
 #' @rdname cmd_run_yael_preprocess
 #' @export
 cmd_run_yael_preprocess <- function(
-    subject_code,
+    subject,
     t1w_path = NULL,
     ct_path = NULL,
     t2w_path = NULL,
@@ -254,7 +270,7 @@ cmd_run_yael_preprocess <- function(
     normalize_template = "mni_icbm152_nlin_asym_09b",
     normalize_images = c("T1w", "T2w", "T1wContrast", "fGATIR", "preopCT"),
     run_recon_all = TRUE,
-    dry_run = FALSE, verbose = TRUE) {
+    dry_run = FALSE, verbose = TRUE, ...) {
   # DIPSAUS DEBUG START
   # subject_code = "testtest3"
   # t1w_path = "/Users/dipterix/rave_data/raw_dir/DBS_93/rave-imaging/coregistration/MRI_reference.nii.gz"
@@ -269,10 +285,25 @@ cmd_run_yael_preprocess <- function(
   # normalize_images = c("T1w", "T2w", "T1wContrast", "fGATIR", "preopCT")
   # normalize_template = "mni_icbm152_nlin_asym_09b"
 
+  if(missing(subject)) {
+    subject <- list(...)$subject_code
+    if(!length(subject)) {
+      stop("cmd_run_yael_preprocess: `subject` is missing. Please provide a RAVE subject ID")
+    }
+    ravepipeline::logger(
+      level = "warning",
+      "cmd_run_yael_preprocess: initializing with argument `subject_code` is no longer ",
+      "appropriate. Use argument `subject` instead"
+    )
+  }
+
   run_recon_all <- as.integer(isTRUE(as.logical(run_recon_all)))
   register_reversed <- isTRUE(as.logical(register_reversed))
 
-  yael_process <- YAELProcess$new(subject_code = subject_code)
+  yael_process <- as_yael_process(subject = subject)
+  subject <- yael_process$get_subject()
+  project_name <- subject$project_name
+  subject_code <- subject$subject_code
 
   if(length(t1w_path)) {
     t1w_path <- normalizePath(t1w_path, winslash = "/", mustWork = TRUE)
@@ -288,8 +319,6 @@ cmd_run_yael_preprocess <- function(
   if(length(preopct_path)) { preopct_path <- normalizePath(preopct_path, winslash = "/", mustWork = TRUE) } else { preopct_path <- "" }
   if(length(flair_path)) { flair_path <- normalizePath(flair_path, winslash = "/", mustWork = TRUE) } else { flair_path <- "" }
   if(length(t1w_contrast_path)) { t1w_contrast_path <- normalizePath(t1w_contrast_path, winslash = "/", mustWork = TRUE) } else { t1w_contrast_path <- "" }
-
-  subject <- RAVESubject$new(project_name = "YAEL", subject_code = subject_code, strict = FALSE)
 
   if(length(normalize_template)) {
     if("mni_icbm152_nlin_asym_09b" %in% normalize_template) {
@@ -334,8 +363,6 @@ cmd_run_yael_preprocess <- function(
   # Always use a temporary working path since the target directory might contain spaces
   work_path_actual <- path_abs(subject$preprocess_settings$raw_path, must_work = FALSE)
 
-  project_name <- "YAEL"
-
   template <- c(readLines(system.file('shell-templates/yael-preprocess.R', package = "ravecore")), "")
   cmd <- ravepipeline::glue(paste(template, collapse = "\n"), .sep = "\n", .open = "{{", .close = "}}", .trim = FALSE)
 
@@ -365,7 +392,7 @@ cmd_run_yael_preprocess <- function(
     dry_run = dry_run,
     log_file = file.path(log_path, log_file, fsep = "/"),
     src_path = t1w_path,
-    dest_path = file.path(work_path_actual, "rave-imaging", fsep = "/"),
+    dest_path = path_abs(subject$imaging_path),
     execute = execute,
     command = rscript_path()
   )

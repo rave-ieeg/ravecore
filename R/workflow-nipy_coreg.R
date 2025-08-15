@@ -86,12 +86,9 @@ cmd_run_nipy_coreg <- function(
     dry_run = FALSE, verbose = FALSE) {
 
   subject <- restore_subject_instance(subject, strict = FALSE)
-  work_path <- normalizePath(
-    file.path(subject$preprocess_settings$raw_path, "rave-imaging"),
-    winslash = "/", mustWork = FALSE
-  )
-  ct_path <- normalizePath(ct_path, winslash = "/", mustWork = TRUE)
-  mri_path <- normalizePath(mri_path, winslash = "/", mustWork = TRUE)
+  work_path <- path_abs(subject$imaging_path, must_work = FALSE)
+  ct_path <- path_abs(ct_path, must_work = TRUE)
+  mri_path <- path_abs(mri_path, must_work = TRUE)
 
   reg_type <- match.arg(reg_type)
   interp <- match.arg(interp)

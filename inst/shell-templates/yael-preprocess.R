@@ -22,6 +22,11 @@ normalize_template <- {{ normalize_template_str }}
 normalize_images <- {{ normalize_images_str }}
 run_recon_all <- {{ run_recon_all }}
 
+
+subject <- ravecore::RAVESubject$new(project_name = project_name,
+                                     subject_code = subject_code,
+                                     strict = FALSE)
+
 max_mem_size <- ravepipeline::raveio_getopt("max_mem", default = 8)
 if(length(max_mem_size) == 1 && is.numeric(max_mem_size) && !is.na(max_mem_size) && isTRUE(max_mem_size < 12)) {
   # Cannot register to MNI152b as this requires at least 12GB RAM
@@ -41,7 +46,7 @@ if(!length(normalize_template)) {
 
 if( !run_recon_all ) {
   ravecore::yael_preprocess(
-    subject_code = subject_code,
+    subject = subject,
     t1w_path = t1w_path,
     ct_path = ct_path,
     t2w_path = t2w_path,
@@ -86,7 +91,7 @@ if( !run_recon_all ) {
   # Run FreeSurfer
   subject <- ravecore::RAVESubject$new(project_name = project_name, subject_code = subject_code, strict = FALSE)
   ravecore::yael_preprocess(
-    subject_code = subject_code,
+    subject = subject,
     t1w_path = t1w_path,
     ct_path = ct_path,
     t2w_path = t2w_path,

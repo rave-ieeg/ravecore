@@ -6,7 +6,7 @@
 \title{Run a built-in 'YAEL' imaging processing workflow}
 \usage{
 yael_preprocess(
-  subject_code,
+  subject,
   t1w_path = NULL,
   ct_path = NULL,
   t2w_path = NULL,
@@ -22,11 +22,12 @@ yael_preprocess(
   normalize_back = ifelse(length(normalize_template) >= 1, normalize_template[[1]], NA),
   atlases = list(),
   add_surfaces = FALSE,
-  verbose = TRUE
+  verbose = TRUE,
+  ...
 )
 
 cmd_run_yael_preprocess(
-  subject_code,
+  subject,
   t1w_path = NULL,
   ct_path = NULL,
   t2w_path = NULL,
@@ -39,11 +40,12 @@ cmd_run_yael_preprocess(
   normalize_images = c("T1w", "T2w", "T1wContrast", "fGATIR", "preopCT"),
   run_recon_all = TRUE,
   dry_run = FALSE,
-  verbose = TRUE
+  verbose = TRUE,
+  ...
 )
 }
 \arguments{
-\item{subject_code}{character of subject code}
+\item{subject}{subject ID}
 
 \item{t1w_path}{path to 'T1'-weighted preoperative 'MRI', used as underlay
 and base image. If you want to have 'ACPC' aligned scanner coordinate
@@ -89,6 +91,8 @@ reconstructions are inaccessible)}
 
 \item{verbose}{whether to print out the information; default is \code{TRUE}}
 
+\item{...}{reserved for legacy code and deprecated arguments}
+
 \item{run_recon_all}{whether to run 'FreeSurfer'; default is true}
 
 \item{dry_run}{whether to dry-run}
@@ -109,7 +113,7 @@ normalization.
 
 # For T1 normalization only; add ct_path to include coregistration
 cmd_run_yael_preprocess(
-  subject_code = "pt01",
+  subject = "pt01",
   t1w_path = "/path/to/T1w.nii.gz",
 
   # normalize T1 to MNI152

@@ -108,7 +108,7 @@ YAELProcess <- R6::R6Class(
         strict = FALSE
       )
       YAELProcess$new(
-        subject_code = subject,
+        subject = subject,
         image_types = object$data$image_types,
         imaging_path = object$data$work_path
       )
@@ -116,7 +116,9 @@ YAELProcess <- R6::R6Class(
 
     #' @description
     #' Constructor to instantiate the class
-    #' @param subject_code character code representing the subject
+    #' @param subject 'RAVE' subject or subject ID; for native standard,
+    #' this can be character code without project names, but for 'BIDS'
+    #' subjects, this must be a full subject ID with project information
     #' @param image_types vector of image types, such as \code{'T1w'},
     #' \code{'CT'}, \code{'fGATIR'}. All images except \code{'CT'} will be
     #' considered \code{'preop'} (before electrode implantation). Please
@@ -126,7 +128,19 @@ YAELProcess <- R6::R6Class(
     #' if not default); internally used to set the work path during
     #' serialization. Please do not set it manually unless you know what you
     #' are doing
-    initialize = function(subject_code, image_types, imaging_path = NULL) {
+    #' @param ... reserved for legacy code
+    initialize = function(subject, image_types, imaging_path = NULL, ...) {
+      if(missing(subject)) {
+        subject <- list(...)$subject_code
+        if(!length(subject)) {
+          stop("YAELProcess: `subject` is missing. Please provide a RAVE subject ID")
+        }
+        ravepipeline::logger(
+          level = "warning",
+          "YAELProcess: initializing with argument `subject_code` is no longer ",
+          "appropriate. Use argument `subject` instead"
+        )
+      }
 
       # On windows, throw a warning if running with rstudioapi
       if( rstudio_main_session(os = "windows") ) {
@@ -138,16 +152,16 @@ YAELProcess <- R6::R6Class(
         ravepipeline::logger("Avoid running YAELProcess directly in RStudio interactive sessions. Try to save the script and run it in a separate R session (e.g. from terminal or the native R GUI). RStudio has a bug that might crash when launching the process. There is nothing I can do about it :/", level = level)
       }
 
-      if(!is.character(subject_code) || grepl("/", subject_code, fixed = TRUE)) {
+      if(!is.character(subject) || grepl("/", subject, fixed = TRUE)) {
         # user passed a subject ID
-        subject <- as_rave_subject(subject_code, strict = FALSE)
+        subject <- as_rave_subject(subject, strict = FALSE)
       } else {
-        stopifnot2(length(subject_code) == 1 && is.character(subject_code) &&
-                     !is.na(subject_code) && nzchar(subject_code),
+        stopifnot2(length(subject) == 1 && is.character(subject) &&
+                     !is.na(subject) && nzchar(subject),
                    msg = "Please enter a valid subject code (with combinations of letter and digits)")
-        subject_code <- gsub("^sub-", "", subject_code, ignore.case = TRUE)
+        subject <- gsub("^sub-", "", subject, ignore.case = TRUE)
         subject <- RAVESubject$new(project_name = "YAEL",
-                                   subject_code = subject_code,
+                                   subject_code = subject,
                                    strict = FALSE)
       }
 
@@ -872,7 +886,7 @@ YAELProcess <- R6::R6Class(
 #' @returns A processing instance, see \code{\link{YAELProcess}}
 #' @examples
 #'
-#' process <- as_yael_process("test_subject")
+#' process <- as_yael_process("YAEL/test_subject")
 #'
 #' # This example requires extra demo data & settings.
 #' \dontrun{
@@ -901,7 +915,7 @@ as_yael_process <- function(subject) {
     }
   }
   subject <- restore_subject_instance(subject, strict = FALSE)
-  YAELProcess$new(subject_code = subject)
+  YAELProcess$new(subject = subject)
 }
 
 

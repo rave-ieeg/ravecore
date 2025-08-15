@@ -52,7 +52,7 @@ RAVESubjectRecordingBlockRawVoltageRepository <- R6::R6Class(
     #' @param subject 'RAVE' subject
     #' @param electrodes string or integers indicating electrodes to load
     #' @param reference_name always \code{'noref'} (no reference); trying to
-    #' set to other volues will result in a warning
+    #' set to other values will result in a warning
     #' @param blocks name of the recording blocks to load
     #' @param quiet see field \code{quiet}
     #' @param repository_id see field \code{repository_id}

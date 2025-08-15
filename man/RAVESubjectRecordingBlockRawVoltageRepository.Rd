@@ -118,7 +118,7 @@ constructor
 \item{\code{electrodes}}{string or integers indicating electrodes to load}
 
 \item{\code{reference_name}}{always \code{'noref'} (no reference); trying to
-set to other volues will result in a warning}
+set to other values will result in a warning}
 
 \item{\code{blocks}}{name of the recording blocks to load}
 

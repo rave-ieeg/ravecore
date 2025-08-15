@@ -241,7 +241,7 @@ transform_point_to_template_volumetric <- function(subject, scan_ras_mat, method
   if(method %in% c("auto", "nonlinear")) {
     # check if nonlinear exists
     mapping <- tryCatch({
-      yael <- YAELProcess$new(subject_code = subject$subject_code)
+      yael <- as_yael_process(subject = subject)
       mapping <- yael$get_template_mapping(template_name = "mni_icbm152_nlin_asym_09b")
       if(!length(mapping)) {
         mapping <- yael$get_template_mapping(template_name = "mni_icbm152_nlin_asym_09a")
@@ -276,7 +276,7 @@ transform_point_to_template_volumetric <- function(subject, scan_ras_mat, method
     }
 
     # map to template using non-linear deformation
-    yael <- YAELProcess$new(subject_code = subject$subject_code)
+    yael <- as_yael_process(subject = subject)
 
 
     scan_ras_selected <- scan_ras_mat[valid_positions, , drop = FALSE]
@@ -363,7 +363,7 @@ transform_point_to_template <- function(
   subject <- restore_subject_instance(subject, strict = FALSE)
   native_brain <- rave_brain(subject, usetemplateifmissing = FALSE)
   if(is.null(native_brain)) {
-    stop("Unable to find the rave-imaging folder for subject ", subject$subject_id)
+    stop("Unable to find `fs` nor `ants` folder under the subject rave-imaging directory; subject ID: ", subject$subject_id)
   }
 
   if(missing(positions)) {
@@ -441,7 +441,7 @@ transform_thinfilm_to_mni152 <- function(
   # brain objects
   native_brain <- rave_brain(subject, usetemplateifmissing = FALSE)
   if(is.null(native_brain)) {
-    stop("Unable to find the rave-imaging folder for subject ", subject$subject_id)
+    stop("Unable to find `fs` nor `ants` folder under the subject rave-imaging directory; subject ID: ", subject$subject_id)
   }
   # MNI152 mapping uses cvs_avg35_inMNI152 template
   template_file_path <- file.path(threeBrain::default_template_directory(), template_subject)

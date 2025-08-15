@@ -141,7 +141,7 @@ cmd_run_freesurfer_recon_all <- function(
     freesurfer_home = freesurfer_home,
     log_file = file.path(log_path, log_file, fsep = "/"),
     src_path = mri_path,
-    dest_path = file.path(work_path_actual, "rave-imaging", "fs", fsep = "/"),
+    dest_path = file.path(subject$imaging_path, "fs", fsep = "/"),
     execute = execute,
     command = "bash"
   )
@@ -238,7 +238,7 @@ cmd_run_freesurfer_recon_all_clinical <- function(
     freesurfer_home = freesurfer_home,
     log_file = file.path(log_path, log_file, fsep = "/"),
     src_path = mri_path,
-    dest_path = file.path(work_path_actual, "rave-imaging", "fs", fsep = "/"),
+    dest_path = file.path(subject$imaging_path, "fs", fsep = "/"),
     execute = execute,
     command = "bash"
   )

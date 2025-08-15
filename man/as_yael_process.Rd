@@ -20,7 +20,7 @@ Image registration across different modals. Normalize brain 'T1'-weighted
 }
 \examples{
 
-process <- as_yael_process("test_subject")
+process <- as_yael_process("YAEL/test_subject")
 
 # This example requires extra demo data & settings.
 \dontrun{
