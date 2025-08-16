@@ -472,9 +472,12 @@ transform_thinfilm_to_mni152 <- function(
                                    template$template_subject)
   read_surface <- function(path) {
     y <- ieegio::read_surface(path)
-    list(
-      vertices = t(y$geometry$vertices[1:3, , drop = FALSE]),
-      faces = t(y$geometry$faces) - as.integer(y$geometry$face_start - 1L)
+    structure(
+      list(
+        vertices = t(y$geometry$vertices[1:3, , drop = FALSE]),
+        faces = t(y$geometry$faces) - as.integer(y$geometry$face_start - 1L)
+      ),
+      class = "fs.surface"
     )
   }
   # x <- freesurferformats::read.fs.surface(p)
