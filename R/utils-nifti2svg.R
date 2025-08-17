@@ -222,7 +222,7 @@ plot_volume_slices <- function(
       depth <- depths[idx]
       call$depth <- depth
       base64_images <- eval(call)
-      shiny::tagList(
+      htmltools::tagList(
         format(
           base64_images$underlay_base64, type = "html_svg",
           opacity = 1, width = image_size, height = image_size,
