@@ -156,14 +156,17 @@ RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
 
           if(is.null(cached_arrays[[stype]])) {
             # this is a sample electrode channel, load anyway
-            sample_signal <- inst$load_blocks(blocks = block, type = data_type, simplify = TRUE)
+            sample_signal <- inst$load_blocks(blocks = block,
+                                              type = data_type,
+                                              simplify = TRUE)
             dm <- dim(sample_signal)
             if(!length(dm)) { dm <- length(sample_signal) }
             array_dimension <- c(dm, length(all_electrodes))
 
             # length(array_dimension) is 2 for voltage
             dnames <- list(
-              Time = seq(0, by = 1 / sample_rates[[stype]], length.out = array_dimension[[1]]),
+              Time = seq(0, by = 1 / sample_rates[[stype]],
+                         length.out = array_dimension[[1]]),
               Electrode = all_electrodes
             )
 

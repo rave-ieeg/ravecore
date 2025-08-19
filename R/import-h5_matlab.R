@@ -84,6 +84,9 @@ import_from_h5_mat_per_channel <- function(
   ravepipeline::lapply_jobs(electrodes, function(e) {
     cfile <- file.path(save_path, sprintf('electrode_%d.h5', e))
 
+    # The function may run in a separate session
+    ravecore <- asNamespace("ravecore")
+
     for (block in blocks) {
       # block <- blocks[[1]]
 
@@ -95,9 +98,10 @@ import_from_h5_mat_per_channel <- function(
       if(endsWith(tolower(path), "mat")) {
         mat <- ieegio::io_read_mat(path, verbose = FALSE)
       } else {
-        mat <- asNamespace("ravecore")$read_mat2(path, verbose = FALSE)
+        mat <- ravecore$read_mat2(path, verbose = FALSE)
       }
-      name <- asNamespace("ravecore")$guess_raw_trace(mat, length(electrodes), is_vector = TRUE)
+      name <- ravecore$guess_raw_trace(mat, length(electrodes),
+                                       is_vector = TRUE)
       signal <- as.double(mat[[name]][])
 
       # truncate so all signals have the same length, skipped when validating contents is off

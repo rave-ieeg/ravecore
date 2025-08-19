@@ -31,10 +31,9 @@ base64_plot_slice <- function(
   position[[which_axis]] <- depth
   title_text <- sprintf("%s, %s=%.1f", which, which_axis, depth)
 
-  ravepipeline <- asNamespace('ravepipeline')
-  base64_plot <- ravepipeline$base64_plot
 
-  underlay_base64 <- base64_plot(
+
+  underlay_base64 <- ravepipeline::base64_plot(
     width = 512, height = 512,
     {
       oldpar1 <- graphics::par(mar = c(0, 0, 0, 0))
@@ -55,7 +54,7 @@ base64_plot_slice <- function(
 
   overlay_base64 <- NULL
   if(!is.null(overlay)) {
-    overlay_base64 <- base64_plot(
+    overlay_base64 <- ravepipeline::base64_plot(
       width = 512, height = 512,
       {
         oldpar2 <- graphics::par(mar = c(0, 0, 0, 0))

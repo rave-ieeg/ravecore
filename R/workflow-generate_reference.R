@@ -120,7 +120,7 @@ generate_reference <- function(subject, electrodes) {
       if (dir.exists(warray_path)) {
         unlink(warray_path, recursive = TRUE)
       }
-      dir_create2(dirname(warray_path))
+      ravecore$dir_create2(dirname(warray_path))
       warray <- filearray::filearray_create(filebase = warray_path,
                                             dimension = dim(coef),
                                             type = "complex")

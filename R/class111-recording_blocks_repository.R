@@ -132,6 +132,10 @@ RAVESubjectRecordingBlockRepository <- R6::R6Class(
           x = blocks,
           fun = function(block) {
             # block <- blocks[[1]]
+            ravecore <- asNamespace("ravecore")
+            file_path <- ravecore$file_path
+            dir_create2 <- ravecore$dir_create2
+
             block_path <- dir_create2(file_path(data_path, block))
             block_data <- container[[block]]
 

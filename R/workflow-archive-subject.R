@@ -637,6 +637,9 @@ install_subject <- function(
   ravepipeline::lapply_jobs(
     x = names(meta$paths),
     fun = function(nm) {
+      ravecore <- asNamespace("ravecore")
+      file_path <- ravecore$file_path
+      path_rel <- ravecore$path_rel
 
       copy_file_into <- function(from, to, src_root = NA, file_type = NA, ...) {
         if(file.exists(from)) {
