@@ -51,7 +51,8 @@ package <code>htmltools</code>.</p>
 <span>  overlay_col <span class="op">=</span> <span class="va">col</span>,</span>
 <span>  overlay_alpha <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  interleave <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">overlay_alpha</span><span class="op">)</span>,</span>
-<span>  interleave_period <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  interleave_period <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>  interleave_transition <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ease-in-out"</span>, <span class="st">"linear"</span><span class="op">)</span>,</span>
 <span>  pixel_width <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  underlay_range <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  overlay_range <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -103,8 +104,14 @@ two colors to construct color palettes</p></dd>
 
 
 <dt id="arg-interleave-period">interleave_period<a class="anchor" aria-label="anchor" href="#arg-interleave-period"></a></dt>
-<dd><p>interleave animation duration per period; default
-is 3 seconds</p></dd>
+<dd><p>interleave animation duration per period,
+only used when overlay is specified; default is 4 seconds</p></dd>
+
+
+<dt id="arg-interleave-transition">interleave_transition<a class="anchor" aria-label="anchor" href="#arg-interleave-transition"></a></dt>
+<dd><p>interleave animation transition, only used
+when overlay is specified; choices are <code>'ease-in-out'</code> (default)
+and <code>'linear'</code></p></dd>
 
 
 <dt id="arg-pixel-width">pixel_width<a class="anchor" aria-label="anchor" href="#arg-pixel-width"></a></dt>
