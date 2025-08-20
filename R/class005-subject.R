@@ -211,14 +211,14 @@ RAVESubject <- R6::R6Class(
     #' @returns integer vector of valid electrodes
     valid_electrodes = function(reference_name = NULL, refresh = FALSE){
       if(missing(reference_name) || is.null(reference_name)) {
-        reference_name <- "default" %OF% self$reference_names
+        reference_name <- "default" %OF% c(self$reference_names, "noref")
       }
       if(refresh){
         private$.reference_tables[[reference_name]] <- self$meta_data(
-          meta_type = 'references', meta_name = reference_name)
+          meta_type = 'references', meta_name = reference_name, strict = FALSE)
       } else {
         private$.reference_tables[[reference_name]] %?<-% self$meta_data(
-          meta_type = 'references', meta_name = reference_name)
+          meta_type = 'references', meta_name = reference_name, strict = FALSE)
       }
       ref_table <- private$.reference_tables[[reference_name]]
       as.integer(ref_table$Electrode[ref_table$Reference != ''])
