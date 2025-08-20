@@ -84,7 +84,7 @@ export_table <- function(x, file, format = c("auto", "csv", "csv.zip", "tsv", "h
       file_move(zf, file)
     },
     "tsv" = {
-      utils::write.table(x = x, file = file, append = FALSE, na = "n/a",
+      utils::write.table(x = x, file = file, append = FALSE, na = "n/a", sep = "\t",
                          row.names = FALSE, fileEncoding = "UTF-8")
     },
     "fst" = {
@@ -212,6 +212,7 @@ import_table <- function(file, format = c("auto", "csv", "csv.zip", "tsv", "h5",
       args <- list(...)
       args$file <- file
       if(!length(args$na)) { args$na <- "n/a" }
+      if(!length(args$sep)) { args$sep <- "\t" }
       if(!length(args$header)) { args$header <- TRUE }
       do.call(utils::read.table, args)
     },
