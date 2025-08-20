@@ -96,8 +96,11 @@ base64_plot_slice <- function(
 #' @param overlay_alpha overlay transparency
 #' @param interleave whether to interleave overlay; default is true when
 #' \code{overlay_alpha} is unspecified
-#' @param interleave_period interleave animation duration per period; default
-#' is 3 seconds
+#' @param interleave_period interleave animation duration per period,
+#' only used when overlay is specified; default is 4 seconds
+#' @param interleave_transition interleave animation transition, only used
+#' when overlay is specified; choices are \code{'ease-in-out'} (default)
+#' and \code{'linear'}
 #' @param pixel_width pixel width resolution; default is 0.5 millimeters
 #' @param underlay_range,overlay_range numeric vectors of two, value ranges
 #' of underlay and overlay
@@ -168,11 +171,14 @@ plot_volume_slices <- function(
     which = c("coronal", "axial", "sagittal"), nc = NA,
     col = c("black", "white"), overlay_col = col,
     overlay_alpha = NA, interleave = is.na(overlay_alpha),
-    interleave_period = 3, pixel_width = 0.5,
+    interleave_period = 4, interleave_transition = c("ease-in-out", "linear"),
+    pixel_width = 0.5,
     underlay_range = NULL, overlay_range = NULL, ...) {
 
   # this function requires htmltools
   stopifnot(package_installed("htmltools"))
+
+  interleave_transition <- match.arg(interleave_transition)
 
   image_size <-  512
   which <- match.arg(which)
@@ -216,6 +222,16 @@ plot_volume_slices <- function(
     overlay_alpha <- ifelse(interleave, 1, 0.5)
   }
 
+  interleave_transition_str <- switch (
+    interleave_transition,
+    "linear" = "0;1;0",
+    {
+      ys <- ease_in_out(seq(0, 1, by = 0.1))
+      ys <- c(ys, rev(ys)[-1])
+      paste(sprintf("%.2f", ys), collapse = ";")
+    }
+  )
+
   svg_content <- htmltools::tagList(lapply(seq_len(nc), function(col) {
     htmltools::tagList(lapply(seq_len(nr), function(row) {
       idx <- (row - 1) * nc + col
@@ -236,7 +252,9 @@ plot_volume_slices <- function(
               svg_x = (col - 1) * image_size, svg_y = (row - 1) * image_size,
               if(interleave) {
                 htmltools::tags$animate(
-                  attributeName = "opacity", values="0;1;0",
+                  attributeName = "opacity",
+                  # ease-on-out
+                  values=interleave_transition_str,
                   dur = sprintf("%.2fs", interleave_period),
                   repeatCount = "indefinite"
                 )

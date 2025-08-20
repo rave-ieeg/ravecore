@@ -14,7 +14,8 @@ plot_volume_slices(
   overlay_col = col,
   overlay_alpha = NA,
   interleave = is.na(overlay_alpha),
-  interleave_period = 3,
+  interleave_period = 4,
+  interleave_transition = c("ease-in-out", "linear"),
   pixel_width = 0.5,
   underlay_range = NULL,
   overlay_range = NULL,
@@ -45,8 +46,12 @@ two colors to construct color palettes}
 \item{interleave}{whether to interleave overlay; default is true when
 \code{overlay_alpha} is unspecified}
 
-\item{interleave_period}{interleave animation duration per period; default
-is 3 seconds}
+\item{interleave_period}{interleave animation duration per period,
+only used when overlay is specified; default is 4 seconds}
+
+\item{interleave_transition}{interleave animation transition, only used
+when overlay is specified; choices are \code{'ease-in-out'} (default)
+and \code{'linear'}}
 
 \item{pixel_width}{pixel width resolution; default is 0.5 millimeters}
 
