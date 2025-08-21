@@ -189,11 +189,12 @@ RAVESubjectRecordingBlockRepository <- R6::R6Class(
     },
 
     #' @description get container where loaded data are stored
+    #' @param ... passed to \code{mount_data}
     #' @returns A named map, typically with data arrays, shape/dimension
     #' information
-    get_container = function() {
+    get_container = function(...) {
       if(private$.data$`@size`() == 0) {
-        self$mount_data()
+        self$mount_data(...)
       }
       private$.data
     }

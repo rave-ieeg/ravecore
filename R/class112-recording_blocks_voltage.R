@@ -45,6 +45,7 @@ RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
         strict = TRUE,
         lazy_load = TRUE
       )
+      repo$`@restored` <- TRUE
       return(repo)
     },
 

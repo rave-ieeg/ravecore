@@ -154,7 +154,7 @@ electrodes <- repository$electrode_instances
 e <- electrodes$e_14
 
 # referenced voltage
-voltage <- e$load_data("voltage")
+voltage <- e$load_data_with_epochs("voltage")
 
 # 6001 time points (2000 sample rate)
 # 287 trials

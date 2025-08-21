@@ -54,6 +54,7 @@ RAVESubjectEpochRepository <- R6::R6Class(
         strict = TRUE,
         lazy_load = TRUE
       )
+      repo$`@restored` <- TRUE
       return(repo)
     },
 
@@ -161,7 +162,7 @@ RAVESubjectEpochRepository <- R6::R6Class(
             arr <- arr[dimnames = FALSE, drop = FALSE]
 
             if(length(electrode_instance$reference)) {
-              reference <- electrode_instance$reference$load_data(data_type)
+              reference <- electrode_instance$reference$load_data_with_epochs(data_type)
               reference <- reference[dimnames = FALSE, drop = FALSE]
             } else {
               reference <- as.matrix(0)
@@ -278,11 +279,12 @@ RAVESubjectEpochRepository <- R6::R6Class(
     },
 
     #' @description get container where loaded data are stored
+    #' @param ... passed to \code{mount_data}
     #' @returns A named map, typically with data arrays, shape/dimension
     #' information
-    get_container = function() {
+    get_container = function(...) {
       if(private$.data$`@size`() == 0) {
-        self$mount_data()
+        self$mount_data(...)
       }
       private$.data
     }
@@ -466,7 +468,7 @@ RAVESubjectEpochRepository <- R6::R6Class(
 #' e <- electrodes$e_14
 #'
 #' # referenced voltage
-#' voltage <- e$load_data("voltage")
+#' voltage <- e$load_data_with_epochs("voltage")
 #'
 #' # 6001 time points (2000 sample rate)
 #' # 287 trials

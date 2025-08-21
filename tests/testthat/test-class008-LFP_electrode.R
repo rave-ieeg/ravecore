@@ -27,20 +27,20 @@ test_that("LFP_electrode", {
   raw <- serialize(self, NULL, refhook = ravepipeline::rave_serialize_refhook)
   e14 <- unserialize(raw, refhook = ravepipeline::rave_unserialize_refhook)
 
-  data <- self$load_data("power")
-  testthat::expect_equal(data[], e14$load_data("power")[])
+  data <- self$load_data_with_epochs("power")
+  testthat::expect_equal(data[], e14$load_data_with_epochs("power")[])
 
-  data <- self$load_data("phase")
-  testthat::expect_equal(data[], e14$load_data("phase")[])
+  data <- self$load_data_with_epochs("phase")
+  testthat::expect_equal(data[], e14$load_data_with_epochs("phase")[])
 
-  data <- self$load_data("wavelet-coefficient")
-  testthat::expect_equal(data[], e14$load_data("wavelet-coefficient")[])
+  data <- self$load_data_with_epochs("wavelet-coefficient")
+  testthat::expect_equal(data[], e14$load_data_with_epochs("wavelet-coefficient")[])
 
-  data <- self$load_data("voltage")
-  testthat::expect_equal(data[], e14$load_data("voltage")[])
+  data <- self$load_data_with_epochs("voltage")
+  testthat::expect_equal(data[], e14$load_data_with_epochs("voltage")[])
 
-  data <- self$load_data("raw-voltage")
-  testthat::expect_equal(data[], e14$load_data("raw-voltage")[])
+  data <- self$load_data_with_epochs("raw-voltage")
+  testthat::expect_equal(data[], e14$load_data_with_epochs("raw-voltage")[])
 
   data <- self$load_blocks("008", type = "power")
   testthat::expect_equal(data, e14$load_blocks("008", type = "power"))

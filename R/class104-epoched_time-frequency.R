@@ -30,7 +30,7 @@ RAVESubjectEpochTimeFreqBaseRepository <- R6::R6Class(
     `@unmarshal` = function(object, ...) {
       stopifnot(identical(object$namespace, "ravecore"))
       stopifnot(inherits(object$data, "RAVESubjectEpochTimeFreqBaseRepository_marshal"))
-      return(RAVESubjectEpochTimeFreqBaseRepository$new(
+      repo <- RAVESubjectEpochTimeFreqBaseRepository$new(
         subject = RAVESubject$public_methods$`@unmarshal`(object$data$subject),
         electrodes = object$data$intended_electrode_list,
         reference_name = object$data$reference_name,
@@ -41,7 +41,9 @@ RAVESubjectEpochTimeFreqBaseRepository <- R6::R6Class(
         stitch_events = object$data$stitch_events,
         strict = TRUE,
         lazy_load = TRUE
-      ))
+      )
+      repo$`@restored` <- TRUE
+      return(repo)
     },
 
 
@@ -116,24 +118,33 @@ RAVESubjectEpochTimeFreqBaseRepository <- R6::R6Class(
       # force = FALSE
       # electrodes <- 13
 
+      workers <- 0
+      if(self$`@restored`) { workers <- 1 }
+
       data_type <- private$.data_type
       if(length(data_type) == 0) { return(self) }
 
       # determine electrodes to load
-      electrodes <- parse_svec(electrodes)
-      electrodes <- electrodes[electrodes %in% self$electrode_list]
-      if(!length(electrodes)) {
-        electrodes <- self$electrode_list
+      if(length(electrodes) == 1 && is.na(electrodes)) {
+        # Do not load data, just fill in the meta
+        electrodes <- integer()
+      } else {
+        electrodes <- parse_svec(electrodes)
+        electrodes <- electrodes[electrodes %in% self$electrode_list]
+        if(!length(electrodes)) {
+          electrodes <- self$electrode_list
+        }
       }
 
       # check data_list
       nms <- sprintf("e_%d", electrodes)
 
-      if( !force ) {
+      if( length(private$.data) > 0 && !force ) {
         exist_list <- names(private$.data$data_list)
         if(all(nms %in% exist_list)) { return(self) }
       }
 
+      all_electrode_instances <- self$electrode_instances
       electrode_instances <- self$electrode_instances[nms]
 
       # fine references to load
@@ -151,12 +162,13 @@ RAVESubjectEpochTimeFreqBaseRepository <- R6::R6Class(
         ravepipeline::lapply_jobs(
           reference_instances,
           function(inst) {
-            inst$load_data(data_type)
+            inst$load_data_with_epochs(data_type)
             return()
           }, callback = function(inst) {
             sprintf("Loading Reference | %s", inst$number)
           },
-          .globals = list(data_type = data_type)
+          .globals = list(data_type = data_type),
+          .workers = workers
         )
       }
 
@@ -165,12 +177,13 @@ RAVESubjectEpochTimeFreqBaseRepository <- R6::R6Class(
         electrode_instances,
         function(inst) {
           ravepipeline::RAVEFileArray$new(
-            inst$load_data(type = data_type)
+            inst$load_data_with_epochs(type = data_type)
           )
         }, callback = function(inst) {
           sprintf("Loading Time-Frequency Components | Electrode %s", inst$number)
         },
-        .globals = list(data_type = data_type)
+        .globals = list(data_type = data_type),
+        .workers = workers
       )
       # Clear progress finish line
       cat("          \r")
@@ -182,11 +195,11 @@ RAVESubjectEpochTimeFreqBaseRepository <- R6::R6Class(
       )
 
       # construct dim and dimnames
-      dim <- dim(data_list[[1]])
-      dim[[4]] <- length(self$electrode_list)
+      inst <- all_electrode_instances[[1]]
+      dimnames <- inst$load_dimnames_with_epochs(type = data_type)
+      dimnames$Electrode <- self$electrode_list
 
-      dimnames <- dimnames(data_list[[1]])
-      dimnames[[4]] <- self$electrode_list
+      dim <- vapply(dimnames, length, 0L)
 
       private$.data$`@mset`(
         # data_list = data_list,
@@ -196,7 +209,9 @@ RAVESubjectEpochTimeFreqBaseRepository <- R6::R6Class(
       )
 
       private$.data$data_list <- as.list(private$.data$data_list)
-      private$.data$data_list[nms] <- data_list[nms]
+      if(length(data_list)) {
+        private$.data$data_list[nms] <- data_list[nms]
+      }
 
       self
     }

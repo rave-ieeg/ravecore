@@ -30,7 +30,7 @@
 #' print(e)
 #'
 #' # Now epoch power
-#' power <- e$load_data("power")
+#' power <- e$load_data_with_epochs("power")
 #' names(dimnames(power))
 #'
 #' # Subset power
@@ -503,16 +503,16 @@ LFP_reference <- R6::R6Class(
     #' @description method to load electrode data
     #' @param type data type such as \code{"power"}, \code{"phase"},
     #' \code{"voltage"}, \code{"wavelet-coefficient"}.
-    load_data = function(type = c(
-      "power", "phase", "voltage", "wavelet-coefficient")){
-
+    load_data_with_epochs = function(type = c(
+      "power", "phase", "voltage", "wavelet-coefficient",
+      "raw-voltage"
+    ) ){
       type <- match.arg(type)
       if(type == "voltage"){
         return(self$.load_voltage())
       } else {
         return(self$.load_wavelet(type))
       }
-
     },
 
     #' @description load electrode block-wise data (with reference),

@@ -29,7 +29,7 @@
 #' print(e)
 #'
 #' # Now epoch power
-#' power <- e$load_data("power")
+#' power <- e$load_data_with_epochs("power")
 #' names(dimnames(power))
 #'
 #' # Subset power
@@ -53,10 +53,11 @@ LFP_electrode <- R6::R6Class(
     .location = 'iEEG',
     .is_reference = FALSE,
     .power_enabled = TRUE,
-    check_dimensions = function(type = c("voltage", "power", "phase", "wavelet-coefficient")){
+    check_dimensions = function(type = c("raw-voltage", "voltage", "power",
+                                         "phase", "wavelet-coefficient")){
       type <- match.arg(type)
       # Check time-points
-      if(type == "voltage"){
+      if(type %in% c("raw-voltage", "voltage")){
         srate <- self$raw_sample_rate
         freq <- NULL
       } else {
@@ -681,10 +682,10 @@ LFP_electrode <- R6::R6Class(
     #' types except for \code{"raw-voltage"} will be referenced.
     #' For \code{"raw-voltage"}, no reference will be performed since the data
     #' will be the "raw" signal (no processing).
-    load_data = function(type = c(
+    load_data_with_epochs = function(type = c(
       "power", "phase", "voltage", "wavelet-coefficient",
       "raw-voltage"
-    )){
+    )) {
 
       type <- match.arg(type)
       switch(
@@ -700,6 +701,38 @@ LFP_electrode <- R6::R6Class(
         }
       )
 
+    },
+
+    #' @description get expected dimension names
+    #' @param type see \code{load_data_with_epochs}
+    load_dimnames_with_epochs = function(type = c(
+      "power", "phase", "voltage", "wavelet-coefficient",
+      "raw-voltage"
+    )) {
+      type <- match.arg(type)
+      dim_info <- private$check_dimensions(type = type)
+
+      frequency <- dim_info$freq[[1]]
+      time <- dim_info$tidx / dim_info$srate
+      trial <- dim_info$epoch_tbl$Trial
+      electrode <- self$number
+
+      has_frequency <- type %in% c("power", "phase", "wavelet-coefficient")
+      if(has_frequency) {
+        dnames <- list(
+          Frequency = frequency,
+          Time = time,
+          Trial = trial,
+          Electrode = electrode
+        )
+      } else {
+        dnames <- list(
+          Time = time,
+          Trial = trial,
+          Electrode = electrode
+        )
+      }
+      return(dnames)
     },
 
     #' @description load electrode block-wise data (with no reference),
@@ -878,5 +911,5 @@ LFP_electrode <- R6::R6Class(
 
 
 # self = LFP_electrode$new('demo/DemoSubject', 14); self$trial_intervals <- c(-1,2); self$set_epoch("auditory_onset")
-# self$load_data('wave')
-# self$load_data('volt')
+# self$load_data_with_epochs('wave')
+# self$load_data_with_epochs('volt')

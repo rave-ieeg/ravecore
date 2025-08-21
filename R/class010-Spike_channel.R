@@ -10,10 +10,10 @@ Spike_electrode <- R6::R6Class(
     .location = 'iEEG',
     .is_reference = FALSE,
     .power_enabled = FALSE,
-    check_dimensions = function(type = c("voltage")){
+    check_dimensions = function(type = c("raw-voltage", "voltage")){
       type <- match.arg(type)
       # Check time-points
-      if(type == "voltage"){
+      if(type %in% c("raw-voltage", "voltage")){
         srate <- self$raw_sample_rate
         freq <- NULL
       } else {
@@ -328,7 +328,7 @@ Spike_electrode <- R6::R6Class(
     #' types except for \code{"raw-voltage"} will be referenced.
     #' For \code{"raw-voltage"}, no reference will be performed since the data
     #' will be the "raw" signal (no processing).
-    load_data = function(type = c("raw-voltage", "voltage")){
+    load_data_with_epochs = function(type = c("raw-voltage", "voltage")){
 
       type <- match.arg(type)
       switch(
@@ -341,6 +341,24 @@ Spike_electrode <- R6::R6Class(
         }
       )
 
+    },
+
+    #' @description get expected dimension names
+    #' @param type see \code{load_data_with_epochs}
+    load_dimnames_with_epochs = function(type = c("raw-voltage", "voltage")) {
+      type <- match.arg(type)
+      dim_info <- private$check_dimensions(type = type)
+
+      time <- dim_info$tidx / dim_info$srate
+      trial <- dim_info$epoch_tbl$Trial
+      electrode <- self$number
+
+      dnames <- list(
+        Time = time,
+        Trial = trial,
+        Electrode = electrode
+      )
+      return(dnames)
     },
 
     #' @description load electrode block-wise data (with no reference),

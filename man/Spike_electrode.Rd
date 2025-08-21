@@ -46,7 +46,8 @@ with current electrode type}
 \item \href{#method-Spike_electrode-new}{\code{Spike_electrode$new()}}
 \item \href{#method-Spike_electrode-.load_noref_voltage}{\code{Spike_electrode$.load_noref_voltage()}}
 \item \href{#method-Spike_electrode-.load_raw_voltage}{\code{Spike_electrode$.load_raw_voltage()}}
-\item \href{#method-Spike_electrode-load_data}{\code{Spike_electrode$load_data()}}
+\item \href{#method-Spike_electrode-load_data_with_epochs}{\code{Spike_electrode$load_data_with_epochs()}}
+\item \href{#method-Spike_electrode-load_dimnames_with_epochs}{\code{Spike_electrode$load_dimnames_with_epochs()}}
 \item \href{#method-Spike_electrode-load_blocks}{\code{Spike_electrode$load_blocks()}}
 \item \href{#method-Spike_electrode-clear_cache}{\code{Spike_electrode$clear_cache()}}
 \item \href{#method-Spike_electrode-clear_memory}{\code{Spike_electrode$clear_memory()}}
@@ -57,6 +58,7 @@ with current electrode type}
 <details open><summary>Inherited methods</summary>
 <ul>
 <li><span class="pkg-link" data-pkg="ravepipeline" data-topic="RAVESerializable" data-id="@compare"><a href='../../ravepipeline/html/RAVESerializable.html#method-RAVESerializable-@compare'><code>ravepipeline::RAVESerializable$@compare()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVEAbstarctElectrode" data-id="load_data"><a href='../../ravecore/html/RAVEAbstarctElectrode.html#method-RAVEAbstarctElectrode-load_data'><code>ravecore::RAVEAbstarctElectrode$load_data()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVEAbstarctElectrode" data-id="set_epoch"><a href='../../ravecore/html/RAVEAbstarctElectrode.html#method-RAVEAbstarctElectrode-set_epoch'><code>ravecore::RAVEAbstarctElectrode$set_epoch()</code></a></span></li>
 </ul>
 </details>
@@ -177,12 +179,12 @@ load raw voltage (no process)
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Spike_electrode-load_data"></a>}}
-\if{latex}{\out{\hypertarget{method-Spike_electrode-load_data}{}}}
-\subsection{Method \code{load_data()}}{
+\if{html}{\out{<a id="method-Spike_electrode-load_data_with_epochs"></a>}}
+\if{latex}{\out{\hypertarget{method-Spike_electrode-load_data_with_epochs}{}}}
+\subsection{Method \code{load_data_with_epochs()}}{
 method to load electrode data
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Spike_electrode$load_data(type = c("raw-voltage", "voltage"))}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{Spike_electrode$load_data_with_epochs(type = c("raw-voltage", "voltage"))}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -196,6 +198,23 @@ For \code{"voltage"}, 'Notch' filters must be applied. All these
 types except for \code{"raw-voltage"} will be referenced.
 For \code{"raw-voltage"}, no reference will be performed since the data
 will be the "raw" signal (no processing).}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Spike_electrode-load_dimnames_with_epochs"></a>}}
+\if{latex}{\out{\hypertarget{method-Spike_electrode-load_dimnames_with_epochs}{}}}
+\subsection{Method \code{load_dimnames_with_epochs()}}{
+get expected dimension names
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Spike_electrode$load_dimnames_with_epochs(type = c("raw-voltage", "voltage"))}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{type}}{see \code{load_data_with_epochs}}
 }
 \if{html}{\out{</div>}}
 }

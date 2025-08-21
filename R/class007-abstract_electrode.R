@@ -145,11 +145,27 @@ RAVEAbstarctElectrode <- R6::R6Class(
       .NotYetImplemented()
     },
 
+
     #' @description method to load electrode data
     #' @param type data type such as \code{"power"}, \code{"phase"},
     #' \code{"voltage"}, \code{"wavelet-coefficient"}, or others
     #' depending on child class implementations
+    load_data_with_epochs = function(type) {
+      .NotYetImplemented()
+    },
+
+    #' @description alias of \code{load_data_with_epochs} for legacy code
+    #' @param type see \code{load_data_with_epochs}
     load_data = function(type){
+      if(length(type) > 1) {
+        type <- type[[1]]
+      }
+      self$load_data_with_epochs(type = type)
+    },
+
+    #' @description get expected dimension names
+    #' @param type see \code{load_data_with_epochs}
+    load_dimnames_with_epochs = function(type) {
       .NotYetImplemented()
     },
 
@@ -367,7 +383,7 @@ RAVEAbstarctElectrode <- R6::R6Class(
 #' print(e)
 #'
 #' # Now epoch power
-#' power <- e$load_data("power")
+#' power <- e$load_data_with_epochs("power")
 #' names(dimnames(power))
 #'
 #' # Subset power
@@ -487,7 +503,7 @@ new_reference <- function(subject, number, signal_type, ...){
 #' print(e)
 #'
 #' # Now epoch power
-#' power <- e$load_data("power")
+#' power <- e$load_data_with_epochs("power")
 #' names(dimnames(power))
 #'
 #' # Subset power

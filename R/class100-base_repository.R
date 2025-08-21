@@ -48,6 +48,11 @@ RAVESubjectBaseRepository <- R6::R6Class(
   ),
   public = list(
 
+    #' @field @restored internal flag indicating whether the repository
+    #' is restored from serialization. Repositories restored from serialization
+    #' will behave differently (slightly) for performance considerations
+    `@restored` = FALSE,
+
     #' @description Internal method
     #' @param ... internal arguments
     `@marshal` = function(...) {
@@ -74,14 +79,16 @@ RAVESubjectBaseRepository <- R6::R6Class(
     `@unmarshal` = function(object, ...) {
       stopifnot(identical(object$namespace, "ravecore"))
       stopifnot(inherits(object$data, "RAVESubjectBaseRepository_marshal"))
-      return(RAVESubjectBaseRepository$new(
+      repo <- RAVESubjectBaseRepository$new(
         subject = RAVESubject$public_methods$`@unmarshal`(object$data$subject),
         electrodes = object$data$intended_electrode_list,
         reference_name = object$data$reference_name,
         quiet = TRUE,
         repository_id = object$data$repository_id,
         strict = FALSE
-      ))
+      )
+      repo$`@restored` <- TRUE
+      return(repo)
     },
 
     #' @field repository_id repository identifier, typically generated with

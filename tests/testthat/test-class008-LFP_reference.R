@@ -27,17 +27,17 @@ test_that("LFP_reference - single channel", {
   e14$set_epoch(epoch = "auditory_onset")
   e14$trial_intervals <- c(-1, 2)
 
-  data <- self$load_data("power")
-  testthat::expect_equal(data[], e14$load_data("power")[])
+  data <- self$load_data_with_epochs("power")
+  testthat::expect_equal(data[], e14$load_data_with_epochs("power")[])
 
-  data <- self$load_data("phase")
-  testthat::expect_equal(data[], e14$load_data("phase")[])
+  data <- self$load_data_with_epochs("phase")
+  testthat::expect_equal(data[], e14$load_data_with_epochs("phase")[])
 
-  data <- self$load_data("wavelet-coefficient")
-  testthat::expect_equal(data[], e14$load_data("wavelet-coefficient")[])
+  data <- self$load_data_with_epochs("wavelet-coefficient")
+  testthat::expect_equal(data[], e14$load_data_with_epochs("wavelet-coefficient")[])
 
-  data <- self$load_data("voltage")
-  testthat::expect_equal(data[], e14$load_data("voltage")[])
+  data <- self$load_data_with_epochs("voltage")
+  testthat::expect_equal(data[], e14$load_data_with_epochs("voltage")[])
 
   data <- self$load_blocks("008", type = "power")
   testthat::expect_equal(data, e14$load_blocks("008", type = "power"))
@@ -85,10 +85,10 @@ test_that("LFP_reference - multi-channel", {
   self$trial_intervals <- c(-1, 2)
 
   testthat::expect_true({
-    data <- self$load_data("power")
-    data <- self$load_data("phase")
-    data <- self$load_data("wavelet-coefficient")
-    data <- self$load_data("voltage")
+    data <- self$load_data_with_epochs("power")
+    data <- self$load_data_with_epochs("phase")
+    data <- self$load_data_with_epochs("wavelet-coefficient")
+    data <- self$load_data_with_epochs("voltage")
     data <- self$load_blocks("008", type = "power")
     data <- self$load_blocks("008", type = "phase")
     data <- self$load_blocks("008", type = "wavelet-coefficient")

@@ -19,6 +19,10 @@ please use \code{\link{prepare_subject_bare0}} to create base repository.
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
+\item{\code{@restored}}{internal flag indicating whether the repository
+is restored from serialization. Repositories restored from serialization
+will behave differently (slightly) for performance considerations}
+
 \item{\code{repository_id}}{repository identifier, typically generated with
 random string}
 

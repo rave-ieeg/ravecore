@@ -116,7 +116,9 @@ intervals are missing}
 \item \href{#method-RAVEAbstarctElectrode-set_epoch}{\code{RAVEAbstarctElectrode$set_epoch()}}
 \item \href{#method-RAVEAbstarctElectrode-clear_cache}{\code{RAVEAbstarctElectrode$clear_cache()}}
 \item \href{#method-RAVEAbstarctElectrode-clear_memory}{\code{RAVEAbstarctElectrode$clear_memory()}}
+\item \href{#method-RAVEAbstarctElectrode-load_data_with_epochs}{\code{RAVEAbstarctElectrode$load_data_with_epochs()}}
 \item \href{#method-RAVEAbstarctElectrode-load_data}{\code{RAVEAbstarctElectrode$load_data()}}
+\item \href{#method-RAVEAbstarctElectrode-load_dimnames_with_epochs}{\code{RAVEAbstarctElectrode$load_dimnames_with_epochs()}}
 \item \href{#method-RAVEAbstarctElectrode-load_blocks}{\code{RAVEAbstarctElectrode$load_blocks()}}
 \item \href{#method-RAVEAbstarctElectrode-clone}{\code{RAVEAbstarctElectrode$clone()}}
 }
@@ -228,12 +230,12 @@ method to clear memory
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-RAVEAbstarctElectrode-load_data"></a>}}
-\if{latex}{\out{\hypertarget{method-RAVEAbstarctElectrode-load_data}{}}}
-\subsection{Method \code{load_data()}}{
+\if{html}{\out{<a id="method-RAVEAbstarctElectrode-load_data_with_epochs"></a>}}
+\if{latex}{\out{\hypertarget{method-RAVEAbstarctElectrode-load_data_with_epochs}{}}}
+\subsection{Method \code{load_data_with_epochs()}}{
 method to load electrode data
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVEAbstarctElectrode$load_data(type)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{RAVEAbstarctElectrode$load_data_with_epochs(type)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -242,6 +244,40 @@ method to load electrode data
 \item{\code{type}}{data type such as \code{"power"}, \code{"phase"},
 \code{"voltage"}, \code{"wavelet-coefficient"}, or others
 depending on child class implementations}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-RAVEAbstarctElectrode-load_data"></a>}}
+\if{latex}{\out{\hypertarget{method-RAVEAbstarctElectrode-load_data}{}}}
+\subsection{Method \code{load_data()}}{
+alias of \code{load_data_with_epochs} for legacy code
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{RAVEAbstarctElectrode$load_data(type)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{type}}{see \code{load_data_with_epochs}}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-RAVEAbstarctElectrode-load_dimnames_with_epochs"></a>}}
+\if{latex}{\out{\hypertarget{method-RAVEAbstarctElectrode-load_dimnames_with_epochs}{}}}
+\subsection{Method \code{load_dimnames_with_epochs()}}{
+get expected dimension names
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{RAVEAbstarctElectrode$load_dimnames_with_epochs(type)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{type}}{see \code{load_data_with_epochs}}
 }
 \if{html}{\out{</div>}}
 }

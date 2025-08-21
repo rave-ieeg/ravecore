@@ -93,7 +93,7 @@ e$trial_intervals <- list(c(-1, 2))
 print(e)
 
 # Now epoch power
-power <- e$load_data("power")
+power <- e$load_data_with_epochs("power")
 names(dimnames(power))
 
 # Subset power
@@ -129,7 +129,7 @@ e$trial_intervals <- list(c(-1, 2))
 print(e)
 
 # Now epoch power
-power <- e$load_data("power")
+power <- e$load_data_with_epochs("power")
 names(dimnames(power))
 
 # Subset power

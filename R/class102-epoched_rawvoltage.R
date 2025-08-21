@@ -34,7 +34,7 @@ RAVESubjectEpochRawVoltageRepository <- R6::R6Class(
     `@unmarshal` = function(object, ...) {
       stopifnot(identical(object$namespace, "ravecore"))
       stopifnot(inherits(object$data, "RAVESubjectEpochRawVoltageRepository_marshal"))
-      return(RAVESubjectEpochRawVoltageRepository$new(
+      repo <- RAVESubjectEpochRawVoltageRepository$new(
         subject = RAVESubject$public_methods$`@unmarshal`(object$data$subject),
         electrodes = object$data$intended_electrode_list,
         reference_name = "noref",
@@ -45,7 +45,9 @@ RAVESubjectEpochRawVoltageRepository <- R6::R6Class(
         stitch_events = object$data$stitch_events,
         strict = TRUE,
         lazy_load = TRUE
-      ))
+      )
+      repo$`@restored` <- TRUE
+      return(repo)
     },
 
     #' @description constructor
@@ -111,32 +113,45 @@ RAVESubjectEpochRawVoltageRepository <- R6::R6Class(
       # self$mount_data(electrodes = 13)
       # private$.data
       # private$.data$data_list
+      # self$`@restored` <- TRUE
 
-      electrodes <- parse_svec(electrodes)
-      electrodes <- electrodes[electrodes %in% self$electrode_list]
-      if(!length(electrodes)) {
-        electrodes <- self$electrode_list
+      workers <- 0
+      if(self$`@restored`) { workers <- 1 }
+
+      if(length(electrodes) == 1 && is.na(electrodes)) {
+        # Do not load data, just fill in the meta
+        electrodes <- integer()
+      } else {
+        electrodes <- parse_svec(electrodes)
+        electrodes <- electrodes[electrodes %in% self$electrode_list]
+        if(!length(electrodes)) {
+          electrodes <- self$electrode_list
+        }
       }
 
       # check data_list
       nms <- sprintf("e_%d", electrodes)
 
-      if( !force ) {
+      if( length(private$.data) > 0 && !force ) {
         exist_list <- names(private$.data$data_list)
         if(all(nms %in% exist_list)) { return(self) }
       }
 
-      electrode_instances <- self$electrode_instances[nms]
+      all_electrode_instances <- self$electrode_instances
+      electrode_instances <- all_electrode_instances[nms]
 
       data_list <- ravepipeline::lapply_jobs(
         electrode_instances,
         function(inst) {
           ravepipeline::RAVEFileArray$new(
-            inst$load_data(type = "raw-voltage")
+            inst$load_data_with_epochs(type = "raw-voltage")
           )
-        }, callback = function(inst) {
+        },
+        callback = function(inst) {
           sprintf("Loading Original Raw Voltage | Electrode %s", inst$number)
-        }
+        },
+        # restored repository don't need parallel because everything is cached
+        .workers = workers
       )
       # Clear progress finish line
       cat("          \r")
@@ -147,11 +162,11 @@ RAVESubjectEpochRawVoltageRepository <- R6::R6Class(
       )
 
       # construct dim and dimnames
-      dim <- dim(data_list[[1]])
-      dim[[3]] <- length(self$electrode_list)
+      inst <- all_electrode_instances[[1]]
+      dimnames <- inst$load_dimnames_with_epochs(type = "raw-voltage")
+      dimnames$Electrode <- self$electrode_list
 
-      dimnames <- dimnames(data_list[[1]])
-      dimnames[[3]] <- self$electrode_list
+      dim <- vapply(dimnames, length, 0L)
 
       private$.data$`@mset`(
         # data_list = data_list,
@@ -161,7 +176,9 @@ RAVESubjectEpochRawVoltageRepository <- R6::R6Class(
       )
 
       private$.data$data_list <- as.list(private$.data$data_list)
-      private$.data$data_list[nms] <- data_list[nms]
+      if(length(data_list)) {
+        private$.data$data_list[nms] <- data_list[nms]
+      }
 
       self
     }
