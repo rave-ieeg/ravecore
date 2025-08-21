@@ -349,6 +349,17 @@ cache_root <- function(check = FALSE){
   re
 }
 
+ravedash_session_root <- function() {
+  path <- ravepipeline::raveio_getopt("ravedash_session_root", default = NA)
+  if (length(path) != 1 || is.na(path) || !is.character(path)) {
+    path <- ravepipeline::raveio_getopt("tensor_temp_path", default = NA)
+    if (length(path) != 1 || is.na(path) || !is.character(path)) {
+      path <- file.path(tempdir(), "rave2-session")
+    }
+  }
+  path
+}
+
 #' @rdname cache_path
 #' @export
 clear_cached_files <- function(subject_code, quiet = FALSE){
@@ -408,6 +419,7 @@ clear_cached_files <- function(subject_code, quiet = FALSE){
   clear_dir(tools::R_user_dir('ravepipeline', "cache"))
   clear_dir(tools::R_user_dir('ravecore', "cache"))
   clear_dir(cache_root())
+  clear_dir(ravedash_session_root())
 
   # ravetools_path <- file.path(
   #   getOption(
