@@ -151,7 +151,9 @@ intervals are missing</p></dd>
 <li><p><a href="#method-RAVEAbstarctElectrode-set_epoch"><code>RAVEAbstarctElectrode$set_epoch()</code></a></p></li>
 <li><p><a href="#method-RAVEAbstarctElectrode-clear_cache"><code>RAVEAbstarctElectrode$clear_cache()</code></a></p></li>
 <li><p><a href="#method-RAVEAbstarctElectrode-clear_memory"><code>RAVEAbstarctElectrode$clear_memory()</code></a></p></li>
+<li><p><a href="#method-RAVEAbstarctElectrode-load_data_with_epochs"><code>RAVEAbstarctElectrode$load_data_with_epochs()</code></a></p></li>
 <li><p><a href="#method-RAVEAbstarctElectrode-load_data"><code>RAVEAbstarctElectrode$load_data()</code></a></p></li>
+<li><p><a href="#method-RAVEAbstarctElectrode-load_dimnames_with_epochs"><code>RAVEAbstarctElectrode$load_dimnames_with_epochs()</code></a></p></li>
 <li><p><a href="#method-RAVEAbstarctElectrode-load_blocks"><code>RAVEAbstarctElectrode$load_blocks()</code></a></p></li>
 <li><p><a href="#method-RAVEAbstarctElectrode-clone"><code>RAVEAbstarctElectrode$clone()</code></a></p></li>
 </ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="ravepipeline" data-topic="RAVESerializable" data-id="@compare"><a href="http://dipterix.org/ravepipeline/reference/RAVESerializable.html#method-@compare"><code>ravepipeline::RAVESerializable$@compare()</code></a></span></li>
@@ -255,11 +257,11 @@ the event name is <code>"name"</code>.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-RAVEAbstarctElectrode-load_data"></a><div class="section">
-<h3 id="method-load-data-">Method <code>load_data()</code><a class="anchor" aria-label="anchor" href="#method-load-data-"></a></h3>
+</div><p></p><hr><a id="method-RAVEAbstarctElectrode-load_data_with_epochs"></a><div class="section">
+<h3 id="method-load-data-with-epochs-">Method <code>load_data_with_epochs()</code><a class="anchor" aria-label="anchor" href="#method-load-data-with-epochs-"></a></h3>
 <p>method to load electrode data</p><div class="section">
 <h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RAVEAbstarctElectrode</span><span class="op">$</span><span class="fu">load_data</span><span class="op">(</span><span class="va">type</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RAVEAbstarctElectrode</span><span class="op">$</span><span class="fu">load_data_with_epochs</span><span class="op">(</span><span class="va">type</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -273,16 +275,48 @@ depending on child class implementations</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-RAVEAbstarctElectrode-load_blocks"></a><div class="section">
-<h3 id="method-load-blocks-">Method <code>load_blocks()</code><a class="anchor" aria-label="anchor" href="#method-load-blocks-"></a></h3>
-<p>load electrode block-wise data (with reference),
-useful when epoch is absent</p><div class="section">
+</div><p></p><hr><a id="method-RAVEAbstarctElectrode-load_data"></a><div class="section">
+<h3 id="method-load-data-">Method <code>load_data()</code><a class="anchor" aria-label="anchor" href="#method-load-data-"></a></h3>
+<p>alias of <code>load_data_with_epochs</code> for legacy code</p><div class="section">
 <h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RAVEAbstarctElectrode</span><span class="op">$</span><span class="fu">load_blocks</span><span class="op">(</span><span class="va">blocks</span>, <span class="va">type</span>, simplify <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RAVEAbstarctElectrode</span><span class="op">$</span><span class="fu">load_data</span><span class="op">(</span><span class="va">type</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>type</code></dt>
+<dd><p>see <code>load_data_with_epochs</code></p></dd>
+
+
+</dl><p></p></div>
+</div>
+
+</div><p></p><hr><a id="method-RAVEAbstarctElectrode-load_dimnames_with_epochs"></a><div class="section">
+<h3 id="method-load-dimnames-with-epochs-">Method <code>load_dimnames_with_epochs()</code><a class="anchor" aria-label="anchor" href="#method-load-dimnames-with-epochs-"></a></h3>
+<p>get expected dimension names</p><div class="section">
+<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RAVEAbstarctElectrode</span><span class="op">$</span><span class="fu">load_dimnames_with_epochs</span><span class="op">(</span><span class="va">type</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>type</code></dt>
+<dd><p>see <code>load_data_with_epochs</code></p></dd>
+
+
+</dl><p></p></div>
+</div>
+
+</div><p></p><hr><a id="method-RAVEAbstarctElectrode-load_blocks"></a><div class="section">
+<h3 id="method-load-blocks-">Method <code>load_blocks()</code><a class="anchor" aria-label="anchor" href="#method-load-blocks-"></a></h3>
+<p>load electrode block-wise data (with reference),
+useful when epoch is absent</p><div class="section">
+<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RAVEAbstarctElectrode</span><span class="op">$</span><span class="fu">load_blocks</span><span class="op">(</span><span class="va">blocks</span>, <span class="va">type</span>, simplify <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>blocks</code></dt>
 <dd><p>session blocks</p></dd>
 
@@ -302,12 +336,12 @@ useful when epoch is absent</p><div class="section">
 </div><p></p><hr><a id="method-RAVEAbstarctElectrode-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
+<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RAVEAbstarctElectrode</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
+<h4 id="arguments-9">Arguments<a class="anchor" aria-label="anchor" href="#arguments-9"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 

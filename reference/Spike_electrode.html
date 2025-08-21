@@ -94,12 +94,14 @@ with current electrode type</p></dd>
 <li><p><a href="#method-Spike_electrode-new"><code>Spike_electrode$new()</code></a></p></li>
 <li><p><a href="#method-Spike_electrode-.load_noref_voltage"><code>Spike_electrode$.load_noref_voltage()</code></a></p></li>
 <li><p><a href="#method-Spike_electrode-.load_raw_voltage"><code>Spike_electrode$.load_raw_voltage()</code></a></p></li>
-<li><p><a href="#method-Spike_electrode-load_data"><code>Spike_electrode$load_data()</code></a></p></li>
+<li><p><a href="#method-Spike_electrode-load_data_with_epochs"><code>Spike_electrode$load_data_with_epochs()</code></a></p></li>
+<li><p><a href="#method-Spike_electrode-load_dimnames_with_epochs"><code>Spike_electrode$load_dimnames_with_epochs()</code></a></p></li>
 <li><p><a href="#method-Spike_electrode-load_blocks"><code>Spike_electrode$load_blocks()</code></a></p></li>
 <li><p><a href="#method-Spike_electrode-clear_cache"><code>Spike_electrode$clear_cache()</code></a></p></li>
 <li><p><a href="#method-Spike_electrode-clear_memory"><code>Spike_electrode$clear_memory()</code></a></p></li>
 <li><p><a href="#method-Spike_electrode-clone"><code>Spike_electrode$clone()</code></a></p></li>
 </ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="ravepipeline" data-topic="RAVESerializable" data-id="@compare"><a href="http://dipterix.org/ravepipeline/reference/RAVESerializable.html#method-@compare"><code>ravepipeline::RAVESerializable$@compare()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVEAbstarctElectrode" data-id="load_data"><a href="RAVEAbstarctElectrode.html#method-load_data"><code>ravecore::RAVEAbstarctElectrode$load_data()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVEAbstarctElectrode" data-id="set_epoch"><a href="RAVEAbstarctElectrode.html#method-set_epoch"><code>ravecore::RAVEAbstarctElectrode$set_epoch()</code></a></span></li>
 </ul></details></p><hr><a id="method-Spike_electrode-@marshal"></a><div class="section">
 <h3 id="method-marshal-">Method <code>@marshal()</code><a class="anchor" aria-label="anchor" href="#method-marshal-"></a></h3>
@@ -210,11 +212,11 @@ with current electrode type</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-Spike_electrode-load_data"></a><div class="section">
-<h3 id="method-load-data-">Method <code>load_data()</code><a class="anchor" aria-label="anchor" href="#method-load-data-"></a></h3>
+</div><p></p><hr><a id="method-Spike_electrode-load_data_with_epochs"></a><div class="section">
+<h3 id="method-load-data-with-epochs-">Method <code>load_data_with_epochs()</code><a class="anchor" aria-label="anchor" href="#method-load-data-with-epochs-"></a></h3>
 <p>method to load electrode data</p><div class="section">
 <h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Spike_electrode</span><span class="op">$</span><span class="fu">load_data</span><span class="op">(</span>type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"raw-voltage"</span>, <span class="st">"voltage"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Spike_electrode</span><span class="op">$</span><span class="fu">load_data_with_epochs</span><span class="op">(</span>type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"raw-voltage"</span>, <span class="st">"voltage"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -233,11 +235,27 @@ will be the "raw" signal (no processing).</p></dd>
 </dl><p></p></div>
 </div>
 
+</div><p></p><hr><a id="method-Spike_electrode-load_dimnames_with_epochs"></a><div class="section">
+<h3 id="method-load-dimnames-with-epochs-">Method <code>load_dimnames_with_epochs()</code><a class="anchor" aria-label="anchor" href="#method-load-dimnames-with-epochs-"></a></h3>
+<p>get expected dimension names</p><div class="section">
+<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Spike_electrode</span><span class="op">$</span><span class="fu">load_dimnames_with_epochs</span><span class="op">(</span>type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"raw-voltage"</span>, <span class="st">"voltage"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>type</code></dt>
+<dd><p>see <code>load_data_with_epochs</code></p></dd>
+
+
+</dl><p></p></div>
+</div>
+
 </div><p></p><hr><a id="method-Spike_electrode-load_blocks"></a><div class="section">
 <h3 id="method-load-blocks-">Method <code>load_blocks()</code><a class="anchor" aria-label="anchor" href="#method-load-blocks-"></a></h3>
 <p>load electrode block-wise data (with no reference),
 useful when epoch is absent</p><div class="section">
-<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
+<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Spike_electrode</span><span class="op">$</span><span class="fu">load_blocks</span><span class="op">(</span></span>
 <span>  <span class="va">blocks</span>,</span>
 <span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"raw-voltage"</span>, <span class="st">"voltage"</span><span class="op">)</span>,</span>
@@ -246,7 +264,7 @@ useful when epoch is absent</p><div class="section">
 </div>
 
 <div class="section">
-<h4 id="arguments-7">Arguments<a class="anchor" aria-label="anchor" href="#arguments-7"></a></h4>
+<h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>blocks</code></dt>
 <dd><p>session blocks</p></dd>
 
@@ -270,24 +288,8 @@ all other types, 'Wavelet' transforms are required.</p></dd>
 </div><p></p><hr><a id="method-Spike_electrode-clear_cache"></a><div class="section">
 <h3 id="method-clear-cache-">Method <code>clear_cache()</code><a class="anchor" aria-label="anchor" href="#method-clear-cache-"></a></h3>
 <p>method to clear cache on hard drive</p><div class="section">
-<h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Spike_electrode</span><span class="op">$</span><span class="fu">clear_cache</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
-</div>
-
-<div class="section">
-<h4 id="arguments-8">Arguments<a class="anchor" aria-label="anchor" href="#arguments-8"></a></h4>
-<p></p><div class="arguments"><dl><dt><code>...</code></dt>
-<dd><p>ignored</p></dd>
-
-
-</dl><p></p></div>
-</div>
-
-</div><p></p><hr><a id="method-Spike_electrode-clear_memory"></a><div class="section">
-<h3 id="method-clear-memory-">Method <code>clear_memory()</code><a class="anchor" aria-label="anchor" href="#method-clear-memory-"></a></h3>
-<p>method to clear memory</p><div class="section">
 <h4 id="usage-10">Usage<a class="anchor" aria-label="anchor" href="#usage-10"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Spike_electrode</span><span class="op">$</span><span class="fu">clear_memory</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Spike_electrode</span><span class="op">$</span><span class="fu">clear_cache</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
@@ -299,15 +301,31 @@ all other types, 'Wavelet' transforms are required.</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-Spike_electrode-clone"></a><div class="section">
-<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
-<p>The objects of this class are cloneable with this method.</p><div class="section">
+</div><p></p><hr><a id="method-Spike_electrode-clear_memory"></a><div class="section">
+<h3 id="method-clear-memory-">Method <code>clear_memory()</code><a class="anchor" aria-label="anchor" href="#method-clear-memory-"></a></h3>
+<p>method to clear memory</p><div class="section">
 <h4 id="usage-11">Usage<a class="anchor" aria-label="anchor" href="#usage-11"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Spike_electrode</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Spike_electrode</span><span class="op">$</span><span class="fu">clear_memory</span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
 <h4 id="arguments-10">Arguments<a class="anchor" aria-label="anchor" href="#arguments-10"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>...</code></dt>
+<dd><p>ignored</p></dd>
+
+
+</dl><p></p></div>
+</div>
+
+</div><p></p><hr><a id="method-Spike_electrode-clone"></a><div class="section">
+<h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
+<p>The objects of this class are cloneable with this method.</p><div class="section">
+<h4 id="usage-12">Usage<a class="anchor" aria-label="anchor" href="#usage-12"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">Spike_electrode</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-11">Arguments<a class="anchor" aria-label="anchor" href="#arguments-11"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 

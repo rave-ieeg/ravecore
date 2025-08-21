@@ -54,7 +54,13 @@ please use <code><a href="prepare_subject_bare.html">prepare_subject_bare0</a></
     </div>
     <div class="section level2">
     <h2 id="public-fields">Public fields<a class="anchor" aria-label="anchor" href="#public-fields"></a></h2>
-    <p></p><div class="r6-fields"><dl><dt><code>repository_id</code></dt>
+    <p></p><div class="r6-fields"><dl><dt><code>@restored</code></dt>
+<dd><p>internal flag indicating whether the repository
+is restored from serialization. Repositories restored from serialization
+will behave differently (slightly) for performance considerations</p></dd>
+
+
+<dt><code>repository_id</code></dt>
 <dd><p>repository identifier, typically generated with
 random string</p></dd>
 

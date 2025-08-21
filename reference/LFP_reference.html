@@ -113,12 +113,14 @@ with current electrode type</p></dd>
 <li><p><a href="#method-LFP_reference-.load_noref_voltage"><code>LFP_reference$.load_noref_voltage()</code></a></p></li>
 <li><p><a href="#method-LFP_reference-.load_wavelet"><code>LFP_reference$.load_wavelet()</code></a></p></li>
 <li><p><a href="#method-LFP_reference-.load_voltage"><code>LFP_reference$.load_voltage()</code></a></p></li>
-<li><p><a href="#method-LFP_reference-load_data"><code>LFP_reference$load_data()</code></a></p></li>
+<li><p><a href="#method-LFP_reference-load_data_with_epochs"><code>LFP_reference$load_data_with_epochs()</code></a></p></li>
 <li><p><a href="#method-LFP_reference-load_blocks"><code>LFP_reference$load_blocks()</code></a></p></li>
 <li><p><a href="#method-LFP_reference-clear_cache"><code>LFP_reference$clear_cache()</code></a></p></li>
 <li><p><a href="#method-LFP_reference-clear_memory"><code>LFP_reference$clear_memory()</code></a></p></li>
 <li><p><a href="#method-LFP_reference-clone"><code>LFP_reference$clone()</code></a></p></li>
 </ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="ravepipeline" data-topic="RAVESerializable" data-id="@compare"><a href="http://dipterix.org/ravepipeline/reference/RAVESerializable.html#method-@compare"><code>ravepipeline::RAVESerializable$@compare()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVEAbstarctElectrode" data-id="load_data"><a href="RAVEAbstarctElectrode.html#method-load_data"><code>ravecore::RAVEAbstarctElectrode$load_data()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVEAbstarctElectrode" data-id="load_dimnames_with_epochs"><a href="RAVEAbstarctElectrode.html#method-load_dimnames_with_epochs"><code>ravecore::RAVEAbstarctElectrode$load_dimnames_with_epochs()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVEAbstarctElectrode" data-id="set_epoch"><a href="RAVEAbstarctElectrode.html#method-set_epoch"><code>ravecore::RAVEAbstarctElectrode$set_epoch()</code></a></span></li>
 </ul></details></p><hr><a id="method-LFP_reference-@marshal"></a><div class="section">
 <h3 id="method-marshal-">Method <code>@marshal()</code><a class="anchor" aria-label="anchor" href="#method-marshal-"></a></h3>
@@ -268,12 +270,12 @@ with current electrode type</p></dd>
 </dl><p></p></div>
 </div>
 
-</div><p></p><hr><a id="method-LFP_reference-load_data"></a><div class="section">
-<h3 id="method-load-data-">Method <code>load_data()</code><a class="anchor" aria-label="anchor" href="#method-load-data-"></a></h3>
+</div><p></p><hr><a id="method-LFP_reference-load_data_with_epochs"></a><div class="section">
+<h3 id="method-load-data-with-epochs-">Method <code>load_data_with_epochs()</code><a class="anchor" aria-label="anchor" href="#method-load-data-with-epochs-"></a></h3>
 <p>method to load electrode data</p><div class="section">
 <h4 id="usage-9">Usage<a class="anchor" aria-label="anchor" href="#usage-9"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">LFP_reference</span><span class="op">$</span><span class="fu">load_data</span><span class="op">(</span></span>
-<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"power"</span>, <span class="st">"phase"</span>, <span class="st">"voltage"</span>, <span class="st">"wavelet-coefficient"</span><span class="op">)</span></span>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">LFP_reference</span><span class="op">$</span><span class="fu">load_data_with_epochs</span><span class="op">(</span></span>
+<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"power"</span>, <span class="st">"phase"</span>, <span class="st">"voltage"</span>, <span class="st">"wavelet-coefficient"</span>, <span class="st">"raw-voltage"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -399,7 +401,7 @@ transforms are required.</p></dd>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">e</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Now epoch power</span></span></span>
-<span class="r-in"><span><span class="va">power</span> <span class="op">&lt;-</span> <span class="va">e</span><span class="op">$</span><span class="fu">load_data</span><span class="op">(</span><span class="st">"power"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">power</span> <span class="op">&lt;-</span> <span class="va">e</span><span class="op">$</span><span class="fu">load_data_with_epochs</span><span class="op">(</span><span class="st">"power"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/dimnames.html" class="external-link">dimnames</a></span><span class="op">(</span><span class="va">power</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Subset power</span></span></span>
