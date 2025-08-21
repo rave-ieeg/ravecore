@@ -124,7 +124,7 @@ power_baseline.rave_prepare_power <- function(
   # Make sure the data is properly loaded
   x$mount_data(electrodes = electrodes)
 
-  sub_list <- x$power$data_list[sel]
+  sub_list <- x$power$data_list[sprintf("e_%d", x$electrode_list[sel])]
   sub_elec <- x$electrode_list[sel]
 
   # dm <- dim(sub_list[[1]])
@@ -199,7 +199,7 @@ power_baseline.rave_prepare_power <- function(
           index = idx,
           electrode = e,
           array = ravepipeline::RAVEFileArray$new(
-            x$power$data_list[[idx]], temporary = FALSE)
+            x$power$data_list[[sprintf("e_%d", e)]], temporary = FALSE)
         )
       })
 
