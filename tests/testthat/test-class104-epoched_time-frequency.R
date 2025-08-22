@@ -809,6 +809,21 @@ test_that("RAVESubjectEpochTimeFreqCoefRepository", {
 
   testthat::expect_true(inherits(repo_new, "rave_prepare_time_frequency_coefficients"))
 
+
+  testthat::expect_true(length(repo_new$`@get_container`()) > 0)
+  original_container <- as.list(repo_new0$get_container())
+  restored_container <- as.list(repo_new$`@get_container`())
+
+  testthat::expect_equal(restored_container$dim, original_container$dim)
+  testthat::expect_equal(restored_container$dimnames, original_container$dimnames)
+  testthat::expect_equal(restored_container$signature, original_container$signature)
+  testthat::expect_equal(
+    lapply(restored_container$data_list, function(x) { x$.filebase }),
+    lapply(original_container$data_list, function(x) { x$.filebase })
+  )
+
+
+
   names_old <- names(repo_old)
   names_old <- names_old[!names_old %in% names(repo_new)]
   testthat::expect_equal(names_old, character(0L))
@@ -901,6 +916,19 @@ test_that("RAVESubjectEpochPowerRepository", {
   testthat::expect_equal(repo_new$project, repo_old$project)
   testthat::expect_equal(repo_new$subject, repo_old$subject)
 
+  testthat::expect_true(length(repo_new$`@get_container`()) > 0)
+  original_container <- as.list(repo_new0$get_container())
+  restored_container <- as.list(repo_new$`@get_container`())
+
+  testthat::expect_equal(restored_container$dim, original_container$dim)
+  testthat::expect_equal(restored_container$dimnames, original_container$dimnames)
+  testthat::expect_equal(restored_container$signature, original_container$signature)
+  testthat::expect_equal(
+    lapply(restored_container$data_list, function(x) { x$.filebase }),
+    lapply(original_container$data_list, function(x) { x$.filebase })
+  )
+
+
   testthat::expect_equal(repo_new$electrode_list, repo_old$electrode_list)
 
   testthat::expect_equal(repo_new$reference_name, repo_old$reference_name)
@@ -968,12 +996,28 @@ test_that("RAVESubjectEpochPhaseRepository", {
     epoch_name = "auditory_onset",
     time_windows = c(-1, 2),
     stitch_events = NULL,
-    repository_id = repository_id
+    repository_id = repository_id,
+    lazy_load = FALSE
   )
   raw <- serialize(repo_new0, NULL, refhook = ravepipeline::rave_serialize_refhook)
   repo_new <- unserialize(raw, refhook = ravepipeline::rave_unserialize_refhook)
 
   testthat::expect_true(inherits(repo_new, "rave_prepare_phase"))
+
+
+  testthat::expect_true(length(repo_new$`@get_container`()) > 0)
+  original_container <- as.list(repo_new0$get_container())
+  restored_container <- as.list(repo_new$`@get_container`())
+
+  testthat::expect_equal(restored_container$dim, original_container$dim)
+  testthat::expect_equal(restored_container$dimnames, original_container$dimnames)
+  testthat::expect_equal(restored_container$signature, original_container$signature)
+  testthat::expect_equal(
+    lapply(restored_container$data_list, function(x) { x$.filebase }),
+    lapply(original_container$data_list, function(x) { x$.filebase })
+  )
+
+
 
   names_old <- names(repo_old)
   names_old <- names_old[!names_old %in% names(repo_new)]

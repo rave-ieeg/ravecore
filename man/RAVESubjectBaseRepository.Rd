@@ -79,6 +79,7 @@ different identifiers); generated from \code{digest_key}}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
+\item \href{#method-RAVESubjectRepository-@get_container}{\code{RAVESubjectBaseRepository$@get_container()}}
 \item \href{#method-RAVESubjectRepository-@marshal}{\code{RAVESubjectBaseRepository$@marshal()}}
 \item \href{#method-RAVESubjectRepository-@unmarshal}{\code{RAVESubjectBaseRepository$@unmarshal()}}
 \item \href{#method-RAVESubjectRepository-new}{\code{RAVESubjectBaseRepository$new()}}
@@ -93,6 +94,16 @@ different identifiers); generated from \code{digest_key}}
 </ul>
 </details>
 }}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-RAVESubjectRepository-@get_container"></a>}}
+\if{latex}{\out{\hypertarget{method-RAVESubjectRepository-@get_container}{}}}
+\subsection{Method \code{@get_container()}}{
+Internal method, do not use it directly
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectBaseRepository$@get_container()}\if{html}{\out{</div>}}
+}
+
+}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVESubjectRepository-@marshal"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVESubjectRepository-@marshal}{}}}

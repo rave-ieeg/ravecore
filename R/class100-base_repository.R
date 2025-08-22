@@ -48,6 +48,11 @@ RAVESubjectBaseRepository <- R6::R6Class(
   ),
   public = list(
 
+    #' @description Internal method, do not use it directly
+    `@get_container` = function() {
+      private$.data
+    },
+
     #' @field @restored internal flag indicating whether the repository
     #' is restored from serialization. Repositories restored from serialization
     #' will behave differently (slightly) for performance considerations

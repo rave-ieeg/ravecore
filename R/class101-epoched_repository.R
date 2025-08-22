@@ -1,3 +1,26 @@
+restore_epoch_container_from_snapshot = function(container, snapshot) {
+  if(is.null(snapshot)) { return(invisible()) }
+  tryCatch({
+
+    channel_names <- names(snapshot$data_list)
+    data_list <- structure(
+      names = channel_names,
+      lapply(channel_names, function(channel_name) {
+        data_array <- ravepipeline::RAVEFileArray$public_methods$`@unmarshal`(snapshot$data_list[[channel_name]])
+        data_array$`@impl`
+      })
+    )
+
+    container$dim <- snapshot$dim
+    container$dimnames <- snapshot$dimnames
+    container$signature <- snapshot$signature
+    container$data_list <- data_list
+
+  }, error = function(e) {
+  })
+  invisible()
+}
+
 #' 'RAVE' class for epoch repository
 #' @description
 #' Compared to \code{\link{RAVESubjectBaseRepository}}, this repository
@@ -24,7 +47,6 @@ RAVESubjectEpochRepository <- R6::R6Class(
   ),
   public = list(
 
-
     #' @description Internal method
     #' @param ... internal arguments
     `@marshal` = function(...) {
@@ -33,6 +55,31 @@ RAVESubjectEpochRepository <- R6::R6Class(
       object$data$epoch_name <- private$.epoch_name
       object$data$time_windows <- private$.time_windows
       object$data$stitch_events <- private$.stitch_events
+
+      # self <- RAVESubjectEpochRawVoltageRepository$new(
+      #   subject = "demo/DemoSubject",
+      #   electrodes = 13:16,
+      #   reference_name = "default",
+      #   epoch_name = "auditory_onset",
+      #   time_windows = c(-1, 2),
+      #   stitch_events = NULL, lazy_load = FALSE
+      # )
+      # private <- self$.__enclos_env__$private
+      container <- as.list(private$.data)
+      if(length(container) > 0) {
+        data_names <- names(container$data_list)
+        data_snapshot <- structure(
+          names = data_names,
+          lapply(data_names, function(data_name) {
+            data_array <- ravepipeline::RAVEFileArray$new(container$data_list[[data_name]],
+                                                          temporary = FALSE)
+            data_array$`@marshal`()
+          })
+        )
+        container$data_list <- data_snapshot
+        object$data$container_snapshot <- container
+      }
+
       class(object$data) <- c("RAVESubjectEpochRepository_marshal", class(object$data))
       object
     },
@@ -53,6 +100,10 @@ RAVESubjectEpochRepository <- R6::R6Class(
         stitch_events = object$data$stitch_events,
         strict = TRUE,
         lazy_load = TRUE
+      )
+      restore_epoch_container_from_snapshot(
+        container = repo$`@get_container`(),
+        snapshot = object$data$container_snapshot
       )
       repo$`@restored` <- TRUE
       return(repo)

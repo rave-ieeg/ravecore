@@ -113,24 +113,24 @@ base64_plot_slice <- function(
 #'
 #' # toy-example:
 #'
-#' shape <- c(50, 50, 50)
+#' shape <- c(10, 10, 10)
 #' vox2ras <- matrix(
-#'   c(1, 1.732, 0, -68.3,
-#'     -1.732, 1, 2, -31.7,
-#'     0, -2, 0, 50,
+#'   c(10, 17.32, 0, -136,
+#'     -17.32, 10, 20, -63,
+#'     0, -20, 0, 100,
 #'     0, 0, 0, 1),
 #'   nrow = 4, byrow = TRUE
 #' )
 #'
 #' # continuous
-#' x <- array(sin(seq_len(125000) / 100), shape)
+#' x <- abs(array(sin(seq_len(100) / 10), shape))
 #'
 #' underlay <- ieegio::as_ieegio_volume(x, vox2ras = vox2ras)
-#' overlay <- ieegio::as_ieegio_volume(x > 0, vox2ras = vox2ras)
+#' overlay <- ieegio::as_ieegio_volume(x > 0.2, vox2ras = vox2ras)
 #'
 #' plot_volume_slices(
 #'   underlay, overlay = overlay,
-#'   depths = seq(-100, 100, length.out = 4),
+#'   depths = seq(0, 150, length.out = 4), pixel_width = 5,
 #'   overlay_col = c("#00000000", "#FF000044", "#FF0000FF")
 #' )
 #'

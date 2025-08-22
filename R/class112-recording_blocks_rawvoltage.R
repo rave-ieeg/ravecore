@@ -45,6 +45,10 @@ RAVESubjectRecordingBlockRawVoltageRepository <- R6::R6Class(
         strict = TRUE,
         lazy_load = TRUE
       )
+      restore_block_container_from_snapshot(
+        container = repo$`@get_container`(),
+        snapshot = object$data$container_snapshot
+      )
       repo$`@restored` <- TRUE
       return(repo)
     },
@@ -101,6 +105,9 @@ RAVESubjectRecordingBlockRawVoltageRepository <- R6::R6Class(
       # electrodes <- 13
       # self$mount_data(electrodes = 16, force = FALSE)
 
+      workers <- 0
+      if( self$`@restored` ) { workers <- 1 }
+
       data_type <- private$.data_type
       if(!length(data_type)) { return(self) }
 
@@ -142,90 +149,96 @@ RAVESubjectRecordingBlockRawVoltageRepository <- R6::R6Class(
       }
 
       # Initialize
-      block_data <- ravepipeline::lapply_jobs(blocks, function(block) {
-        block_cache <- file.path(cache_path, block)
-        # if(force && file_exists(block_cache)) {
-        #   unlink(block_cache, recursive = TRUE)
-        # }
+      block_data <- ravepipeline::lapply_jobs(
+        blocks,
+        function(block) {
+          block_cache <- file.path(cache_path, block)
+          # if(force && file_exists(block_cache)) {
+          #   unlink(block_cache, recursive = TRUE)
+          # }
 
-        cached_arrays <- list()
-        lapply(electrode_instances, function(inst) {
-          # inst <- electrode_instances[[1]]
+          cached_arrays <- list()
+          lapply(electrode_instances, function(inst) {
+            # inst <- electrode_instances[[1]]
 
-          stype <- inst$type
+            stype <- inst$type
 
-          if(is.null(cached_arrays[[stype]])) {
-            # this is a sample electrode channel, load anyway
-            sample_signal <- inst$load_blocks(blocks = block,
-                                              type = data_type,
-                                              simplify = TRUE)
-            dm <- dim(sample_signal)
-            if(!length(dm)) { dm <- length(sample_signal) }
-            array_dimension <- c(dm, length(all_electrodes))
+            if(is.null(cached_arrays[[stype]])) {
+              # this is a sample electrode channel, load anyway
+              sample_signal <- inst$load_blocks(blocks = block,
+                                                type = data_type,
+                                                simplify = TRUE)
+              dm <- dim(sample_signal)
+              if(!length(dm)) { dm <- length(sample_signal) }
+              array_dimension <- c(dm, length(all_electrodes))
 
-            # length(array_dimension) is 2 for voltage
-            dnames <- list(
-              Time = seq(0, by = 1 / sample_rates[[stype]],
-                         length.out = array_dimension[[1]]),
-              Electrode = all_electrodes
-            )
-
-            cached_arrays[[stype]] <<- list(
-              dim = structure(array_dimension, names = names(dnames)),
-              dimnames = dnames,
-              sample_rate = sample_rates[[stype]],
-              data = filearray::filearray_load_or_create(
-                filebase = file.path(cache_path, block, stype),
-                dimension = array_dimension,
-                type = storage.mode(sample_signal),
-                mode = "readwrite",
-                symlink_ok = FALSE,
-                partition_size = 1L,
-                project = inst$subject$project_name,
-                subject = inst$subject$subject_code,
-                block = block,
-                rave_data_type = data_type,
-                channels = all_electrodes,
-                initialize = FALSE,
-                verbose = FALSE,
-                auto_set_headers = TRUE,
-                signal_type = stype,
-                references = reference_table$Reference,
-                on_missing = function(arr) {
-                  dimnames(arr) <- dnames
-                  arr
-                }
+              # length(array_dimension) is 2 for voltage
+              dnames <- list(
+                Time = seq(0, by = 1 / sample_rates[[stype]],
+                           length.out = array_dimension[[1]]),
+                Electrode = all_electrodes
               )
-            )
+
+              cached_arrays[[stype]] <<- list(
+                dim = structure(array_dimension, names = names(dnames)),
+                dimnames = dnames,
+                sample_rate = sample_rates[[stype]],
+                data = filearray::filearray_load_or_create(
+                  filebase = file.path(cache_path, block, stype),
+                  dimension = array_dimension,
+                  type = storage.mode(sample_signal),
+                  mode = "readwrite",
+                  symlink_ok = FALSE,
+                  partition_size = 1L,
+                  project = inst$subject$project_name,
+                  subject = inst$subject$subject_code,
+                  block = block,
+                  rave_data_type = data_type,
+                  channels = all_electrodes,
+                  initialize = FALSE,
+                  verbose = FALSE,
+                  auto_set_headers = TRUE,
+                  signal_type = stype,
+                  references = reference_table$Reference,
+                  on_missing = function(arr) {
+                    dimnames(arr) <- dnames
+                    arr
+                  }
+                )
+              )
+            }
+
+            item <- cached_arrays[[stype]]
+            dnames <- item$dimnames
+            farray <- item$data
+            sel <- dnames$Electrode == inst$number
+
+            if(force || is.na(farray[1, sel])) {
+              # Channel needs to be loaded
+              signal <- inst$load_blocks(blocks = block, type = data_type, simplify = TRUE)
+              farray[, sel] <- signal
+            }
+            return()
+          })
+
+          # For better serialization
+          for(ii in seq_along(cached_arrays)) {
+            cached_arrays[[ii]]$data <- ravepipeline::RAVEFileArray$new( cached_arrays[[ii]]$data )
           }
-
-          item <- cached_arrays[[stype]]
-          dnames <- item$dimnames
-          farray <- item$data
-          sel <- dnames$Electrode == inst$number
-
-          if(force || is.na(farray[1, sel])) {
-            # Channel needs to be loaded
-            signal <- inst$load_blocks(blocks = block, type = data_type, simplify = TRUE)
-            farray[, sel] <- signal
-          }
-          return()
-        })
-
-        # For better serialization
-        for(ii in seq_along(cached_arrays)) {
-          cached_arrays[[ii]]$data <- ravepipeline::RAVEFileArray$new( cached_arrays[[ii]]$data )
-        }
-        cached_arrays
-      }, .globals = list(
-        cache_path = cache_path,
-        electrode_instances = electrode_instances,
-        data_type = data_type,
-        sample_rates = sample_rates,
-        all_electrodes = all_electrodes,
-        reference_table = reference_table,
-        force = force
-      ), callback = callback)
+          cached_arrays
+        },
+        .globals = list(
+          cache_path = cache_path,
+          electrode_instances = electrode_instances,
+          data_type = data_type,
+          sample_rates = sample_rates,
+          all_electrodes = all_electrodes,
+          reference_table = reference_table,
+          force = force
+        ),
+        callback = callback,
+        .workers = workers
+      )
 
       # Clear progress finish line
       cat("          \r")

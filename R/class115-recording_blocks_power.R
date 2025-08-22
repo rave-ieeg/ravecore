@@ -42,6 +42,11 @@ RAVESubjectRecordingBlockPowerRepository <- R6::R6Class(
         strict = TRUE,
         lazy_load = TRUE
       )
+      restore_block_container_from_snapshot(
+        container = repo$`@get_container`(),
+        snapshot = object$data$container_snapshot
+      )
+      repo$`@restored` <- TRUE
       return(repo)
     },
 

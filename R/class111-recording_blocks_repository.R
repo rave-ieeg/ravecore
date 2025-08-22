@@ -1,3 +1,32 @@
+restore_block_container_from_snapshot = function(container, snapshot) {
+  if(is.null(snapshot)) { return(invisible()) }
+  tryCatch({
+
+    block_names <- names(snapshot)
+    lapply(block_names, function(block_name) {
+      block_snapshot <- snapshot[[block_name]]
+      signal_types <- names(block_snapshot)
+      block_data <- structure(
+        names = signal_types,
+        lapply(signal_types, function(signal_type) {
+          signal_data <- block_snapshot[[signal_type]]
+          data_array <- ravepipeline::RAVEFileArray$public_methods$`@unmarshal`(signal_data$data)
+          signal_data$data <- data_array$`@impl`
+          n_timepoints <- signal_data$dimnames$Time
+          signal_data$dimnames$Time <- seq(0, by = 1 / signal_data$sample_rate,
+                                           length.out = n_timepoints)
+          signal_data
+        })
+      )
+      container[[block_name]] <- block_data
+      return()
+    })
+
+  }, error = function(e) {
+  })
+  invisible()
+}
+
 #' 'RAVE' class for loading entire recording block repository
 #' @description
 #' Compared to \code{\link{RAVESubjectBaseRepository}}, this repository
@@ -20,13 +49,34 @@ RAVESubjectRecordingBlockRepository <- R6::R6Class(
   ),
   public = list(
 
-
     #' @description Internal method
     #' @param ... internal arguments
     `@marshal` = function(...) {
       object <- super$`@marshal`()
       object$r6_generator <- "RAVESubjectRecordingBlockRepository"
       object$data$blocks <- private$.blocks
+      if(length(private$.data)) {
+        block_names <- names(private$.data)
+        container_snapshot <- structure(
+          names = block_names,
+          lapply(block_names, function(block_name) {
+            block_data <- private$.data[[block_name]]
+            signal_types <- names(block_data)
+            structure(
+              names = signal_types,
+              lapply(signal_types, function(signal_type) {
+                signal_data <- block_data[[signal_type]]
+                data_array <- ravepipeline::RAVEFileArray$new(signal_data$data,
+                                                              temporary = FALSE)
+                signal_data$data <- data_array$`@marshal`()
+                signal_data$dimnames$Time <- length(signal_data$dimnames$Time)
+                signal_data
+              })
+            )
+          })
+        )
+        object$data$container_snapshot <- container_snapshot
+      }
       class(object$data) <- c("RAVESubjectRecordingBlockRepository_marshal", class(object$data))
       object
     },
@@ -46,6 +96,11 @@ RAVESubjectRecordingBlockRepository <- R6::R6Class(
         strict = TRUE,
         lazy_load = TRUE
       )
+      restore_block_container_from_snapshot(
+        container = repo$`@get_container`(),
+        snapshot = object$data$container_snapshot
+      )
+      repo$`@restored` <- TRUE
       return(repo)
     },
 
