@@ -9,7 +9,7 @@ package htmltools."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ravecore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9005</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9006</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -140,24 +140,24 @@ plotted directly.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># toy-example:</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">50</span>, <span class="fl">50</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">vox2ras</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1.732</span>, <span class="fl">0</span>, <span class="op">-</span><span class="fl">68.3</span>,</span></span>
-<span class="r-in"><span>    <span class="op">-</span><span class="fl">1.732</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="op">-</span><span class="fl">31.7</span>,</span></span>
-<span class="r-in"><span>    <span class="fl">0</span>, <span class="op">-</span><span class="fl">2</span>, <span class="fl">0</span>, <span class="fl">50</span>,</span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">17.32</span>, <span class="fl">0</span>, <span class="op">-</span><span class="fl">136</span>,</span></span>
+<span class="r-in"><span>    <span class="op">-</span><span class="fl">17.32</span>, <span class="fl">10</span>, <span class="fl">20</span>, <span class="op">-</span><span class="fl">63</span>,</span></span>
+<span class="r-in"><span>    <span class="fl">0</span>, <span class="op">-</span><span class="fl">20</span>, <span class="fl">0</span>, <span class="fl">100</span>,</span></span>
 <span class="r-in"><span>    <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>  nrow <span class="op">=</span> <span class="fl">4</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># continuous</span></span></span>
-<span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html" class="external-link">array</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fl">125000</span><span class="op">)</span> <span class="op">/</span> <span class="fl">100</span><span class="op">)</span>, <span class="va">shape</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/array.html" class="external-link">array</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span> <span class="op">/</span> <span class="fl">10</span><span class="op">)</span>, <span class="va">shape</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">underlay</span> <span class="op">&lt;-</span> <span class="fu">ieegio</span><span class="fu">::</span><span class="fu"><a href="http://dipterix.org/ieegio/reference/as_ieegio_volume.html" class="external-link">as_ieegio_volume</a></span><span class="op">(</span><span class="va">x</span>, vox2ras <span class="op">=</span> <span class="va">vox2ras</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">overlay</span> <span class="op">&lt;-</span> <span class="fu">ieegio</span><span class="fu">::</span><span class="fu"><a href="http://dipterix.org/ieegio/reference/as_ieegio_volume.html" class="external-link">as_ieegio_volume</a></span><span class="op">(</span><span class="va">x</span> <span class="op">&gt;</span> <span class="fl">0</span>, vox2ras <span class="op">=</span> <span class="va">vox2ras</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">overlay</span> <span class="op">&lt;-</span> <span class="fu">ieegio</span><span class="fu">::</span><span class="fu"><a href="http://dipterix.org/ieegio/reference/as_ieegio_volume.html" class="external-link">as_ieegio_volume</a></span><span class="op">(</span><span class="va">x</span> <span class="op">&gt;</span> <span class="fl">0.2</span>, vox2ras <span class="op">=</span> <span class="va">vox2ras</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">plot_volume_slices</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="va">underlay</span>, overlay <span class="op">=</span> <span class="va">overlay</span>,</span></span>
-<span class="r-in"><span>  depths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">100</span>, <span class="fl">100</span>, length.out <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  depths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">150</span>, length.out <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>, pixel_width <span class="op">=</span> <span class="fl">5</span>,</span></span>
 <span class="r-in"><span>  overlay_col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#00000000"</span>, <span class="st">"#FF000044"</span>, <span class="st">"#FF0000FF"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> 'base64_plot' is not an exported object from 'namespace:ravepipeline'</span>

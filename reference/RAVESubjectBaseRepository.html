@@ -9,7 +9,7 @@ please use prepare_subject_bare0 to create base repository."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ravecore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9005</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9006</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -150,16 +150,25 @@ different identifiers); generated from <code>digest_key</code></p></dd>
 <div class="section">
 <h3 id="public-methods">Public methods<a class="anchor" aria-label="anchor" href="#public-methods"></a></h3>
 
-<ul><li><p><a href="#method-RAVESubjectRepository-@marshal"><code>RAVESubjectBaseRepository$@marshal()</code></a></p></li>
+<ul><li><p><a href="#method-RAVESubjectRepository-@get_container"><code>RAVESubjectBaseRepository$@get_container()</code></a></p></li>
+<li><p><a href="#method-RAVESubjectRepository-@marshal"><code>RAVESubjectBaseRepository$@marshal()</code></a></p></li>
 <li><p><a href="#method-RAVESubjectRepository-@unmarshal"><code>RAVESubjectBaseRepository$@unmarshal()</code></a></p></li>
 <li><p><a href="#method-RAVESubjectRepository-new"><code>RAVESubjectBaseRepository$new()</code></a></p></li>
 <li><p><a href="#method-RAVESubjectRepository-export_matlab"><code>RAVESubjectBaseRepository$export_matlab()</code></a></p></li>
 <li><p><a href="#method-RAVESubjectRepository-clone"><code>RAVESubjectBaseRepository$clone()</code></a></p></li>
 </ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="ravepipeline" data-topic="RAVESerializable" data-id="@compare"><a href="http://dipterix.org/ravepipeline/reference/RAVESerializable.html#method-@compare"><code>ravepipeline::RAVESerializable$@compare()</code></a></span></li>
-</ul></details></p><hr><a id="method-RAVESubjectRepository-@marshal"></a><div class="section">
+</ul></details></p><hr><a id="method-RAVESubjectRepository-@get_container"></a><div class="section">
+<h3 id="method-get-container-">Method <code>@get_container()</code><a class="anchor" aria-label="anchor" href="#method-get-container-"></a></h3>
+<p>Internal method, do not use it directly</p><div class="section">
+<h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code>RAVESubjectBaseRepository$@get_container()</code></pre></div><p></p></div>
+</div>
+
+
+</div><p></p><hr><a id="method-RAVESubjectRepository-@marshal"></a><div class="section">
 <h3 id="method-marshal-">Method <code>@marshal()</code><a class="anchor" aria-label="anchor" href="#method-marshal-"></a></h3>
 <p>Internal method</p><div class="section">
-<h4 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h4>
+<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code>RAVESubjectBaseRepository$@marshal(...)</code></pre></div><p></p></div>
 </div>
 
@@ -175,7 +184,7 @@ different identifiers); generated from <code>digest_key</code></p></dd>
 </div><p></p><hr><a id="method-RAVESubjectRepository-@unmarshal"></a><div class="section">
 <h3 id="method-unmarshal-">Method <code>@unmarshal()</code><a class="anchor" aria-label="anchor" href="#method-unmarshal-"></a></h3>
 <p>Internal method</p><div class="section">
-<h4 id="usage-1">Usage<a class="anchor" aria-label="anchor" href="#usage-1"></a></h4>
+<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code>RAVESubjectBaseRepository$@unmarshal(object, ...)</code></pre></div><p></p></div>
 </div>
 
@@ -191,7 +200,7 @@ different identifiers); generated from <code>digest_key</code></p></dd>
 </div><p></p><hr><a id="method-RAVESubjectRepository-new"></a><div class="section">
 <h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
 <p>constructor</p><div class="section">
-<h4 id="usage-2">Usage<a class="anchor" aria-label="anchor" href="#usage-2"></a></h4>
+<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va"><a href="../reference/RAVESubjectBaseRepository.html">RAVESubjectBaseRepository</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
 <span>  <span class="va">subject</span>,</span>
 <span>  electrodes <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -250,7 +259,7 @@ errors out when subject is missing</p></dd>
 </div><p></p><hr><a id="method-RAVESubjectRepository-export_matlab"></a><div class="section">
 <h3 id="method-export-matlab-">Method <code>export_matlab()</code><a class="anchor" aria-label="anchor" href="#method-export-matlab-"></a></h3>
 <p>Export the repository to 'Matlab' for future analysis</p><div class="section">
-<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RAVESubjectBaseRepository</span><span class="op">$</span><span class="fu">export_matlab</span><span class="op">(</span><span class="va">...</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
@@ -270,7 +279,7 @@ errors out when subject is missing</p></dd>
 </div><p></p><hr><a id="method-RAVESubjectRepository-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
+<h4 id="usage-5">Usage<a class="anchor" aria-label="anchor" href="#usage-5"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RAVESubjectBaseRepository</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
