@@ -46,5 +46,6 @@ Suggests:
     rpyANTs,
     rpymat,
     htmltools,
+    plotly,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
