@@ -124,6 +124,7 @@ and the values are the sampling frequencies</p></dd>
 <span>  electrodes <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  reference_name <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  blocks <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  downsample <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  quiet <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  repository_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -149,6 +150,13 @@ and the values are the sampling frequencies</p></dd>
 
 <dt><code>blocks</code></dt>
 <dd><p>name of the recording blocks to load</p></dd>
+
+
+<dt><code>downsample</code></dt>
+<dd><p>down-sample rate by this integer number to save space
+and speed up computation; typically 'ERP' signals do not need super
+high sampling frequencies to load; default is <code>NA</code> and no
+down-sample is performed.</p></dd>
 
 
 <dt><code>...</code></dt>
