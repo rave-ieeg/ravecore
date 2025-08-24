@@ -166,64 +166,70 @@ RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
 
       all_electrodes <- as.integer(subject$electrodes)
 
-      if(force || length(electrode_instances) * length(blocks) > 10) {
-        callback <- function(block) {
-          sprintf("Loading Recording Blocks | Recording block %s", block)
+      if(force || length(electrode_instances) > 4) {
+        callback <- function(inst) {
+          sprintf("Loading Recording Blocks | Channel %s", inst$number)
         }
       } else {
         callback <- NULL
       }
 
-      # Initialize
-      block_data <- ravepipeline::lapply_jobs(blocks, function(block) {
-        # block <- blocks[[1]]
-        block_cache <- file.path(cache_path, block)
-        # if(force && file_exists(block_cache)) {
-        #   unlink(block_cache, recursive = TRUE)
-        # }
+      # get all signal types needed
+      signal_types <- vapply(electrode_instances, function(inst) { inst$type }, "")
+      signal_types_unique <- unique(signal_types)
 
-        cached_arrays <- list()
-        lapply(electrode_instances, function(inst) {
-          # inst <- electrode_instances[[1]]
-
-          stype <- inst$type
-
-          if(stype == "LFP") {
-            data_type <- "voltage"
-          } else {
-            # Special treatment: Spike and Aux channels dont need reference
-            data_type <- "raw-voltage"
+      # Initialize the arrays
+      block_preparation <- structure(
+        names = blocks,
+        lapply(blocks, function(block) {
+          # block <- blocks[[1]]
+          block_cache <- file.path(cache_path, block)
+          if(force && file_exists(block_cache)) {
+            unlink(block_cache, recursive = TRUE)
           }
+          cached_arrays <- list()
 
-          if(is.null(cached_arrays[[stype]])) {
-            # this is a sample electrode channel, load anyway
-            sample_dim_info <- inst$load_dim_with_blocks(blocks = block, type = data_type)[[block]]
-            dm <- unname(sample_dim_info$dim)
-            dm[[2]] <- length(all_electrodes)
+          # load dimensional information and initialize the arrays
+          structure(
+            names = signal_types_unique,
+            lapply(signal_types_unique, function(stype) {
+              # stype <- signal_types_unique[[1]]
+              if(stype == "LFP") {
+                data_type <- "voltage"
+              } else {
+                # Special treatment: Spike and Aux channels don't need reference
+                data_type <- "raw-voltage"
+              }
 
-            if(isTRUE(downsample > 1)) {
-              dm[[1]] <- length(ravetools::decimate(seq_len(dm[[1]]), downsample))
-            } else {
-              downsample <- 1L
-            }
-            array_dimension <- as.integer(dm)
+              # get one instance
+              inst <- electrode_instances[[which(signal_types == stype)[[1]]]]
 
-            # length(array_dimension) is 2 for voltage
-            sample_rate <- as.double(sample_rates[[stype]])
-            dnames <- list(
-              # sample_rates is already downsampled so no need to multiply
-              Time = seq(0, by = 1 / sample_rate,
-                         length.out = array_dimension[[1]]),
-              Electrode = all_electrodes
-            )
+              # this is a sample electrode channel, load anyway
+              sample_dim_info <- inst$load_dim_with_blocks(blocks = block, type = data_type)[[block]]
+              dm <- unname(sample_dim_info$dim)
+              dm[[2]] <- length(all_electrodes)
 
-            cached_arrays[[stype]] <<- list(
-              dim = structure(array_dimension, names = names(dnames)),
-              dimnames = dnames,
-              sample_rate = sample_rate,
-              downsample = downsample,
-              data = filearray::filearray_load_or_create(
-                filebase = file.path(cache_path, block, stype),
+              if(isTRUE(downsample > 1)) {
+                dm[[1]] <- length(ravetools::decimate(seq_len(dm[[1]]), downsample))
+              } else {
+                downsample <- 1L
+              }
+              array_dimension <- as.integer(dm)
+
+              # length(array_dimension) is 2 for voltage
+              sample_rate <- as.double(sample_rates[[stype]])
+              dnames <- list(
+                # sample_rates is already down-sampled so no need to multiply
+                Time = seq(0, by = 1 / sample_rate,
+                           length.out = array_dimension[[1]]),
+                Electrode = all_electrodes
+              )
+
+              file_array_path <- file.path(cache_path, block, stype)
+              dir_create2(dirname(file_array_path))
+
+              data_array <- filearray::filearray_load_or_create(
+                filebase = file_array_path,
                 dimension = array_dimension,
                 type = "float",
                 mode = "readwrite",
@@ -246,56 +252,90 @@ RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
                   arr
                 }
               )
-            )
-          }
 
-          item <- cached_arrays[[stype]]
-          dnames <- item$dimnames
-          farray <- item$data
-          sel <- dnames$Electrode == inst$number
+              dnames$Time <- c(0, 1 / sample_rate, array_dimension[[1]])
+              list(
+                dim = structure(array_dimension, names = names(dnames)),
+                dimnames = dnames,
+                sample_rate = sample_rate,
+                downsample = downsample,
+                data = ravepipeline::RAVEFileArray$new(data_array, temporary = FALSE)
+              )
+            })
+          )
 
-          if(force || is.na(farray[1, sel])) {
-            # Channel needs to be loaded
-            signal <- inst$load_data_with_blocks(blocks = block,
-                                                 type = data_type,
-                                                 simplify = TRUE)
-            if(isTRUE(downsample > 1)) {
-              signal <- ravetools::decimate(signal, downsample)
-            }
-            farray[, sel] <- signal
-          }
-          return()
         })
+      )
 
-        # For better serialization
-        for(ii in seq_along(cached_arrays)) {
-          cached_arrays[[ii]]$data <- ravepipeline::RAVEFileArray$new( cached_arrays[[ii]]$data )
-        }
-        cached_arrays
-      }, .globals = list(
-        cache_path = cache_path,
-        electrode_instances = electrode_instances,
-        sample_rates = sample_rates,
-        all_electrodes = all_electrodes,
-        reference_table = reference_table,
-        force = force,
-        downsample = downsample
-      ), callback = callback)
+      # load electrode data
+      ravepipeline::lapply_jobs(
+        electrode_instances,
+        function(inst) {
+          # inst <- electrode_instances[[1]]
+
+          stype <- inst$type
+          if(stype == "LFP") {
+            data_type <- "voltage"
+          } else {
+            # Special treatment: Spike and Aux channels don't need reference
+            data_type <- "raw-voltage"
+          }
+
+          lapply(blocks, function(block) {
+
+            item <- block_preparation[[block]][[stype]]
+            sel <- item$dimnames$Electrode == inst$number
+            farray <- item$data$`@impl`
+
+            if(is.na(farray[1, sel])) {
+              # Channel needs to be loaded
+              signal <- inst$load_data_with_blocks(blocks = block,
+                                                   type = data_type,
+                                                   simplify = TRUE)
+              if(isTRUE(downsample > 1)) {
+                signal <- ravetools::decimate(signal, downsample)
+              }
+              farray[, sel] <- signal
+            }
+
+            return()
+
+          })
+
+          return()
+        },
+        .globals = list(
+          block_preparation = block_preparation,
+          blocks = blocks,
+          downsample = downsample
+        ),
+        callback = callback
+      )
 
       # Clear progress finish line
-      cat("          \r")
+      if(is.function(callback)) { cat("          \r") }
 
 
       block_data <- structure(
         names = blocks,
-        lapply(block_data, function(data_list) {
-          for(stype in names(data_list)) {
-            item <- data_list[[stype]]
-            item$data <- item$data$`@impl`
-            item$data$.mode <- "readonly"
-            data_list[[stype]] <- item
-          }
-          data_list
+        lapply(blocks, function(block) {
+          # block <- blocks[[1]]
+          block_info <- block_preparation[[block]]
+          signal_types <- names(block_info)
+
+          structure(
+            names = signal_types,
+            lapply(signal_types, function(stype) {
+              stype_info <- block_info[[stype]]
+
+              # expand time dimname back
+              time_params <- stype_info$dimnames$Time
+              stype_info$dimnames$Time <- seq(time_params[[1]], by = time_params[[2]], length.out = time_params[[3]])
+              stype_info$data <- stype_info$data$`@impl`
+              stype_info$data$.mode <- "readonly"
+              stype_info
+            })
+          )
         })
       )
 
