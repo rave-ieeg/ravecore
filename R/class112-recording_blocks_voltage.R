@@ -237,7 +237,7 @@ RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
                 rave_data_type = "voltage",
                 channels = all_electrodes,
                 initialize = FALSE,
-                verbose = TRUE,
+                verbose = FALSE,
                 auto_set_headers = TRUE,
                 signal_type = stype,
                 references = reference_table$Reference,
