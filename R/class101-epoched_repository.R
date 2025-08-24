@@ -146,7 +146,7 @@ RAVESubjectEpochRepository <- R6::R6Class(
       self$set_epoch(epoch_name, stitch_events)
 
       if(!lazy_load) {
-        self$mount_data()
+        self$mount_data(force = FALSE)
       }
     },
 
@@ -330,12 +330,12 @@ RAVESubjectEpochRepository <- R6::R6Class(
     },
 
     #' @description get container where loaded data are stored
-    #' @param ... passed to \code{mount_data}
+    #' @param force,... passed to \code{mount_data}
     #' @returns A named map, typically with data arrays, shape/dimension
     #' information
-    get_container = function(...) {
+    get_container = function(force = FALSE, ...) {
       if(private$.data$`@size`() == 0) {
-        self$mount_data(...)
+        self$mount_data(force = force, ...)
       }
       private$.data
     }
@@ -349,7 +349,7 @@ RAVESubjectEpochRepository <- R6::R6Class(
       if(!missing(v) && v) {
         private$update_subject()
         self$set_epoch(private$.epoch_name, private$.stitch_events)
-        self$mount_data()
+        self$mount_data(force = FALSE)
       }
       invisible()
     },

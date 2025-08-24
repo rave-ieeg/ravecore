@@ -363,7 +363,7 @@ prepare_subject_with_blocks_legacy <- function(
 
 }
 
-testthat::test_that("RAVESubjectRecordingBlockRepository", {
+testthat::test_that("RAVESubjectRecordingBlockVoltageRepository", {
 
   testthat::skip_on_cran()
   testthat::skip_if_not({
@@ -393,6 +393,7 @@ testthat::test_that("RAVESubjectRecordingBlockRepository", {
 
   testthat::expect_equal(repo_new$signature, repo_new0$signature)
 
+  testthat::expect_true(length(repo_new0$`@get_container`()) > 0)
   testthat::expect_true(length(repo_new$`@get_container`()) > 0)
 
   original_container <- as.list(repo_new0$`@get_container`(), sorted = TRUE)
@@ -478,5 +479,77 @@ testthat::test_that("RAVESubjectRecordingBlockRepository", {
   testthat::expect_equal(container_new$`008`$LFP$dimnames, container_old$`008`$voltage$dnames)
   testthat::expect_equal(unname(container_new$`008`$LFP$dim),
                          unname(dim(container_old$`008`$voltage$data)))
+
+})
+
+
+testthat::test_that("RAVESubjectRecordingBlockVoltageRepository - downsampled", {
+
+  testthat::skip_on_cran()
+  testthat::skip_if_not({
+    dir.exists(as_rave_subject("demo/DemoSubject", strict = FALSE)$path)
+  })
+
+  repo_new0 <- RAVESubjectRecordingBlockVoltageRepository$new(
+    subject = 'demo/DemoSubject',
+    electrodes = 13:16,
+    reference_name = "default",
+    blocks = c("008", "010"),
+    lazy_load = FALSE,
+    downsample = 4
+  )
+
+  raw <- serialize(repo_new0, NULL, refhook = ravepipeline::rave_serialize_refhook)
+  repo_new <- unserialize(raw, refhook = ravepipeline::rave_unserialize_refhook)
+
+  testthat::expect_equal(repo_new$signature, repo_new0$signature)
+
+  testthat::expect_equal(repo_new$sample_rates, repo_new0$sample_rates)
+
+  testthat::expect_true(length(repo_new0$`@get_container`()) > 0)
+  testthat::expect_true(length(repo_new$`@get_container`()) > 0)
+
+  original_container <- as.list(repo_new0$`@get_container`(), sorted = TRUE)
+  restored_container <- as.list(repo_new$`@get_container`(), sorted = TRUE)
+
+  expand_container <- function(container) {
+    block_names <- names(container)
+    structure(
+      names = block_names,
+      lapply(block_names, function(block_name) {
+        block_data <- container[[block_name]]
+        signal_types <- names(block_data)
+        structure(
+          names = signal_types,
+          lapply(signal_types, function(signal_type) {
+            signal_data <- block_data[[signal_type]]
+            signal_data$data <- serialize(
+              ravepipeline::RAVEFileArray$new(signal_data$data, FALSE),
+              connection = NULL, refhook = ravepipeline::rave_serialize_refhook)
+            signal_data
+          })
+        )
+      })
+    )
+  }
+
+
+  testthat::expect_equal(expand_container(restored_container),
+                         expand_container(original_container))
+
+  testthat::expect_true(inherits(repo_new, "prepare_subject_with_blocks"))
+  testthat::expect_true(inherits(repo_new, "rave_repository"))
+
+  # New attributes
+  testthat::expect_true(!is.null(repo_new$voltage))
+
+  # singal data
+  container_new <- repo_new$voltage
+  container_old <- repo_new0$voltage
+
+  testthat::expect_equal(container_new$`008`$LFP$sample_rate, 500)
+  testthat::expect_equal(container_new$`008`$LFP$sample_rate, container_old$`008`$LFP$sample_rate)
+
+  testthat::expect_equal(container_new$`008`$LFP$dimnames, container_old$`008`$LFP$dimnames)
 
 })

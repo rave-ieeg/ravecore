@@ -122,7 +122,7 @@ power_baseline.rave_prepare_power <- function(
   sel <- x$electrode_list %in% electrodes
 
   # Make sure the data is properly loaded
-  x$mount_data(electrodes = electrodes)
+  x$mount_data(force = FALSE, electrodes = electrodes)
 
   sub_list <- x$power$data_list[sprintf("e_%d", x$electrode_list[sel])]
   sub_elec <- x$electrode_list[sel]

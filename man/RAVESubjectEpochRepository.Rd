@@ -241,13 +241,13 @@ electrode channels)}
 \subsection{Method \code{get_container()}}{
 get container where loaded data are stored
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectEpochRepository$get_container(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectEpochRepository$get_container(force = FALSE, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{passed to \code{mount_data}}
+\item{\code{force, ...}}{passed to \code{mount_data}}
 }
 \if{html}{\out{</div>}}
 }

@@ -28,6 +28,9 @@ RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
       object <- super$`@marshal`()
       object$r6_generator <- "RAVESubjectRecordingBlockVoltageRepository"
       class(object$data) <- c("RAVESubjectRecordingBlockVoltageRepository_marshal", class(object$data))
+
+      object$data$downsample <- private$.downsample
+
       object
     },
 
@@ -41,6 +44,7 @@ RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
         electrodes = object$data$intended_electrode_list,
         reference_name = object$data$reference_name,
         blocks = object$data$blocks,
+        downsample = object$data$downsample,
         quiet = TRUE,
         repository_id = object$data$repository_id,
         strict = TRUE,
@@ -87,9 +91,14 @@ RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
       super$initialize(subject = subject, electrodes = electrodes,
                        reference_name = reference_name, quiet = quiet,
                        repository_id = repository_id, blocks = blocks,
-                       lazy_load = lazy_load,
+                       lazy_load = TRUE,
                        .class = .class)
       private$.downsample <- downsample
+
+      # Has to call this explicitly because downsampling is needed!
+      if( !lazy_load ) {
+        self$mount_data(force = FALSE)
+      }
     },
 
     #' @description function to mount data
@@ -104,7 +113,14 @@ RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
       self$quiet <- TRUE
       on.exit({ self$quiet <- quiet_old })
 
-      # self <- RAVESubjectRecordingBlockVoltageRepository$new(subject = "demo/DemoSubject", lazy_load = TRUE)
+      # self <- RAVESubjectRecordingBlockVoltageRepository$new(
+      #   subject = 'demo/DemoSubject',
+      #   electrodes = 13:16,
+      #   reference_name = "default",
+      #   blocks = c("008", "010"),
+      #   lazy_load = TRUE,
+      #   downsample = 4
+      # )
       # private <- self$.__enclos_env__$private
       # private$.data
       # data_type <- "voltage"
@@ -116,12 +132,14 @@ RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
 
       blocks <- self$blocks
       subject <- self$subject
+
+      # sample_rates is already down-sampled
       sample_rates <- self$sample_rates
       signal_types <- unique(self$electrode_signal_types)
       reference_table <- self$reference_table
       reference_table <- reference_table[order(reference_table$Electrode), ]
       downsample <- as.integer(private$.downsample)
-      if(is.na(downsample)) {
+      if(!isTRUE(downsample > 1)) {
         downsample <- 1L
       }
 
@@ -158,6 +176,7 @@ RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
 
       # Initialize
       block_data <- ravepipeline::lapply_jobs(blocks, function(block) {
+        # block <- blocks[[1]]
         block_cache <- file.path(cache_path, block)
         # if(force && file_exists(block_cache)) {
         #   unlink(block_cache, recursive = TRUE)
@@ -192,7 +211,8 @@ RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
             # length(array_dimension) is 2 for voltage
             sample_rate <- as.double(sample_rates[[stype]])
             dnames <- list(
-              Time = seq(0, by = downsample / sample_rate,
+              # sample_rates is already downsampled so no need to multiply
+              Time = seq(0, by = 1 / sample_rate,
                          length.out = array_dimension[[1]]),
               Electrode = all_electrodes
             )

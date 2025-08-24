@@ -141,7 +141,7 @@ RAVESubjectRecordingBlockRepository <- R6::R6Class(
       private$.blocks <- blocks
 
       if(!lazy_load) {
-        self$mount_data()
+        self$mount_data(force = FALSE)
       }
     },
 
@@ -244,12 +244,12 @@ RAVESubjectRecordingBlockRepository <- R6::R6Class(
     },
 
     #' @description get container where loaded data are stored
-    #' @param ... passed to \code{mount_data}
+    #' @param force,... passed to \code{mount_data}
     #' @returns A named map, typically with data arrays, shape/dimension
     #' information
-    get_container = function(...) {
+    get_container = function(force = FALSE, ...) {
       if(private$.data$`@size`() == 0) {
-        self$mount_data(...)
+        self$mount_data(force = force, ...)
       }
       private$.data
     }
@@ -262,7 +262,7 @@ RAVESubjectRecordingBlockRepository <- R6::R6Class(
     needs_update = function(v) {
       if(!missing(v) && v) {
         private$update_subject()
-        self$mount_data()
+        self$mount_data(force = FALSE)
       }
       invisible()
     },
