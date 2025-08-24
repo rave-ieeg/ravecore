@@ -46,7 +46,8 @@ with current electrode type}
 \item \href{#method-Auxiliary_electrode-.load_raw_voltage}{\code{Auxiliary_electrode$.load_raw_voltage()}}
 \item \href{#method-Auxiliary_electrode-load_data_with_epochs}{\code{Auxiliary_electrode$load_data_with_epochs()}}
 \item \href{#method-Auxiliary_electrode-load_dimnames_with_epochs}{\code{Auxiliary_electrode$load_dimnames_with_epochs()}}
-\item \href{#method-Auxiliary_electrode-load_blocks}{\code{Auxiliary_electrode$load_blocks()}}
+\item \href{#method-Auxiliary_electrode-load_data_with_blocks}{\code{Auxiliary_electrode$load_data_with_blocks()}}
+\item \href{#method-Auxiliary_electrode-load_dim_with_blocks}{\code{Auxiliary_electrode$load_dim_with_blocks()}}
 \item \href{#method-Auxiliary_electrode-clear_cache}{\code{Auxiliary_electrode$clear_cache()}}
 \item \href{#method-Auxiliary_electrode-clear_memory}{\code{Auxiliary_electrode$clear_memory()}}
 \item \href{#method-Auxiliary_electrode-clone}{\code{Auxiliary_electrode$clone()}}
@@ -56,6 +57,7 @@ with current electrode type}
 <details open><summary>Inherited methods</summary>
 <ul>
 <li><span class="pkg-link" data-pkg="ravepipeline" data-topic="RAVESerializable" data-id="@compare"><a href='../../ravepipeline/html/RAVESerializable.html#method-RAVESerializable-@compare'><code>ravepipeline::RAVESerializable$@compare()</code></a></span></li>
+<li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVEAbstarctElectrode" data-id="load_blocks"><a href='../../ravecore/html/RAVEAbstarctElectrode.html#method-RAVEAbstarctElectrode-load_blocks'><code>ravecore::RAVEAbstarctElectrode$load_blocks()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVEAbstarctElectrode" data-id="load_data"><a href='../../ravecore/html/RAVEAbstarctElectrode.html#method-RAVEAbstarctElectrode-load_data'><code>ravecore::RAVEAbstarctElectrode$load_data()</code></a></span></li>
 <li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVEAbstarctElectrode" data-id="set_epoch"><a href='../../ravecore/html/RAVEAbstarctElectrode.html#method-RAVEAbstarctElectrode-set_epoch'><code>ravecore::RAVEAbstarctElectrode$set_epoch()</code></a></span></li>
 </ul>
@@ -220,13 +222,13 @@ get expected dimension names
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-Auxiliary_electrode-load_blocks"></a>}}
-\if{latex}{\out{\hypertarget{method-Auxiliary_electrode-load_blocks}{}}}
-\subsection{Method \code{load_blocks()}}{
+\if{html}{\out{<a id="method-Auxiliary_electrode-load_data_with_blocks"></a>}}
+\if{latex}{\out{\hypertarget{method-Auxiliary_electrode-load_data_with_blocks}{}}}
+\subsection{Method \code{load_data_with_blocks()}}{
 load electrode block-wise data (with no reference),
 useful when epoch is absent
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{Auxiliary_electrode$load_blocks(
+\if{html}{\out{<div class="r">}}\preformatted{Auxiliary_electrode$load_data_with_blocks(
   blocks,
   type = c("raw-voltage", "voltage"),
   simplify = TRUE
@@ -246,6 +248,26 @@ for \code{"voltage"} data, 'Notch' filters must be applied; for
 all other types, 'Wavelet' transforms are required.}
 
 \item{\code{simplify}}{whether to simplify the result}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-Auxiliary_electrode-load_dim_with_blocks"></a>}}
+\if{latex}{\out{\hypertarget{method-Auxiliary_electrode-load_dim_with_blocks}{}}}
+\subsection{Method \code{load_dim_with_blocks()}}{
+get expected dimension information for block-based loader
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{Auxiliary_electrode$load_dim_with_blocks(
+  blocks,
+  type = c("raw-voltage", "voltage")
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{blocks, type}}{see \code{load_data_with_blocks}}
 }
 \if{html}{\out{</div>}}
 }

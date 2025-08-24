@@ -368,7 +368,7 @@ Auxiliary_electrode <- R6::R6Class(
     #' then the result will be a vector (\code{type="voltage"}) or a matrix
     #' (others), otherwise the result will be a named list where the names
     #' are the blocks.
-    load_blocks = function(blocks, type = c("raw-voltage", "voltage"), simplify = TRUE) {
+    load_data_with_blocks = function(blocks, type = c("raw-voltage", "voltage"), simplify = TRUE) {
       type <- match.arg(type)
       if(!length(blocks)) {
         if(simplify){ return(NULL) }
@@ -410,6 +410,47 @@ Auxiliary_electrode <- R6::R6Class(
 
       return(dat)
 
+    },
+
+    #' @description get expected dimension information for block-based loader
+    #' @param blocks,type see \code{load_data_with_blocks}
+    load_dim_with_blocks = function(blocks, type = c("raw-voltage", "voltage")) {
+      type <- match.arg(type)
+      if(!length(blocks)) {
+        return(list())
+      }
+      stopifnot2(all(blocks %in% self$subject$blocks),
+                 msg = "Electrode `load_blocks`: all blocks must exist")
+
+      sel <- self$subject$electrodes %in% self$number
+      imported <- self$subject$preprocess_settings$data_imported[sel]
+      if(!isTRUE(imported)) {
+        stop("load_blocks: please import electrode ", self$number, " first.")
+      }
+
+      sample_rate <- self$raw_sample_rate
+
+      fnames <- c(self$preprocess_file, self$voltage_file, self$preprocess_file)
+      dprefix <- c("/raw/%s", "/raw/voltage/%s", "/notch/%s")
+      sel <- file_exists(fnames)
+      if(!any(sel)) {
+        stop("cannot find any voltage data file for electrode ", self$number, ". Have you imported it yet?")
+      }
+      voltage_file <- fnames[sel][[1]]
+      voltage_prefix <- dprefix[sel][[1]]
+      re <- structure(lapply(blocks, function(block){
+        dat <- load_h5(voltage_file,
+                       name = sprintf(voltage_prefix, block),
+                       ram = FALSE)
+        n_timepoints <- length(dat)
+        # time by channel
+        list(
+          sample_rate = sample_rate,
+          dim = c(Time = n_timepoints, Electrode = 1L)
+        )
+
+      }), names = blocks)
+      return(re)
     },
 
     #' @description method to clear cache on hard drive

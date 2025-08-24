@@ -749,8 +749,10 @@ LFP_electrode <- R6::R6Class(
     #' then the result will be a vector (\code{type="voltage"}) or a matrix
     #' (others), otherwise the result will be a named list where the names
     #' are the blocks.
-    load_blocks = function(blocks, type = c("power", "phase", "voltage", "wavelet-coefficient", "raw-voltage"),
-                           simplify = TRUE) {
+    load_data_with_blocks = function(blocks,
+                                     type = c("power", "phase", "voltage",
+                                              "wavelet-coefficient", "raw-voltage"),
+                                     simplify = TRUE) {
       type <- match.arg(type)
       if(!length(blocks)) {
         if(simplify){ return(NULL) }
@@ -794,7 +796,7 @@ LFP_electrode <- R6::R6Class(
       if(type == "voltage") {
         dat <- load_blocks_voltage_single(self = self, blocks = blocks)
         if(has_reference) {
-          ref <- self$reference$load_blocks(blocks = blocks, simplify = FALSE, type = "voltage")
+          ref <- self$reference$load_data_with_blocks(blocks = blocks, simplify = FALSE, type = "voltage")
           for(block in blocks) {
             dat[[block]] <- dat[[block]] - ref[[block]]
           }
@@ -802,7 +804,7 @@ LFP_electrode <- R6::R6Class(
       } else {
 
         if(has_reference) {
-          ref <- self$reference$load_blocks(blocks = blocks, simplify = FALSE, type = "wavelet-coefficient")
+          ref <- self$reference$load_data_with_blocks(blocks = blocks, simplify = FALSE, type = "wavelet-coefficient")
           dat <- load_blocks_wavelet_single(self = self, blocks = blocks, type = "wavelet-coefficient")
           for(block in blocks) {
             dat[[block]] <- dat[[block]] - ref[[block]]
@@ -823,6 +825,79 @@ LFP_electrode <- R6::R6Class(
 
       return(dat)
 
+    },
+
+    #' @description get expected dimension information for block-based loader
+    #' @param blocks,type see \code{load_data_with_blocks}
+    load_dim_with_blocks = function(blocks, type = c(
+      "power", "phase", "voltage", "wavelet-coefficient",
+      "raw-voltage"
+    )) {
+      type <- match.arg(type)
+      if(!length(blocks)) {
+        return(list())
+      }
+      stopifnot2(all(blocks %in% self$subject$blocks),
+                 msg = "Electrode `load_blocks`: all blocks must exist")
+
+      sel <- self$subject$electrodes %in% self$number
+      imported <- self$subject$preprocess_settings$data_imported[sel]
+      if(!isTRUE(imported)) {
+        stop("load_blocks: please import electrode ", self$number, " first.")
+      }
+
+      if(type %in% c("raw-voltage", "voltage")) {
+        sample_rate <- self$raw_sample_rate
+
+        fnames <- c(self$preprocess_file, self$voltage_file, self$preprocess_file)
+        dprefix <- c("/raw/%s", "/raw/voltage/%s", "/notch/%s")
+        sel <- file_exists(fnames)
+        if(!any(sel)) {
+          stop("cannot find any voltage data file for electrode ", self$number, ". Have you imported it yet?")
+        }
+        voltage_file <- fnames[sel][[1]]
+        voltage_prefix <- dprefix[sel][[1]]
+        re <- structure(lapply(blocks, function(block){
+          dat <- load_h5(voltage_file,
+                         name = sprintf(voltage_prefix, block),
+                         ram = FALSE)
+          n_timepoints <- length(dat)
+          # time by channel
+          list(
+            sample_rate = sample_rate,
+            dim = c(Time = n_timepoints, Electrode = 1L)
+          )
+
+        }), names = blocks)
+        return(re)
+      } else {
+
+        # time-frequency
+        fnames <- c(self$power_file, self$phase_file)
+        dprefix <- c("/raw/power/%s", "/raw/phase/%s")
+        sel <- file_exists(fnames)
+        if(!any(sel)) {
+          stop("cannot find any time-frequency coefficient file for electrode ", self$number,
+               ". Have you imported & applied transform (wavelet, hilbert, ...) to it yet?")
+        }
+        sample_rate <- self$power_sample_rate
+
+        tf_file <- fnames[sel][[1]]
+        tf_prefix <- dprefix[sel][[1]]
+        re <- structure(lapply(blocks, function(block){
+          dat <- load_h5(tf_file,
+                         name = sprintf(tf_prefix, block),
+                         ram = FALSE)
+          dm <- dim(dat)
+
+          list(
+            dim = c(Frequency = dm[[1]], Time = dm[[2]], Electrode = 1),
+            sample_rate = sample_rate
+          )
+        }), names = blocks)
+        return(re)
+
+      }
     },
 
     #' @description method to clear cache on hard drive

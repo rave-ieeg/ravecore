@@ -119,7 +119,9 @@ intervals are missing}
 \item \href{#method-RAVEAbstarctElectrode-load_data_with_epochs}{\code{RAVEAbstarctElectrode$load_data_with_epochs()}}
 \item \href{#method-RAVEAbstarctElectrode-load_data}{\code{RAVEAbstarctElectrode$load_data()}}
 \item \href{#method-RAVEAbstarctElectrode-load_dimnames_with_epochs}{\code{RAVEAbstarctElectrode$load_dimnames_with_epochs()}}
+\item \href{#method-RAVEAbstarctElectrode-load_data_with_blocks}{\code{RAVEAbstarctElectrode$load_data_with_blocks()}}
 \item \href{#method-RAVEAbstarctElectrode-load_blocks}{\code{RAVEAbstarctElectrode$load_blocks()}}
+\item \href{#method-RAVEAbstarctElectrode-load_dim_with_blocks}{\code{RAVEAbstarctElectrode$load_dim_with_blocks()}}
 \item \href{#method-RAVEAbstarctElectrode-clone}{\code{RAVEAbstarctElectrode$clone()}}
 }
 }
@@ -283,13 +285,13 @@ get expected dimension names
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-RAVEAbstarctElectrode-load_blocks"></a>}}
-\if{latex}{\out{\hypertarget{method-RAVEAbstarctElectrode-load_blocks}{}}}
-\subsection{Method \code{load_blocks()}}{
+\if{html}{\out{<a id="method-RAVEAbstarctElectrode-load_data_with_blocks"></a>}}
+\if{latex}{\out{\hypertarget{method-RAVEAbstarctElectrode-load_data_with_blocks}{}}}
+\subsection{Method \code{load_data_with_blocks()}}{
 load electrode block-wise data (with reference),
 useful when epoch is absent
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVEAbstarctElectrode$load_blocks(blocks, type, simplify = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{RAVEAbstarctElectrode$load_data_with_blocks(blocks, type, simplify = TRUE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -301,6 +303,40 @@ useful when epoch is absent
 \code{"voltage"}, \code{"wavelet-coefficient"}.}
 
 \item{\code{simplify}}{whether to simplify the result}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-RAVEAbstarctElectrode-load_blocks"></a>}}
+\if{latex}{\out{\hypertarget{method-RAVEAbstarctElectrode-load_blocks}{}}}
+\subsection{Method \code{load_blocks()}}{
+alias of \code{load_data_with_blocks} for legacy code
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{RAVEAbstarctElectrode$load_blocks(blocks, type, simplify = TRUE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{blocks, type, simplify}}{see \code{load_data_with_blocks}}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-RAVEAbstarctElectrode-load_dim_with_blocks"></a>}}
+\if{latex}{\out{\hypertarget{method-RAVEAbstarctElectrode-load_dim_with_blocks}{}}}
+\subsection{Method \code{load_dim_with_blocks()}}{
+get expected dimension information for block-based loader
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{RAVEAbstarctElectrode$load_dim_with_blocks(blocks, type)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{blocks, type}}{see \code{load_data_with_blocks}}
 }
 \if{html}{\out{</div>}}
 }

@@ -169,6 +169,7 @@ RAVEAbstarctElectrode <- R6::R6Class(
       .NotYetImplemented()
     },
 
+
     #' @description load electrode block-wise data (with reference),
     #' useful when epoch is absent
     #' @param blocks session blocks
@@ -179,10 +180,24 @@ RAVEAbstarctElectrode <- R6::R6Class(
     #' then the result will be a vector (\code{type="voltage"}) or a matrix
     #' (others), otherwise the result will be a named list where the names
     #' are the blocks.
+    load_data_with_blocks = function(blocks, type, simplify = TRUE) {
+      .NotYetImplemented()
+    },
+
+    #' @description alias of \code{load_data_with_blocks} for legacy code
+    #' @param blocks,type,simplify see \code{load_data_with_blocks}
     load_blocks = function(blocks, type, simplify = TRUE) {
+      if(length(type) > 1) {
+        type <- type[[1]]
+      }
+      self$load_data_with_blocks(blocks = blocks, type = type, simplify = simplify)
+    },
+
+    #' @description get expected dimension information for block-based loader
+    #' @param blocks,type see \code{load_data_with_blocks}
+    load_dim_with_blocks = function(blocks, type) {
       .NotYetImplemented()
     }
-
   ),
   active = list(
 

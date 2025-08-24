@@ -39,17 +39,17 @@ test_that("LFP_reference - single channel", {
   data <- self$load_data_with_epochs("voltage")
   testthat::expect_equal(data[], e14$load_data_with_epochs("voltage")[])
 
-  data <- self$load_blocks("008", type = "power")
-  testthat::expect_equal(data, e14$load_blocks("008", type = "power"))
+  data <- self$load_data_with_blocks("008", type = "power")
+  testthat::expect_equal(data, e14$load_data_with_blocks("008", type = "power"))
 
-  data <- self$load_blocks("008", type = "phase")
-  testthat::expect_equal(data, e14$load_blocks("008", type = "phase"))
+  data <- self$load_data_with_blocks("008", type = "phase")
+  testthat::expect_equal(data, e14$load_data_with_blocks("008", type = "phase"))
 
-  data <- self$load_blocks("008", type = "wavelet-coefficient")
-  testthat::expect_equal(data, e14$load_blocks("008", type = "wavelet-coefficient"))
+  data <- self$load_data_with_blocks("008", type = "wavelet-coefficient")
+  testthat::expect_equal(data, e14$load_data_with_blocks("008", type = "wavelet-coefficient"))
 
-  data <- self$load_blocks("008", type = "voltage")
-  testthat::expect_equal(data, e14$load_blocks("008", type = "voltage"))
+  data <- self$load_data_with_blocks("008", type = "voltage")
+  testthat::expect_equal(data, e14$load_data_with_blocks("008", type = "voltage"))
 
   e14$clear_cache()
   self$clear_cache()
@@ -89,10 +89,10 @@ test_that("LFP_reference - multi-channel", {
     data <- self$load_data_with_epochs("phase")
     data <- self$load_data_with_epochs("wavelet-coefficient")
     data <- self$load_data_with_epochs("voltage")
-    data <- self$load_blocks("008", type = "power")
-    data <- self$load_blocks("008", type = "phase")
-    data <- self$load_blocks("008", type = "wavelet-coefficient")
-    data <- self$load_blocks("008", type = "voltage")
+    data <- self$load_data_with_blocks("008", type = "power")
+    data <- self$load_data_with_blocks("008", type = "phase")
+    data <- self$load_data_with_blocks("008", type = "wavelet-coefficient")
+    data <- self$load_data_with_blocks("008", type = "voltage")
     TRUE
   })
 

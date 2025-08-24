@@ -144,9 +144,9 @@ RAVESubjectRecordingBlockTimeFreqBaseRepository <- R6::R6Class(
 
           if(is.null(cached_arrays[[stype]])) {
             # this is a sample electrode channel, load anyway
-            sample_signal <- inst$load_blocks(blocks = block,
-                                              type = data_type,
-                                              simplify = TRUE)
+            sample_signal <- inst$load_data_with_blocks(blocks = block,
+                                                        type = data_type,
+                                                        simplify = TRUE)
             dm <- dim(sample_signal)
             if(!length(dm)) { dm <- length(sample_signal) }
             array_dimension <- c(dm, length(all_electrodes))
@@ -194,7 +194,9 @@ RAVESubjectRecordingBlockTimeFreqBaseRepository <- R6::R6Class(
 
           if(force || is.na(farray[1, 1, sel])) {
             # Channel needs to be loaded
-            signal <- inst$load_blocks(blocks = block, type = data_type, simplify = TRUE)
+            signal <- inst$load_data_with_blocks(blocks = block,
+                                                 type = data_type,
+                                                 simplify = TRUE)
             farray[, , sel] <- signal
           }
           return()

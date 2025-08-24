@@ -43,20 +43,20 @@ test_that("Auxiliary_electrode", {
   # data <- self$load_data("raw-voltage")
   # testthat::expect_equal(data[], e14$load_data("raw-voltage")[])
   #
-  # data <- self$load_blocks("008", type = "power")
-  # testthat::expect_equal(data, e14$load_blocks("008", type = "power"))
+  # data <- self$load_data_with_blocks("008", type = "power")
+  # testthat::expect_equal(data, e14$load_data_with_blocks("008", type = "power"))
   #
-  # data <- self$load_blocks("008", type = "phase")
-  # testthat::expect_equal(data, e14$load_blocks("008", type = "phase"))
+  # data <- self$load_data_with_blocks("008", type = "phase")
+  # testthat::expect_equal(data, e14$load_data_with_blocks("008", type = "phase"))
   #
-  # data <- self$load_blocks("008", type = "wavelet-coefficient")
-  # testthat::expect_equal(data, e14$load_blocks("008", type = "wavelet-coefficient"))
+  # data <- self$load_data_with_blocks("008", type = "wavelet-coefficient")
+  # testthat::expect_equal(data, e14$load_data_with_blocks("008", type = "wavelet-coefficient"))
   #
-  # data <- self$load_blocks("008", type = "voltage")
-  # testthat::expect_equal(data, e14$load_blocks("008", type = "voltage"))
+  # data <- self$load_data_with_blocks("008", type = "voltage")
+  # testthat::expect_equal(data, e14$load_data_with_blocks("008", type = "voltage"))
   #
-  # data <- self$load_blocks("008", type = "raw-voltage")
-  # testthat::expect_equal(data, e14$load_blocks("008", type = "raw-voltage"))
+  # data <- self$load_data_with_blocks("008", type = "raw-voltage")
+  # testthat::expect_equal(data, e14$load_data_with_blocks("008", type = "raw-voltage"))
   #
   #
   # self$clear_cache()

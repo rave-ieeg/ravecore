@@ -70,7 +70,7 @@ electrodes <- repository$electrode_instances
 e <- electrodes$e_14
 
 # referenced voltage
-voltage <- e$load_blocks("008", "voltage")
+voltage <- e$load_data_with_blocks("008", "voltage")
 
 ravetools::diagnose_channel(voltage, srate = 2000)
 
