@@ -325,12 +325,12 @@ RAVESubjectRecordingBlockVoltageRepository <- R6::R6Class(
 #' @export
 prepare_subject_voltage_with_blocks <- function(
     subject, electrodes = NULL, blocks = NULL,
-    reference_name = NULL, ...,
+    reference_name = NULL, downsample = NA, ...,
     quiet = FALSE, repository_id = NULL, strict = TRUE) {
   RAVESubjectRecordingBlockVoltageRepository$new(
     subject = subject, electrodes = electrodes,
-    reference_name = reference_name, blocks = blocks, ...,
-    quiet = quiet, repository_id = repository_id, strict = strict)
+    reference_name = reference_name, blocks = blocks, downsample = downsample,
+    ..., quiet = quiet, repository_id = repository_id, strict = strict)
 }
 
 

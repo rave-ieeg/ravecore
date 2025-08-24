@@ -40,6 +40,7 @@ prepare_subject_voltage_with_blocks(
   electrodes = NULL,
   blocks = NULL,
   reference_name = NULL,
+  downsample = NA,
   ...,
   quiet = FALSE,
   repository_id = NULL,
@@ -97,6 +98,10 @@ prepare_subject_power_with_blocks(
 
 \item{strict}{whether to check existence of subject before loading data;
 default is true}
+
+\item{downsample}{positive integer or \code{NA}, indicating whether the
+signals should be down-sampled during loading, for voltage traces only;
+default is \code{NA}, meaning no down-sampling}
 }
 \value{
 A \code{\link{RAVESubjectRecordingBlockRepository}} instance
@@ -111,9 +116,21 @@ Its existence is simply for backward compatibility. It instantiates a
 super-class of the rest of methods. Therefore, please refer to the rest of
 the methods for loading specific data types.
 
+If you do not need to analyze super high-frequency signals,
+it is recommended to set a proper \code{downsample} value to down-sample
+the signals while loading voltage traces. This helps optimizing the data
+storage and speed up computation (significantly). For example, suppose
+you have 200 channels sampled at 30,000 Hz, a 30-minute recording will
+cost around 80+ gigabyte memory only to store, let along the storage needed
+to compute analyses and time needed to perform those analyses. Down-sampling
+the channels helps a lot. If you are mostly interested in signals below
+100 Hz, then down-sampling voltage traces to 400 Hz will preserve the
+frequency components needed, and it takes 1.2 gigabytes to hold the same
+recording in memory.
+
 Due to the large-data nature of blocks of signals, the repository will
 prepare cache files for all the channels, allowing users to load the
-cached data
+cached data later without needing to reload
 }
 \examples{
 
