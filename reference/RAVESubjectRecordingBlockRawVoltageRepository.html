@@ -13,7 +13,7 @@ repository."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ravecore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9007</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -143,6 +143,7 @@ and the values are the sampling frequencies</p></dd>
 <span>  electrodes <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  reference_name <span class="op">=</span> <span class="st">"noref"</span>,</span>
 <span>  blocks <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  downsample <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  quiet <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  repository_id <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -169,6 +170,13 @@ set to other values will result in a warning</p></dd>
 
 <dt><code>blocks</code></dt>
 <dd><p>name of the recording blocks to load</p></dd>
+
+
+<dt><code>downsample</code></dt>
+<dd><p>down-sample rate by this integer number to save space
+and speed up computation; typically 'ERP' signals do not need super
+high sampling frequencies to load; default is <code>NA</code> and no
+down-sample is performed.</p></dd>
 
 
 <dt><code>...</code></dt>
