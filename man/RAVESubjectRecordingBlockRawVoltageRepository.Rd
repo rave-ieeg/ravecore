@@ -102,6 +102,7 @@ constructor
   electrodes = NULL,
   reference_name = "noref",
   blocks = NULL,
+  downsample = NA,
   ...,
   quiet = TRUE,
   repository_id = NULL,
@@ -122,6 +123,11 @@ constructor
 set to other values will result in a warning}
 
 \item{\code{blocks}}{name of the recording blocks to load}
+
+\item{\code{downsample}}{down-sample rate by this integer number to save space
+and speed up computation; typically 'ERP' signals do not need super
+high sampling frequencies to load; default is \code{NA} and no
+down-sample is performed.}
 
 \item{\code{...}}{passed to \code{\link{RAVESubjectBaseRepository}} constructor}
 

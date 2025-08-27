@@ -29,6 +29,7 @@ prepare_subject_raw_voltage_with_blocks(
   electrodes = NULL,
   blocks = NULL,
   reference_name = "noref",
+  downsample = NA,
   ...,
   quiet = FALSE,
   repository_id = NULL,
