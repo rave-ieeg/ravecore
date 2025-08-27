@@ -961,14 +961,33 @@ RAVESubject <- R6::R6Class(
   )
 )
 
-
-
-#' Get \code{\link{RAVESubject}} instance from character
+#' @name new_rave_subject
+#' @title Get \code{\link{RAVESubject}} instance from character
+#' @param project_name character of 'RAVE' project name
+#' @param subject_code character of 'RAVE' subject code
 #' @param subject_id character in format \code{"project/subject"}
 #' @param strict whether to check if subject directories exist or not
 #' @param reload whether to reload (update) subject information, default is true
 #' @returns \code{\link{RAVESubject}} instance
 #' @seealso \code{\link{RAVESubject}}
+#' @examples
+#'
+#' subject <- new_rave_subject(project_name = "demo@bids:ds04001",
+#'                             subject_code = "DemoSubject",
+#'                             strict = FALSE)
+#'
+#' subject
+#'
+#' subject$project$path
+#' subject$imaging_path
+#'
+#' @export
+new_rave_subject <- function(project_name, subject_code, strict = TRUE) {
+  RAVESubject$new(project_name = project_name, subject_code = subject_code, strict = strict)
+}
+
+
+#' @rdname new_rave_subject
 #' @export
 as_rave_subject <- function(subject_id, strict = TRUE, reload = TRUE){
   if(inherits(subject_id, 'RAVESubject')){
@@ -988,6 +1007,8 @@ as_rave_subject <- function(subject_id, strict = TRUE, reload = TRUE){
   }
 
 }
+
+
 
 restore_subject_instance <- function(subject_id, strict = FALSE) {
   if(inherits(subject_id, 'RAVESubject')){
