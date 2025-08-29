@@ -76,9 +76,17 @@ glimpse_voltage_repository_with_blocks <- function(
   if(is.na(channel_gap) || channel_gap < 0) { channel_gap <- 1000 }
 
   # Get epoch
-  if(isTRUE(epoch_name %in% repository$subject$epoch_names)) {
+  if(inherits(epoch_name, "RAVEEpoch")) {
+    epoch <- epoch_name
+    epoch_name <- epoch$name
+  } else if(isTRUE(epoch_name %in% repository$subject$epoch_names)) {
     epoch <- repository$subject$get_epoch(epoch_name = epoch_name, as_table = FALSE)
-
+  } else {
+    epoch <- NULL
+  }
+  if(is.null(epoch)) {
+    annotation_table_full <- NULL
+  } else {
     # generate annotation table from epoch
     epoch_events <- unique(c("", epoch$available_events))
     annotation_table_full <- data.table::rbindlist(lapply(seq_along(epoch_events), function(ii) {
@@ -99,9 +107,6 @@ glimpse_voltage_repository_with_blocks <- function(
         color = ii + 1
       )
     }))
-  } else {
-    epoch <- NULL
-    annotation_table_full <- NULL
   }
 
 

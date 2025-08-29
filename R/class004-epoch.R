@@ -122,7 +122,7 @@ RAVEEpoch <- R6::R6Class(
         })
         cnames <- names(table)
         cnames <- cnames[!cnames %in% c(BASIC_EPOCH_TABLE_COLUMNS, 'X')]
-        cnames <- cnames[grepl('^X\\.[0-9]+$', cnames)]
+        cnames <- cnames[!grepl('^X\\.[0-9]+$', cnames)]
         self$.columns <- cnames
       }
       self$update_table()
