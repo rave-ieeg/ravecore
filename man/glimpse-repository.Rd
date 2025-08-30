@@ -3,19 +3,31 @@
 \name{glimpse-repository}
 \alias{glimpse-repository}
 \alias{glimpse_voltage_repository_with_blocks}
+\alias{glimpse_voltage_filearray}
 \title{Visualizes repositories with interactive plots}
 \usage{
 glimpse_voltage_repository_with_blocks(
   repository,
   initial_block = NULL,
   channels = NULL,
-  epoch_name = NULL,
+  epoch = NULL,
   start_time = 0,
   duration = 5,
   channel_gap = 1000,
   highpass_freq = NA,
-  lowpass_freq = NA,
-  shiny_ns = NULL
+  lowpass_freq = NA
+)
+
+glimpse_voltage_filearray(
+  filearray,
+  sample_rate,
+  channels = NULL,
+  epoch = NULL,
+  start_time = 0,
+  duration = 5,
+  channel_gap = 1000,
+  highpass_freq = NA,
+  lowpass_freq = NA
 )
 }
 \arguments{
@@ -25,7 +37,7 @@ glimpse_voltage_repository_with_blocks(
 
 \item{channels}{channels to visualize; default is all}
 
-\item{epoch_name}{additional epoch to annotation}
+\item{epoch}{additional epoch to annotation}
 
 \item{start_time, duration, channel_gap}{initial start time, duration, and
 channel gap (can be changed later)}
@@ -52,13 +64,40 @@ if(interactive() && file.exists(subject$data_path)) {
     subject = subject
   )
 
-  glimpse_voltage_repository_with_blocks(
+  app <- glimpse_voltage_repository_with_blocks(
     repository = repository,
     initial_block = "008",
-    epoch_name = "auditory_onset",
+    epoch = "auditory_onset",
     highpass_freq = 0.5
   )
 
+  print(app)
+  close(app)
+
 }
+
+# ---- Example 2 ---------------------------------------------------
+
+# Construct a filearray
+
+
+sample_rate <- 100
+filearray <- filearray::as_filearray(array(rnorm(50000),
+                                           dim = c(10000, 5)))
+
+dimnames(filearray) <- list(
+  Time = seq_len(10000) / sample_rate,
+  Electrode = 1:5
+)
+
+app <- glimpse_voltage_filearray(filearray = filearray,
+                                 sample_rate = sample_rate,
+                                 channel_gap = 6)
+
+if(interactive()) {
+  print(app)
+}
+
+
 
 }

@@ -9,7 +9,7 @@
 #' @param repository 'RAVE' repository
 #' @param initial_block initial recording block to select
 #' @param channels channels to visualize; default is all
-#' @param epoch_name additional epoch to annotation
+#' @param epoch additional epoch to annotation
 #' @param start_time,duration,channel_gap initial start time, duration, and
 #' channel gap (can be changed later)
 #' @param highpass_freq,lowpass_freq filter to apply when visualizing the
@@ -27,33 +27,58 @@
 #'     subject = subject
 #'   )
 #'
-#'   glimpse_voltage_repository_with_blocks(
+#'   app <- glimpse_voltage_repository_with_blocks(
 #'     repository = repository,
 #'     initial_block = "008",
-#'     epoch_name = "auditory_onset",
+#'     epoch = "auditory_onset",
 #'     highpass_freq = 0.5
 #'   )
 #'
+#'   print(app)
+#'   close(app)
+#'
 #' }
+#'
+#' # ---- Example 2 ---------------------------------------------------
+#'
+#' # Construct a filearray
+#'
+#'
+#' sample_rate <- 100
+#' filearray <- filearray::as_filearray(array(rnorm(50000),
+#'                                            dim = c(10000, 5)))
+#'
+#' dimnames(filearray) <- list(
+#'   Time = seq_len(10000) / sample_rate,
+#'   Electrode = 1:5
+#' )
+#'
+#' app <- glimpse_voltage_filearray(filearray = filearray,
+#'                                  sample_rate = sample_rate,
+#'                                  channel_gap = 6)
+#'
+#' if(interactive()) {
+#'   print(app)
+#' }
+#'
+#'
 #'
 #' @export
 glimpse_voltage_repository_with_blocks <- function(
-    repository, initial_block = NULL, channels = NULL, epoch_name = NULL,
+    repository, initial_block = NULL, channels = NULL, epoch = NULL,
     start_time = 0, duration = 5, channel_gap = 1000,
-    highpass_freq = NA, lowpass_freq = NA, shiny_ns = NULL) {
+    highpass_freq = NA, lowpass_freq = NA) {
 
   if(!package_installed("plotly")) {
     stop("This function requires package `plotly`. Please instal this package first.")
   }
 
   # repository <- ravecore::prepare_subject_voltage_with_blocks("demo/DemoSubject")
-  # epoch_name <- "auditory_onset"
+  # epoch <- "auditory_onset"
   # channels <- NULL
   # initial_block <- NULL
   # channel_gap <- 1000
   # start_time = 0; duration = 5
-
-  ns <- shiny::NS(shiny_ns)
 
   if(!length(highpass_freq)) { highpass_freq <- NA }
   if(!length(lowpass_freq)) { lowpass_freq <- NA }
@@ -76,10 +101,10 @@ glimpse_voltage_repository_with_blocks <- function(
   if(is.na(channel_gap) || channel_gap < 0) { channel_gap <- 1000 }
 
   # Get epoch
-  if(inherits(epoch_name, "RAVEEpoch")) {
-    epoch <- epoch_name
+  if(inherits(epoch, "RAVEEpoch")) {
     epoch_name <- epoch$name
-  } else if(isTRUE(epoch_name %in% repository$subject$epoch_names)) {
+  } else if(is.character(epoch) && isTRUE(epoch %in% repository$subject$epoch_names)) {
+    epoch_name <- epoch
     epoch <- repository$subject$get_epoch(epoch_name = epoch_name, as_table = FALSE)
   } else {
     epoch <- NULL
@@ -286,70 +311,73 @@ glimpse_voltage_repository_with_blocks <- function(
   n_timepoints <- signal_info$dim[[1]]
   max_duration <- floor(n_timepoints / signal_info$sample_rate)
 
-  module_ui <- shiny::fluidPage(
-    shiny::tags$style(
-      ".row { margin-left: 0; margin-right: 0; }",
-      ".col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9 { padding: 0; }"
-    ),
-    style = "margin:0; padding:0; height:100vh",
-    shiny::sidebarLayout(
-      fluid = TRUE,
-      shiny::sidebarPanel(
-
-        style = "height:100vh; border-radius:0",
-        width = 2,
-
-        shiny::selectInput(
-          inputId = ns("block"),
-          label = "Block",
-          choices = repository$blocks,
-          selected = initial_block
-        ),
-
-        shiny::selectInput(
-          inputId = ns("quality"),
-          label = "Quality",
-          choices = c("performance", "balanced", "high-quality"),
-          selected = "performance"
-        ),
-
-        shiny::numericInput(
-          inputId = ns("channel_gap"),
-          label = "Gap size",
-          min = 0, step = 50,
-          value = channel_gap
-        ),
-
-        shiny::numericInput(
-          inputId = ns("start_time"),
-          label = "Start time",
-          min = 0, max = floor(max_duration - 1), step = 1,
-          value = start_time
-        ),
-
-        shiny::numericInput(
-          inputId = ns("duration"),
-          label = "Duration",
-          min = 0, step = 0.5,
-          value = duration
-        ),
-
-        shiny::actionButton(
-          inputId = ns("sync"),
-          label = "Sync selection"
-        )
-
+  module_ui <- function(id = NULL) {
+    ns <- shiny::NS(id)
+    shiny::fluidPage(
+      shiny::tags$style(
+        ".row { margin-left: 0; margin-right: 0; }",
+        ".col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9 { padding: 0; }"
       ),
+      style = "margin:0; padding:0; height:100vh",
+      shiny::sidebarLayout(
+        fluid = TRUE,
+        shiny::sidebarPanel(
 
-      shiny::mainPanel(
+          style = "height:100vh; border-radius:0",
+          width = 2,
 
-        width = 10,
+          shiny::selectInput(
+            inputId = ns("block"),
+            label = "Block",
+            choices = repository$blocks,
+            selected = initial_block
+          ),
 
-        plotly::plotlyOutput(outputId = ns("stream_plot"), width = "100%", height = "100vh")
+          shiny::selectInput(
+            inputId = ns("quality"),
+            label = "Quality",
+            choices = c("performance", "balanced", "high-quality"),
+            selected = "performance"
+          ),
 
+          shiny::numericInput(
+            inputId = ns("channel_gap"),
+            label = "Channel range",
+            min = 0, step = 50,
+            value = channel_gap
+          ),
+
+          shiny::numericInput(
+            inputId = ns("start_time"),
+            label = "Start time",
+            min = 0, max = floor(max_duration - 1), step = 1,
+            value = start_time
+          ),
+
+          shiny::numericInput(
+            inputId = ns("duration"),
+            label = "Duration",
+            min = 0, step = 0.5,
+            value = duration
+          ),
+
+          shiny::actionButton(
+            inputId = ns("sync"),
+            label = "Sync selection"
+          )
+
+        ),
+
+        shiny::mainPanel(
+
+          width = 10,
+
+          plotly::plotlyOutput(outputId = ns("stream_plot"), width = "100%", height = "100vh")
+
+        )
       )
     )
-  )
+  }
 
   module_server <- function(input, output, session, ...){
 
@@ -476,13 +504,469 @@ glimpse_voltage_repository_with_blocks <- function(
     options <- list()
   }
 
-  shiny::shinyApp(
+  env <- new.env(parent = emptyenv())
+  list2env(list(
     ui = module_ui,
-    server = function(input, output, session) {
-      shiny::moduleServer(id = shiny_ns, module_server)
-    },
+    server = module_server,
     options = options
-  )
+  ), envir = env)
+  class(env) <- "glimpse_shinyapp"
+  return(env)
 }
 
-# glimpse_voltage_repository_with_blocks(repository, highpass_freq = 1)
+
+#' @rdname glimpse-repository
+#' @export
+glimpse_voltage_filearray <- function(
+    filearray, sample_rate, channels = NULL, epoch = NULL,
+    start_time = 0, duration = 5, channel_gap = 1000,
+    highpass_freq = NA, lowpass_freq = NA
+) {
+
+  if(!package_installed("plotly")) {
+    stop("This function requires package `plotly`. Please instal this package first.")
+  }
+
+  if(!inherits(filearray, "FileArray")) {
+    stop("`filearray` must be a file array created from package `filearray`")
+  }
+  dnames <- dimnames(filearray)
+
+  if(!identical(c("Time", "Electrode"), names(dnames))) {
+    stop("Filearray must have `Time` x `Electrode` dimensions")
+  }
+
+  # repository_ <- ravecore::prepare_subject_voltage_with_blocks("demo/DemoSubject")
+  # filearray <- repository_$voltage$`012`$LFP$data
+  # epoch <- repository_$subject$get_epoch("auditory_onset")
+  # channels <- NULL
+  # channel_gap <- 1000
+  # start_time = 0; duration = 5
+  # sample_rate <- 30000
+
+  if(!length(highpass_freq)) { highpass_freq <- NA }
+  if(!length(lowpass_freq)) { lowpass_freq <- NA }
+  filter_msg <- NULL
+  if(!is.na(highpass_freq)) {
+    filter_msg <- sprintf(" HighPass=%g", highpass_freq)
+  }
+  if(!is.na(lowpass_freq)) {
+    filter_msg <- c(filter_msg, sprintf(" LowPass=%g", lowpass_freq))
+  }
+  filter_msg <- paste(filter_msg, collapse = ",")
+
+
+  channels <- parse_svec(channels)
+  all_channels <- dnames$Electrode
+  channels <- all_channels[all_channels %in% channels]
+  if(!length(channels)) {
+    channels <- all_channels
+  }
+
+  if(is.na(channel_gap) || channel_gap < 0) { channel_gap <- 1000 }
+
+  # Get epoch
+  if(inherits(epoch, "RAVEEpoch")) {
+    epoch_name <- epoch$name
+  } else {
+    epoch <- NULL
+  }
+  if(is.null(epoch)) {
+    annotation_table_full <- NULL
+  } else {
+    # generate annotation table from epoch
+    epoch_events <- unique(c("", epoch$available_events))
+    annotation_table_full <- data.table::rbindlist(lapply(seq_along(epoch_events), function(ii) {
+      event_name <- epoch_events[[ii]]
+      event_cname <- epoch$get_event_colname(event = event_name, missing = "warning")
+      if(event_name == "") { event_name <- "Onset" }
+      annotation_table <- data.frame(
+        block = epoch$table$Block,
+        time = epoch$table[[event_cname]],
+        label = sprintf(
+          "%s[%s,t=%.1f]<br>[%s]%s",
+          event_name,
+          epoch$table$Trial,
+          epoch$table[[event_cname]],
+          epoch$table$Block,
+          epoch$table$Condition
+        ),
+        group = event_name,
+        color = ii + 1
+      )
+    }))
+  }
+
+
+
+  # get electrode table
+
+  # channel names
+  channel_names <- sprintf("ch%d", channels)
+
+  # initialize the plot object
+  stream_plot_container <- StreamSignalPlot$new(
+    n_channels = length(channels),
+    sample_rates = sample_rate,
+    start_time = start_time,
+    channel_names = channel_names,
+    channel_gap = channel_gap,
+    title = "",
+    ylab = "Channel"
+  )
+
+  update_plot <- function(
+    start_time,
+    duration,
+    channel_gap,
+    quality = c("performance", "balanced", "high-quality"),
+    init = FALSE,
+    stream_proxy
+  ) {
+
+    quality <- match.arg(quality)
+
+    if(length(start_time) != 1 || is.na(start_time)) { start_time <- stream_plot_container$start_time }
+    if(length(duration) != 1 || is.na(duration)) { start_time <- stream_plot_container$max_duration }
+    if(length(channel_gap) != 1 || is.na(channel_gap)) { channel_gap <- stream_plot_container$channel_gap }
+
+    end_time <- start_time + duration
+
+    current_start_time <- stream_plot_container$start_time
+    current_duration <- stream_plot_container$max_duration
+    current_data_range <- current_start_time + c(0, current_duration)
+
+    stream_plot_container$channel_gap <- channel_gap
+    stream_plot_container$annotations <- annotation_table_full
+    stream_plot_container$title <- filter_msg
+
+    switch (
+      quality,
+      "high-quality" = { stream_plot_container$MAX_POINTS <- 2000000 },
+      "performance" = { stream_plot_container$MAX_POINTS <- 100000 },
+      { stream_plot_container$MAX_POINTS <- 500000 }
+    )
+
+    # Whether to load data from disk - performance
+    data_needs_update <- init ||
+      current_data_range[[1]] > start_time ||
+      current_data_range[[2]] < end_time
+
+    # Update stream_plot_container
+    if( data_needs_update ) {
+      shiny::showNotification("Loading data...", id = "notification")
+
+      if( init ) {
+        load_start_time <- start_time
+        load_duration <- duration
+      } else {
+        # preload duration
+        total_sample_rates <- sum(stream_plot_container$sample_rates)
+        total_timepoints <- duration * total_sample_rates
+        if(total_timepoints <= 1e6) {
+          # 40 MB from disk
+          load_duration <- 1e7 / total_sample_rates
+          load_start_time <- start_time - ((load_duration - duration) * 0.5)
+          if(load_start_time < 0) {
+            load_start_time <- 0
+          }
+        } else if(total_timepoints <= 1e7){
+          # max 100 MB from disk
+          load_start_time <- start_time
+          load_duration <- duration + ceiling(duration * 0.75)
+        } else {
+          load_start_time <- start_time
+          load_duration <- duration
+        }
+      }
+
+      # construct filters
+      filter <- NULL
+      if(!is.na(highpass_freq) || !is.na(lowpass_freq)) {
+        max_order <- floor(load_duration * sample_rate / 3) - 1
+        filter <- ravetools::design_filter(
+          sample_rate = sample_rate,
+          method = "firls",
+          high_pass_freq = highpass_freq,
+          low_pass_freq = lowpass_freq,
+          filter_order = min(1600, max_order)
+        )
+      }
+
+      row_selector <- which(dnames$Electrode %in% channels)
+      signal_data <- unname(subset(
+        filearray,
+        Electrode ~ Electrode %in% channels,
+        Time ~ Time >= load_start_time & Time <= (load_start_time + load_duration),
+        drop = FALSE, .env = environment()
+      ))
+
+      if(length(filter)) {
+        signal_data <- ravetools::filtfilt(b = filter$b, a = filter$a, x = signal_data)
+      }
+
+      lapply(seq_along(row_selector), function(ii) {
+        stream_plot_container$set_channel_data(row_selector[[ii]], data = signal_data[, ii])
+        return()
+      })
+
+      stream_plot_container$start_time <- load_start_time
+    }
+
+
+    if(!init) {
+      shiny::showNotification("Updating graphics...", id = "notification")
+      stream_plot_container$update(proxy = stream_proxy,
+                                   start_time = start_time,
+                                   duration = duration)
+    }
+    shiny::removeNotification(id = "notification")
+  }
+
+  # initialize UI
+  n_timepoints <- length(dnames$Time)
+  max_duration <- floor(n_timepoints / sample_rate)
+
+  module_ui <- function(id = NULL) {
+    ns <- shiny::NS(id)
+    shiny::fluidPage(
+      shiny::tags$style(
+        ".row { margin-left: 0; margin-right: 0; }",
+        ".col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9 { padding: 0; }"
+      ),
+      style = "margin:0; padding:0; height:100vh",
+      shiny::sidebarLayout(
+        fluid = TRUE,
+        shiny::sidebarPanel(
+
+          style = "height:100vh; border-radius:0",
+          width = 2,
+
+          shiny::selectInput(
+            inputId = ns("quality"),
+            label = "Quality",
+            choices = c("performance", "balanced", "high-quality"),
+            selected = "performance"
+          ),
+
+          shiny::numericInput(
+            inputId = ns("channel_gap"),
+            label = "Channel range",
+            min = 0, step = 50,
+            value = channel_gap
+          ),
+
+          shiny::numericInput(
+            inputId = ns("start_time"),
+            label = "Start time",
+            min = 0, max = floor(max_duration - 1), step = 1,
+            value = start_time
+          ),
+
+          shiny::numericInput(
+            inputId = ns("duration"),
+            label = "Duration",
+            min = 0, step = 0.5,
+            value = duration
+          ),
+
+          shiny::actionButton(
+            inputId = ns("sync"),
+            label = "Sync selection"
+          )
+
+        ),
+
+        shiny::mainPanel(
+
+          width = 10,
+
+          plotly::plotlyOutput(outputId = ns("stream_plot"), width = "100%", height = "100vh")
+
+        )
+      )
+    )
+  }
+
+  module_server <- function(input, output, session, ...){
+
+
+    # Local reactive values, used to store reactive event triggers
+    local_reactives <- shiny::reactiveValues(
+      update_outputs = NULL
+    )
+
+    stream_proxy <- plotly::plotlyProxy(outputId = "stream_plot", session = session)
+
+    # input inter-interactions
+    shiny::bindEvent(
+      shiny::observe({
+        # try({
+        duration <- input$duration
+        if(length(duration) == 1 && !is.na(duration) && isTRUE(duration > 0)) {
+          shiny::updateNumericInput(
+            session = session,
+            inputId = 'start_time',
+            step = max(duration * 0.75, min(1, round(duration, 2)))
+          )
+        }
+        # })
+      }),
+      input$duration,
+      ignoreNULL = TRUE, ignoreInit = FALSE
+    )
+
+    shiny::bindEvent(
+      shiny::observe({
+        update_plot(
+          start_time = input$start_time,
+          duration = input$duration,
+          channel_gap = input$channel_gap,
+          quality = input$quality,
+          init = FALSE,
+          stream_proxy = stream_proxy
+        )
+      }),
+      input$start_time,
+      input$duration,
+      input$channel_gap,
+      input$quality,
+      ignoreNULL = TRUE, ignoreInit = TRUE
+    )
+
+
+    shiny::bindEvent(
+      shiny::observe({
+        relayout <- as.list(plotly::event_data("plotly_relayout"))
+        start_time <- as.numeric(relayout[["xaxis.range[0]"]])
+        end_time <- as.numeric(relayout[["xaxis.range[1]"]])
+        if(length(start_time) != 1 || is.na(start_time)) { return() }
+        # start_time <- floor(start_time)
+        shiny::updateNumericInput(session = session,
+                                  inputId = 'start_time',
+                                  value = start_time)
+
+        if(length(end_time) != 1 || is.na(end_time)) { return() }
+        duration <- end_time - start_time
+        shiny::updateNumericInput(session = session,
+                                  inputId = 'duration',
+                                  value = duration)
+      }),
+      input$sync,
+      ignoreInit = TRUE, ignoreNULL = TRUE
+    )
+
+    # Register outputs
+    output$stream_plot <- plotly::renderPlotly({
+
+      update_plot(
+        start_time = start_time,
+        duration = duration,
+        channel_gap = channel_gap,
+        quality = "performance",
+        init = TRUE
+      )
+
+      stream_plot_container$render()
+    })
+  }
+
+  if(rstudio_main_session()) {
+    # rstudioapi::viewer
+    options <- list(launch.browser = asNamespace("rstudioapi")$viewer)
+  } else {
+    options <- list()
+  }
+
+  env <- new.env(parent = emptyenv())
+  list2env(list(
+    ui = module_ui,
+    server = module_server,
+    options = options
+  ), envir = env)
+  class(env) <- "glimpse_shinyapp"
+  return(env)
+}
+
+#' @export
+print.glimpse_shinyapp <- function(x, port = NULL, use_browser = FALSE, ...) {
+
+  args <- list(...)
+  options <- as.list(x$options)
+  if(length(names(args))) {
+    options[names(args)] <- args
+  }
+
+  # we can use rs_exec
+  running <- FALSE
+  if(length(x$.job_id)) {
+    running <- tryCatch(
+      {
+        status <- ravepipeline::check_job(x$.job_id)
+        status$status == 2
+      },
+      error = function(e) {
+        FALSE
+      }
+    )
+    if(!running) {
+      ravepipeline::remove_job(x$.job_id)
+    }
+  }
+  if(!running) {
+    # find an available port
+    if(is.null(port)) {
+      if(is.null(x$port)) {
+        httpuv <- asNamespace("httpuv")
+        x$port <- httpuv$randomPort()
+      }
+    } else {
+      x$port <- port
+    }
+
+    options$port <- x$port
+    x$.job_id <- ravepipeline::start_job(
+      function(x, options) {
+        options$launch.browser <- FALSE
+        print(shiny::shinyApp(
+          ui = x$ui(),
+          server = x$server,
+          options = options
+        ))
+
+      },
+      fun_args = list(x = x, options = options),
+      ensure_init = TRUE,
+      method = "callr",
+      workdir = tempdir(check = TRUE)
+    )
+  }
+
+  url <- sprintf("http://127.0.0.1:%s", x$port)
+
+  if(is.function(options$launch.browser) && !use_browser) {
+    if(!running) { Sys.sleep(2) }
+    options$launch.browser(url)
+  } else if(isTRUE(options$launch.browser) || use_browser) {
+    if(!running) { Sys.sleep(2) }
+    utils::browseURL(url)
+  }
+
+  message(sprintf("ShinyApp created at\n\t%s\n\nIf you see nothing, print the app again or copy-paste this URL to the browser and the app will appear...\nRun `close(app)` to shut it down.", url))
+
+  invisible(url)
+}
+
+#' @export
+close.glimpse_shinyapp <- function(con, ...) {
+  if(length(con$.job_id)) {
+    ravepipeline::remove_job(con$.job_id)
+    con$.job_id <- NULL
+  }
+  invisible(con)
+}
+
+# repository_ <- ravecore::prepare_subject_voltage_with_blocks("demo/DemoSubject")
+# app <- glimpse_voltage_repository_with_blocks(repository_, highpass_freq = 1)
+# filearray <- repository_$voltage$`012`$LFP$data
+# glimpse_voltage_filearray(filearray, 2000)
