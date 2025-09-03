@@ -568,8 +568,25 @@ glimpse_voltage_filearray <- function(
   # Get epoch
   if(inherits(epoch, "RAVEEpoch")) {
     epoch_name <- epoch$name
-  } else {
-    epoch <- NULL
+  } else if(is.character(epoch) && !is.na(epoch) && nzchar(epoch)) {
+    epoch_table <- filearray$get_header(epoch, default = NULL)
+    if(is.data.frame(epoch_table) && nrow(epoch_table)) {
+      epoch <- tryCatch(
+        {
+          epoch <- RAVEEpoch$new("demo/DemoSubject", name = "_dummy_")
+          epoch$data$`@reset`()
+          lapply(seq_len(nrow(epoch_table)), function(ii) {
+            row <- epoch_table[ii, ]
+            epoch$data[[as.character(row$Trial)]] <- row
+          })
+          epoch$update_table()
+          epoch
+        },
+        error = function(e) {
+          NULL
+        }
+      )
+    }
   }
   if(is.null(epoch)) {
     annotation_table_full <- NULL
