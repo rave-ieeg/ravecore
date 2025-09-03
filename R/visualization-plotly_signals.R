@@ -72,7 +72,7 @@ StreamSignalPlot <- R6::R6Class(
             x0    = t0, x1 = t0,
             y0    = 0,  y1 = 1,
             line  = list(color = annot_colors[[ii]], width = 1),
-            layer = "below"     # draw above traces
+            layer = "between"     # draw above traces
           ),
           annot = list(
             xref = "x2", yref = "paper",
