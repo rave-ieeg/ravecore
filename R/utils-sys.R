@@ -37,3 +37,15 @@ rstudio_main_session <- function(
 shiny_is_running <- function() {
   asNamespace("ravepipeline")$shiny_is_running()
 }
+
+
+rstudio_viewer <- function(missing = TRUE) {
+
+  if( rstudio_main_session() ) {
+    # This means rstudioapi has been installed
+    return(asNamespace("rstudioapi")$viewer)
+  }
+
+  return(missing)
+
+}

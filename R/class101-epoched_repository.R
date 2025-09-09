@@ -1,4 +1,4 @@
-restore_epoch_container_from_snapshot = function(container, snapshot) {
+restore_epoch_container_from_snapshot <- function(container, snapshot) {
   if(is.null(snapshot)) { return(invisible()) }
   tryCatch({
 

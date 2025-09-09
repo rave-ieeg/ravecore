@@ -3,6 +3,9 @@
 # Make sure python is properly configured if ravemanager is installed
 # or do nothing
 if( get0("check_rpymat", inherits = TRUE, ifnotfound = TRUE) ) {
+  # This is non-CRAN package for RAVE users,
+  # For normal CRAN users, this script will end up with errors unless
+  # they explicitly configure python environments
   if(system.file(package = "ravemanager") != "") {
     ravemanager <- asNamespace("ravemanager")
     ravemanager$configure_python(verbose = TRUE)

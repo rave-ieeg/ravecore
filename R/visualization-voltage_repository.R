@@ -499,7 +499,7 @@ glimpse_voltage_repository_with_blocks <- function(
 
   if(rstudio_main_session()) {
     # rstudioapi::viewer
-    options <- list(launch.browser = asNamespace("rstudioapi")$viewer)
+    options <- list(launch.browser = rstudio_viewer())
   } else {
     options <- list()
   }
@@ -890,7 +890,7 @@ glimpse_voltage_filearray <- function(
 
   if(rstudio_main_session()) {
     # rstudioapi::viewer
-    options <- list(launch.browser = asNamespace("rstudioapi")$viewer)
+    options <- list(launch.browser = rstudio_viewer())
   } else {
     options <- list()
   }
@@ -934,8 +934,18 @@ print.glimpse_shinyapp <- function(x, port = NULL, use_browser = FALSE, ...) {
     # find an available port
     if(is.null(port)) {
       if(is.null(x$port)) {
-        httpuv <- asNamespace("httpuv")
-        x$port <- httpuv$randomPort()
+        x$port <- tryCatch(
+          {
+            # use optional package httpuv
+            httpuv::randomPort()
+          },
+          error = function(e) {
+
+            # alternatively, randomly select one port
+            sample(seq(1205L, 49151L), size = 1L)
+          }
+        )
+
       }
     } else {
       x$port <- port

@@ -497,6 +497,15 @@ install_subject <- function(
     item <- template_subjects[[path]]
     if(isTRUE(item$version == 1)){
       # use rave::download_sample_data (RAVE 1.0)
+      # RAVE 1.0 uses non-CRAN package
+
+      # We need to check availability as users installed from CRAN directly
+      # wouldn't have this package.
+      if(!package_installed("rave")) {
+        stop("This subject is a RAVE 1.0 subject. Please follow https://rave.wiki to install RAVE before installing this subject.")
+      }
+
+      # For max backward compatibility
       rave <- asNamespace("rave")
       rave$download_sample_data(subject = path, replace_if_exists = TRUE)
       return(invisible())
