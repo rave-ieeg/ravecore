@@ -45,10 +45,15 @@ channel gap (can be changed later)}
 \item{highpass_freq, lowpass_freq}{filter to apply when visualizing the
 signals, useful when signals have 'DC' shift}
 
-\item{shiny_ns}{shiny name-space}
+\item{filearray}{a \code{\link[filearray]{as_filearray}} object, must be two
+dimensional matrix for voltage (time by electrode), with
+\code{\link{dimnames}} being the time in seconds and electrode in label name}
+
+\item{sample_rate}{sample rate of the file-array}
 }
 \value{
-An R-shiny application
+An R-shiny application container environment; use
+\code{\link{print}} method to launch the application.
 }
 \description{
 Requires optional package \code{'plotly'}; please install the package prior
@@ -97,7 +102,6 @@ app <- glimpse_voltage_filearray(filearray = filearray,
 if(interactive()) {
   print(app)
 }
-
 
 
 }

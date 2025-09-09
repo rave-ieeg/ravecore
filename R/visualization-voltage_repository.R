@@ -14,9 +14,14 @@
 #' channel gap (can be changed later)
 #' @param highpass_freq,lowpass_freq filter to apply when visualizing the
 #' signals, useful when signals have 'DC' shift
-#' @param shiny_ns shiny name-space
+#' @param filearray a \code{\link[filearray]{as_filearray}} object, must be two
+#' dimensional matrix for voltage (time by electrode), with
+#' \code{\link{dimnames}} being the time in seconds and electrode in label name
+#' @param sample_rate sample rate of the file-array
 #'
-#' @returns An R-shiny application
+#' @returns An R-shiny application container environment; use
+#' \code{\link{print}} method to launch the application.
+#'
 #' @examples
 #'
 #' subject <- as_rave_subject("demo/DemoSubject", strict = FALSE)
@@ -62,7 +67,9 @@
 #' }
 #'
 #'
-#'
+NULL
+
+#' @rdname glimpse-repository
 #' @export
 glimpse_voltage_repository_with_blocks <- function(
     repository, initial_block = NULL, channels = NULL, epoch = NULL,
