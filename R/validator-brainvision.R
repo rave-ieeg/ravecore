@@ -55,7 +55,7 @@ validate_raw_brainvision <- function(subject, blocks, electrodes, check_content 
 
           is_brainvision <- tolower(query_results$extension) %in% c("dat", "eeg", "vhdr", "vmrk")
 
-          if(!any(sel)) {
+          if(!any(is_brainvision)) {
             validation_errors$add(sprintf("Files with BIDS entities `%s` found, but no BrainVision files (.dat, .eeg, .vhdr, .vmrk) found.", block))
             return()
           }

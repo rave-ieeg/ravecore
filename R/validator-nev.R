@@ -61,7 +61,7 @@ validate_raw_nevnsx <- function(subject, blocks, electrodes, check_content = TRU
 
           is_headerfile <- tolower(query_results$extension) %in% c("nev")
 
-          if(!any(sel)) {
+          if(!any(is_headerfile)) {
             validation_errors$add(sprintf("Files with BIDS entities `%s` found, but no NeuroEvent files (.nev) found.", block))
             return()
           }
