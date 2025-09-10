@@ -9,7 +9,7 @@ Authors@R: c(
     person("Trustees of the University of Pennsylvania", role = "cph",
             comment = "All files in this package unless explicitly stated in the file")
     )
-Description: Core infastructure to read, process, and analyze intracranial
+Description: Core infrastructure to read, process, and analyze intracranial
     electroencephalography and deep-brain stimulation in 'RAVE', a
     reproducible framework for analysis and visualization of 'iEEG' 
     by Magnotti, Wang, and Beauchamp, (2020, 
