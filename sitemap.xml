@@ -4,6 +4,7 @@
 <url><loc>http://rave.wiki/ravecore/LICENSE.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/authors.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/index.html</loc></url>
+<url><loc>http://rave.wiki/ravecore/news/index.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/Auxiliary_electrode.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/LFP_electrode.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/LFP_reference.html</loc></url>
@@ -64,8 +65,8 @@
 <url><loc>http://rave.wiki/ravecore/reference/py_nipy_coreg.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/rave_brain.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/rave_cmd_tools.html</loc></url>
+<url><loc>http://rave.wiki/ravecore/reference/rave_legacy_subject_format_conversion.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/rave_path.html</loc></url>
-<url><loc>http://rave.wiki/ravecore/reference/rave_subject_format_conversion.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/ravecore-constants.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/ravecore-package.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/run_wavelet.html</loc></url>

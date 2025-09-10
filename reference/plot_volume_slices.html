@@ -9,7 +9,7 @@ package htmltools."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ravecore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9010</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9011</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -18,9 +18,10 @@ package htmltools."></head><body>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/orgs/rave-ieeg/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/rave-ieeg/ravecore/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -30,7 +31,7 @@ package htmltools."></head><body>
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Plot volume slices into 'SVG' images</h1>
-      <small class="dont-index">Source: <a href="https://github.com/orgs/rave-ieeg/blob/main/R/utils-nifti2svg.R" class="external-link"><code>R/utils-nifti2svg.R</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/rave-ieeg/ravecore/blob/main/R/utils-nifti2svg.R" class="external-link"><code>R/utils-nifti2svg.R</code></a></small>
       <div class="d-none name"><code>plot_volume_slices.Rd</code></div>
     </div>
 
@@ -160,7 +161,6 @@ plotted directly.</p>
 <span class="r-in"><span>  depths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">150</span>, length.out <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>, pixel_width <span class="op">=</span> <span class="fl">5</span>,</span></span>
 <span class="r-in"><span>  overlay_col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#00000000"</span>, <span class="st">"#FF000044"</span>, <span class="st">"#FF0000FF"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> 'base64_plot' is not an exported object from 'namespace:ravepipeline'</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Actual NIfTI</span></span></span>
 <span class="r-in"><span><span class="co"># Require `install_subject("yael_demo_001")`</span></span></span>
