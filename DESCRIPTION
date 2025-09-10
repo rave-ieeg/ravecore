@@ -1,6 +1,6 @@
 Package: ravecore
 Title: Core File Structures and Workflows for 'RAVE'
-Version: 0.0.0.9010
+Version: 0.0.0.9011
 Authors@R: c(
     person("Zhengjia", "Wang", email = "dipterix.wang@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-5629-1116")),
     person("John", "Magnotti", email = "john.magnotti@pennmedicine.upenn.edu", role = c("aut")),
@@ -9,11 +9,12 @@ Authors@R: c(
     person("Trustees of the University of Pennsylvania", role = "cph",
             comment = "All files in this package unless explicitly stated in the file")
     )
-Description: Read, process, and analyze intracranial
-    electroencephalography and deep-brain stimulation with 'RAVE', a
+Description: Core infastructure to read, process, and analyze intracranial
+    electroencephalography and deep-brain stimulation in 'RAVE', a
     reproducible framework for analysis and visualization of 'iEEG' 
-    by Magnotti, Wang, and Beauchamp, (2020, <doi:10.1016/j.neuroimage.2020.117341>). 
-    Supports 'BIDS' <https://bids.neuroimaging.io> or native file conventions to
+    by Magnotti, Wang, and Beauchamp, (2020, 
+    <doi:10.1016/j.neuroimage.2020.117341>). Supports 'BIDS' 
+    <https://bids.neuroimaging.io> or native file conventions to
     ingest signals in 'HDF5', 'Matlab', 'EDF', 'BrainVision', or 'BlackRock'
     formats; process images in 'NIfTI' and 'FreeSurfer' formats, providing
     brain imaging normalization to template brain, facilitate 'threeBrain'
@@ -26,7 +27,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Language: en-US
 URL: https://rave.wiki, http://rave.wiki/ravecore/
-BugReports: https://github.com/orgs/rave-ieeg/discussions
+BugReports: https://github.com/rave-ieeg/ravecore/issues
 Imports: 
     tools,
     utils,
@@ -46,7 +47,10 @@ Suggests:
     rpyANTs,
     rpymat,
     htmltools,
+    httpuv,
     plotly,
+    RNifti,
+    RNiftyReg,
     shiny,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
