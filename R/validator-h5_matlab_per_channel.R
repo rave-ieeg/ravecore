@@ -92,19 +92,41 @@ validate_raw_h5_mat_per_channel <- function(subject, blocks, electrodes, check_c
           }
           query_results <- query_results[sel, ]
 
-          is_headerfile <- tolower(query_results$extension) %in% c("nev")
+          is_datafile <- tolower(query_results$suffix) %in% c("matlab", "h5", "hdf5", "ieeg_matlab",
+                                                              "ieeg_hdf5", "ieeg_h5")
 
-          if(!any(sel)) {
-            validation_errors$add(sprintf("Files with BIDS entities `%s` found, but no NeuroEvent files (.nev) found.", block))
+          if(!any(is_datafile)) {
+            validation_errors$add(sprintf("Files with BIDS entities `%s` found, but only one matlab (.mat) or HDF5 (.h5) file is allowed for each block.", block))
             return()
           }
-          query_results <- query_results[is_headerfile, ]
+          query_results <- query_results[is_datafile, ]
 
 
           blockfiles <- lapply(query_results$parsed, function(parsed) {
-            bidsr::resolve_bids_path(bids_subject@project, format(parsed), storage = "raw")
+            path <- bidsr::resolve_bids_path(bids_subject@project, format(parsed), storage = "raw")
+            if(dir_exists(path)) {
+              return(path)
+            }
+            return()
           })
-          return(blockfiles)
+          blockfiles <- unlist(blockfiles)
+          if(length(blockfiles) == 0) {
+            stop("No folder ends with 'matlab' or 'hdf5' under block ", block)
+          }
+
+          bpath <- blockfiles[[1]]
+
+          files <- list.files(bpath, pattern = '[0-9]+\\.(mat|h5)$', ignore.case = TRUE)
+
+          if(!length(files)) {
+            validation_errors$add(sprintf(
+              "No Matlab/HDF5 file (.mat/.h5) under '%s'",
+              bpath
+            ))
+            return()
+          }
+          return(file_path(bpath, files))
+
         })
 
         return(NULL)
