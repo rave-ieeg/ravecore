@@ -6,7 +6,7 @@
 \alias{ravecore-package}
 \title{ravecore: Core File Structures and Workflows for 'RAVE'}
 \description{
-Read, process, and analyze intracranial electroencephalography and deep-brain stimulation in 'RAVE', a reproducible framework for analysis and visualization of 'iEEG' by Magnotti, Wang, and Beauchamp, (2020, \doi{10.1016/j.neuroimage.2020.117341}). Supports 'BIDS' \url{https://bids.neuroimaging.io} or native file conventions to ingest signals in 'HDF5', 'Matlab', 'EDF', 'BrainVision', or 'BlackRock' formats; process images in 'NIfTI' and 'FreeSurfer' formats, providing brain imaging normalization to template brain, facilitate 'threeBrain' package for comprehensive electrode localization, see "your advanced electrode localizer" ('YAEL') by Wang, Magnotti, Zhang, and Beauchamp (2023, \doi{10.1523/ENEURO.0328-23.2023}).
+Core infrastructure to read, process, and analyze intracranial electroencephalography and deep-brain stimulation in 'RAVE', a reproducible framework for analysis and visualization of 'iEEG' by Magnotti, Wang, and Beauchamp, (2020, \doi{10.1016/j.neuroimage.2020.117341}). Supports 'BIDS' \url{https://bids.neuroimaging.io} or native file conventions to ingest signals in 'HDF5', 'Matlab', 'EDF', 'BrainVision', or 'BlackRock' formats; process images in 'NIfTI' and 'FreeSurfer' formats, providing brain imaging normalization to template brain, facilitate 'threeBrain' package for comprehensive electrode localization, see "your advanced electrode localizer" ('YAEL') by Wang, Magnotti, Zhang, and Beauchamp (2023, \doi{10.1523/ENEURO.0328-23.2023}).
 }
 \seealso{
 Useful links:

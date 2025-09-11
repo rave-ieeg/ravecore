@@ -92,8 +92,8 @@ validate_raw_h5_mat_per_channel <- function(subject, blocks, electrodes, check_c
           }
           query_results <- query_results[sel, ]
 
-          is_datafile <- tolower(query_results$suffix) %in% c("matlab", "h5", "hdf5", "ieeg_matlab",
-                                                              "ieeg_hdf5", "ieeg_h5")
+          is_datafile <- tolower(query_results$suffix) %in% c("matlab", "hdf5", "ieeg_matlab",
+                                                              "ieeg_hdf5")
 
           if(!any(is_datafile)) {
             validation_errors$add(sprintf("Files with BIDS entities `%s` found, but only one matlab (.mat) or HDF5 (.h5) file is allowed for each block.", block))
