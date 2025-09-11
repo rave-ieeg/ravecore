@@ -39,7 +39,7 @@ Imports:
     jsonlite,
     methods,
     R6,
-    ravepipeline (>= 0.0.1.9017),
+    ravepipeline (>= 0.0.2),
     ravetools,
     S7,
     threeBrain
