@@ -1,17 +1,17 @@
 Package: ravecore
 Title: Core File Structures and Workflows for 'RAVE'
-Version: 0.0.0.9011
+Version: 0.1.0
 Authors@R: c(
     person("Zhengjia", "Wang", email = "dipterix.wang@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-5629-1116")),
-    person("John", "Magnotti", email = "john.magnotti@pennmedicine.upenn.edu", role = c("aut")),
     person("Xiang", "Zhang", email = "xiang.zhang@pennmedicine.upenn.edu", role = c("aut")),
+    person("John", "Magnotti", email = "john.magnotti@pennmedicine.upenn.edu", role = c("aut")),
     person("Michael", "Beauchamp", email = "michael.beauchamp@pennmedicine.upenn.edu", role = c("aut")),
     person("Trustees of the University of Pennsylvania", role = "cph",
             comment = "All files in this package unless explicitly stated in the file")
     )
-Description: Core infrastructure to read, process, and analyze intracranial
-    electroencephalography and deep-brain stimulation in 'RAVE', a
-    reproducible framework for analysis and visualization of 'iEEG' 
+Description: Defines storage standard for Read, process, and analyze 
+    intracranial electroencephalography and deep-brain stimulation in 'RAVE', 
+    a reproducible framework for analysis and visualization of 'iEEG' 
     by Magnotti, Wang, and Beauchamp, (2020, 
     <doi:10.1016/j.neuroimage.2020.117341>). Supports 'BIDS' 
     <https://bids.neuroimaging.io> or native file conventions to

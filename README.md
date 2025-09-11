@@ -5,7 +5,7 @@
 [![R-CMD-check](https://github.com/rave-ieeg/ravecore/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/rave-ieeg/ravecore/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-The goal of `ravecore` is to provide core infrastructure to read, process, and 
+The goal of `ravecore` is to provide storage infrastructure to read, process, and 
 analyze intracranial electroencephalography and deep-brain stimulation in 
 [`RAVE`](https://rave.wiki), a reproducible framework for analysis and 
 visualization framework. This package supports [`BIDS`](https://bids.neuroimaging.io) 
@@ -13,7 +13,11 @@ or native file conventions to ingest signals in `HDF5`, `Matlab`, `EDF`,
 `BrainVision`, or `BlackRock` formats. For images, this package process images 
 in `NIfTI` and `FreeSurfer` formats, providing brain imaging normalization to 
 template brain, facilitate comprehensive electrode localization and 3D brain 
-visualization.
+visualization. Other `RAVE` packages include:
+
+* `ravetools` - signal and imaging tools
+* `ravepipeline` - running pipelines and interactive modules
+* `ravedash` - front-end user interface
 
 See our official website for tutorials and documentations: 
 

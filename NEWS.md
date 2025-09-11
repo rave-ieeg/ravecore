@@ -1,3 +1,3 @@
-# ravecore 0.0.1
+# ravecore 0.1.0
 
 * Initial CRAN submission.
