@@ -67,14 +67,14 @@ supported when <code>'FreeSurfer'</code> reconstruction is missing.</p></dd>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Run `install_subject("DemoSubject")` first!</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="kw">if</span><span class="op">(</span> <span class="fu"><a href="new_rave_subject.html">has_rave_subject</a></span><span class="op">(</span><span class="st">"demo/DemoSubject"</span><span class="op">)</span> <span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">convert_electrode_table_to_bids</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"demo/DemoSubject"</span>,</span></span>
 <span class="r-in"><span>  space <span class="op">=</span> <span class="st">"ScanRAS"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
