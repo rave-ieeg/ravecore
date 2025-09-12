@@ -432,7 +432,7 @@ RAVESubjectBaseRepository <- R6::R6Class(
 #' @param ... passed to \code{\link{RAVESubjectBaseRepository}} constructor
 #' @examples
 #'
-#' \dontrun{
+#' if( has_rave_subject("demo/DemoSubject") ) {
 #'
 #'
 #' repository <- prepare_subject_bare0("demo/DemoSubject",

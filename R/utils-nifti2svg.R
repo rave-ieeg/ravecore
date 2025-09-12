@@ -128,34 +128,39 @@ base64_plot_slice <- function(
 #' underlay <- ieegio::as_ieegio_volume(x, vox2ras = vox2ras)
 #' overlay <- ieegio::as_ieegio_volume(x > 0.2, vox2ras = vox2ras)
 #'
-#' plot_volume_slices(
-#'   underlay, overlay = overlay,
-#'   depths = seq(0, 150, length.out = 4), pixel_width = 5,
-#'   overlay_col = c("#00000000", "#FF000044", "#FF0000FF")
-#' )
+#' if(interactive()) {
 #'
-#' # Actual NIfTI
+#'   plot_volume_slices(
+#'     underlay, overlay = overlay,
+#'     depths = seq(0, 150, length.out = 4), pixel_width = 5,
+#'     overlay_col = c("#00000000", "#FF000044", "#FF0000FF")
+#'   )
+#'
+#' }
+#'
 #' # Require `install_subject("yael_demo_001")`
+#' if(has_rave_subject("YAEL/yael_demo_001")) {
+#'
 #' subject <- ravecore::as_rave_subject("YAEL/yael_demo_001",
 #'                                      strict = FALSE)
 #'
 #'
 #' t1 <- file.path(subject$imaging_path, "coregistration",
 #'                 "MRI_reference.nii.gz")
-#' if (file.exists(t1)) {
 #'
-#'   ct <- file.path(subject$imaging_path, "coregistration",
-#'                   "CT_RAW.nii.gz")
-#'   transform <- read.table(
-#'     file.path(subject$imaging_path, "coregistration",
-#'               "CT_IJK_to_MR_RAS.txt")
-#'   )
+#' ct <- file.path(subject$imaging_path, "coregistration",
+#'                 "CT_RAW.nii.gz")
+#' transform <- read.table(
+#'   file.path(subject$imaging_path, "coregistration",
+#'             "CT_IJK_to_MR_RAS.txt")
+#' )
 #'
-#'   ct_image_original <- ieegio::read_volume(ct)
-#'   ct_image_aligned <- ieegio::as_ieegio_volume(
-#'     ct_image_original[], vox2ras = as.matrix(transform)
-#'   )
+#' ct_image_original <- ieegio::read_volume(ct)
+#' ct_image_aligned <- ieegio::as_ieegio_volume(
+#'   ct_image_original[], vox2ras = as.matrix(transform)
+#' )
 #'
+#' if(interactive()) {
 #'   plot_volume_slices(
 #'     t1, overlay = ct_image_aligned,
 #'     overlay_col = c("#00000000", "#FF000044", "#FF0000FF"),
@@ -163,6 +168,7 @@ base64_plot_slice <- function(
 #'   )
 #' }
 #'
+#' }
 #'
 #'
 #' @export

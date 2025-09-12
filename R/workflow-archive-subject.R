@@ -15,8 +15,6 @@
 #'
 #' @examples
 #'
-#' # This example requires you to install demo subject
-#'
 #' \dontrun{
 #'
 #'
@@ -478,11 +476,10 @@ archive_subject <- function(
 #' @param ... passed to \code{\link[utils]{download.file}}
 #' @examples
 #'
-#' # Please run 2nd example of function archive_subject
 #'
 #' \dontrun{
 #'
-#' install_subject(path)
+#' install_subject("DemoSubject")
 #'
 #' }
 #'

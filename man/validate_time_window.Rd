@@ -34,11 +34,11 @@ validate_time_window(list(list(-1, 2), list(3, 5)))
 
 # Incorrect usage (will raise errors)
 
-  # Invalid interval (length must be two for each intervals)
-  validate_time_window(list(c(-1, 2, 3, 5)))
+# Invalid interval (length must be two for each intervals)
+validate_time_window(list(c(-1, 2, 3, 5)))
 
-  # Time intervals must be in ascending order
-  validate_time_window(c(2, 1))
+# Time intervals must be in ascending order
+validate_time_window(c(2, 1))
 
 }
 

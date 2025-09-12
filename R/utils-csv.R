@@ -118,7 +118,7 @@ safe_write_csv <- function(x, file, ..., quiet = FALSE){
 #' @examples
 #'
 #' # Run `install_subject("DemoSubject")` first!
-#' \dontrun{
+#' if( has_rave_subject("demo/DemoSubject") ) {
 #'
 #' convert_electrode_table_to_bids(
 #'   "demo/DemoSubject",

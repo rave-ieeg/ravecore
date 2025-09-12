@@ -35,8 +35,10 @@
 #' # is missing
 #' subject <- as_rave_subject("YAEL/s01", strict = FALSE)
 #'
-#' cmd_run_freesurfer_recon_all(subject = subject,
-#'                          mri_path = "/path/to/T1.nii.gz")
+#' cmd_run_freesurfer_recon_all(
+#'   subject = subject,
+#'   mri_path = "/path/to/T1.nii.gz"
+#' )
 #'
 #' }
 #' @export

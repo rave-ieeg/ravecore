@@ -69,9 +69,10 @@ average of electrode 13, 14, 15, 16, and 24.}
 }
 }
 \examples{
-\dontrun{
 
-# Download subject demo/DemoSubject (~500 MB)
+# Download subject demo/DemoSubject
+if( has_rave_subject("demo/DemoSubject") ) {
+
 
 # Electrode 14 in demo/DemoSubject
 subject <- as_rave_subject("demo/DemoSubject")
@@ -105,9 +106,10 @@ e$clear_cache()
 ref$clear_cache()
 
 }
-\dontrun{
 
-# Download subject demo/DemoSubject (~500 MB)
+# Download subject demo/DemoSubject
+if( has_rave_subject("demo/DemoSubject") ) {
+
 
 # Electrode 14 in demo/DemoSubject
 subject <- as_rave_subject("demo/DemoSubject")

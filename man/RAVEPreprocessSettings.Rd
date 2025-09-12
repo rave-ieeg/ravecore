@@ -20,7 +20,7 @@ then a weight matrix;
 # The following example require downloading demo subject (~700 MB) from
 # https://github.com/beauchamplab/rave/releases/tag/v0.1.9-beta
 
-\dontrun{
+if( has_rave_subject("demo/DemoSubject") ) {
 
 conf <- RAVEPreprocessSettings$new(subject = 'demo/DemoSubject')
 conf$blocks  # "008" "010" "011" "012"

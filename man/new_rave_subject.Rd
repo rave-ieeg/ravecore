@@ -3,11 +3,14 @@
 \name{new_rave_subject}
 \alias{new_rave_subject}
 \alias{as_rave_subject}
+\alias{has_rave_subject}
 \title{Get \code{\link{RAVESubject}} instance from character}
 \usage{
 new_rave_subject(project_name, subject_code, strict = TRUE)
 
 as_rave_subject(subject_id, strict = TRUE, reload = TRUE)
+
+has_rave_subject(subject_id)
 }
 \arguments{
 \item{project_name}{character of 'RAVE' project name}

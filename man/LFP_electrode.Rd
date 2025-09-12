@@ -21,9 +21,9 @@ of the electrode class \code{LFP_electrode}
 
 # Download subject demo/DemoSubject
 
-subject <- as_rave_subject("demo/DemoSubject", strict = FALSE)
+if(has_rave_subject("demo/DemoSubject")) {
 
-if(dir.exists(subject$path)) {
+subject <- as_rave_subject("demo/DemoSubject", strict = FALSE)
 
 # Electrode 14 in demo/DemoSubject
 e <- new_electrode(subject = subject, number = 14, signal_type = "LFP")

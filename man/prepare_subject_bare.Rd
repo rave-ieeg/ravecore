@@ -48,7 +48,7 @@ A \code{\link{RAVESubjectBaseRepository}} instance
 }
 \examples{
 
-\dontrun{
+if( has_rave_subject("demo/DemoSubject") ) {
 
 
 repository <- prepare_subject_bare0("demo/DemoSubject",

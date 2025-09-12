@@ -2,7 +2,8 @@
 #' @description This class is not intended for direct use. Please
 #' create new child classes and implement some key methods.
 #' @examples
-#' \dontrun{
+#'
+#' if( has_rave_subject("demo/DemoSubject") ) {
 #'
 #' # To run this example, please download demo subject (~700 MB) from
 #' # https://github.com/beauchamplab/rave/releases/tag/v0.1.9-beta
@@ -374,9 +375,10 @@ RAVEAbstarctElectrode <- R6::R6Class(
 #' }
 #'
 #' @examples
-#' \dontrun{
 #'
-#' # Download subject demo/DemoSubject (~500 MB)
+#' # Download subject demo/DemoSubject
+#' if( has_rave_subject("demo/DemoSubject") ) {
+#'
 #'
 #' # Electrode 14 in demo/DemoSubject
 #' subject <- as_rave_subject("demo/DemoSubject")
@@ -494,9 +496,10 @@ new_reference <- function(subject, number, signal_type, ...){
 #' }
 #'
 #' @examples
-#' \dontrun{
 #'
-#' # Download subject demo/DemoSubject (~500 MB)
+#' # Download subject demo/DemoSubject
+#' if( has_rave_subject("demo/DemoSubject") ) {
+#'
 #'
 #' # Electrode 14 in demo/DemoSubject
 #' subject <- as_rave_subject("demo/DemoSubject")

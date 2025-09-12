@@ -888,7 +888,6 @@ YAELProcess <- R6::R6Class(
 #'
 #' process <- as_yael_process("YAEL/test_subject")
 #'
-#' # This example requires extra demo data & settings.
 #' \dontrun{
 #'
 #' # Import and set original T1w MRI and CT

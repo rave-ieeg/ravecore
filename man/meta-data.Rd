@@ -39,20 +39,20 @@ Load or save meta data to 'RAVE' subject
 }
 \examples{
 
-subject <- as_rave_subject("demo/DemoSubject", strict = FALSE)
 
-if(interactive() && dir.exists(subject$meta_path)) {
+if(has_rave_subject("demo/DemoSubject")) {
+  subject <- as_rave_subject("demo/DemoSubject", strict = FALSE)
 
   electrode_table <- subject$get_electrode_table()
 
   save_meta2(
-    "electrodes",
-    electrode_table,
+    data = electrode_table,
+    meta_type = "electrodes",
     project_name = subject$project_name,
     subject_code = subject$subject_code
   )
 
- load_meta2("electrodes", subject_id = subject)
+  load_meta2(meta_type = "electrodes", subject_id = subject)
 }
 
 }

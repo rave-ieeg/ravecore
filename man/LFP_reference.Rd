@@ -18,9 +18,9 @@ create instances. This documentation is to describe the member methods
 of the electrode class \code{LFP_reference}
 }
 \examples{
-\dontrun{
 
 # Download subject demo/DemoSubject
+if( has_rave_subject("demo/DemoSubject") ) {
 
 
 subject <- as_rave_subject("demo/DemoSubject")

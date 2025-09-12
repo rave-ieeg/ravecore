@@ -61,23 +61,25 @@ to launching the viewer.
 }
 \examples{
 
-subject <- as_rave_subject("demo/DemoSubject", strict = FALSE)
+if(has_rave_subject("demo/DemoSubject")) {
+  subject <- as_rave_subject("demo/DemoSubject", strict = FALSE)
 
-if(interactive() && file.exists(subject$data_path)) {
 
   repository <- ravecore::prepare_subject_voltage_with_blocks(
-    subject = subject
-  )
+    subject = subject)
 
-  app <- glimpse_voltage_repository_with_blocks(
-    repository = repository,
-    initial_block = "008",
-    epoch = "auditory_onset",
-    highpass_freq = 0.5
-  )
+  if (interactive()) {
+    app <- glimpse_voltage_repository_with_blocks(
+      repository = repository,
+      initial_block = "008",
+      epoch = "auditory_onset",
+      highpass_freq = 0.5
+    )
 
-  print(app)
-  close(app)
+    print(app)
+    close(app)
+
+  }
 
 }
 
@@ -95,11 +97,12 @@ dimnames(filearray) <- list(
   Electrode = 1:5
 )
 
-app <- glimpse_voltage_filearray(filearray = filearray,
-                                 sample_rate = sample_rate,
-                                 channel_gap = 6)
-
 if(interactive()) {
+
+  app <- glimpse_voltage_filearray(filearray = filearray,
+                                   sample_rate = sample_rate,
+                                   channel_gap = 6)
+
   print(app)
 }
 

@@ -14,7 +14,8 @@ This class is not intended for direct use. Please
 create new child classes and implement some key methods.
 }
 \examples{
-\dontrun{
+
+if( has_rave_subject("demo/DemoSubject") ) {
 
 # To run this example, please download demo subject (~700 MB) from
 # https://github.com/beauchamplab/rave/releases/tag/v0.1.9-beta

@@ -32,7 +32,7 @@ columns are \code{Event_xxx} (starts with "Event").
 # Please download DemoSubject ~700MB from
 # https://github.com/beauchamplab/rave/releases/tag/v0.1.9-beta
 
-\dontrun{
+if(has_rave_subject("demo/DemoSubject")) {
 
 # Load meta/epoch_auditory_onset.csv from subject demo/DemoSubject
 epoch <-RAVEEpoch$new(subject = 'demo/DemoSubject',
@@ -50,7 +50,7 @@ epoch$set_trial(Block = '008', Time = 10,
 new_trial1 <- epoch$trial_at(1)
 
 # Compare new and old trial 1
-rbind(old_trial1, new_trial1)
+list(old_trial1, new_trial1)
 
 # To get updated trial table, must update first
 epoch$update_table()

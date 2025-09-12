@@ -22,7 +22,6 @@ Image registration across different modals. Normalize brain 'T1'-weighted
 
 process <- as_yael_process("YAEL/test_subject")
 
-# This example requires extra demo data & settings.
 \dontrun{
 
 # Import and set original T1w MRI and CT

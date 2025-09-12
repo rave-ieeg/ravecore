@@ -39,8 +39,6 @@ Archive and share a subject
 }
 \examples{
 
-# This example requires you to install demo subject
-
 \dontrun{
 
 

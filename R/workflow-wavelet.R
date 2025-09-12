@@ -29,9 +29,8 @@
 #'
 #' @examples
 #'
-#' # the example require downloading extra demo subject. This can be done
-#' # via `ravepipeline::ravepipeline_finalize_installation()` followed by
-#' # `ravecore::install_subject("DemoSubject")`
+#' # Check https://rave.wiki for additional pipeline installation
+#'
 #' \dontrun{
 #'
 #' # ---- Recommended usage --------------------------------------------

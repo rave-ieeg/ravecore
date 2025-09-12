@@ -135,7 +135,7 @@ cached data later without needing to reload
 }
 \examples{
 
-\dontrun{
+if( has_rave_subject("demo/DemoSubject") ) {
 
 
 # ---- An use-case example ------------------------------------------------
@@ -145,7 +145,7 @@ subject <- as_rave_subject("demo/DemoSubject")
 # list all blocks
 subject$blocks
 
-repository <- prepare_subject_with_voltage_blocks(
+repository <- prepare_subject_voltage_with_blocks(
   subject,
   electrodes = 13:16,
   blocks = "008",
@@ -195,7 +195,7 @@ ravetools::diagnose_channel(channel_signals,
 subject <- as_rave_subject("demo/DemoSubject")
 
 # Lazy-load block 008
-repository <- prepare_subject_with_voltage_blocks(
+repository <- prepare_subject_voltage_with_blocks(
   subject,
   electrodes = 13:16,
   blocks = "008",

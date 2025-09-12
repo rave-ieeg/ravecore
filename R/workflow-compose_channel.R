@@ -33,16 +33,7 @@
 #'
 #' @examples
 #'
-#' # Make sure demo subject exists in this example, just want to make
-#' # sure the example does not error out
-#' if(
-#'   interactive() && "demo" %in% get_projects() &&
-#'   "DemoSubject" %in% as_rave_project('demo')$subjects() &&
-#'   local({
-#'     subject <- as_rave_subject("demo/DemoSubject")
-#'     !100 %in% subject$electrodes
-#'   })
-#' ) {
+#' if(interactive() && has_rave_subject("demo/DemoSubject")) {
 #'
 #'   # the actual example code:
 #'   # new channel 100 = 2 x channel 14 - (channe 15 + 16)

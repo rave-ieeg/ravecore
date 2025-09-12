@@ -94,7 +94,8 @@ be shared across electrodes (e.g. in some mini-electrodes), remove
 }
 \examples{
 
-\dontrun{
+if( has_rave_subject("demo/DemoSubject") ) {
+
 # The following code need to download additional demo data
 # Please see https://rave.wiki/ for more details
 

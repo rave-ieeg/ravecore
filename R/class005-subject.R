@@ -1008,6 +1008,27 @@ as_rave_subject <- function(subject_id, strict = TRUE, reload = TRUE){
 
 }
 
+#' @rdname new_rave_subject
+#' @export
+has_rave_subject <- function(subject_id) {
+
+  if(!is.character(subject_id)) {
+    if( inherits(subject_id, 'RAVEPreprocessSettings') ) {
+      subject_id <- subject_id$subject$subject_id
+    } else {
+      subject_id <- subject_id$subject_id
+    }
+  }
+
+  tryCatch({
+    as_rave_subject(subject_id, strict = TRUE)
+    TRUE
+  }, error = function(e) {
+    FALSE
+  })
+
+}
+
 
 
 restore_subject_instance <- function(subject_id, strict = FALSE) {

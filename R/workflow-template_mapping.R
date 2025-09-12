@@ -345,9 +345,12 @@ transform_point_to_template_volumetric <- function(subject, scan_ras_mat, method
 #' @returns A table of electrode 'MNI' coordinates.
 #' @examples
 #'
-#' if(interactive()) {
+#' if(has_rave_subject("demo/DemoSubject")) {
 #'
-#' transform_point_to_template('demo/DemoSubject', mapping_method = "volumetric")
+#'   transform_point_to_template(
+#'     subject = 'demo/DemoSubject',
+#'     mapping_method = "volumetric"
+#'   )
 #'
 #' }
 #'

@@ -24,14 +24,15 @@
 #' @examples
 #'
 #'
-#' # Please make sure DemoSubject is correctly installed
-#' # The subject is ~1GB from Github
-#'
-#' if(interactive()){
+#' if(has_rave_subject("demo/DemoSubject")) {
 #'
 #'   brain <- rave_brain("demo/DemoSubject")
 #'
-#'   if( !is.null(brain) ) { brain$plot() }
+#'   if(interactive()) {
+#'
+#'     brain$plot()
+#'
+#'   }
 #'
 #' }
 #'

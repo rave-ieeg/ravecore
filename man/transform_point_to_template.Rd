@@ -81,9 +81,12 @@ Calculate template 'MNI' coordinates for points on native brain
 }
 \examples{
 
-if(interactive()) {
+if(has_rave_subject("demo/DemoSubject")) {
 
-transform_point_to_template('demo/DemoSubject', mapping_method = "volumetric")
+  transform_point_to_template(
+    subject = 'demo/DemoSubject',
+    mapping_method = "volumetric"
+  )
 
 }
 

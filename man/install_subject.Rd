@@ -48,11 +48,10 @@ Install a subject from the internet, a zip file or a directory
 }
 \examples{
 
-# Please run 2nd example of function archive_subject
 
 \dontrun{
 
-install_subject(path)
+install_subject("DemoSubject")
 
 }
 

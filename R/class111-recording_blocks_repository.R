@@ -357,7 +357,7 @@ RAVESubjectRecordingBlockRepository <- R6::R6Class(
 #'
 #' @examples
 #'
-#' \dontrun{
+#' if( has_rave_subject("demo/DemoSubject") ) {
 #'
 #'
 #' # ---- An use-case example ------------------------------------------------
@@ -367,7 +367,7 @@ RAVESubjectRecordingBlockRepository <- R6::R6Class(
 #' # list all blocks
 #' subject$blocks
 #'
-#' repository <- prepare_subject_with_voltage_blocks(
+#' repository <- prepare_subject_voltage_with_blocks(
 #'   subject,
 #'   electrodes = 13:16,
 #'   blocks = "008",
@@ -417,7 +417,7 @@ RAVESubjectRecordingBlockRepository <- R6::R6Class(
 #' subject <- as_rave_subject("demo/DemoSubject")
 #'
 #' # Lazy-load block 008
-#' repository <- prepare_subject_with_voltage_blocks(
+#' repository <- prepare_subject_voltage_with_blocks(
 #'   subject,
 #'   electrodes = 13:16,
 #'   blocks = "008",
