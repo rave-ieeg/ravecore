@@ -64,7 +64,9 @@ rave_legacy_subject_format_conversion <- function(
     re <- sapply(blocks, function(block) {
       s <- ieegio::io_read_h5(h5path, name = sprintf("/raw/voltage/%s", block), ram = FALSE)
       # save_h5(s, file = h5path, name = sprintf("/ref/voltage/%s", block), chunk = 1024, quiet = TRUE)
-      length(s)
+      l <- length(s)
+      s$close()
+      l
     }, simplify = FALSE, USE.NAMES = TRUE)
     ieegio::io_write_h5("invalid", file = h5path, name = "reference", ctype = "character", quiet = TRUE)
 

@@ -858,10 +858,9 @@ LFP_electrode <- R6::R6Class(
         voltage_file <- fnames[sel][[1]]
         voltage_prefix <- dprefix[sel][[1]]
         re <- structure(lapply(blocks, function(block){
-          dat <- load_h5(voltage_file,
-                         name = sprintf(voltage_prefix, block),
-                         ram = FALSE)
+          dat <- load_h5(voltage_file, name = sprintf(voltage_prefix, block), ram = FALSE)
           n_timepoints <- length(dat)
+          dat$close()
           # time by channel
           list(
             sample_rate = sample_rate,
@@ -885,11 +884,9 @@ LFP_electrode <- R6::R6Class(
         tf_file <- fnames[sel][[1]]
         tf_prefix <- dprefix[sel][[1]]
         re <- structure(lapply(blocks, function(block){
-          dat <- load_h5(tf_file,
-                         name = sprintf(tf_prefix, block),
-                         ram = FALSE)
+          dat <- load_h5(tf_file, name = sprintf(tf_prefix, block), ram = FALSE)
           dm <- dim(dat)
-
+          dat$close()
           list(
             dim = c(Frequency = dm[[1]], Time = dm[[2]], Electrode = 1),
             sample_rate = sample_rate

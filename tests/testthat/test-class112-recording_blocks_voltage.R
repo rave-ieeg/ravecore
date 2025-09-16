@@ -100,7 +100,9 @@ prepare_subject_with_blocks_legacy <- function(
     elec <- new_electrode(subject = subject, number = e)
     wavelet_ntimepoints <- structure(lapply(blocks, function(block) {
       dat <- ieegio::io_read_h5(elec$power_file, sprintf("raw/power/%s", block), ram = FALSE)
-      dim(dat)[[2]]
+      l <- dim(dat)[[2]]
+      dat$close()
+      return(l)
     }), names = blocks)
 
   } else {
@@ -119,7 +121,9 @@ prepare_subject_with_blocks_legacy <- function(
     } else {
       dat <- ieegio::io_read_h5(elec$voltage_file, sprintf("raw/voltage/%s", block), ram = FALSE)
     }
-    length(dat)
+    l <- length(dat)
+    dat$close()
+    return(l)
   }), names = blocks)
 
   # ----- electrode_table -----

@@ -606,10 +606,9 @@ LFP_reference <- R6::R6Class(
         voltage_file <- fnames[sel][[1]]
         voltage_prefix <- dprefix[sel][[1]]
         re <- structure(lapply(blocks, function(block){
-          dat <- load_h5(voltage_file,
-                         name = sprintf(voltage_prefix, block),
-                         ram = FALSE)
+          dat <- load_h5(voltage_file, name = sprintf(voltage_prefix, block), ram = FALSE)
           n_timepoints <- length(dat)
+          dat$close()
           # time by channel
           list(
             sample_rate = sample_rate,
@@ -633,10 +632,9 @@ LFP_reference <- R6::R6Class(
         tf_file <- fnames[sel][[1]]
         tf_prefix <- dprefix[sel][[1]]
         re <- structure(lapply(blocks, function(block){
-          dat <- load_h5(tf_file,
-                         name = sprintf(tf_prefix, block),
-                         ram = FALSE)
+          dat <- load_h5(tf_file, name = sprintf(tf_prefix, block), ram = FALSE)
           dm <- dim(dat)
+          dat$close()
 
           list(
             dim = c(Frequency = dm[[1]], Time = dm[[2]], Electrode = 1),
@@ -761,15 +759,11 @@ load_blocks_voltage_single <- function(self, blocks) {
 
   if(file.exists(self$voltage_file)) {
     re <- structure(lapply(blocks, function(block){
-      load_h5(self$voltage_file,
-              name = sprintf("/raw/voltage/%s", block),
-              ram = TRUE)
+      load_h5(self$voltage_file, name = sprintf("/raw/voltage/%s", block), ram = TRUE)
     }), names = blocks)
   } else if(file.exists(self$preprocess_file)){
     re <- structure(lapply(blocks, function(block){
-      load_h5(self$preprocess_file,
-              name = sprintf("/notch/%s", block),
-              ram = TRUE)
+      load_h5(self$preprocess_file, name = sprintf("/notch/%s", block), ram = TRUE)
     }), names = blocks)
   } else {
     stop("Voltage data file is missing or corrupted: [subject: ", self$subject$subject_id, ", electrode: ", self$number, "]")
@@ -783,24 +777,16 @@ load_blocks_wavelet_single <- function(self, blocks, type) {
   # load directly from HDF5 file
   if(type == "power") {
     fun <- function(block) {
-      t(load_h5(self$power_file,
-                name = sprintf("/raw/power/%s", block),
-                ram = TRUE))
+      t(load_h5(self$power_file, name = sprintf("/raw/power/%s", block), ram = TRUE))
     }
   } else if(type == "phase") {
     fun <- function(block) {
-      t(load_h5(self$phase_file,
-                name = sprintf("/raw/phase/%s", block),
-                ram = TRUE))
+      t(load_h5(self$phase_file, name = sprintf("/raw/phase/%s", block), ram = TRUE))
     }
   } else {
     fun <- function(block){
-      power <- load_h5(self$power_file,
-                       name = sprintf("/raw/power/%s", block),
-                       ram = TRUE)
-      phase <- load_h5(self$phase_file,
-                       name = sprintf("/raw/phase/%s", block),
-                       ram = TRUE)
+      power <- load_h5(self$power_file, name = sprintf("/raw/power/%s", block), ram = TRUE)
+      phase <- load_h5(self$phase_file, name = sprintf("/raw/phase/%s", block), ram = TRUE)
       t(sqrt(power) * exp(1i * phase))
     }
   }
@@ -831,9 +817,7 @@ load_blocks_voltage_multi <- function(self, blocks) {
 
       # load from H5
       if(file.exists(self$voltage_file)) {
-        ref <- load_h5(self$voltage_file,
-                       name = sprintf("/voltage/%s", block),
-                       ram = TRUE)
+        ref <- load_h5(self$voltage_file, name = sprintf("/voltage/%s", block), ram = TRUE)
       } else {
         stop("Cannot find calculated reference data of: ", self$number)
         # ref <- load_h5(self$preprocess_file,
@@ -878,9 +862,7 @@ load_blocks_wavelet_multi <- function(self, blocks, type) {
       dir_create2(dirname(cache_path))
 
       # load from H5
-      ref <- load_h5(self$power_file,
-                     name = sprintf("/wavelet/coef/%s", block),
-                     ram = TRUE)
+      ref <- load_h5(self$power_file, name = sprintf("/wavelet/coef/%s", block), ram = TRUE)
       dm <- dim(ref)[c(2,1)]
       ref <- t(ref[,,1] * exp(1i * ref[,,2]))
       arr <- filearray::filearray_create(

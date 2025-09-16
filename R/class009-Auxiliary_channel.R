@@ -385,9 +385,7 @@ Auxiliary_electrode <- R6::R6Class(
 
       if(type == "raw-voltage") {
         dat <- structure(lapply(blocks, function(block){
-          load_h5(self$preprocess_file,
-                  name = sprintf("/raw/%s", block),
-                  ram = TRUE)
+          load_h5(self$preprocess_file, name = sprintf("/raw/%s", block), ram = TRUE)
         }), names = blocks)
         if(simplify && length(blocks) == 1) {
           dat <- dat[[1]]
@@ -439,10 +437,9 @@ Auxiliary_electrode <- R6::R6Class(
       voltage_file <- fnames[sel][[1]]
       voltage_prefix <- dprefix[sel][[1]]
       re <- structure(lapply(blocks, function(block){
-        dat <- load_h5(voltage_file,
-                       name = sprintf(voltage_prefix, block),
-                       ram = FALSE)
+        dat <- load_h5(voltage_file, name = sprintf(voltage_prefix, block), ram = FALSE)
         n_timepoints <- length(dat)
+        dat$close()
         # time by channel
         list(
           sample_rate = sample_rate,
