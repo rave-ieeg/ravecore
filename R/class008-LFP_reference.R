@@ -722,32 +722,29 @@ LFP_reference <- R6::R6Class(
 
     #' @field power_file path to power 'HDF5' file
     power_file = function(){
-      if(is.numeric(self$number)){
-        return(super$power_file)
-      } else {
-        return(file.path(self$subject$reference_path,
-                         self$h5_fname))
+      file <- file.path(self$subject$reference_path, self$h5_fname)
+      if(!file.exists(file) && is.numeric(self$number)) {
+        file <- super$power_file
       }
+      file
     },
 
     #' @field phase_file path to phase 'HDF5' file
     phase_file = function(){
-      if(is.numeric(self$number)){
-        return(super$phase_file)
-      } else {
-        return(file.path(self$subject$reference_path,
-                         self$h5_fname))
+      file <- file.path(self$subject$reference_path, self$h5_fname)
+      if(!file.exists(file) && is.numeric(self$number)) {
+        file <- super$phase_file
       }
+      file
     },
 
     #' @field voltage_file path to voltage 'HDF5' file
     voltage_file = function(){
-      if(!is.numeric(self$number)){
-        return(file.path(self$subject$reference_path,
-                         self$h5_fname))
-      } else {
-        return(super$voltage_file)
+      file <- file.path(self$subject$reference_path, self$h5_fname)
+      if(!file.exists(file) && is.numeric(self$number)) {
+        file <- super$voltage_file
       }
+      file
     }
 
   )
