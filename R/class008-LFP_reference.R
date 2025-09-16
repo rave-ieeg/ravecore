@@ -66,7 +66,7 @@ LFP_reference <- R6::R6Class(
       }
       list(
         namespace = "ravecore",
-        r6_generator = "LFP_electrode",
+        r6_generator = "LFP_reference",
         data = list(
           subject = self$subject$`@marshal`(),
           number = self$number,
@@ -84,9 +84,9 @@ LFP_reference <- R6::R6Class(
     #' @param object,... internal arguments
     `@unmarshal` = function(object) {
       stopifnot(object$namespace == "ravecore")
-      stopifnot(object$r6_generator == "LFP_electrode")
+      stopifnot(object$r6_generator == "LFP_reference")
       subject <- RAVESubject$public_methods$`@unmarshal`(object$data$subject)
-      re <- LFP_electrode$new(subject = subject, number = object$data$number, quiet = TRUE)
+      re <- LFP_reference$new(subject = subject, number = object$data$number, quiet = TRUE)
       re$location <- object$data$location_type
       if(length(object$data$epoch_name)) {
         re$set_epoch(epoch = object$data$epoch_name, stitch_events = object$data$stitch_events)
@@ -122,7 +122,7 @@ LFP_reference <- R6::R6Class(
     },
 
     #' @description set reference for current electrode
-    #' @param reference either \code{NULL} or \code{LFP_electrode} instance
+    #' @param reference must be \code{NULL}
     set_reference = function(reference){
       # Do nothing as this is already a reference electrode
       if(length(reference)){
