@@ -65,7 +65,15 @@ test_that("LFP_reference - multi-channel", {
     file.exists(subject$path)
   })
 
-  self <- LFP_reference$new(subject = 'demo/DemoSubject', number = "ref_13-16,24")
+  self0 <- LFP_reference$new(subject = 'demo/DemoSubject', number = "ref_13-16,24")
+  self <- unserialize(
+    serialize(self0, NULL, refhook = ravepipeline::rave_serialize_refhook),
+    ravepipeline::rave_unserialize_refhook
+  )
+
+  testthat::expect_true(self == self0)
+  testthat::expect_true(inherits(self, "LFP_reference"))
+
   testthat::skip_if_not(self$valid)
 
   private <- self$.__enclos_env__$private
