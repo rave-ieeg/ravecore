@@ -72,9 +72,9 @@ generate_reference <- function(subject, electrodes) {
                                          number = e,
                                          quiet = TRUE)
       if (has_wavelet) {
-        s <- ieegio::io_read_h5(inst$voltage_file, sprintf("raw/voltage/%s", block))
+        s <- ieegio::io_read_h5(inst$voltage_file, sprintf("raw/voltage/%s", block), ram = TRUE)
       } else {
-        s <- ieegio::io_read_h5(inst$preprocess_file, sprintf("notch/%s", block))
+        s <- ieegio::io_read_h5(inst$preprocess_file, sprintf("notch/%s", block), ram = TRUE)
       }
       ref_signal <- ref_signal + (s[] / nchans)
     }

@@ -803,7 +803,10 @@ validate_subject_voltage <- function(subject, version = 2, verbose = TRUE, other
             raw_len <- tryCatch({
               name <- sprintf('raw/%s', b)
               stopifnot(name %in% h5names)
-              length(ieegio::io_read_h5(pre_elec, name = name, ram = FALSE))
+              ptr <- ieegio::io_read_h5(pre_elec, name = name, ram = FALSE)
+              l <- length(ptr)
+              ptr$close()
+              return(l)
             }, error = function(e){-1})
 
             if( raw_len <= 0 ){
@@ -814,7 +817,10 @@ validate_subject_voltage <- function(subject, version = 2, verbose = TRUE, other
               notch_len <- tryCatch({
                 name <- sprintf('notch/%s', b)
                 stopifnot(name %in% h5names)
-                length(ieegio::io_read_h5(pre_elec, name = name, ram = FALSE))
+                ptr <- ieegio::io_read_h5(pre_elec, name = name, ram = FALSE)
+                l <- length(ptr)
+                ptr$close()
+                return(l)
               }, error = function(e){-1})
             }else{
               notch_len <- raw_len
@@ -938,7 +944,9 @@ validate_subject_voltage <- function(subject, version = 2, verbose = TRUE, other
               name <- sprintf('raw/voltage/%s', b)
               stopifnot(name %in% data_names)
               raw <- ieegio::io_read_h5(voltage_file, name, ram = FALSE)
-              length(raw)
+              l <- length(raw)
+              raw$close()
+              return(l)
             }, error = function(e) {
               0
             })
@@ -949,7 +957,9 @@ validate_subject_voltage <- function(subject, version = 2, verbose = TRUE, other
               name <- sprintf('ref/voltage/%s', b)
               stopifnot(name %in% data_names)
               raw <- ieegio::io_read_h5(voltage_file, name, ram = FALSE)
-              length(raw)
+              l <- length(raw)
+              raw$close()
+              return(l)
             }, error = function(e) {
               NA
             })
@@ -1009,7 +1019,9 @@ validate_subject_voltage <- function(subject, version = 2, verbose = TRUE, other
               name <- sprintf('raw/%s', b)
               stopifnot(name %in% data_names)
               raw <- ieegio::io_read_h5(pre_voltage_file, name, ram = FALSE)
-              length(raw)
+              l <- length(raw)
+              raw$close()
+              return(l)
             }, error = function(e) {
               0
             })
@@ -1020,7 +1032,9 @@ validate_subject_voltage <- function(subject, version = 2, verbose = TRUE, other
               name <- sprintf('notch/%s', b)
               stopifnot(name %in% data_names)
               raw <- ieegio::io_read_h5(pre_voltage_file, name, ram = FALSE)
-              length(raw)
+              l <- length(raw)
+              raw$close()
+              return(l)
             }, error = function(e) {
               NA
             })
@@ -1165,9 +1179,10 @@ validate_subject_power_phase <- function(subject, version = 2, verbose = TRUE, o
           name <- sprintf('raw/%s/%s', dtype, b)
           stopifnot(name %in% h5names)
           raw <- ieegio::io_read_h5(f, name, ram = FALSE)
-          raw <- dim(raw)
-          if(length(raw) != 2) { return(c(0, 0)) }
-          raw
+          dm <- dim(raw)
+          raw$close()
+          if(length(dm) != 2) { return(c(0, 0)) }
+          dm
         }, error = function(e){
           c(0, 0)
         })
@@ -1177,9 +1192,10 @@ validate_subject_power_phase <- function(subject, version = 2, verbose = TRUE, o
           name <- sprintf('ref/%s/%s', dtype, b)
           stopifnot(name %in% h5names)
           raw <- ieegio::io_read_h5(f, name, ram = FALSE)
-          raw <- dim(raw)
-          if(length(raw) != 2) { return(c(0, 0)) }
-          raw
+          dm <- dim(raw)
+          raw$close()
+          if(length(dm) != 2) { return(c(0, 0)) }
+          dm
         }, error = function(e){
           c(0, 0)
         })
@@ -1435,12 +1451,9 @@ validate_subject_reference <- function(subject, verbose = TRUE, other_checks = N
 
       for(block in blocks) {
         explen <- signal_lengths[[block]]
-        actlen <- length(load_h5(
-          file = ref_file,
-          name = sprintf("voltage/%s", block),
-          read_only = TRUE,
-          ram = FALSE
-        ))
+        ptr <- load_h5(file = ref_file, name = sprintf("voltage/%s", block), read_only = TRUE, ram = FALSE)
+        actlen <- length(ptr)
+        ptr$close()
         if(explen != actlen) {
           stop(sprintf("reference %s has inconsistent voltage length in block [%s]: expected: %.0f vs. actual: %.0f", ref_name, block, explen, actlen))
         }
@@ -1470,12 +1483,9 @@ validate_subject_reference <- function(subject, verbose = TRUE, other_checks = N
         signal_lengths <- signal_lengths[1, , drop = FALSE]
         for(block in blocks) {
           expdim <- c(n_freq, signal_lengths[[block]], 2)
-          actdim <- dim(load_h5(
-            file = ref_file,
-            name = sprintf("wavelet/coef/%s", block),
-            read_only = TRUE,
-            ram = FALSE
-          ))
+          ptr <- load_h5(file = ref_file, name = sprintf("wavelet/coef/%s", block), read_only = TRUE, ram = FALSE)
+          actdim <- dim(ptr)
+          ptr$close()
           if(length(actdim) != 3 || actdim[[3]] != 2) {
             stop(sprintf("reference %s has corrupted wavelet data in block [%s]", ref_name, block))
           }

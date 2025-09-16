@@ -171,18 +171,19 @@ run_wavelet <- function(
       if(!sample_name %in% sample_names) {
         stop(sprintf("I can find the imported signal file for Electrode %s, but cannot find any notch-filtered signal for block %s. The data file might be corrupted.", electrodes[[1]], block))
       }
-      sample_data <- load_h5(sample_file, name = sample_name, ram = FALSE, read_only = TRUE)
-      data_length <- length(sample_data)
+      ptr <- load_h5(sample_file, name = sample_name, ram = FALSE, read_only = TRUE)
+      data_length <- length(ptr)
 
       if(data_length <= 0) {
         stop(sprintf("Electrode %s has zero-length signal (/notch/%s). The data file might be corrupted.", electrodes[[1]], block))
       }
 
       if(pre_downsample > 1) {
-        sample_data <- ravetools::decimate(
-          sample_data[], pre_downsample, ftype = "fir")
+        sample_data <- ravetools::decimate(ptr[], pre_downsample, ftype = "fir")
         data_length <- length(sample_data)
       }
+
+      ptr$close()
 
       generate_kernel(freqs = freqs, srate = srate / pre_decimate, wave_num = cycles, data_length = data_length, signature = subject$subject_id)
     })

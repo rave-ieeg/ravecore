@@ -171,7 +171,7 @@ set reference for current electrode
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{reference}}{either \code{NULL} or \code{LFP_electrode} instance}
+\item{\code{reference}}{must be \code{NULL}}
 }
 \if{html}{\out{</div>}}
 }
