@@ -1,5 +1,5 @@
 
-#' Defines preprocess configurations
+#' @title Defines preprocess configurations
 #' @description \code{R6} class definition
 #' @examples
 #'

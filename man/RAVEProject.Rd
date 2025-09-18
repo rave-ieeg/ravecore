@@ -176,7 +176,7 @@ whether a specific subject exists in this project
 \if{html}{\out{<a id="method-RAVEProject-group_path"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVEProject-group_path}{}}}
 \subsection{Method \code{group_path()}}{
-get group data path for 'rave' module
+get group data path for 'RAVE' module
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{RAVEProject$group_path(module_id, must_work = FALSE)}\if{html}{\out{</div>}}
 }
@@ -184,7 +184,7 @@ get group data path for 'rave' module
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{module_id}}{character, 'rave' module ID}
+\item{\code{module_id}}{character, 'RAVE' module ID}
 
 \item{\code{must_work}}{whether the directory must exist; if not exists,
 should a new one be created?}

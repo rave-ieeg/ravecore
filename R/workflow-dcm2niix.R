@@ -86,7 +86,7 @@
 #   return(dst_path)
 # }
 
-#' @title Run 'DICOM' to 'NIfTI'
+#' @title Convert DICOM to NIfTI via \code{'dcm2niix'}
 #' @description
 #' Check \url{https://rave.wiki} on how to set up \code{'conda'} environment
 #' for 'RAVE' using \code{'ravemanager'}.

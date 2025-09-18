@@ -1,4 +1,4 @@
-#' Abstract definition of electrode class in RAVE
+#' @title Abstract definition of electrode class in 'RAVE'
 #' @description This class is not intended for direct use. Please
 #' create new child classes and implement some key methods.
 #' @examples

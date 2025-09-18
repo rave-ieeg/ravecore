@@ -1,4 +1,4 @@
-#' 'RAVE' class for loading 'spectrogram' phase components
+#' @title 'RAVE' class for loading time-frequency phase components
 #' @description
 #' Loads time-frequency phase
 #'

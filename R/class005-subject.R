@@ -1,5 +1,5 @@
 
-#' Defines 'RAVE' subject class
+#' @title Defines 'RAVE' subject class
 #' @description \code{R6} class definition
 #' @export
 RAVESubject <- R6::R6Class(

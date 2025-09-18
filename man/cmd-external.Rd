@@ -66,5 +66,4 @@ A list of data containing the script details:
 \description{
 These shell commands are only tested on 'MacOS' and 'Linux'.
 On 'Windows' machines, please use the 'WSL2' system.
-and \code{'CT'}
 }

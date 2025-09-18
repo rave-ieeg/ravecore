@@ -2,7 +2,7 @@
 % Please edit documentation in R/class104-epoched_time-frequency.R
 \name{RAVESubjectEpochTimeFreqCoefRepository}
 \alias{RAVESubjectEpochTimeFreqCoefRepository}
-\title{'RAVE' class for epoch repository - spectrogram}
+\title{'RAVE' class for epoch repository - time-frequency}
 \description{
 The repository inherits \code{link{RAVESubjectEpochTimeFreqBaseRepository}}, with epoch
 trials, and is intended for loading processed and referenced time-frequency

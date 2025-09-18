@@ -1,4 +1,4 @@
-#' 'RAVE' class for loading entire block of 'spectrogram' coefficients
+#' @title 'RAVE' class for loading entire block of time-frequency coefficients
 #' @seealso \code{\link{prepare_subject_with_blocks}}
 RAVESubjectRecordingBlockTimeFreqBaseRepository <- R6::R6Class(
   classname = "RAVESubjectRecordingBlockTimeFreqBaseRepository",

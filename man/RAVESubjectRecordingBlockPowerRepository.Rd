@@ -2,7 +2,7 @@
 % Please edit documentation in R/class115-recording_blocks_power.R
 \name{RAVESubjectRecordingBlockPowerRepository}
 \alias{RAVESubjectRecordingBlockPowerRepository}
-\title{'RAVE' class for loading 'spectrogram' power components}
+\title{'RAVE' class for loading time-frequency power components}
 \description{
 Loads time-frequency power
 }

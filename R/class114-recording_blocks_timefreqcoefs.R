@@ -1,4 +1,4 @@
-#' 'RAVE' class for loading 'spectrogram' coefficients
+#' @title 'RAVE' class for loading time-frequency coefficients
 #' @description
 #' Loads time-frequency coefficients (complex numbers)
 #'

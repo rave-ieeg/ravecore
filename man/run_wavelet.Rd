@@ -2,7 +2,7 @@
 % Please edit documentation in R/workflow-wavelet.R
 \name{run_wavelet}
 \alias{run_wavelet}
-\title{Apply 'Morlet' wavelet to subject}
+\title{Apply Morlet-Wavelet to subject}
 \usage{
 run_wavelet(
   subject,

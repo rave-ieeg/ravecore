@@ -1,5 +1,7 @@
 ACPC
 AFNI
+ANTs
+BVCDF
 BlackRock
 BrainVision
 CMD
@@ -17,11 +19,14 @@ LFP
 Localizer
 MNI
 MacOS
+Microsystem
 Morlet
 Multitaper
 NIfTI
+NSx
 NeuroImage
 ORCID
+OpenNeuro
 RAS
 ROI
 WSL
@@ -31,6 +36,8 @@ doi
 iEEG
 localizer
 neuroimage
+neuroimaging
 preprocess
+scalable
 spectrogram
 threeBrain

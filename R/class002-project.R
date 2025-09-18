@@ -116,7 +116,7 @@ S7::method(format.generic, RAVEProjectImpl) <- function(x, ...) {
 # }
 # bidsr::bids_project()
 
-#' Definition for 'RAVE' project class
+#' @title Definition for 'RAVE' project class
 #' @description See \code{\link{as_rave_project}} for creating 'RAVE' project
 #' class
 #' @export
@@ -279,8 +279,8 @@ RAVEProject <- R6::R6Class(
       dir_exists(file_path(parent_path, subject_code))
     },
 
-    #' @description get group data path for 'rave' module
-    #' @param module_id character, 'rave' module ID
+    #' @description get group data path for 'RAVE' module
+    #' @param module_id character, 'RAVE' module ID
     #' @param must_work whether the directory must exist; if not exists,
     #' should a new one be created?
     group_path = function(module_id, must_work = FALSE){

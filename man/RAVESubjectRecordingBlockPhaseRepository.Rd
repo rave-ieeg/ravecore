@@ -2,7 +2,7 @@
 % Please edit documentation in R/class115-recording_blocks_phase.R
 \name{RAVESubjectRecordingBlockPhaseRepository}
 \alias{RAVESubjectRecordingBlockPhaseRepository}
-\title{'RAVE' class for loading 'spectrogram' phase components}
+\title{'RAVE' class for loading time-frequency phase components}
 \description{
 Loads time-frequency phase
 }

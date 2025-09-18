@@ -1,4 +1,4 @@
-#' Compose a "phantom" channel from existing electrodes
+#' @title Compose a phantom channel from existing electrodes
 #' @description
 #' In some cases, for example, deep-brain stimulation ('DBS'),
 #' it is often needed to analyze averaged electrode channels from segmented

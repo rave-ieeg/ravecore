@@ -21,7 +21,7 @@ restore_epoch_container_from_snapshot <- function(container, snapshot) {
   invisible()
 }
 
-#' 'RAVE' class for epoch repository
+#' @title 'RAVE' class for epoch repository
 #' @description
 #' Compared to \code{\link{RAVESubjectBaseRepository}}, this repository
 #' requires epoch information. please use

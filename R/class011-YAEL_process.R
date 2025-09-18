@@ -52,11 +52,12 @@ camel_template_name <- function(
 }
 
 
-#' @title Class definition of \code{'YAEL'} image pipeline
+#' @title Class definition of 'YAEL' image pipeline
 #' @description
 #' Rigid-registration across multiple types of images, non-linear normalization
-#' from native brain to common templates, and map template atlas or 'ROI' back
-#' to native brain. See examples at \code{\link{as_yael_process}}
+#' from native brain to common templates, and map template atlas or
+#' regions of interest back to native brain. See examples at
+#' \code{\link{as_yael_process}}
 #' @export
 YAELProcess <- R6::R6Class(
   classname = "YAELProcess",
@@ -272,7 +273,7 @@ YAELProcess <- R6::R6Class(
       )
     },
 
-    #' @description Register other images to 'T1' weighted 'MRI'
+    #' @description Register other images to \code{'T1'} weighted \code{'MRI'}
     #' @param image_type type of the image to register, must be set via
     #' \code{process$set_input_image} first.
     #' @param reverse whether to reverse the registration; default is false,
@@ -651,9 +652,9 @@ YAELProcess <- R6::R6Class(
 
     #' @description
     #' Create a reconstruction folder (as an alternative option) that
-    #' is generated from template brain to facilitate the '3D' viewer.
-    #' Please make sure method \code{map_to_template} is called before using
-    #' this method (or the program will fail)
+    #' is generated from template brain to facilitate the three-dimensional
+    #' viewer. Please make sure method \code{map_to_template} is called before
+    #' using this method (or the program will fail)
     #' @param template_name template to use for mapping
     #' @param add_surfaces whether to create surfaces that is morphed from
     #' template to local; default is \code{TRUE}. Please enable this option
@@ -816,7 +817,7 @@ YAELProcess <- R6::R6Class(
       return(invisible())
     },
 
-    #' @description Get '3D' brain model
+    #' @description Get three-dimensional brain model
     #' @param electrodes whether to add electrodes to the viewers; can be
     #' logical, data frame, or a character (path to electrode table). When
     #' the value is \code{TRUE}, the electrode file under \code{project_name}
@@ -876,7 +877,7 @@ YAELProcess <- R6::R6Class(
   )
 )
 
-#' Create a 'YAEL' imaging processing instance
+#' @title Create a 'YAEL' imaging processing instance
 #' @description
 #' Image registration across different modals. Normalize brain 'T1'-weighted
 #' 'MRI' to template brain and generate subject-level atlas files. See

@@ -1,5 +1,5 @@
-#' Register 'CT' to 'MR' images via \code{'nipy'} script
-#' @description Align 'CT' using
+#' @title Register a computerized tomography (CT) image to MRI via \code{'nipy'}
+#' @description Align \code{'CT'} using
 #' \code{nipy.algorithms.registration.histogram_registration}.
 #' @param ct_path,mri_path absolute paths to 'CT' and 'MR' image files
 #' @param clean_source whether to replace negative 'CT' values with zeros;

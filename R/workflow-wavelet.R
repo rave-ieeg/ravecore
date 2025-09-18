@@ -1,4 +1,4 @@
-#' Apply 'Morlet' wavelet to subject
+#' @title Apply Morlet-Wavelet to subject
 #' @description
 #' Calculates time-frequency decomposition; not intended for direct use.
 #' Please use 'RAVE' pipelines (see 'Examples').

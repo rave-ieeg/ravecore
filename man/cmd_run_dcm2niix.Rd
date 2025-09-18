@@ -2,7 +2,7 @@
 % Please edit documentation in R/workflow-dcm2niix.R
 \name{cmd_run_dcm2niix}
 \alias{cmd_run_dcm2niix}
-\title{Run 'DICOM' to 'NIfTI'}
+\title{Convert DICOM to NIfTI via \code{'dcm2niix'}}
 \usage{
 cmd_run_dcm2niix(
   subject,

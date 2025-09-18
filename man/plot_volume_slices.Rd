@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils-nifti2svg.R
 \name{plot_volume_slices}
 \alias{plot_volume_slices}
-\title{Plot volume slices into 'SVG' images}
+\title{Plot volume slices into scalable vector graphics SVG images}
 \usage{
 plot_volume_slices(
   x,
@@ -61,8 +61,8 @@ of underlay and overlay}
 \item{...}{passed to internal method}
 }
 \value{
-A 'SVG' tag object that can be embedded in shiny applications or
-plotted directly.
+A \code{'SVG'} tag object that can be embedded in shiny applications
+or plotted directly.
 }
 \description{
 Display slices, or interleave with image overlays. Require installing

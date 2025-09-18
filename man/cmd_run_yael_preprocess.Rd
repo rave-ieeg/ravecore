@@ -103,7 +103,7 @@ raw folder. It will take a while to run the workflow.
 }
 \description{
 Image processing pipeline \doi{10.1523/ENEURO.0328-23.2023},
-allowing cross-modality image registration, 'T1'-weighted 'MRI' normalization
+allowing cross-modality image registration, T1-weighted MRI normalization
 to template brain, creating subject-level brain atlas from inverse
 normalization.
 }

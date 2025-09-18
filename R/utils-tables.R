@@ -1,4 +1,4 @@
-#' Export data frame to different common formats
+#' @title Export data frame to different common formats
 #' @description
 #' Stores and load data in various of data format. See 'Details' for limitations.
 #'

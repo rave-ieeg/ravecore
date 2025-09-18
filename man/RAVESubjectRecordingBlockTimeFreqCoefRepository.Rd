@@ -2,7 +2,7 @@
 % Please edit documentation in R/class114-recording_blocks_timefreqcoefs.R
 \name{RAVESubjectRecordingBlockTimeFreqCoefRepository}
 \alias{RAVESubjectRecordingBlockTimeFreqCoefRepository}
-\title{'RAVE' class for loading 'spectrogram' coefficients}
+\title{'RAVE' class for loading time-frequency coefficients}
 \description{
 Loads time-frequency coefficients (complex numbers)
 }

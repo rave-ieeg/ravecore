@@ -1,4 +1,4 @@
-#' 'RAVE' class for base repository
+#' @title 'RAVE' class for base repository
 #' @description
 #' The class is for creating child classes, to instantiate the class,
 #' please use \code{\link{prepare_subject_bare0}} to create base repository.

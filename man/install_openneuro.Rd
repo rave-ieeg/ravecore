@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils-openneuro.R
 \name{install_openneuro}
 \alias{install_openneuro}
-\title{Install data-sets from 'OpenNeuro'}
+\title{Install data-sets from OpenNeuro}
 \usage{
 install_openneuro(
   accession_number,
@@ -12,7 +12,7 @@ install_openneuro(
 )
 }
 \arguments{
-\item{accession_number}{'OpenNeuro' accession number}
+\item{accession_number}{\code{'OpenNeuro'} accession number}
 
 \item{subject_codes}{subject codes, with or without the prefix \code{'sub-'},
 default is \code{NULL} to download the entire data repository}

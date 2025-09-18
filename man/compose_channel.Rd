@@ -2,7 +2,7 @@
 % Please edit documentation in R/workflow-compose_channel.R
 \name{compose_channel}
 \alias{compose_channel}
-\title{Compose a "phantom" channel from existing electrodes}
+\title{Compose a phantom channel from existing electrodes}
 \usage{
 compose_channel(
   subject,

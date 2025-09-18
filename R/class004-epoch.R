@@ -1,4 +1,4 @@
-#' Definition for epoch class
+#' @title Definition for epoch class
 #' @description Trial epoch, contains the following information: \code{Block}
 #' experiment block/session string; \code{Time} trial onset within that block;
 #' \code{Trial} trial number; \code{Condition} trial condition. Other optional

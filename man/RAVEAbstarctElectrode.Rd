@@ -2,7 +2,7 @@
 % Please edit documentation in R/class007-abstract_electrode.R
 \name{RAVEAbstarctElectrode}
 \alias{RAVEAbstarctElectrode}
-\title{Abstract definition of electrode class in RAVE}
+\title{Abstract definition of electrode class in 'RAVE'}
 \value{
 If \code{simplify} is enabled, and only one block is loaded,
 then the result will be a vector (\code{type="voltage"}) or a matrix

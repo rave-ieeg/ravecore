@@ -77,7 +77,7 @@ base64_plot_slice <- function(
   )
 }
 
-#' @title Plot volume slices into 'SVG' images
+#' @title Plot volume slices into scalable vector graphics SVG images
 #' @description
 #' Display slices, or interleave with image overlays. Require installing
 #' package \code{htmltools}.
@@ -105,8 +105,8 @@ base64_plot_slice <- function(
 #' @param underlay_range,overlay_range numeric vectors of two, value ranges
 #' of underlay and overlay
 #' @param ... passed to internal method
-#' @returns A 'SVG' tag object that can be embedded in shiny applications or
-#' plotted directly.
+#' @returns A \code{'SVG'} tag object that can be embedded in shiny applications
+#' or plotted directly.
 #' @examples
 #'
 #'

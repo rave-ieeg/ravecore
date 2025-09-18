@@ -2,7 +2,6 @@
 #' @title External shell commands for 'RAVE'
 #' @description These shell commands are only tested on 'MacOS' and 'Linux'.
 #' On 'Windows' machines, please use the 'WSL2' system.
-#' and \code{'CT'}
 #' @param dry_run whether to run in dry-run mode; under such mode, the shell
 #' command will not execute. This is useful for debugging scripts; default is
 #' false

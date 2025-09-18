@@ -1,4 +1,4 @@
-#' Definitions of reference with 'LFP' signal type
+#' @title Definitions of reference with local field potential signal type
 #' @description Please use a safer \code{\link{new_reference}} function to
 #' create instances. This documentation is to describe the member methods
 #' of the electrode class \code{LFP_reference}

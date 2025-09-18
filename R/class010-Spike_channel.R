@@ -1,4 +1,4 @@
-#' Class definition for micro-wire spike channels
+#' @title Class definition for micro-wire spike channels
 #' @export
 Spike_electrode <- R6::R6Class(
   classname = 'Spike_electrode',

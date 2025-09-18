@@ -97,7 +97,7 @@ RAVESubjectEpochTimeFreqBaseRepository <- R6::R6Class(
       )
     },
 
-    #' @description function to mount processed and referenced 'spectrogram'
+    #' @description function to mount processed and referenced spectrogram
     #' @param force force update data; default is true
     #' @param electrodes electrodes to update for expert-use use; default is
     #' \code{NULL} (all electrode channels will be mounted)
@@ -286,7 +286,7 @@ RAVESubjectEpochTimeFreqBaseRepository <- R6::R6Class(
 )
 
 
-#' @title 'RAVE' class for epoch repository - spectrogram
+#' @title 'RAVE' class for epoch repository - time-frequency
 #' @description
 #' The repository inherits \code{link{RAVESubjectEpochTimeFreqBaseRepository}}, with epoch
 #' trials, and is intended for loading processed and referenced time-frequency

@@ -1,4 +1,4 @@
-#' 'RAVE' class for blocks of voltage repository
+#' @title 'RAVE' class for blocks of voltage repository
 #' @description
 #' Compared to \code{\link{RAVESubjectBaseRepository}}, this repository
 #' loads the entire voltage traces for selected blocks; use

@@ -3,7 +3,7 @@
 \name{cmd_run_ants_coreg}
 \alias{cmd_run_ants_coreg}
 \alias{ants_coreg}
-\title{Register 'CT' and 'MR' images via \code{'ANTs'}}
+\title{Register a computerized tomography (CT) image to MRI via 'ANTs'}
 \usage{
 ants_coreg(
   ct_path,

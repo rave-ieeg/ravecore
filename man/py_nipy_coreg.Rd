@@ -3,7 +3,7 @@
 \name{py_nipy_coreg}
 \alias{py_nipy_coreg}
 \alias{cmd_run_nipy_coreg}
-\title{Register 'CT' to 'MR' images via \code{'nipy'} script}
+\title{Register a computerized tomography (CT) image to MRI via \code{'nipy'}}
 \usage{
 py_nipy_coreg(
   ct_path,
@@ -83,6 +83,6 @@ space in the original 'CT' to 'RAS' in 'MR' scanner space}
 }
 }
 \description{
-Align 'CT' using
+Align \code{'CT'} using
 \code{nipy.algorithms.registration.histogram_registration}.
 }

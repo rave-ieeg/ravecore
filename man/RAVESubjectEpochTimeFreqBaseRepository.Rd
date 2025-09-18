@@ -151,7 +151,7 @@ default is false}
 \if{html}{\out{<a id="method-RAVESubjectEpochTimeFreqBaseRepository-mount_data"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVESubjectEpochTimeFreqBaseRepository-mount_data}{}}}
 \subsection{Method \code{mount_data()}}{
-function to mount processed and referenced 'spectrogram'
+function to mount processed and referenced spectrogram
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{RAVESubjectEpochTimeFreqBaseRepository$mount_data(
   ...,

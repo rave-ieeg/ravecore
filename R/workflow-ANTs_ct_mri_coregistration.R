@@ -1,5 +1,5 @@
 #' @name cmd_run_ants_coreg
-#' @title Register 'CT' and 'MR' images via \code{'ANTs'}
+#' @title Register a computerized tomography (CT) image to MRI via 'ANTs'
 #' @description
 #' Please avoid calling \code{ants_coreg} directly; use
 #' \code{cmd_run_ants_coreg} for more robust behaviors

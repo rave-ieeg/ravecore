@@ -1,4 +1,4 @@
-#' 'RAVE' class for loading 'spectrogram' power components
+#' @title 'RAVE' class for loading time-frequency power components
 #' @description
 #' Loads time-frequency power
 #'

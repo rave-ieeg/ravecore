@@ -2,7 +2,7 @@
 % Please edit documentation in R/class011-YAEL_process.R
 \name{YAELProcess}
 \alias{YAELProcess}
-\title{Class definition of \code{'YAEL'} image pipeline}
+\title{Class definition of 'YAEL' image pipeline}
 \value{
 whether the image has been set (or replaced)
 
@@ -34,8 +34,9 @@ invalid rows will be filled with \code{NA})
 }
 \description{
 Rigid-registration across multiple types of images, non-linear normalization
-from native brain to common templates, and map template atlas or 'ROI' back
-to native brain. See examples at \code{\link{as_yael_process}}
+from native brain to common templates, and map template atlas or
+regions of interest back to native brain. See examples at
+\code{\link{as_yael_process}}
 }
 \section{Super class}{
 \code{\link[ravepipeline:RAVESerializable]{ravepipeline::RAVESerializable}} -> \code{YAELProcess}
@@ -218,7 +219,7 @@ Get 'RAVE' subject instance
 \if{html}{\out{<a id="method-YAELProcess-register_to_T1w"></a>}}
 \if{latex}{\out{\hypertarget{method-YAELProcess-register_to_T1w}{}}}
 \subsection{Method \code{register_to_T1w()}}{
-Register other images to 'T1' weighted 'MRI'
+Register other images to \code{'T1'} weighted \code{'MRI'}
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{YAELProcess$register_to_T1w(image_type = "CT", reverse = FALSE, verbose = TRUE)}\if{html}{\out{</div>}}
 }
@@ -495,9 +496,9 @@ coordinate system.}
 \if{latex}{\out{\hypertarget{method-YAELProcess-construct_ants_folder_from_template}{}}}
 \subsection{Method \code{construct_ants_folder_from_template()}}{
 Create a reconstruction folder (as an alternative option) that
-is generated from template brain to facilitate the '3D' viewer.
-Please make sure method \code{map_to_template} is called before using
-this method (or the program will fail)
+is generated from template brain to facilitate the three-dimensional
+viewer. Please make sure method \code{map_to_template} is called before
+using this method (or the program will fail)
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{YAELProcess$construct_ants_folder_from_template(
   template_name = rpyants_builtin_templates(),
@@ -523,7 +524,7 @@ you are studying the deep brain structures). Always use
 \if{html}{\out{<a id="method-YAELProcess-get_brain"></a>}}
 \if{latex}{\out{\hypertarget{method-YAELProcess-get_brain}{}}}
 \subsection{Method \code{get_brain()}}{
-Get '3D' brain model
+Get three-dimensional brain model
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{YAELProcess$get_brain(
   electrodes = TRUE,

@@ -3,7 +3,7 @@
 \name{niftyreg_coreg}
 \alias{niftyreg_coreg}
 \alias{cmd_run_niftyreg_coreg}
-\title{Register 'CT' to 'MR' images via \code{'NiftyReg'}}
+\title{Register a computerized tomography (CT) image to MRI via \code{'NiftyReg'}}
 \usage{
 niftyreg_coreg(
   ct_path,
@@ -61,5 +61,5 @@ space in the original 'CT' to 'RAS' in 'MR' scanner space}
 }
 }
 \description{
-Supports 'Rigid', 'affine', or 'non-linear' transformation
+Supports rigid, affine, or non-linear transformation
 }

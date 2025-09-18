@@ -1,10 +1,10 @@
 
-#' @title Install data-sets from 'OpenNeuro'
+#' @title Install data-sets from OpenNeuro
 #' @description
 #' Enjoy hundreds of open-access data sets from \url{openneuro.org} with a
 #' simple accession number.
 #'
-#' @param accession_number 'OpenNeuro' accession number
+#' @param accession_number \code{'OpenNeuro'} accession number
 #' @param subject_codes subject codes, with or without the prefix \code{'sub-'},
 #' default is \code{NULL} to download the entire data repository
 #' @param tag version number; default is \code{NULL} to download the latest

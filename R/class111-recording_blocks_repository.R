@@ -27,7 +27,7 @@ restore_block_container_from_snapshot <- function(container, snapshot) {
   invisible()
 }
 
-#' 'RAVE' class for loading entire recording block repository
+#' @title 'RAVE' class for loading entire recording block repository
 #' @description
 #' Compared to \code{\link{RAVESubjectBaseRepository}}, this repository
 #' requires specifying block information. please use

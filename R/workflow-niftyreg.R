@@ -1,5 +1,5 @@
-#' Register 'CT' to 'MR' images via \code{'NiftyReg'}
-#' @description Supports 'Rigid', 'affine', or 'non-linear' transformation
+#' @title Register a computerized tomography (CT) image to MRI via \code{'NiftyReg'}
+#' @description Supports rigid, affine, or non-linear transformation
 #' @param ct_path,mri_path absolute paths to 'CT' and 'MR' image files
 #' @param coreg_path registration path, where to save results; default is
 #' the parent folder of \code{ct_path}

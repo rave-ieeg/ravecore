@@ -1,4 +1,4 @@
-#' Class definition for auxiliary channels
+#' @title Class definition for auxiliary channels
 #' @export
 Auxiliary_electrode <- R6::R6Class(
   classname = 'Auxiliary_electrode',

@@ -2,7 +2,7 @@
 % Please edit documentation in R/class008-LFP_electrode.R
 \name{LFP_electrode}
 \alias{LFP_electrode}
-\title{Definitions of electrode with 'LFP' signal type}
+\title{Definitions of electrode with local field potential signal type}
 \value{
 if the reference number if \code{NULL} or \code{'noref'}, then
 returns 0, otherwise returns a \code{\link[filearray]{FileArray-class}}

@@ -2,11 +2,11 @@
 % Please edit documentation in R/class113-recording_blocks_coefs.R
 \name{RAVESubjectRecordingBlockTimeFreqBaseRepository}
 \alias{RAVESubjectRecordingBlockTimeFreqBaseRepository}
-\title{'RAVE' class for loading entire block of 'spectrogram' coefficients}
+\title{'RAVE' class for loading entire block of time-frequency coefficients}
 \description{
-'RAVE' class for loading entire block of 'spectrogram' coefficients
+'RAVE' class for loading entire block of time-frequency coefficients
 
-'RAVE' class for loading entire block of 'spectrogram' coefficients
+'RAVE' class for loading entire block of time-frequency coefficients
 }
 \seealso{
 \code{\link{prepare_subject_with_blocks}}
