@@ -27,7 +27,7 @@ the data folder name is always the accession number}
 The data folder name on the local disk.
 }
 \description{
-Enjoy hundreds of open-access data sets from \url{openneuro.org} with a
+Enjoy hundreds of open-access data sets from \url{https://openneuro.org} with a
 simple accession number.
 }
 \examples{

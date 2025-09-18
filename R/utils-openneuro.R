@@ -1,7 +1,7 @@
 
 #' @title Install data-sets from OpenNeuro
 #' @description
-#' Enjoy hundreds of open-access data sets from \url{openneuro.org} with a
+#' Enjoy hundreds of open-access data sets from \url{https://openneuro.org} with a
 #' simple accession number.
 #'
 #' @param accession_number \code{'OpenNeuro'} accession number

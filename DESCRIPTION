@@ -19,7 +19,7 @@ Description: Defines storage standard for Read, process, and analyze
     ingest signals from 'Matlab' data files, hierarchical data format 5 (HDF5), 
     European data format (EDF), BrainVision core data format (BVCDF), or 
     BlackRock Microsystem (NEV/NSx); process images in 
-    neuroimaging informatics technology initiative (NIfTI) and 
+    Neuroimaging informatics technology initiative (NIfTI) and 
     'FreeSurfer' formats, providing brain imaging normalization to template 
     brain, facilitating 'threeBrain' package for comprehensive electrode 
     localization via 'YAEL' (your advanced electrode localizer) by Wang, 
