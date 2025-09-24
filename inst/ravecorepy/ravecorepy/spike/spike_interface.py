@@ -78,7 +78,7 @@ def combine_recording_by_channel(recordings, channel_ids = None):
 
 def combine_recording_by_time(recordings):
     import spikeinterface as si
-    return si.append_recordings(recordings)
+    return si.concatenate_recordings(recordings)
 
 
 def bandpass(recording, freq_min=300.0, freq_max=6000.0):

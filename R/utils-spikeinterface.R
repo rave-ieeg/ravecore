@@ -5,6 +5,11 @@ use_spikeinterface <- function(repository, signal_type = "Spike") {
   container <- repository$get_container()
   blocks <- sort(repository$blocks)
 
+  n_timepoints <- vapply(blocks, function(block) {
+    as.double(container[[block]][[signal_type]]$dim[[1]])
+  }, FUN.VALUE = NA_real_)
+
+
   ravecorepy <- load_ravecorepy()
 
   # get channel locations
@@ -169,7 +174,7 @@ use_spikeinterface <- function(repository, signal_type = "Spike") {
 
 
 
-  return(recordings)
+  return(list(recordings = recordings, n_timepoints = n_timepoints))
 }
 
 
@@ -182,7 +187,9 @@ spike_sort_py <- function(repository, sorter_name = 'mountainsort5', verbose = T
   # verbose = TRUE
   # sorter_name = 'mountainsort5'
 
-  recordings <- use_spikeinterface(repository)
+  prep_results <- use_spikeinterface(repository)
+  recordings <- prep_results$recordings
+  n_timepoints <- prep_results$n_timepoints
 
   ravecorepy <- load_ravecorepy()
   sorted <- ravecorepy$spike$run_sorter(recording = recordings, sorter_name = sorter_name, folder = save_path, verbose = verbose)
@@ -212,7 +219,6 @@ spike_sort_py <- function(repository, sorter_name = 'mountainsort5', verbose = T
   template_waveforms <- rpymat::py_to_r(templates$get_templates(non_empty_units))
 
   # get spike train
-  n_segments <- sorted$get_num_segments()
   blocks <- sort(repository$blocks)
   unit_ids <- rpymat::py_to_r(non_empty_units)
   # spike_trains <- structure(names = blocks, lapply(seq_along(blocks), function(ii_seg) {
@@ -231,12 +237,12 @@ spike_sort_py <- function(repository, sorter_name = 'mountainsort5', verbose = T
 
   list(
     `@impl` = list(
-      n_segments = n_segments,
       sorted = sorted,
       analyzer = analyzer,
       waveforms = waveforms
     ),
     blocks = blocks,
+    n_timepoints = n_timepoints,
     unit_ids = unit_ids,
     waveform_mean = template_waveforms
     # spike_trains = spike_trains
@@ -258,16 +264,25 @@ extract_spike_train <- function(repository, sorted_results, epoch_name, epoch_wi
     epoch_table <- epoch_name$table
   }
 
+  n_timepoints <- sorted_results$n_timepoints
+  blocks <- sorted_results$blocks
+
   spike_train <- lapply(split(epoch_table, epoch_table$Block), function(sub) {
     # sub <- split(epoch_table, epoch_table$Block)[[1]]
     block <- sub$Block[[1]]
     cond <- sub$Condition[[1]]
-    if(!isTRUE(block %in% sorted_results$blocks)) { return() }
-    segment_index <- as.integer(which(sorted_results$blocks == block) - 1)
+    if(!isTRUE(block %in% blocks)) { return() }
+    segment <- which(blocks == block)
+
+    if(segment == 1) {
+      pad_timepoints <- 0
+    } else {
+      pad_timepoints <- sum(n_timepoints[seq_len(segment - 1)])
+    }
 
     re <- lapply(seq_len(nrow(sub)), function(ii) {
       row <- sub[ii, ]
-      time <- row$Time
+      time <- row$Time + pad_timepoints / sample_rate
       trial <- row$Trial
       cond <- row$Condition
 
@@ -279,7 +294,7 @@ extract_spike_train <- function(repository, sorted_results, epoch_name, epoch_wi
 
           spike_train <- rpymat::py_to_r(sorted_results$`@impl`$sorted$get_unit_spike_train(
             unit_id = unit_id,
-            segment_index = segment_index,
+            segment_index = 0L,
             start_frame = floor(window[[1]] * sample_rate),
             end_frame = ceiling(window[[2]] * sample_rate),
             return_times = TRUE
