@@ -81,7 +81,7 @@ use_spikeinterface <- function(repository, signal_type = "Spike") {
         channel = ch,
         path = si_path
       )
-      if(dir_exists(si_path)) {
+      if(dir.exists(si_path)) {
         tryCatch(
           {
             rec <- ravecorepy$spike$load_recording(path = si_path)
