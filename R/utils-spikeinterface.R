@@ -192,7 +192,11 @@ spike_sort_py <- function(repository, sorter_name = 'mountainsort5', verbose = T
   n_timepoints <- prep_results$n_timepoints
 
   ravecorepy <- load_ravecorepy()
+  # bandpass
+  recordings_bandpassed <- ravecorepy$spike$bandpass(recordings)
+
   sorted <- ravecorepy$spike$run_sorter(recording = recordings, sorter_name = sorter_name, folder = save_path, verbose = verbose)
+
 
   non_empty_units <- sorted$get_non_empty_unit_ids()
 
@@ -200,7 +204,7 @@ spike_sort_py <- function(repository, sorter_name = 'mountainsort5', verbose = T
   si <- rpymat::import("spikeinterface")
   analyzer = si$create_sorting_analyzer(
     sorting=sorted,
-    recording=recordings,
+    recording=recordings_bandpassed,
     folder=file_path(save_path, "analyzers"),
     overwrite=TRUE
   )
