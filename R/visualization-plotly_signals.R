@@ -44,7 +44,7 @@ StreamSignalPlot <- R6::R6Class(
           ranges = start_time + c(0, duration)
         ))
       }
-      # annot_table <- data.frame(time = runif(10) * 2, label = letters[1:10], color = 1:10)
+      # annot_table <- data.frame(time = stats::runif(10) * 2, label = letters[1:10], color = 1:10)
       n_annots <- nrow(annot_table)
 
       annot_colors <- annot_table$color
