@@ -1,6 +1,6 @@
 use_spikeinterface <- function(repository, signal_type = "Spike") {
 
-  # repository <- ravecore::prepare_subject_raw_voltage_with_blocks(subject = "test/PAV067", electrodes = 1:8); signal_type = "Spike"
+  # repository <- ravecore::prepare_subject_raw_voltage_with_blocks(subject = "test/PAV067", electrodes = 1:6); signal_type = "Spike"
 
   container <- repository$get_container()
   blocks <- sort(repository$blocks)
@@ -9,7 +9,8 @@ use_spikeinterface <- function(repository, signal_type = "Spike") {
 
   # get channel locations
   electrodes <- sort(repository$electrode_list)
-  electrode_table <- repository$subject$get_electrode_table(electrodes = electrodes)
+  electrode_table <- repository$subject$get_electrode_table()
+  electrode_table <- electrode_table[electrode_table$Electrode %in% electrodes, ]
 
   electrode_coords <- as.matrix(electrode_table[, c("Coord_x", "Coord_y", "Coord_z")])
   dimnames(electrode_coords) <- NULL
@@ -32,6 +33,81 @@ use_spikeinterface <- function(repository, signal_type = "Spike") {
     electrode_2d[dups, 2] <- electrode_2d[dups, 2] + stats::runif(sum(dups), min = -0.0001, 0.0001)
   }
 
+  iter_tbl <- expand.grid(block = blocks, channel = electrodes)
+  n_iters <- nrow(iter_tbl)
+
+  n_workers <- ravepipeline::raveio_getopt("max_worker")
+  if(!isTRUE(n_workers > 0)) { n_workers <- 1L }
+
+  if(n_iters < 10) {
+    callback <- NULL
+  } else {
+    callback <- function(iter) {
+      sprintf("Prepare spike sorting|Iteration %s", iter)
+    }
+  }
+
+  chunk_size <- ceiling(n_iters / n_workers)
+
+  paths <- ravepipeline::lapply_jobs(seq_len(n_workers), function(iter) {
+
+    ravecore <- asNamespace("ravecore")
+    ravecorepy <- ravecore$load_ravecorepy()
+
+    row_ii <- seq_len(chunk_size) + iter * (chunk_size - 1)
+    row_ii <- row_ii[row_ii <= n_iters]
+    if(!length(row_ii)) { return() }
+
+    container <- repository$get_container(electrodes = unique(iter_tbl$channel[row_ii]))
+
+    lapply(row_ii, function(ii) {
+      row <- iter_tbl[ii, ]
+      block <- row$block
+      ch <- row$channel
+
+      data_list <- container[[block]][[signal_type]]
+      data <- data_list$data
+      sample_rate <- data_list$sample_rate
+      if(!length(data)) { return(NULL) }
+
+      filebase <- data$.filebase
+      si_root <- file.path(filebase, "spikeinterface", fsep = "/")
+      if(!dir.exists(si_root)) {
+        dir.create(si_root, showWarnings = FALSE, recursive = TRUE)
+      }
+      si_path <- file.path(si_root, ch, fsep = "/")
+      re <- list(
+        block = block,
+        channel = ch,
+        path = si_path
+      )
+      if(dir_exists(si_path)) {
+        tryCatch(
+          {
+            rec <- ravecorepy$spike$load_recording(path = si_path)
+            return(re)
+          },
+          error = function(e) {
+            unlink(si_path, recursive = TRUE)
+          }
+        )
+      }
+
+      data_ii <- structure(subset(data, Electrode ~ Electrode == ch, drop = FALSE), names = NULL)
+      rec <- ravecorepy$spike$make_recording(traces = data_ii, fs_hz = sample_rate, path = si_path)
+      return(re)
+    })
+  }, callback = callback, .workers = n_workers, .globals = list(
+    chunk_size = chunk_size,
+    n_iters = n_iters,
+    iter_tbl = iter_tbl,
+    signal_type = signal_type,
+    repository = repository
+
+  ))
+
+  # paths <- unlist(paths, recursive = FALSE, use.names = FALSE)
+  # paths <- data.table::rbindlist(paths)
 
   recording_blocks <- lapply(blocks, function(block) {
     # block <- blocks[[1]]; signal_type = "Spike"
@@ -42,29 +118,14 @@ use_spikeinterface <- function(repository, signal_type = "Spike") {
 
     if(!length(data)) { return(NULL) }
     filebase <- data$.filebase
-    si_root <- dir_create2(file.path(filebase, "spikeinterface"))
+    si_root <- file_path(filebase, "spikeinterface")
 
     recording_list <- lapply(seq_along(electrodes), function(ii) {
       # ii <- 1
       ch <- electrodes[[ii]]
       # coords <- electrode_coords[ii, , drop = FALSE]
-      si_path <- file.path(si_root, ch)
-      if(dir_exists(si_path)) {
-        si_path2 <- path_abs(si_path)
-        tryCatch(
-          {
-            rec <- ravecorepy$spike$load_recording(path = si_path2)
-            return(rec)
-          },
-          error = function(e) {
-            unlink(si_path, recursive = TRUE)
-          }
-        )
-      }
-
-      data_ii <- structure(subset(data, Electrode ~ Electrode == ch, drop = FALSE), names = NULL)
-      rec <- ravecorepy$spike$make_recording(traces = data_ii, fs_hz = sample_rate, path = si_path)
-      return(rec)
+      si_path <- file_path(si_root, ch)
+      return(ravecorepy$spike$load_recording(path = si_path))
     })
 
     recording_list <- lapply(recording_list, function(rec) {
