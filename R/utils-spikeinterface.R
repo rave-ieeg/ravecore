@@ -353,9 +353,9 @@ epoch_spike_train <- function(repository, sorted_results, epoch_name, epoch_wind
 visualize_epoch_spike_train <- function(
     repository, sorted_results, epoch_name, epoch_window,
     unit_id, conditions = NULL,
-    waveform_method = c("mean", "quantile"), waveform_ylim = NULL,
+    waveform_method = c("mean", "quantile"), waveform_ylim = NULL, waveform_alpha = 0.5,
     isi_max_time = 500, isi_step_size = 10,
-    raster_cex = 0.4, raster_pch = "|",
+    raster_cex = 0.4, raster_pch = "|", raster_alpha = 1,
     firerate_smooth = TRUE,
     use_baseline = FALSE, baseline_window = c(-0.5, 0),
     plot_baseline = use_baseline,
@@ -471,7 +471,7 @@ visualize_epoch_spike_train <- function(
   on.exit({ graphics::par(oldpar) })
 
   graphics::layout(
-    matrix(c(3,3,4,4,4,1,1,2,2,5), ncol = 2),
+    matrix(c(3,3,3,4,4,1,1,2,2,5), ncol = 2),
     widths = c(2.5, 1)
   )
 
@@ -502,9 +502,20 @@ visualize_epoch_spike_train <- function(
   }
 
   graphics::par(mar = c(4.1, 4.1, 3.1, 2.1))
-  graphics::matplot(waveform_time, waveform_samples, type = 'l', lty = 1, col = "gray90",
-          axes = FALSE, xlab = "Time (ms)", ylab = bquote("Voltage (" ~ mu ~ "V)"),
-          main = sprintf("Spike unit #%d", unit_id), xaxs = "i", xlim = xlim, ylim = waveform_ylim)
+  graphics::matplot(
+    waveform_time,
+    waveform_samples,
+    type = 'l',
+    lty = 1,
+    col = grDevices::adjustcolor("#E5E5E5", alpha.f = waveform_alpha),
+    axes = FALSE,
+    xlab = "Time (ms)",
+    ylab = bquote("Voltage (" ~ mu ~ "V)"),
+    main = sprintf("Spike unit #%d", unit_id),
+    xaxs = "i",
+    xlim = xlim,
+    ylim = waveform_ylim
+  )
 
   switch (
     waveform_method,
@@ -554,7 +565,7 @@ visualize_epoch_spike_train <- function(
     yaxs = "i",
     ylim = c(0, max(log_counts)),
 
-    main = sprintf("Histogram (%.0f%% ISI < 1.5 ms)", mean(isis_in_ms < 1.5) * 100)
+    main = sprintf("Histogram (%.1f%% ISI < 1.5 ms)", mean(isis_in_ms < 1.5) * 100)
   )
   graphics::rect(xleft = xleft, xright = xright, ybottom = 0, ytop = isi_hist$counts, col = "gray80", border = graphics::par("bg"))
   xat <- pretty(c(0, isi_max_time))
@@ -579,7 +590,7 @@ visualize_epoch_spike_train <- function(
     ylim = c(0, nrow(trial_info) + 1),
     main = "Over-time plot",
     ylab = "Trial", xlab = "",
-    col = merged$Color,
+    col = grDevices::adjustcolor(merged$Color, alpha = raster_alpha),
     xaxs = "i", yaxs = "r"
   )
 
@@ -695,7 +706,17 @@ visualize_epoch_spike_train <- function(
 # epoch_table <- epoch$table
 # epoch_table$Block <- repository$blocks[[1]]
 # epoch_window <- c(-1, 2)
-# visualize_epoch_spike_train(repository, sorted_results, epoch_table, epoch_window, 2, firerate_smooth = TRUE)
+# visualize_epoch_spike_train(
+#   repository,
+#   sorted_results,
+#   epoch_table,
+#   epoch_window,
+#   unit_id = 4,
+#   firerate_smooth = TRUE,
+#   waveform_ylim = c(-150, 50),
+#   raster_pch = 3,
+#   raster_cex = 1
+# )
 # visualize_epoch_spike_train(repository, sorted_results, epoch_table, epoch_window, 2, firerate_smooth = F, baseline_window = c(-1, 0), use_baseline = F)
 
 
