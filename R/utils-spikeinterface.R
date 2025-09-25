@@ -9,11 +9,13 @@ use_spikeinterface <- function(repository, signal_type = "Spike") {
     as.double(container[[block]][[signal_type]]$dim[[1]])
   }, FUN.VALUE = NA_real_)
 
+  # Only store Spike signal
+  electrodes <- container[[blocks[[1]]]][[signal_type]]$dimnames$Electrode
+  electrodes <- electrodes[electrodes %in% repository$electrode_list]
 
   ravecorepy <- load_ravecorepy()
 
   # get channel locations
-  electrodes <- sort(repository$electrode_list)
   electrode_table <- repository$subject$get_electrode_table()
   electrode_table <- electrode_table[electrode_table$Electrode %in% electrodes, ]
 
