@@ -618,7 +618,14 @@ visualize_epoch_spike_train <- function(
         remove_last <- FALSE
       }
 
-      h <- graphics::hist(subsub$Time, bins, plot = FALSE)
+      print(c(time_range))
+
+      tryCatch({
+        h <- graphics::hist(subsub$Time, bins, plot = FALSE)
+      }, error = function(e) {
+        print(list(time_range = range(subsub$Time), bin_range = range(bins)))
+        stop(e)
+      })
       firing_rate <- h$counts / bin_size
 
       if(remove_first) {
