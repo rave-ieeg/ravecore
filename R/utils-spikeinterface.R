@@ -381,11 +381,11 @@ visualize_epoch_spike_train <- function(
   bin_size <- isi_step_size / 1000
   if(isTRUE(firerate_smooth)) {
     half_bandwidth <- 0.05
-    filter <- dnorm(seq(-half_bandwidth, half_bandwidth, by = bin_size), mean = 0, sd = half_bandwidth / 3) * bin_size
+    filter <- stats::dnorm(seq(-half_bandwidth, half_bandwidth, by = bin_size), mean = 0, sd = half_bandwidth / 3) * bin_size
   } else if (isTRUE(firerate_smooth > 0)) {
     # firerate_smooth is the half-bandwidth, default is 0.25
     half_bandwidth <- as.double(firerate_smooth)
-    filter <- dnorm(seq(-half_bandwidth, half_bandwidth, by = bin_size), mean = 0, sd = half_bandwidth / 3) * bin_size
+    filter <- stats::dnorm(seq(-half_bandwidth, half_bandwidth, by = bin_size), mean = 0, sd = half_bandwidth / 3) * bin_size
   } else {
     filter <- 1
   }
@@ -500,23 +500,23 @@ visualize_epoch_spike_train <- function(
     waveform_ylim <- range(waveform_ylim)
   }
 
-  par(mar = c(4.1, 4.1, 3.1, 2.1))
-  matplot(waveform_time, waveform_samples, type = 'l', lty = 1, col = "gray90",
+  graphics::par(mar = c(4.1, 4.1, 3.1, 2.1))
+  graphics::matplot(waveform_time, waveform_samples, type = 'l', lty = 1, col = "gray90",
           axes = FALSE, xlab = "Time (ms)", ylab = bquote("Voltage (" ~ mu ~ "V)"),
           main = sprintf("Spike unit #%d", unit_id), xaxs = "i", xlim = xlim, ylim = waveform_ylim)
 
   switch (
     waveform_method,
     "quantile" = {
-      waveform_mean <- apply(waveform_samples, 1L, median)
+      waveform_mean <- apply(waveform_samples, 1L, stats::median)
     },
     {
       waveform_mean <- rowMeans(waveform_samples)
     }
   )
   graphics::lines(waveform_time, waveform_mean, lwd = 3)
-  axis(1, pretty(xlim))
-  axis(2, c(waveform_ylim, 0), las = 1)
+  graphics::axis(1, pretty(xlim))
+  graphics::axis(2, c(waveform_ylim, 0), las = 1)
 
   # ---- Plot 1: ISI histogram -------------------------------------------------
   analyzer <- sorted_results$`@impl`$analyzer
@@ -527,7 +527,7 @@ visualize_epoch_spike_train <- function(
     max_isis_in_ms <- NULL
   }
   isi_step_size <- abs(isi_step_size)
-  isi_hist <- hist(isis_in_ms, breaks = c(seq(0, isi_max_time, by = isi_step_size), max_isis_in_ms), plot = FALSE)
+  isi_hist <- graphics::hist(isis_in_ms, breaks = c(seq(0, isi_max_time, by = isi_step_size), max_isis_in_ms), plot = FALSE)
 
   # plot histogram in log10 scale
   isi_hist$counts[isi_hist$counts == 1] <- 1.4 # log10(1.4) ~= 0.15; log10(2) ~= 0.3;
@@ -555,7 +555,7 @@ visualize_epoch_spike_train <- function(
 
     main = sprintf("Histogram (%.0f%% ISI < 1.5 ms)", mean(isis_in_ms < 1.5) * 100)
   )
-  graphics::rect(xleft = xleft, xright = xright, ybottom = 0, ytop = isi_hist$counts, col = "gray80", border = par("bg"))
+  graphics::rect(xleft = xleft, xright = xright, ybottom = 0, ytop = isi_hist$counts, col = "gray80", border = graphics::par("bg"))
   xat <- pretty(c(0, isi_max_time))
   if(xat[[length(xat)]] < isi_max_time) {
     xat <- c(xat, isi_max_time)
@@ -604,7 +604,7 @@ visualize_epoch_spike_train <- function(
 
     # time x trial
     firing_rates <- sapply(split(sub, sub$Trial), function(subsub) {
-      h <- hist(subsub$Time, bins, plot = FALSE)
+      h <- graphics::hist(subsub$Time, bins, plot = FALSE)
       firing_rate <- h$counts / bin_size
       firing_rate
     })
