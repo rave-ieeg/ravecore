@@ -613,7 +613,7 @@ visualize_epoch_spike_train <- function(
 
       baseline <- colMeans(firing_rates[is_baseline, , drop = FALSE])
       baseline[baseline == 0] <- 1
-      firing_rates <- colMeans(t(firing_rates) / baseline)
+      firing_rates <- colMeans(t(firing_rates) / baseline) - 1
 
     } else {
       firing_rates <- rowMeans(firing_rates)
@@ -635,7 +635,12 @@ visualize_epoch_spike_train <- function(
   }
 
   firing_rate_colors <- sapply(firing_rate_info, "[[", "color")
-  ylim <- range(pretty(c(0, max(firing_rates, na.rm = TRUE))))
+
+  if(use_baseline) {
+    ylim <- range(pretty(c(-1, max(firing_rates, na.rm = TRUE))))
+  } else {
+    ylim <- range(pretty(c(0, max(firing_rates, na.rm = TRUE))))
+  }
 
 
   graphics::par(mar = c(4.1, 4.1, 0, 1.1))
