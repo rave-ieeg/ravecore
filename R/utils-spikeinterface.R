@@ -399,10 +399,17 @@ visualize_epoch_spike_train <- function(
     for(w in baseline_window) {
       is_baseline <- is_baseline | firing_rate_time <= w[[2]] & firing_rate_time >= w[[1]]
     }
+    if(!any(is_baseline)) {
+      warning("Baseline is invalid, falling back to average firing rates")
+      use_baseline <- FALSE
+    }
   }
-  if(!any(is_baseline)) {
-    warning("Baseline is invalid, falling back to average firing rates")
-    use_baseline <- FALSE
+  if(!use_baseline) {
+    baseline_window <- tryCatch({
+      validate_time_window(baseline_window)
+    }, error = function(e) {
+      NULL
+    })
   }
 
   add_baseline <- function(ylim, col = "gray50", alpha = 0.2) {
@@ -691,7 +698,7 @@ visualize_epoch_spike_train <- function(
 # epoch_table$Block <- repository$blocks[[1]]
 # epoch_window <- c(-1, 2)
 # visualize_epoch_spike_train(repository, sorted_results, epoch_table, epoch_window, 2, firerate_smooth = TRUE)
-# visualize_epoch_spike_train(repository, sorted_results, epoch_table, epoch_window, 2, firerate_smooth = F, baseline_window = c(-1, 0), use_baseline = TRUE)
+# visualize_epoch_spike_train(repository, sorted_results, epoch_table, epoch_window, 2, firerate_smooth = F, baseline_window = c(-1, 0), use_baseline = F)
 
 
 
