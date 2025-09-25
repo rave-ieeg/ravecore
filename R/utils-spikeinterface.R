@@ -380,7 +380,11 @@ visualize_epoch_spike_train <- function(
   }
 
   # For baseline firing rate
-  bins <- seq(epoch_window[[1]] - half_bandwidth, epoch_window[[2]] + half_bandwidth, by = bin_size)
+  epoch_starts_boundary <- epoch_window[[1]]
+  epoch_ends_boundary <- epoch_window[[2]] + half_bandwidth
+
+  n_breaks <- ceiling((epoch_ends_boundary - epoch_starts_boundary) / bin_size) + 1
+  bins <- seq(epoch_starts_boundary, by = bin_size, length.out = n_breaks)
   firing_rate_time <- (bins[-1] + bins[-length(bins)]) * 0.5
   is_baseline <- rep(FALSE, length(firing_rate_time))
   if(use_baseline) {
