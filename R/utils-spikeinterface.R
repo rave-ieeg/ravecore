@@ -380,7 +380,7 @@ visualize_epoch_spike_train <- function(
   }
 
   # For baseline firing rate
-  epoch_starts_boundary <- epoch_window[[1]]
+  epoch_starts_boundary <- epoch_window[[1]] - half_bandwidth
   epoch_ends_boundary <- epoch_window[[2]] + half_bandwidth
 
   n_breaks <- ceiling((epoch_ends_boundary - epoch_starts_boundary) / bin_size) + 1
@@ -429,6 +429,9 @@ visualize_epoch_spike_train <- function(
     epoch_window = epoch_window + c(-1, 1) * half_bandwidth,
     signal_type = signal_type
   )
+
+  spike_train <- spike_train[spike_train$Time > epoch_starts_boundary & spike_train$Time < epoch_ends_boundary, ]
+
   sample_rate <- repository$sample_rates[[signal_type]]
 
   all_conditions <- sort(unique(spike_train$Condition))
@@ -603,38 +606,10 @@ visualize_epoch_spike_train <- function(
     # time x trial
     firing_rates <- sapply(split(sub, sub$Trial), function(subsub) {
 
-      time_range <- range(subsub$Time, na.rm = TRUE)
-      bins2 <- bins
-      if(time_range[[1]] < bins[[1]]) {
-        remove_first <- TRUE
-        bins2 <- c(time_range[[1]], bins)
-      } else {
-        remove_first <- FALSE
-      }
-      if(time_range[[2]] > bins[[length(bins)]]) {
-        remove_last <- TRUE
-        bins2 <- c(bins2, time_range[[2]])
-      } else {
-        remove_last <- FALSE
-      }
-
-      print(c(time_range))
-
-      tryCatch({
-        h <- graphics::hist(subsub$Time, bins, plot = FALSE)
-      }, error = function(e) {
-        print(list(time_range = range(subsub$Time), bin_range = range(bins)))
-        stop(e)
-      })
+      h <- graphics::hist(subsub$Time, bins, plot = FALSE)
       firing_rate <- h$counts / bin_size
-
-      if(remove_first) {
-        firing_rate <- firing_rate[-1]
-      }
-      if(remove_last) {
-        firing_rate <- firing_rate[-length(firing_rate)]
-      }
       firing_rate
+
     })
 
     if(use_baseline) {
