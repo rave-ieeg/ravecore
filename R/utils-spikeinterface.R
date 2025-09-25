@@ -368,10 +368,14 @@ visualize_epoch_spike_train <- function(
     isi_max_time = 500, isi_step_size = 10,
     raster_cex = 0.4, raster_pch = "|",
     firerate_smooth = TRUE,
+    use_baseline = FALSE, baseline_window = c(-0.5, 0),
+    plot_baseline = use_baseline,
     ...,
     color_palette = NULL, signal_type = c("Spike", "LFP", "Auxiliary")) {
   signal_type <- match.arg(signal_type)
   waveform_method <- match.arg(waveform_method)
+
+  # waveform_method <- "quantile"; isi_max_time = 500; isi_step_size = 10; firerate_smooth = 0.25; color_palette = NULL
 
   # This is to calculate overhead for bins and firerates
   bin_size <- isi_step_size / 1000
@@ -386,8 +390,39 @@ visualize_epoch_spike_train <- function(
     filter <- 1
   }
 
-  # waveform_method <- "quantile"
-  # isi_max_time = 500; isi_step_size = 10
+  # For baseline firing rate
+  bins <- seq(epoch_window[[1]] - half_bandwidth, epoch_window[[2]] + half_bandwidth, by = bin_size)
+  firing_rate_time <- (bins[-1] + bins[-length(bins)]) * 0.5
+  if(length(use_baseline)) {
+    baseline_window <- validate_time_window(baseline_window)
+    is_baseline <- rep(FALSE, length(firing_rate_time))
+    for(w in baseline_window) {
+      is_baseline <- is_baseline | firing_rate_time <= w[[2]] & firing_rate_time >= w[[1]]
+    }
+  } else {
+    baseline_window <- NULL
+  }
+  if(!any(is_baseline)) {
+    warning("Baseline is invalid, falling back to average firing rates")
+    use_baseline <- FALSE
+  }
+
+  add_baseline <- function(ylim, col = "gray50", alpha = 0.2) {
+    if(!plot_baseline) { return() }
+    lapply(baseline_window, function(w) {
+
+      graphics::rect(
+        xleft = w[[1]],
+        xright = w[[2]],
+        border = NA,
+        ybottom = ylim[[1]],
+        ytop = ylim[[2]],
+        col = grDevices::adjustcolor(col, alpha.f = alpha)
+      )
+
+    })
+  }
+
 
   spike_train <- epoch_spike_train(
     repository = repository,
@@ -430,6 +465,7 @@ visualize_epoch_spike_train <- function(
   trial_info$Color <- color_palette[as.integer(trial_info$Condition)]
   merged <- merge(trial_info, spike_train_subset, by = c("Condition", "Trial"))
 
+  # ---- Layout ----------------------------------------------------------------
   oldpar <- graphics::par(no.readonly = TRUE)
   on.exit({ graphics::par(oldpar) })
 
@@ -559,42 +595,73 @@ visualize_epoch_spike_train <- function(
     graphics::axis(2, at = mean(tick_bd), label = sprintf("%s\n(%d)", cond, n_trials), tick = FALSE, las = 1)
   }
 
+  add_baseline(ylim = c(-10, sum(trial_counts_per_cond) + 10), col = "gray50", alpha = 0.2)
+
   # ---- Firing rates ----------------------------------------------------------
+
   firing_rate_info <- lapply(split(merged, merged$Condition), function(sub) {
     # sub <- split(merged, merged$Condition)[[1]]
-    h <- hist(sub$Time, seq(epoch_window[[1]] - 1, epoch_window[[2]] + 1, by = bin_size), plot = FALSE)
-    firing_rate <- h$counts / bin_size / length(unique(sub$Order))
-    time <- h$mids
 
-    if(firerate_smooth) {
-      firing_rate <- stats::filter(firing_rate, filter)
+    # time x trial
+    firing_rates <- sapply(split(sub, sub$Trial), function(subsub) {
+      h <- hist(subsub$Time, bins, plot = FALSE)
+      firing_rate <- h$counts / bin_size
+      firing_rate
+    })
+
+    if(length(use_baseline)) {
+
+      baseline <- colMeans(firing_rates[is_baseline, , drop = FALSE])
+      baseline[baseline == 0] <- 1
+      firing_rates <- colMeans(t(firing_rates) / baseline)
+
+    } else {
+      firing_rates <- rowMeans(firing_rates)
     }
 
     list(
       condition = sub$Condition[[1]],
-      time = time,
-      firing_rate = firing_rate,
+      firing_rates = firing_rates,
       color = sub$Color[[1]]
     )
   })
 
-  firing_rates <- do.call("cbind", lapply(firing_rate_info, "[[", "firing_rate"))
-  firing_rate_colors <- sapply(firing_rate_info, "[[", "color")
-  graphics::par(mar = c(4.1, 4.1, 0, 1.1))
+  # time x trial
+  firing_rates <- do.call("cbind", lapply(firing_rate_info, "[[", "firing_rates"))
 
+
+  if(firerate_smooth) {
+    firing_rates <- stats::filter(firing_rates, filter)
+  }
+
+  firing_rate_colors <- sapply(firing_rate_info, "[[", "color")
   ylim <- range(pretty(c(0, max(firing_rates, na.rm = TRUE))))
 
+
+  graphics::par(mar = c(4.1, 4.1, 0, 1.1))
   graphics::matplot(
-    x = firing_rate_info[[1]]$time,
+    x = firing_rate_time,
     y = firing_rates,
-    type = "l", lty = 1, col = firing_rate_colors,
-    axes = FALSE, xaxs = "i", yaxs = "i", ylim = ylim, xlim = epoch_window,
-    xlab = "Time (s)", ylab = "Firing Rate (Hz)",
-    main = ""
+
+    type = "l",
+    lty = 1,
+    col = firing_rate_colors,
+    axes = FALSE,
+    main = "",
+
+    xlim = epoch_window,
+    xlab = "Time (s)",
+    xaxs = "i",
+
+    ylab = ifelse(use_baseline, "% Change - Firing Rate (x 100%)", "Firing Rate (Hz)"),
+    ylim = ylim,
+    yaxs = "i"
+
   )
   graphics::axis(1, pretty(epoch_window))
   graphics::axis(2, pretty(ylim), las = 1)
 
+  add_baseline(ylim = ylim + c(-1, 1), col = "gray50", alpha = 0.2)
 
   # ---- Legends --------------------------------------------------------------
   graphics::par(mar = c(0.1, 0.1, 0.1, 0.1))
@@ -621,6 +688,7 @@ visualize_epoch_spike_train <- function(
 # epoch_table$Block <- repository$blocks[[1]]
 # epoch_window <- c(-1, 2)
 # visualize_epoch_spike_train(repository, sorted_results, epoch_table, epoch_window, 2, firerate_smooth = TRUE)
+# visualize_epoch_spike_train(repository, sorted_results, epoch_table, epoch_window, 2, firerate_smooth = F, baseline_window = c(-1, 0), use_baseline = TRUE)
 
 
 
