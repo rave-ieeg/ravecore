@@ -181,7 +181,7 @@ StreamSignalPlot <- R6::R6Class(
         }
       } else if( gap <= 0 ) {
         # automatic
-        gap <- quantile(abs(unlist(private$.data)), na.rm = TRUE, probs = 0.999) * 2
+        gap <- stats::quantile(abs(unlist(private$.data)), na.rm = TRUE, probs = 0.999) * 2
       }
       gap
     },

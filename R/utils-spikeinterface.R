@@ -610,7 +610,7 @@ visualize_epoch_spike_train <- function(
   hard_lim <- range(waveform_mean, na.rm = TRUE)
   waveform_ylim <- waveform_ylim[is.finite(waveform_ylim)]
   if(!length(waveform_ylim)) {
-    waveform_ylim <- round(quantile(waveform_samples, c(0.001, 0.999)))
+    waveform_ylim <- round(stats::quantile(waveform_samples, c(0.001, 0.999)))
   } else if(length(waveform_ylim) == 1) {
     waveform_ylim <- c(-1, 1) * abs(waveform_ylim)
   } else {
