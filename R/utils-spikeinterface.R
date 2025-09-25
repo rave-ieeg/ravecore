@@ -393,14 +393,12 @@ visualize_epoch_spike_train <- function(
   # For baseline firing rate
   bins <- seq(epoch_window[[1]] - half_bandwidth, epoch_window[[2]] + half_bandwidth, by = bin_size)
   firing_rate_time <- (bins[-1] + bins[-length(bins)]) * 0.5
-  if(length(use_baseline)) {
+  if(use_baseline) {
     baseline_window <- validate_time_window(baseline_window)
     is_baseline <- rep(FALSE, length(firing_rate_time))
     for(w in baseline_window) {
       is_baseline <- is_baseline | firing_rate_time <= w[[2]] & firing_rate_time >= w[[1]]
     }
-  } else {
-    baseline_window <- NULL
   }
   if(!any(is_baseline)) {
     warning("Baseline is invalid, falling back to average firing rates")
@@ -609,7 +607,7 @@ visualize_epoch_spike_train <- function(
       firing_rate
     })
 
-    if(length(use_baseline)) {
+    if(use_baseline) {
 
       baseline <- colMeans(firing_rates[is_baseline, , drop = FALSE])
       baseline[baseline == 0] <- 1
