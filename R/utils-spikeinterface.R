@@ -602,8 +602,31 @@ visualize_epoch_spike_train <- function(
 
     # time x trial
     firing_rates <- sapply(split(sub, sub$Trial), function(subsub) {
+
+      time_range <- range(subsub$Time, na.rm = TRUE)
+      bins2 <- bins
+      if(time_range[[1]] < bins[[1]]) {
+        remove_first <- TRUE
+        bins2 <- c(time_range[[1]], bins)
+      } else {
+        remove_first <- FALSE
+      }
+      if(time_range[[2]] > bins[[length(bins)]]) {
+        remove_last <- TRUE
+        bins2 <- c(bins2, time_range[[2]])
+      } else {
+        remove_last <- FALSE
+      }
+
       h <- graphics::hist(subsub$Time, bins, plot = FALSE)
       firing_rate <- h$counts / bin_size
+
+      if(remove_first) {
+        firing_rate <- firing_rate[-1]
+      }
+      if(remove_last) {
+        firing_rate <- firing_rate[-length(firing_rate)]
+      }
       firing_rate
     })
 
