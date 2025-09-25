@@ -178,7 +178,7 @@ use_spikeinterface <- function(repository, signal_type = "Spike") {
 }
 
 
-spike_sort_py <- function(repository, sorter_name = 'mountainsort5', verbose = TRUE,
+spike_sort_py <- function(repository, sorter_name = 'mountainsort5', verbose = TRUE, force = FALSE,
                           save_path = file_path(tempdir(), sprintf("rave_si_%s", repository$signature))) {
 
   # DIPSAUS DEBUG START
@@ -195,7 +195,22 @@ spike_sort_py <- function(repository, sorter_name = 'mountainsort5', verbose = T
   # bandpass
   recordings_bandpassed <- ravecorepy$spike$bandpass(recordings)
 
-  sorted <- ravecorepy$spike$run_sorter(recording = recordings, sorter_name = sorter_name, folder = save_path, verbose = verbose)
+  sorted <- NULL
+  if(dir_exists(save_path) && !force) {
+    tryCatch({
+      sorted <- ravecorepy$spike$load_recording(save_path)
+    }, error = function(e) {
+    })
+  }
+  if(is.null(sorted)) {
+    sorted <- ravecorepy$spike$run_sorter(
+      recording = recordings,
+      sorter_name = sorter_name,
+      folder = save_path,
+      verbose = verbose
+    )
+  }
+
 
   non_empty_units <- sorted$get_non_empty_unit_ids()
 
