@@ -56,7 +56,7 @@ ensure_py_package <- local({
     }
     if( !rpymat_is_setup() ) {
       if( error_if_missing ) {
-        stop("Please configure environment first. Run the following command:\n  ravecore:::finalize_installa()")
+        stop("Please configure environment first. Run the following command:\n  ravemanager::configure_python()")
       }
       return( NULL )
     }
