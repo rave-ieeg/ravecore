@@ -89,7 +89,7 @@ install_openneuro <- function(
 
 
   if(!dir_exists(rpymat::env_path())) {
-    stop("Conda is not configured for RAVE. Please run `ravemanager::configure_python()` or `rpymat::configure_conda()` to set it up.")
+    stop("Conda is not configured for RAVE. Please run `ravemanager::configure_python()` to set it up.")
   }
 
 
@@ -111,16 +111,9 @@ install_openneuro <- function(
 
 
   # Make sure openneuro-py has been installed
+  ensure_py_package("openneuro-py", pip = TRUE)
   rpymat::ensure_rpymat(verbose = FALSE)
-  openneuro <- tryCatch(
-    {
-      rpymat::import("openneuro")
-    },
-    error = function(e) {
-      rpymat::add_packages("openneuro-py", pip = TRUE)
-      rpymat::import("openneuro")
-    }
-  )
+  openneuro <- rpymat::import("openneuro")
 
   # Intialize directories
   parent_folder <- dir_create2(parent_folder)

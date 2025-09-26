@@ -16,8 +16,14 @@ ensure_py_package <- local({
   function(packages, python_ver = "auto", ...) {
     check_py_flag()
     if(!rpymat_is_setup()) {
-      standalone <- !file.exists(rpymat::conda_bin())
-      rpymat::configure_conda(python_ver = python_ver, force = TRUE, standalone = standalone)
+
+      if(system.file(package = "ravemanager") != "") {
+        ravemanager <- asNamespace("ravemanager")
+        ravemanager$configure_python(verbose = TRUE)
+      } else {
+        standalone <- !file.exists(rpymat::conda_bin())
+        rpymat::configure_conda(python_ver = python_ver, force = TRUE, standalone = standalone)
+      }
     }
     rpymat::ensure_rpymat(verbose = FALSE)
 
@@ -55,7 +61,7 @@ ensure_py_package <- local({
       return( NULL )
     }
     tryCatch({
-      ensure_py_package(c("spikeinterface", "mountainsort5"))
+      ensure_py_package(c("spikeinterface", "mountainsort5"), pip = TRUE)
 
       rpymat::ensure_rpymat(verbose = FALSE)
 
