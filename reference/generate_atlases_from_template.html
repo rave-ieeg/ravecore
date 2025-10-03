@@ -43,7 +43,9 @@
 <span>  <span class="va">subject</span>,</span>
 <span>  <span class="va">atlas_folders</span>,</span>
 <span>  template_name <span class="op">=</span> <span class="st">"mni_icbm152_nlin_asym_09b"</span>,</span>
-<span>  any_mni152 <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  any_mni152 <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  surfaces <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  as_job <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -70,6 +72,20 @@ templates</p></dd>
 <dt id="arg-any-mni-">any_mni152<a class="anchor" aria-label="anchor" href="#arg-any-mni-"></a></dt>
 <dd><p>if the template is 'MNI152', then whether to check other
 template folders; default is true</p></dd>
+
+
+<dt id="arg-surfaces">surfaces<a class="anchor" aria-label="anchor" href="#arg-surfaces"></a></dt>
+<dd><p>whether to generate surfaces; if true, then a 'GIfTI' file
+and a 'STL' file will be created for each atlas, if applicable. The
+'GIfTI' file will be in right-anterior-superior 'RAS' coordinate system to
+comply with the 'NIfTI' standard, and 'STL' will be in
+left-posterior-superior 'LPS' system that can be imported to 'ITK'-based
+software such as 'BrainLab' or 'ANTs'.</p></dd>
+
+
+<dt id="arg-as-job">as_job<a class="anchor" aria-label="anchor" href="#arg-as-job"></a></dt>
+<dd><p>whether to run as a background job for cleaner environment;
+default is true; set to false for debugging.</p></dd>
 
 </dl></div>
     <div class="section level2">
