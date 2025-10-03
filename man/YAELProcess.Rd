@@ -24,7 +24,7 @@ transformed image in \code{'ANTs'} format
 
 transformed image in \code{'ANTs'} format
 
-Nothing
+Paths to the atlas (volume) files
 
 A matrix of 3 columns, each row is a transformed points (
 invalid rows will be filled with \code{NA})

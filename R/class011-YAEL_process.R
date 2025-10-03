@@ -519,7 +519,7 @@ YAELProcess <- R6::R6Class(
     #' to disable this function. The generated surfaces will stay in native
     #' \code{'T1'} space.
     #' @param verbose whether the print out the progress
-    #' @returns Nothing
+    #' @returns Paths to the atlas (volume) files
     generate_atlas_from_template = function(template_name = rpyants_builtin_templates(),
                                             atlas_folder = NULL, surfaces = NA,
                                             verbose = TRUE) {
@@ -547,8 +547,8 @@ YAELProcess <- R6::R6Class(
         all.files = FALSE,
         full.names = TRUE
       )
-      if(isFALSE(surfaces)) { return(invisible()) }
-      ravepipeline::lapply_jobs(volume_files, function(path) {
+      if(isFALSE(surfaces)) { return(invisible(volume_files)) }
+      paths <- ravepipeline::lapply_jobs(volume_files, function(path) {
         dname <- dirname(path)
         fname <- gsub("\\.(nii|nii\\.gz)$", '', basename(path), ignore.case = TRUE)
         fname <- sprintf("%s.gii", fname)
@@ -556,12 +556,12 @@ YAELProcess <- R6::R6Class(
         if (isTRUE(surfaces) || !file.exists(dst_path)) {
           mesh <- threeBrain::volume_to_surf(path, save_to = dst_path)
         }
-        NULL
+        path
       }, .globals = list(surfaces = surfaces), callback = function(path) {
         fname <- gsub("\\.(nii|nii\\.gz)$", '', basename(path), ignore.case = TRUE)
         sprintf("Generating surfaces | %s", fname)
       })
-      invisible()
+      invisible(volume_files)
     },
 
     #' @description Transform points from native images to template

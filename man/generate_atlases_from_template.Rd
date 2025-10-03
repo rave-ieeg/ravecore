@@ -8,7 +8,9 @@ generate_atlases_from_template(
   subject,
   atlas_folders,
   template_name = "mni_icbm152_nlin_asym_09b",
-  any_mni152 = TRUE
+  any_mni152 = TRUE,
+  surfaces = TRUE,
+  as_job = TRUE
 )
 }
 \arguments{
@@ -24,6 +26,16 @@ templates}
 
 \item{any_mni152}{if the template is 'MNI152', then whether to check other
 template folders; default is true}
+
+\item{surfaces}{whether to generate surfaces; if true, then a 'GIfTI' file
+and a 'STL' file will be created for each atlas, if applicable. The
+'GIfTI' file will be in right-anterior-superior 'RAS' coordinate system to
+comply with the 'NIfTI' standard, and 'STL' will be in
+left-posterior-superior 'LPS' system that can be imported to 'ITK'-based
+software such as 'BrainLab' or 'ANTs'.}
+
+\item{as_job}{whether to run as a background job for cleaner environment;
+default is true; set to false for debugging.}
 }
 \value{
 The function returns nothing, but will create a folder named

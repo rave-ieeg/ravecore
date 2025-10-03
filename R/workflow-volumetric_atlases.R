@@ -49,6 +49,15 @@ get_available_morph_to_template <- function(subject) {
 #' templates
 #' @param any_mni152 if the template is 'MNI152', then whether to check other
 #' template folders; default is true
+#' @param surfaces whether to generate surfaces; if true, then a 'GIfTI' file
+#' and a 'STL' file will be created for each atlas, if applicable. The
+#' 'GIfTI' file will be in right-anterior-superior 'RAS' coordinate system to
+#' comply with the 'NIfTI' standard, and 'STL' will be in
+#' left-posterior-superior 'LPS' system that can be imported to 'ITK'-based
+#' software such as 'BrainLab' or 'ANTs'.
+#' @param as_job whether to run as a background job for cleaner environment;
+#' default is true; set to false for debugging.
+#'
 #' @returns The function returns nothing, but will create a folder named
 #' \code{'atlases'} under raw subject \code{'rave-imaging'} folder.
 #'
@@ -66,7 +75,8 @@ get_available_morph_to_template <- function(subject) {
 #' @export
 generate_atlases_from_template <- function(
     subject, atlas_folders,
-    template_name = 'mni_icbm152_nlin_asym_09b', any_mni152 = TRUE) {
+    template_name = 'mni_icbm152_nlin_asym_09b', any_mni152 = TRUE,
+    surfaces = TRUE, as_job = TRUE) {
 
   subject <- restore_subject_instance(subject)
 
@@ -118,36 +128,68 @@ generate_atlases_from_template <- function(
 
   atlas_folders <- atlas_folders[dir_exists(atlas_folders)]
 
-  job_id <- ravepipeline::start_job(
-    fun = function(subject, template_name, atlas_folders) {
-      ravecore <- asNamespace("ravecore")
-      yael_process <- ravecore$as_yael_process(subject)
+  job_fun <- function(subject, template_name, atlas_folders, surfaces) {
+    ravecore <- asNamespace("ravecore")
+    yael_process <- ravecore$as_yael_process(subject)
 
-      lapply(atlas_folders, function(atlas_folder) {
+    lapply(atlas_folders, function(atlas_folder) {
 
-        yael_process$generate_atlas_from_template(
-          template_name = template_name,
-          atlas_folder = atlas_folder,
-          verbose = TRUE,
-          surfaces = TRUE
-        )
+      atlas_paths <- yael_process$generate_atlas_from_template(
+        template_name = template_name,
+        atlas_folder = atlas_folder,
+        verbose = TRUE,
+        surfaces = surfaces
+      )
 
-        return()
+      if(surfaces && length(atlas_paths) > 0) {
+        lapply(atlas_paths, function(atlas_path) {
+          gii_path <- gsub("\\.(nii|nii\\.gz)$", ".gii", x = atlas_path, ignore.case = TRUE)
+          stl_path <- gsub("\\.(nii|nii\\.gz)$", ".stl", x = atlas_path, ignore.case = TRUE)
+          if(file.exists(gii_path)) {
+            tryCatch({
+              surf <- ieegio::read_surface(gii_path)
+              lps <- diag(c(-1, -1, 1, 1)) %*% surf$geometry$transforms[[1]] %*% surf$geometry$vertices
+              surf <- ieegio::as_ieegio_surface(
+                t(lps),
+                faces = t(surf$geometry$faces),
+                face_start = surf$geometry$face_start
+              )
+              ieegio::write_surface(surf, con = stl_path, type = "geometry", format = 'freesurfer')
+            })
+          }
+        })
+      }
 
-      })
-    },
-    method = "rs_job",
-    fun_args = list(
+      return()
+
+    })
+  }
+
+
+  if( as_job ) {
+    job_id <- ravepipeline::start_job(
+      fun = job_fun,
+      method = "rs_job",
+      fun_args = list(
+        subject = subject,
+        template_name = template_name,
+        atlas_folders = atlas_folders,
+        surfaces = surfaces
+      ),
+      packages = "ravecore",
+      ensure_init = TRUE,
+      name = sprintf("Atlas: %s -> %s", template_name, subject$subject_id)
+    )
+    ravepipeline::resolve_job(job_id)
+  } else {
+    job_fun(
       subject = subject,
       template_name = template_name,
-      atlas_folders = atlas_folders
-    ),
-    packages = "ravecore",
-    ensure_init = TRUE,
-    name = sprintf("Atlas: %s -> %s", template_name, subject$subject_id)
-  )
+      atlas_folders = atlas_folders,
+      surfaces = surfaces
+    )
+  }
 
-  ravepipeline::resolve_job(job_id)
   return(invisible())
 }
 
