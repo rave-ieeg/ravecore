@@ -451,7 +451,8 @@ visualize_epoch_spike_train <- function(
   #     firerate_smooth = TRUE,
   #     use_baseline = FALSE, baseline_window = c(-0.5, 0),
   #     plot_baseline = FALSE,
-  #     color_palette = NULL
+  #     color_palette = NULL,
+  # firerate_bin = 10
   #   )
   # )
 
