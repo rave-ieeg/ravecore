@@ -21,6 +21,7 @@ register_reversed <- {{ register_reversed }}
 normalize_template <- {{ normalize_template_str }}
 normalize_images <- {{ normalize_images_str }}
 run_recon_all <- {{ run_recon_all }}
+use_antspynet <- {{ use_antspynet }}
 
 
 subject <- ravecore::RAVESubject$new(project_name = project_name,
@@ -57,6 +58,7 @@ if( !run_recon_all ) {
     register_reversed = register_reversed,
     normalize_template = normalize_template,
     normalize_images = normalize_images,
+    use_antspynet = use_antspynet,
     add_surfaces = TRUE
   )
   surf_path <- file.path(wdir_actual, "rave-imaging", "ants", "surf")
@@ -102,6 +104,7 @@ if( !run_recon_all ) {
     register_reversed = register_reversed,
     normalize_template = normalize_template,
     normalize_images = normalize_images,
+    use_antspynet = use_antspynet,
     add_surfaces = FALSE
   )
   # Prepare for the FreeSurfer

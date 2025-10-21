@@ -41,6 +41,10 @@
 #' template brain, hence the results will not be accurate. Enable this option
 #' only if cortical surface estimation is not critical (and 'FreeSurfer'
 #' reconstructions are inaccessible)
+#' @param use_antspynet whether to try \code{'antspynet'} if available;
+#' default is true, which uses \code{deep_atropos} instead of the
+#' conventional \code{atropos} to speed up and possibly with more accurate
+#' results.
 #' @param verbose whether to print out the information; default is \code{TRUE}
 #' @param run_recon_all whether to run 'FreeSurfer'; default is true
 #' @param dry_run whether to dry-run
@@ -77,7 +81,9 @@ yael_preprocess <- function(
     normalize_images = c("T1w", "T2w", "T1wContrast", "fGATIR", "preopCT"),
     normalize_back = ifelse(length(normalize_template) >= 1, normalize_template[[1]], NA),
     atlases = list(),
-    add_surfaces = FALSE, verbose = TRUE, ...
+    add_surfaces = FALSE,
+    use_antspynet = TRUE,
+    verbose = TRUE, ...
 ) {
   if(missing(subject)) {
     subject <- list(...)$subject_code
@@ -217,6 +223,7 @@ yael_preprocess <- function(
       yael_process$map_to_template(template_name = template_name,
                                    native_type = "T1w",
                                    use_images = normalize_images,
+                                   use_antspynet = use_antspynet,
                                    verbose = verbose)
     }
     if( template_name %in% normalize_back ) {
@@ -270,7 +277,9 @@ cmd_run_yael_preprocess <- function(
     normalize_template = "mni_icbm152_nlin_asym_09b",
     normalize_images = c("T1w", "T2w", "T1wContrast", "fGATIR", "preopCT"),
     run_recon_all = TRUE,
-    dry_run = FALSE, verbose = TRUE, ...) {
+    dry_run = FALSE,
+    use_antspynet = TRUE,
+    verbose = TRUE, ...) {
   # DIPSAUS DEBUG START
   # subject_code = "testtest3"
   # t1w_path = "/Users/dipterix/rave_data/raw_dir/DBS_93/rave-imaging/coregistration/MRI_reference.nii.gz"
@@ -284,6 +293,9 @@ cmd_run_yael_preprocess <- function(
   # run_recon_all <- FALSE
   # normalize_images = c("T1w", "T2w", "T1wContrast", "fGATIR", "preopCT")
   # normalize_template = "mni_icbm152_nlin_asym_09b"
+  # use_antspynet <- TRUE
+
+  use_antspynet <- isTRUE(use_antspynet)
 
   if(missing(subject)) {
     subject <- list(...)$subject_code

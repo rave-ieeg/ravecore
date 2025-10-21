@@ -22,6 +22,7 @@ yael_preprocess(
   normalize_back = ifelse(length(normalize_template) >= 1, normalize_template[[1]], NA),
   atlases = list(),
   add_surfaces = FALSE,
+  use_antspynet = TRUE,
   verbose = TRUE,
   ...
 )
@@ -40,6 +41,7 @@ cmd_run_yael_preprocess(
   normalize_images = c("T1w", "T2w", "T1wContrast", "fGATIR", "preopCT"),
   run_recon_all = TRUE,
   dry_run = FALSE,
+  use_antspynet = TRUE,
   verbose = TRUE,
   ...
 )
@@ -88,6 +90,11 @@ the corresponding templates (see 'Examples').}
 template brain, hence the results will not be accurate. Enable this option
 only if cortical surface estimation is not critical (and 'FreeSurfer'
 reconstructions are inaccessible)}
+
+\item{use_antspynet}{whether to try \code{'antspynet'} if available;
+default is true, which uses \code{deep_atropos} instead of the
+conventional \code{atropos} to speed up and possibly with more accurate
+results.}
 
 \item{verbose}{whether to print out the information; default is \code{TRUE}}
 

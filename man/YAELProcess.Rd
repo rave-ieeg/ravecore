@@ -268,6 +268,7 @@ Normalize native brain to \code{'MNI152'} template
   template_name = rpyants_builtin_templates(),
   use_images = c("T1w", "T2w", "T1wContrast", "fGATIR", "preopCT"),
   native_type = "T1w",
+  use_antspynet = TRUE,
   verbose = TRUE,
   ...
 )}\if{html}{\out{</div>}}
@@ -287,6 +288,11 @@ for normalization, use wildcard \code{"all"}}
 
 \item{\code{native_type}}{which type of image should be used to map to template;
 default is \code{'T1w'}}
+
+\item{\code{use_antspynet}}{whether to try \code{'antspynet'} if available;
+default is true, which uses \code{deep_atropos} instead of the
+conventional \code{atropos} to speed up and possibly with more accurate
+results.}
 
 \item{\code{verbose}}{whether to print out the process; default is true}
 

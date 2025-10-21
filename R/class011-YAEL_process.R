@@ -332,6 +332,10 @@ YAELProcess <- R6::R6Class(
     #' default types are \code{'T1w'}, \code{'T2w'}, \code{'T1wContrast'},
     #' \code{'fGATIR'}, and \code{'preopCT'}. To use all available images
     #' for normalization, use wildcard \code{"all"}
+    #' @param use_antspynet whether to try \code{'antspynet'} if available;
+    #' default is true, which uses \code{deep_atropos} instead of the
+    #' conventional \code{atropos} to speed up and possibly with more accurate
+    #' results.
     #' @param verbose whether to print out the process; default is true
     #' @param ... additional tuning parameters passed to internal 'Python'
     #' code.
@@ -340,6 +344,7 @@ YAELProcess <- R6::R6Class(
                                use_images = c("T1w", "T2w", "T1wContrast",
                                               "fGATIR", "preopCT"),
                                native_type = "T1w",
+                               use_antspynet = TRUE,
                                verbose = TRUE, ...){
       template_name <- match.arg(template_name)
       # camel version for BIDS
@@ -355,6 +360,7 @@ YAELProcess <- R6::R6Class(
       } else {
         use_images <- unname(as.list(use_images))
       }
+      use_antspynet <- isTRUE(use_antspynet)
       verbose <- isTRUE(verbose)
       yael_py <- private$.impl()
       yael_py$map_to_template(
@@ -364,6 +370,7 @@ YAELProcess <- R6::R6Class(
         template_mask_path = template_mask,
         native_mask_path = NULL,
         use_images = use_images,
+        use_antspynet = use_antspynet,
         verbose = verbose,
         ...
       )
