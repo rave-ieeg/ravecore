@@ -15,7 +15,7 @@ normalization."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ravecore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9006</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9007</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,6 +68,7 @@ normalization.</p>
 <span>  normalize_back <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">normalize_template</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">1</span>, <span class="va">normalize_template</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="cn">NA</span><span class="op">)</span>,</span>
 <span>  atlases <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  add_surfaces <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  use_antspynet <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
@@ -86,6 +87,7 @@ normalization.</p>
 <span>  normalize_images <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"T1w"</span>, <span class="st">"T2w"</span>, <span class="st">"T1wContrast"</span>, <span class="st">"fGATIR"</span>, <span class="st">"preopCT"</span><span class="op">)</span>,</span>
 <span>  run_recon_all <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  dry_run <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  use_antspynet <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -159,6 +161,13 @@ the corresponding templates (see 'Examples').</p></dd>
 template brain, hence the results will not be accurate. Enable this option
 only if cortical surface estimation is not critical (and 'FreeSurfer'
 reconstructions are inaccessible)</p></dd>
+
+
+<dt id="arg-use-antspynet">use_antspynet<a class="anchor" aria-label="anchor" href="#arg-use-antspynet"></a></dt>
+<dd><p>whether to try <code>'antspynet'</code> if available;
+default is true, which uses <code>deep_atropos</code> instead of the
+conventional <code>atropos</code> to speed up and possibly with more accurate
+results.</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
