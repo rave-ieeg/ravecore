@@ -3,6 +3,7 @@ AFNI
 ANTs
 BVCDF
 BlackRock
+BrainLab
 BrainVision
 CMD
 DBS
@@ -13,9 +14,12 @@ Eneuro
 FSL
 FST
 FreeSurfer
+GIfTI
 HDF
 IJK
+ITK
 LFP
+LPS
 Localizer
 MNI
 MacOS
@@ -25,10 +29,12 @@ Multitaper
 NIfTI
 NSx
 NeuroImage
+Neuroimaging
 ORCID
 OpenNeuro
 RAS
 ROI
+STL
 WSL
 YAEL
 affine
@@ -36,7 +42,6 @@ doi
 iEEG
 localizer
 neuroimage
-neuroimaging
 preprocess
 scalable
 spectrogram

@@ -414,7 +414,11 @@ Generate atlas maps from template and morph to native brain
   template_name = rpyants_builtin_templates(),
   atlas_folder = NULL,
   surfaces = NA,
-  verbose = TRUE
+  verbose = TRUE,
+  lambda = 0.2,
+  degree = 2,
+  threshold_lb = 0.5,
+  threshold_ub = NA
 )}\if{html}{\out{</div>}}
 }
 
@@ -433,6 +437,9 @@ to disable this function. The generated surfaces will stay in native
 \code{'T1'} space.}
 
 \item{\code{verbose}}{whether the print out the progress}
+
+\item{\code{lambda, degree, threshold_lb, threshold_ub}}{passed to
+\code{\link[threeBrain]{volume_to_surf}}}
 }
 \if{html}{\out{</div>}}
 }

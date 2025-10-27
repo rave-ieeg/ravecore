@@ -526,10 +526,13 @@ YAELProcess <- R6::R6Class(
     #' to disable this function. The generated surfaces will stay in native
     #' \code{'T1'} space.
     #' @param verbose whether the print out the progress
+    #' @param lambda,degree,threshold_lb,threshold_ub passed to
+    #' \code{\link[threeBrain]{volume_to_surf}}
     #' @returns Paths to the atlas (volume) files
-    generate_atlas_from_template = function(template_name = rpyants_builtin_templates(),
-                                            atlas_folder = NULL, surfaces = NA,
-                                            verbose = TRUE) {
+    generate_atlas_from_template = function(
+        template_name = rpyants_builtin_templates(),
+        atlas_folder = NULL, surfaces = NA, verbose = TRUE,
+        lambda = 0.2, degree = 2, threshold_lb = 0.5, threshold_ub = NA) {
       template_name <- match.arg(template_name)
       template_name2 <- camel_template_name(template_name)
 
@@ -560,11 +563,26 @@ YAELProcess <- R6::R6Class(
         fname <- gsub("\\.(nii|nii\\.gz)$", '', basename(path), ignore.case = TRUE)
         fname <- sprintf("%s.gii", fname)
         dst_path <- file.path(dname, fname)
-        if (isTRUE(surfaces) || !file.exists(dst_path)) {
-          mesh <- threeBrain::volume_to_surf(path, save_to = dst_path)
-        }
+        try(silent = TRUE, {
+          if (isTRUE(surfaces) || !file.exists(dst_path)) {
+            mesh <- threeBrain::volume_to_surf(
+              path,
+              save_to = dst_path,
+              lambda = lambda,
+              degree = degree,
+              threshold_lb = threshold_lb,
+              threshold_ub = threshold_ub
+            )
+          }
+        })
         path
-      }, .globals = list(surfaces = surfaces), callback = function(path) {
+      }, .globals = list(
+        surfaces = surfaces,
+        lambda = lambda,
+        degree = degree,
+        threshold_lb = threshold_lb,
+        threshold_ub = threshold_ub
+      ), callback = function(path) {
         fname <- gsub("\\.(nii|nii\\.gz)$", '', basename(path), ignore.case = TRUE)
         sprintf("Generating surfaces | %s", fname)
       })

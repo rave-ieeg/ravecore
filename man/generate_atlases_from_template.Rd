@@ -10,7 +10,9 @@ generate_atlases_from_template(
   template_name = "mni_icbm152_nlin_asym_09b",
   any_mni152 = TRUE,
   surfaces = TRUE,
-  as_job = TRUE
+  as_job = FALSE,
+  extra_transform = NULL,
+  extra_transform_type = c("ants", "native")
 )
 }
 \arguments{
@@ -35,7 +37,15 @@ left-posterior-superior 'LPS' system that can be imported to 'ITK'-based
 software such as 'BrainLab' or 'ANTs'.}
 
 \item{as_job}{whether to run as a background job for cleaner environment;
-default is true; set to false for debugging.}
+default is false.}
+
+\item{extra_transform}{additional 'affine' transform (a four-by-four matrix)
+that maps the subject native image (not points) to the target image. This
+argument is for pipelines that take in transformed/processed images as input;
+default is \code{NULL}, see 'Details'.}
+
+\item{extra_transform_type}{type of transform if \code{extra_transform} is
+provided.}
 }
 \value{
 The function returns nothing, but will create a folder named
@@ -44,13 +54,55 @@ The function returns nothing, but will create a folder named
 \description{
 Reverse-transform from template atlases via volume mapping
 }
+\details{
+The workflow generates atlases from a template. To run this function, a
+separate normalization is required (see
+\code{\link[ravecore]{cmd_run_yael_preprocess}}). That function normalizes
+native subject's brain (\code{'T1w'} image) to
+a specified template (typically 'MNI152b' non-linear asymmetric version) via
+a deformation field. Once obtaining the normalization transform,
+\code{generate_atlases_from_template} inverse the process, creating
+subject-level atlases based on that template.
+
+When \code{surfaces} is \code{TRUE}, each atlas or mask file will be binned
+with a threshold of \code{0.5}. The resulting binary mask will be used
+to generate a mask surface using \code{\link[threeBrain]{volume_to_surf}}
+function via implicit Laplacian smoothing.
+
+The resulting surfaces and atlases typically sit at native space aligned
+with input \code{'T1w'} image. For each volume, a 'GIfTI' surface will be
+created under right-anterior-superior ('RAS') coordinate system for
+further inferences. In addition, an 'STL' surface will be created under
+left-posterior-superior ('LPS') coordinate system. This file is mainly to
+be used as object file for visualizations in software such as 'BrainLab'.
+
+Some users might have extra processing before
+'YAEL' pipeline (such as 'ACPC' realignment). This function provides a set of
+extra arguments (\code{extra_transform} and \code{extra_transform_type})
+allowing generating atlases to align with the raw 'DICOM' images.
+\code{extra_transform} needs to be an \code{'affine'} matrix that maps
+the image from the input of the 'YAEL' pipeline to the raw 'DICOM' image.
+Be aware that this transform is not the point transformation matrix.
+When \code{extra_transform} is non-empty, an extra folder
+\code{atlases_extra} will be created under the subject imaging folder,
+with transformed files aligned to 'DICOM' stored.
+}
 \examples{
 
 # Please check out https://rave.wiki to configure Python for RAVE
 # or run ravemanager::configure_python()
 \dontrun{
 
-generate_atlases_from_template("YAEL/yael_demo_001")
+generate_atlases_from_template(
+  "YAEL/OCD07", "/path/to/OCD_atlases")
+
+# If the image was ACPC realigned before being fed into the YAEL
+# pipeline
+generate_atlases_from_template(
+  "YAEL/OCD07", "/path/to/OCD_atlases",
+  extra_transform =
+    "/path/to/sub-OCD7_from-T1wACPC_to-T1wNative_mode-image_xfm.mat"
+)
 
 }
 
