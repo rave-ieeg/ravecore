@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ravecore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9007</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9008</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,7 +45,9 @@
 <span>  template_name <span class="op">=</span> <span class="st">"mni_icbm152_nlin_asym_09b"</span>,</span>
 <span>  any_mni152 <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  surfaces <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  as_job <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  as_job <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  extra_transform <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  extra_transform_type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ants"</span>, <span class="st">"native"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -85,13 +87,56 @@ software such as 'BrainLab' or 'ANTs'.</p></dd>
 
 <dt id="arg-as-job">as_job<a class="anchor" aria-label="anchor" href="#arg-as-job"></a></dt>
 <dd><p>whether to run as a background job for cleaner environment;
-default is true; set to false for debugging.</p></dd>
+default is false.</p></dd>
+
+
+<dt id="arg-extra-transform">extra_transform<a class="anchor" aria-label="anchor" href="#arg-extra-transform"></a></dt>
+<dd><p>additional 'affine' transform (a four-by-four matrix)
+that maps the subject native image (not points) to the target image. This
+argument is for pipelines that take in transformed/processed images as input;
+default is <code>NULL</code>, see 'Details'.</p></dd>
+
+
+<dt id="arg-extra-transform-type">extra_transform_type<a class="anchor" aria-label="anchor" href="#arg-extra-transform-type"></a></dt>
+<dd><p>type of transform if <code>extra_transform</code> is
+provided.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>The function returns nothing, but will create a folder named
 <code>'atlases'</code> under raw subject <code>'rave-imaging'</code> folder.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>The workflow generates atlases from a template. To run this function, a
+separate normalization is required (see
+<code><a href="cmd_run_yael_preprocess.html">cmd_run_yael_preprocess</a></code>). That function normalizes
+native subject's brain (<code>'T1w'</code> image) to
+a specified template (typically 'MNI152b' non-linear asymmetric version) via
+a deformation field. Once obtaining the normalization transform,
+<code>generate_atlases_from_template</code> inverse the process, creating
+subject-level atlases based on that template.</p>
+<p>When <code>surfaces</code> is <code>TRUE</code>, each atlas or mask file will be binned
+with a threshold of <code>0.5</code>. The resulting binary mask will be used
+to generate a mask surface using <code><a href="https://dipterix.org/threeBrain/reference/volume_to_surf.html" class="external-link">volume_to_surf</a></code>
+function via implicit Laplacian smoothing.</p>
+<p>The resulting surfaces and atlases typically sit at native space aligned
+with input <code>'T1w'</code> image. For each volume, a 'GIfTI' surface will be
+created under right-anterior-superior ('RAS') coordinate system for
+further inferences. In addition, an 'STL' surface will be created under
+left-posterior-superior ('LPS') coordinate system. This file is mainly to
+be used as object file for visualizations in software such as 'BrainLab'.</p>
+<p>Some users might have extra processing before
+'YAEL' pipeline (such as 'ACPC' realignment). This function provides a set of
+extra arguments (<code>extra_transform</code> and <code>extra_transform_type</code>)
+allowing generating atlases to align with the raw 'DICOM' images.
+<code>extra_transform</code> needs to be an <code>'affine'</code> matrix that maps
+the image from the input of the 'YAEL' pipeline to the raw 'DICOM' image.
+Be aware that this transform is not the point transformation matrix.
+When <code>extra_transform</code> is non-empty, an extra folder
+<code>atlases_extra</code> will be created under the subject imaging folder,
+with transformed files aligned to 'DICOM' stored.</p>
     </div>
 
     <div class="section level2">
@@ -101,7 +146,16 @@ default is true; set to false for debugging.</p></dd>
 <span class="r-in"><span><span class="co"># or run ravemanager::configure_python()</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">generate_atlases_from_template</span><span class="op">(</span><span class="st">"YAEL/yael_demo_001"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">generate_atlases_from_template</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"YAEL/OCD07"</span>, <span class="st">"/path/to/OCD_atlases"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># If the image was ACPC realigned before being fed into the YAEL</span></span></span>
+<span class="r-in"><span><span class="co"># pipeline</span></span></span>
+<span class="r-in"><span><span class="fu">generate_atlases_from_template</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="st">"YAEL/OCD07"</span>, <span class="st">"/path/to/OCD_atlases"</span>,</span></span>
+<span class="r-in"><span>  extra_transform <span class="op">=</span></span></span>
+<span class="r-in"><span>    <span class="st">"/path/to/sub-OCD7_from-T1wACPC_to-T1wNative_mode-image_xfm.mat"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
