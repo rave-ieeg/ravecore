@@ -241,7 +241,7 @@ snapshot_project <- function(x, target_path = NULL, template_subjects = NULL, qu
                                            subject_code = subject_code,
                                            strict = FALSE)
       target_path_subject <- ravecore$file_path(target_path, subject$subject_code)
-      if(!quick || !file_exists(target_path_subject, "snapshot.rds")) {
+      if(!quick || !file_exists(file_path(target_path_subject, "snapshot.rds"))) {
         snapshot <- ravecore$snapshot_subject(subject, target_path = target_path_subject, quick = quick)
       }
 
