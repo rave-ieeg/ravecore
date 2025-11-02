@@ -1,3 +1,21 @@
+ensure_threeBrain_template <- function(template_subject) {
+  template_subject <- gsub("[\\./\\\\]", "", template_subject)
+  template_subject <- trimws(template_subject)
+  if(is.na(template_subject) || !nzchar(template_subject)) {
+    return(NULL)
+  }
+  template_imaging_path <- file.path(threeBrain::default_template_directory(), template_subject)
+
+  if(!dir.exists(template_imaging_path)) {
+    if(!template_subject %in% names(threeBrain::available_templates())) {
+      return(NULL)
+    }
+    threeBrain::download_template_subject(subject_code = template_subject)
+  }
+
+  return(template_imaging_path)
+}
+
 #' @title Load 'FreeSurfer' brain from 'RAVE'
 #' @description Create 3D visualization of the brain and visualize with
 #' modern web browsers
