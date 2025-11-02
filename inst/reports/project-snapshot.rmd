@@ -100,36 +100,40 @@ electrode_tables <- lapply(subject_codes, function(subject_code) {
   )
 })
 electrode_tables <- data.table::rbindlist(electrode_tables)
-summary_table <- stats::reshape(
-  stats::aggregate(
-    list(count = electrode_tables$FSLabel),
-    by = list(FSLabel = electrode_tables$FSLabel,
-              Subject = electrode_tables$Subject),
-    FUN = length
-  ),
-  timevar   = "Subject",
-  idvar     = "FSLabel",
-  direction = "wide"
-)
-
-names(summary_table) <- sub("^count\\.", "", names(summary_table))
-summary_table[is.na(summary_table)] <- 0
-# summary_table <- reshape2::dcast(electrode_tables,
-#                                  FSLabel ~ Subject,
-#                                  fun.aggregate = length,
-#                                  fill = 0, value.var = "FSLabel")
-datatable(
-  summary_table,
-  class = "compact stripe nowrap",
-  rownames = FALSE,
-  fillContainer = FALSE,
-  options = list(
-    scrollX = TRUE,        # allow horizontal scrolling
-    scrollY = FALSE,
-    lengthMenu = list(c(10, 25, 50, 100, -1), c("10", "25", "50", "100", "All")), 
-    paging = TRUE
+if(nrow(electrode_tables) > 0) {
+  summary_table <- stats::reshape(
+    stats::aggregate(
+      list(count = electrode_tables$FSLabel),
+      by = list(FSLabel = electrode_tables$FSLabel,
+                Subject = electrode_tables$Subject),
+      FUN = length
+    ),
+    timevar   = "Subject",
+    idvar     = "FSLabel",
+    direction = "wide"
   )
-)
+  
+  names(summary_table) <- sub("^count\\.", "", names(summary_table))
+  summary_table[is.na(summary_table)] <- 0
+  # summary_table <- reshape2::dcast(electrode_tables,
+  #                                  FSLabel ~ Subject,
+  #                                  fun.aggregate = length,
+  #                                  fill = 0, value.var = "FSLabel")
+  datatable(
+    summary_table,
+    class = "compact stripe nowrap",
+    rownames = FALSE,
+    fillContainer = FALSE,
+    options = list(
+      scrollX = TRUE,        # allow horizontal scrolling
+      scrollY = FALSE,
+      lengthMenu = list(c(10, 25, 50, 100, -1), c("10", "25", "50", "100", "All")), 
+      paging = TRUE
+    )
+  )
+} else {
+  message("No valid electrode table within this project")
+}
 ```
 
 ## Subject Summary
