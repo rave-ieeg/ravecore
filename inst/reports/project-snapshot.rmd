@@ -360,14 +360,18 @@ all_projects <- get_projects()
 all_projects <- all_projects[all_projects != project_name]
 htmltools::tags$ul(
   lapply(all_projects, function(project_name2) {
-    project2 <- as_rave_project(project_name2, strict = FALSE)
-    report2_path <- file.path(project2$group_path("project_overview"), "snapshot", "project-report.html")
-    htmltools::tags$li(
-      htmltools::HTML(sprintf(
-        '<a data-href="%s" data-meta=\'{"project_name":"%s","alt_path":"project-report.html"}\'>%s</a>',
-        path_rel(report2_path, working_path), project_name2, project_name2
-      ))
-    )
+    tryCatch({
+      project2 <- as_rave_project(project_name2, strict = FALSE)
+      report2_path <- file.path(project2$group_path("project_overview"), "snapshot", "project-report.html")
+      htmltools::tags$li(
+        htmltools::HTML(sprintf(
+          '<a data-href="%s" data-meta=\'{"project_name":"%s","alt_path":"project-report.html"}\'>%s</a>',
+          path_rel(report2_path, working_path), project_name2, project_name2
+        ))
+      )
+    }, error = function(e) {
+      NULL
+    })
   })
 )
 ```
