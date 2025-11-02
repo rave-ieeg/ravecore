@@ -279,21 +279,26 @@ report_list <- lapply(subject_codes, function(subject_code) {
 })
 report_list <- unlist(report_list, recursive = FALSE, use.names = FALSE)
 report_table <- data.table::rbindlist(report_list)
-report_table <- report_table[order(report_table$Time, na.last = TRUE, decreasing = TRUE), ]
-
-datatable(
-  report_table,
-  class = "compact stripe nowrap",
-  rownames = FALSE,
-  escape = FALSE,
-  fillContainer = FALSE,
-  options = list(
-    scrollX = TRUE,        # allow horizontal scrolling
-    scrollY = FALSE,
-    lengthMenu = list(c(20, 50, 100, -1), c("20", "50", "100", "All")), 
-    paging = TRUE
+if(nrow(report_table) > 0) {
+  report_table <- report_table[order(report_table$Time, na.last = TRUE, decreasing = TRUE), ]
+  
+  datatable(
+    report_table,
+    class = "compact stripe nowrap",
+    rownames = FALSE,
+    escape = FALSE,
+    fillContainer = FALSE,
+    options = list(
+      scrollX = TRUE,        # allow horizontal scrolling
+      scrollY = FALSE,
+      lengthMenu = list(c(20, 50, 100, -1), c("20", "50", "100", "All")), 
+      paging = TRUE
+    )
   )
-)
+} else {
+  message("No report available")
+}
+
 ```
 
 ## Data Check Results
