@@ -71,6 +71,8 @@ snapshot_table <- function(x, target_path, digit_cnames = NULL, digits = 2, capt
 #' @param template_subjects a vector of characters of template brain to be
 #' used for generating the group brain; see
 #' \code{\link[threeBrain]{available_templates}} for available templates.
+#' @param quick whether to skip certain validations and subjects if snapshot
+#' reports have already existed
 #' @returns \code{snapshot_subject} returns a list of subject summary and
 #' the calculated target path; \code{snapshot_project} returns the path to
 #' the compiled project report in 'HTML'.
@@ -91,7 +93,7 @@ NULL
 
 #' @rdname snapshot_project
 #' @export
-snapshot_subject <- function(x, target_path = NULL) {
+snapshot_subject <- function(x, target_path = NULL, quick = FALSE) {
   subject <- restore_subject_instance(x)
 
   if(length(target_path) != 1) {
@@ -173,7 +175,12 @@ snapshot_subject <- function(x, target_path = NULL) {
   )
 
   # validation
-  validation_results <- validate_subject(subject)
+  if(quick) {
+    validation_method <- "basic"
+  } else {
+    validation_method <- "normal"
+  }
+  validation_results <- validate_subject(subject, method = validation_method)
 
   snapshots <- list(
     subject = subject$subject_id,
@@ -196,7 +203,7 @@ snapshot_subject <- function(x, target_path = NULL) {
 
 #' @rdname snapshot_project
 #' @export
-snapshot_project <- function(x, target_path = NULL, template_subjects = NULL) {
+snapshot_project <- function(x, target_path = NULL, template_subjects = NULL, quick = FALSE) {
   # x <- "demo"
   # target_path = tempfile()
 
@@ -234,9 +241,11 @@ snapshot_project <- function(x, target_path = NULL, template_subjects = NULL) {
                                            subject_code = subject_code,
                                            strict = FALSE)
       target_path_subject <- ravecore$file_path(target_path, subject$subject_code)
-      snapshot <- ravecore$snapshot_subject(subject, target_path = target_path_subject)
+      if(!quick || !file_exists(target_path_subject, "snapshot.rds")) {
+        snapshot <- ravecore$snapshot_subject(subject, target_path = target_path_subject, quick = quick)
+      }
 
-      brain <- ravecore$rave_brain(snapshot$subject)
+      brain <- ravecore$rave_brain(subject)
       if (is.null(brain)) {
         return(NULL)
       }

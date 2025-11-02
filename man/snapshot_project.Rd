@@ -5,9 +5,14 @@
 \alias{snapshot_subject}
 \title{Create overview report for given project or subject}
 \usage{
-snapshot_subject(x, target_path = NULL)
+snapshot_subject(x, target_path = NULL, quick = FALSE)
 
-snapshot_project(x, target_path = NULL, template_subjects = NULL)
+snapshot_project(
+  x,
+  target_path = NULL,
+  template_subjects = NULL,
+  quick = FALSE
+)
 }
 \arguments{
 \item{x}{characters or a 'RAVE' project or subject instance}
@@ -15,6 +20,9 @@ snapshot_project(x, target_path = NULL, template_subjects = NULL)
 \item{target_path}{directory where the snapshot data will be stored; default
 is under \code{'project_overview'} group data folder, see method
 \code{group_data} from \code{\link{RAVEProject}} class.}
+
+\item{quick}{whether to skip certain validations and subjects if snapshot
+reports have already existed}
 
 \item{template_subjects}{a vector of characters of template brain to be
 used for generating the group brain; see
