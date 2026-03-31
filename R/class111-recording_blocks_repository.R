@@ -256,6 +256,14 @@ RAVESubjectRecordingBlockRepository <- R6::R6Class(
   ),
   active = list(
 
+
+    #' @field meta_info list of meta information
+    meta_info = function() {
+      re <- super$meta_info
+      re$recording_blocks <- paste(self$blocks, collapse = ", ")
+      re
+    },
+
     #' @field needs_update write-only attribute when subject needs to be
     #' reloaded from the disk and reference table needs to be updated, use
     #' \code{repo$needs_update <- TRUE}

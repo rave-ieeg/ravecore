@@ -38,6 +38,8 @@ requested electrodes are not fully processed or excluded}
 marked as "excluded" (such as bad channels or channels that should
 not be analyzed); default is often true}
 
+\item{\code{meta_info}}{list of meta information}
+
 \item{\code{needs_update}}{write-only attribute when subject needs to be
 reloaded from the disk and reference table needs to be updated, use
 \code{repo$needs_update <- TRUE}}
@@ -82,6 +84,7 @@ different identifiers); generated from \code{digest_key}}
 \item \href{#method-RAVESubjectRepository-@get_container}{\code{RAVESubjectBaseRepository$@get_container()}}
 \item \href{#method-RAVESubjectRepository-@marshal}{\code{RAVESubjectBaseRepository$@marshal()}}
 \item \href{#method-RAVESubjectRepository-@unmarshal}{\code{RAVESubjectBaseRepository$@unmarshal()}}
+\item \href{#method-RAVESubjectRepository-print}{\code{RAVESubjectBaseRepository$print()}}
 \item \href{#method-RAVESubjectRepository-new}{\code{RAVESubjectBaseRepository$new()}}
 \item \href{#method-RAVESubjectRepository-export_matlab}{\code{RAVESubjectBaseRepository$export_matlab()}}
 \item \href{#method-RAVESubjectRepository-clone}{\code{RAVESubjectBaseRepository$clone()}}
@@ -137,6 +140,16 @@ Internal method
 }
 \if{html}{\out{</div>}}
 }
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-RAVESubjectRepository-print"></a>}}
+\if{latex}{\out{\hypertarget{method-RAVESubjectRepository-print}{}}}
+\subsection{Method \code{print()}}{
+User-friendly print method
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectBaseRepository$print()}\if{html}{\out{</div>}}
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVESubjectRepository-new"></a>}}

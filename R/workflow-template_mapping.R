@@ -1,40 +1,40 @@
 
 transform_point_to_template_surface <- function(subject, scan_ras_mat, hemisphere, use_surface = "pial", template = NA, flip_hemisphere = FALSE, verbose = TRUE, ...) {
 
-  if(length(template) != 1 || is.na(template) || !nzchar(template)) {
+  if (length(template) != 1 || is.na(template) || !nzchar(template)) {
     template <- "fsaverage"
     # make sure the template exists
     template_imaging_path <- file.path(threeBrain::default_template_directory(), template)
-    if(!dir.exists(template_imaging_path)) {
+    if (!dir.exists(template_imaging_path)) {
       threeBrain::download_template_subject(subject_code = template)
     }
   }
 
   subject <- restore_subject_instance(subject, strict = FALSE)
 
-  if(tolower(use_surface) == "pial.t1") {
+  if (tolower(use_surface) == "pial.t1") {
     use_surface <- "pial"
   }
   native_brain <- rave_brain(subject, surfaces = c("pial", "pial.T1", "sphere.reg", use_surface))
   template_brain <- threeBrain::merge_brain(template_subject = template)
   template_brain <- template_brain$template_object
 
-  if(verbose) {
+  if (verbose) {
     ravepipeline::logger("Using `{use_surface}` surface and template `{template}` to transform points to fsaverage (MNI305) space", level = "info", use_glue = TRUE)
   }
 
-  if(length(scan_ras_mat) == 3) {
+  if (length(scan_ras_mat) == 3) {
     scan_ras_mat <- matrix(scan_ras_mat, ncol = 3)
   }
   stopifnot2(is.matrix(scan_ras_mat) && ncol(scan_ras_mat) == 3, msg = "The matrix `scan_ras_mat` must be nx3 dimension")
   n_contacts <- nrow(scan_ras_mat)
 
-  if(missing(hemisphere)) {
+  if (missing(hemisphere)) {
     # auto
     hemisphere <- rep("a", n_contacts)
   } else {
     hemisphere <- substr(tolower(hemisphere), 1L, 1L)
-    if(length(hemisphere) == 1) {
+    if (length(hemisphere) == 1) {
       hemisphere <- rep(hemisphere, n_contacts)
     }
   }
@@ -47,10 +47,10 @@ transform_point_to_template_surface <- function(subject, scan_ras_mat, hemispher
 
   get_surface <- function(brain, surface_type, hemisphere) {
     surf_object <- brain$surfaces[[surface_type]]
-    if( !length(surf_object) ) {
+    if ( !length(surf_object) ) {
       stop("Cannot find surface ", sQuote(surface_type), " from the imaging files. Did you run FreeSurfer reconstruction?")
     }
-    if(hemisphere == "l") {
+    if (hemisphere == "l") {
       dset_name <- sprintf("free_vertices_FreeSurfer Left Hemisphere - %s (%s)", surf_object$surface_type, brain$subject_code)
     } else {
       dset_name <- sprintf("free_vertices_FreeSurfer Right Hemisphere - %s (%s)", surf_object$surface_type, brain$subject_code)
@@ -74,7 +74,7 @@ transform_point_to_template_surface <- function(subject, scan_ras_mat, hemispher
   template_lh_spreg <- get_surface(template_brain, "sphere.reg", "l")
   template_rh_spreg <- get_surface(template_brain, "sphere.reg", "r")
 
-  if(flip_hemisphere) {
+  if (flip_hemisphere) {
     native_brain$add_surface("sphere")
     native_lh_sp <- get_surface(native_brain, "sphere", "l")
     native_rh_sp <- get_surface(native_brain, "sphere", "r")
@@ -89,7 +89,7 @@ transform_point_to_template_surface <- function(subject, scan_ras_mat, hemispher
 
   mapping <- lapply(seq_len(n_contacts), function(ii) {
     is_valid <- valid_positions[[ii]]
-    if(!is_valid) {
+    if (!is_valid) {
       return(list(
         Sphere_x = NA_real_,
         Sphere_y = NA_real_,
@@ -111,17 +111,17 @@ transform_point_to_template_surface <- function(subject, scan_ras_mat, hemispher
 
     tkr_ras <- tkr_ras_mat[ii, seq_len(3)]
 
-    if( !hemi %in% c("l", "r") ) {
+    if ( !hemi %in% c("l", "r") ) {
       mni305_vol <- native_tkr2mni305 %*% c(tkr_ras, 1.0)
-      if(isTRUE(mni305_vol[[1]] > 0)) {
+      if (isTRUE(mni305_vol[[1]] > 0)) {
         hemi <- "r"
       } else {
         hemi <- "l"
       }
     }
 
-    if(flip_hemisphere) {
-      if( hemi == "l" ) {
+    if (flip_hemisphere) {
+      if ( hemi == "l" ) {
         native_surf <- native_lh_surf
         native_sphere <- native_lh_sp
         native_sphere_flipped <- native_rh_sp
@@ -139,7 +139,7 @@ transform_point_to_template_surface <- function(subject, scan_ras_mat, hemispher
         template_spherereg <- template_lh_spreg
       }
     } else {
-      if( hemi == "l" ) {
+      if ( hemi == "l" ) {
         native_surf <- native_lh_surf
         native_spherereg <- native_lh_spreg
         native_sphere <- native_lh_sp
@@ -164,7 +164,7 @@ transform_point_to_template_surface <- function(subject, scan_ras_mat, hemispher
 
     distance_shifted <- native_dist_to_surf[[native_node_id]]
 
-    if(flip_hemisphere) {
+    if (flip_hemisphere) {
       sphere_xyz_native <- native_sphere$vertices[native_node_id, seq_len(3)]
       sphere_xyz_native[[1]] <- -sphere_xyz_native[[1]]
       dir <- t(native_sphere_flipped$vertices[, seq_len(3), drop = FALSE]) - sphere_xyz_native
@@ -215,13 +215,13 @@ transform_point_to_template_volumetric <- function(subject, scan_ras_mat, method
 
   subject <- restore_subject_instance(subject, strict = FALSE)
 
-  if( verbose ) {
+  if ( verbose ) {
     verbose <- TRUE
   } else {
     verbose <- FALSE
   }
 
-  if(length(scan_ras_mat) == 3) {
+  if (length(scan_ras_mat) == 3) {
     scan_ras_mat <- matrix(scan_ras_mat, ncol = 3)
   }
   stopifnot2(is.matrix(scan_ras_mat) && ncol(scan_ras_mat) == 3, msg = "The matrix `scan_ras_mat` must be nx3 dimension")
@@ -229,7 +229,7 @@ transform_point_to_template_volumetric <- function(subject, scan_ras_mat, method
 
   valid_positions <- rowSums(is.na(scan_ras_mat)) == 0
 
-  if(!any(valid_positions)) {
+  if (!any(valid_positions)) {
     re <- scan_ras_mat
     re[] <- NA_real_
     return(re)
@@ -238,20 +238,20 @@ transform_point_to_template_volumetric <- function(subject, scan_ras_mat, method
   native_brain <- rave_brain(subject)
 
   template_name <- "mni_icbm152_nlin_asym_09b"
-  if(method %in% c("auto", "nonlinear")) {
+  if (method %in% c("auto", "nonlinear")) {
     # check if nonlinear exists
     mapping <- tryCatch({
       yael <- as_yael_process(subject = subject)
       mapping <- yael$get_template_mapping(template_name = "mni_icbm152_nlin_asym_09b")
-      if(!length(mapping)) {
+      if (!length(mapping)) {
         mapping <- yael$get_template_mapping(template_name = "mni_icbm152_nlin_asym_09a")
         template_name <- "mni_icbm152_nlin_asym_09a"
       }
-      if(!length(mapping)) {
+      if (!length(mapping)) {
         mapping <- yael$get_template_mapping(template_name = "mni_icbm152_nlin_asym_09c")
         template_name <- "mni_icbm152_nlin_asym_09c"
       }
-      if(!length(mapping)) {
+      if (!length(mapping)) {
         mapping <- yael$get_template_mapping(template_name = "fsaverage")
         template_name <- "fsaverage"
       }
@@ -260,18 +260,18 @@ transform_point_to_template_volumetric <- function(subject, scan_ras_mat, method
       NULL
     })
 
-    if(length(mapping)) {
+    if (length(mapping)) {
       method <- "nonlinear"
     } else {
-      if(method == "nonlinear") {
+      if (method == "nonlinear") {
         stop("Unable to map points from native to template using non-linear method. Missing non-linear deformation files or Python for RAVE is not configured properly.")
       }
       method <- "affine"
     }
   }
 
-  if( method == "nonlinear") {
-    if(verbose) {
+  if ( method == "nonlinear") {
+    if (verbose) {
       ravepipeline::logger("Using non-linear volumetric mapping to transform points to MNI152 space", level = "info", use_glue = FALSE)
     }
 
@@ -280,7 +280,7 @@ transform_point_to_template_volumetric <- function(subject, scan_ras_mat, method
 
 
     scan_ras_selected <- scan_ras_mat[valid_positions, , drop = FALSE]
-    if(nrow(scan_ras_selected) == 1) {
+    if (nrow(scan_ras_selected) == 1) {
       # ANTs does not like it when there is one row
       scan_ras_selected <- rbind(scan_ras_selected, scan_ras_selected)
     }
@@ -292,7 +292,7 @@ transform_point_to_template_volumetric <- function(subject, scan_ras_mat, method
     tmp[!valid_positions, ] <- NA_real_
     mni152_ras <- tmp
   } else {
-    if(verbose) {
+    if (verbose) {
       ravepipeline::logger("Using affine matrix (volumetric) for mapping points to MNI152 space", level = "info", use_glue = FALSE)
     }
     mni152_ras <- native_brain$electrodes$apply_transform_points(
@@ -300,7 +300,7 @@ transform_point_to_template_volumetric <- function(subject, scan_ras_mat, method
     mni152_ras[!valid_positions, ] <- NA_real_
   }
 
-  if( flip_hemisphere ) {
+  if ( flip_hemisphere ) {
     # for those who wish to display the electrodes on the same side
     # rare but this is MNI space, for demo purposes (mostly :)
     mni152_ras[, 1] <- -mni152_ras[, 1]
@@ -345,7 +345,7 @@ transform_point_to_template_volumetric <- function(subject, scan_ras_mat, method
 #' @returns A table of electrode 'MNI' coordinates.
 #' @examples
 #'
-#' if(has_rave_subject("demo/DemoSubject")) {
+#' if (has_rave_subject("demo/DemoSubject")) {
 #'
 #'   transform_point_to_template(
 #'     subject = 'demo/DemoSubject',
@@ -365,11 +365,11 @@ transform_point_to_template <- function(
 
   subject <- restore_subject_instance(subject, strict = FALSE)
   native_brain <- rave_brain(subject, usetemplateifmissing = FALSE)
-  if(is.null(native_brain)) {
+  if (is.null(native_brain)) {
     stop("Unable to find `fs` nor `ants` folder under the subject rave-imaging directory; subject ID: ", subject$subject_id)
   }
 
-  if(missing(positions)) {
+  if (missing(positions)) {
     positions <- as.matrix(native_brain$electrodes$raw_table[, c("Coord_x", "Coord_y", "Coord_z")])
     invalid_positions <- rowSums(positions^2) == 0
     positions[invalid_positions, ] <- NA_real_
@@ -377,21 +377,21 @@ transform_point_to_template <- function(
   } else {
     space <- match.arg(space)
     positions <- as.matrix(positions)
-    if(!length(positions)) {
+    if (!length(positions)) {
       stop("No valid `positions` found.")
     }
-    if(length(positions) == 3) {
+    if (length(positions) == 3) {
       positions <- matrix(positions, ncol = 3L)
     }
   }
-  if( space == "tkrRAS" ) {
+  if ( space == "tkrRAS" ) {
     positions <- native_brain$electrodes$apply_transform_points(
       positions = positions, from = "tkrRAS", to = "scannerRAS")
   }
 
 
   mapping_method <- match.arg(mapping_method)
-  if(mapping_method == "volumetric") {
+  if (mapping_method == "volumetric") {
     res <- transform_point_to_template_volumetric(subject = subject, scan_ras_mat = positions, flip_hemisphere = flip_hemisphere, verbose = verbose, method = volumetric_transform, ...)
   } else {
     res <- transform_point_to_template_surface(subject = subject, scan_ras_mat = positions, flip_hemisphere = flip_hemisphere, verbose = verbose, use_surface = project_surface, ...)
@@ -422,7 +422,7 @@ transform_thinfilm_to_mni152 <- function(
 
   volumetric_transform <- match.arg(volumetric_transform)
   template_subject <- match.arg(template_subject)
-  if(template_subject == "MNI152") {
+  if (template_subject == "MNI152") {
     template_subject <- "cvs_avg35_inMNI152"
   }
 
@@ -437,18 +437,18 @@ transform_thinfilm_to_mni152 <- function(
   subject <- restore_subject_instance(subject, strict = FALSE)
 
   electrode_table <- subject$get_electrode_table()
-  if(!is.data.frame(electrode_table) || nrow(electrode_table) == 0) {
+  if (!is.data.frame(electrode_table) || nrow(electrode_table) == 0) {
     stop("No valid electrode table")
   }
 
   # brain objects
   native_brain <- rave_brain(subject, usetemplateifmissing = FALSE)
-  if(is.null(native_brain)) {
+  if (is.null(native_brain)) {
     stop("Unable to find `fs` nor `ants` folder under the subject rave-imaging directory; subject ID: ", subject$subject_id)
   }
   # MNI152 mapping uses cvs_avg35_inMNI152 template
   template_file_path <- file.path(threeBrain::default_template_directory(), template_subject)
-  if(!dir.exists(template_file_path)) {
+  if (!dir.exists(template_file_path)) {
     threeBrain::download_template_subject(template_subject)
   }
   template <- threeBrain::merge_brain(native_brain, template_subject = template_subject)
@@ -512,10 +512,10 @@ transform_thinfilm_to_mni152 <- function(
   # get geometry configurations
   geometry_names_full <- sprintf("%s_%s", electrode_table$Prototype, electrode_table$LabelPrefix)
   geometry_names <- unique(geometry_names_full)
-  if(length(group_labels)) {
+  if (length(group_labels)) {
     geometry_names <- geometry_names[geometry_names %in% group_labels]
   }
-  if(!length(geometry_names)) {
+  if (!length(geometry_names)) {
     stop("No valid geometry object found. Please make sure the column `Prototype` and `LabelPrefix` are valid in electrodes.csv. Available group labels are: ", paste(sQuote(unique(geometry_names_full)), collapse = ", "))
   }
 
@@ -581,7 +581,7 @@ transform_thinfilm_to_mni152 <- function(
     )
 
     # determine the hemisphere and the template surfaces to be used
-    if(isTRUE(mean(segment_corners_mni152_volume$MNI152_x, na.rm = TRUE) > 0)) {
+    if (isTRUE(mean(segment_corners_mni152_volume$MNI152_x, na.rm = TRUE) > 0)) {
       electrode_hemisphere <- "right"
       template_surface <- template_rh_pial
       template_scan_ras <- template_rh_pial_scan_ras
@@ -621,7 +621,7 @@ transform_thinfilm_to_mni152 <- function(
     mni152_interpolated <- apply(model_positions, 2, function(model_pos) {
       # model_pos <- model_positions[,278]
       fct <- (model_pos[1:2] - model_bounding_box[1, 1:2]) / segment_spacing
-      if(any(fct < 0) || any(fct > n_segments)) {
+      if (any(fct < 0) || any(fct > n_segments)) {
         return(c(0, 0, 0))
       }
 
@@ -688,7 +688,7 @@ transform_thinfilm_to_mni152 <- function(
     ray_direction[, sel] <- t(t(ray_direction[, sel]) / ray_length[sel])
 
     # determine the maximum offset to avoid mapping contacts to sulci
-    if(!is.null(template_annot)) {
+    if (!is.null(template_annot)) {
       # Heuristic of how much offsets if the direction is inner (avoid mapping contacts to the sulci)
       offsets <- abs(template_normals %*% mni152_surf_vol_dir)
       offsets <- sort(offsets)
@@ -713,7 +713,7 @@ transform_thinfilm_to_mni152 <- function(
         })
         # dist <- kdtree$distance[ii, ]
         # sel <- dist <= distance_est
-        # if(any(sel)) {
+        # if (any(sel)) {
         #   idx <- kdtree$index[ii, sel][[which.max(dist[sel])[[1]]]]
         # } else {
         #   idx <- kdtree$index[ii, which.min(dist)[[1]]]

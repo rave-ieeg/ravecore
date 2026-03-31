@@ -28,7 +28,7 @@ RAVESubjectBaseRepository <- R6::R6Class(
       reference_table <- self$reference_table
       electrodes <- private$.intended_electrode_list
 
-      if(private$.auto_exclude) {
+      if (private$.auto_exclude) {
         included_electrodes <- as.integer(reference_table$Electrode[reference_table$Reference != ''])
       } else {
         included_electrodes <- as.integer(reference_table$Electrode)
@@ -36,7 +36,7 @@ RAVESubjectBaseRepository <- R6::R6Class(
       included_electrodes <- included_electrodes[included_electrodes %in% electrodes]
       included_electrodes <- sort(unique(included_electrodes))
 
-      if(!setequal(included_electrodes, electrodes)) {
+      if (!setequal(included_electrodes, electrodes)) {
         ravepipeline::logger("The following electrodes are removed from loading because they are either missing or marked as `excluded`: ", deparse_svec(electrodes[!electrodes %in% included_electrodes]), level = "info")
       }
       private$.electrode_list <- included_electrodes
@@ -96,6 +96,26 @@ RAVESubjectBaseRepository <- R6::R6Class(
       return(repo)
     },
 
+    #' @description
+    #' User-friendly print method
+    print = function() {
+      meta_info <- self$meta_info
+      meta_info$signature <- NULL
+      nms0 <- names(meta_info)
+      nms <- nms0
+      substr(nms, 1L, 1L) <- toupper(substr(nms, 1L, 1L))
+      nms <- gsub("_", " ", nms)
+      mc <- max(nchar(nms))
+      nms <- sprintf(sprintf("%%-%ds", mc), nms)
+
+      cat(c(
+        "RAVE Repository",
+        sprintf("%s: %s", nms, meta_info[nms0]),
+        ""
+      ), sep = "\n")
+    },
+
+
     #' @field repository_id repository identifier, typically generated with
     #' random string
     repository_id = character(),
@@ -119,7 +139,7 @@ RAVESubjectBaseRepository <- R6::R6Class(
                           auto_exclude = TRUE, quiet = TRUE,
                           repository_id = NULL, strict = TRUE, .class = NULL) {
 
-      if(is.null(.class)) {
+      if (is.null(.class)) {
         .class <- "rave_prepare_subject_bare0"
       }
       class(self) <- unique(c(.class, 'rave_repository', class(self)))
@@ -127,7 +147,7 @@ RAVESubjectBaseRepository <- R6::R6Class(
 
       self$quiet <- quiet
       repository_id <- paste(repository_id, collapse = "")
-      if(nzchar(repository_id)) {
+      if (nzchar(repository_id)) {
         self$repository_id <- repository_id
       } else {
         self$repository_id <- rand_string(4)
@@ -137,7 +157,7 @@ RAVESubjectBaseRepository <- R6::R6Class(
       private$.project <- subject$project
       private$.subject <- subject
 
-      if(missing(electrodes) || is.null(electrodes)){
+      if (missing(electrodes) || is.null(electrodes)) {
         electrodes <- subject$get_default("electrodes", default_if_missing = subject$electrodes)
         ravepipeline::logger("No electrodes specified, trying to load all the electrodes: ",
                              deparse_svec(electrodes))
@@ -148,22 +168,22 @@ RAVESubjectBaseRepository <- R6::R6Class(
 
       available_reference_names <- subject$reference_names
       reference_warn <- FALSE
-      if(missing(reference_name) || !length(reference_name) || is.na(reference_name[[1]])) {
+      if (missing(reference_name) || !length(reference_name) || is.na(reference_name[[1]])) {
         reference_warn <- TRUE
         reference_name <- "default"
       }
       reference_name <- as.character(reference_name[[1]])
 
       exception_list <- "noref"
-      if(identical(reference_name, "_unsaved")) {
+      if (identical(reference_name, "_unsaved")) {
         # for reference module
-        if(file_exists(file_path(subject$meta_path, "reference__unsaved.csv"))) {
+        if (file_exists(file_path(subject$meta_path, "reference__unsaved.csv"))) {
           exception_list <- c("noref", "_unsaved")
         }
       }
-      if(!isTRUE(reference_name %in% available_reference_names) && !isTRUE(reference_name %in% exception_list)) {
+      if (!isTRUE(reference_name %in% available_reference_names) && !isTRUE(reference_name %in% exception_list)) {
         reference_warn <- TRUE
-        if(length(available_reference_names)) {
+        if (length(available_reference_names)) {
           reference_name <- available_reference_names[[1]]
         } else {
           reference_name <- "noref"
@@ -172,14 +192,14 @@ RAVESubjectBaseRepository <- R6::R6Class(
 
       private$.reference_name <- reference_name
 
-      if(reference_warn) {
+      if (reference_warn) {
         ravepipeline::logger("No reference specified, using `{reference_name}`",
                              use_glue = TRUE)
 
       }
 
       # revisit: this is when reference_name is noref but noref is missing
-      # if(!isTRUE(reference_name %in% available_reference_names)) {
+      # if (!isTRUE(reference_name %in% available_reference_names)) {
       #   force(self$reference_table)
       # }
 
@@ -237,18 +257,44 @@ RAVESubjectBaseRepository <- R6::R6Class(
     #' marked as "excluded" (such as bad channels or channels that should
     #' not be analyzed); default is often true
     auto_exclude = function(v) {
-      if(!missing(v)) {
+      if (!missing(v)) {
         private$.auto_exclude <- isTRUE(as.logical(v))
       }
       private$update_electrode_list()
       private$.auto_exclude
     },
 
+    #' @field meta_info list of meta information
+    meta_info = function() {
+      cls <- class(self)
+      if (any(cls == "rave_repository")) {
+        idx <- which(cls == "rave_repository")
+        type <- cls[[idx + 1]]
+      } else {
+        cls1 <- cls[startsWith(cls, "rave_prepare_subject_")]
+        if (length(cls1)) {
+          type <- gsub("rave_prepare_subject_", "", cls1[[1]])
+          type <- gsub("_", " ", type)
+        } else {
+          type <- cls[startsWith(cls, "RAVE")][[1]]
+        }
+      }
+
+      list(
+        type = type,
+        signature = self$signature,
+        project_name = self$subject$project_name,
+        subject_code = self$subject$subject_code,
+        electrodes = deparse_svec(self$electrode_list),
+        reference_name = self$reference_name
+      )
+    },
+
     #' @field needs_update write-only attribute when subject needs to be
     #' reloaded from the disk and reference table needs to be updated, use
     #' \code{repo$needs_update <- TRUE}
     needs_update = function(v) {
-      if(!missing(v) && v) {
+      if (!missing(v) && v) {
         private$update_subject()
       }
       invisible()
@@ -300,7 +346,7 @@ RAVESubjectBaseRepository <- R6::R6Class(
       reference_table <- self$reference_table
       reference_instances <- self$reference_instances
 
-      electrode_instances <- structure(lapply(seq_along(electrode_list), function(ii){
+      electrode_instances <- structure(lapply(seq_along(electrode_list), function(ii) {
         e <- electrode_list[[ii]]
         signal_type <- electrode_signal_types[[ii]]
         ref_name <- reference_table$Reference[reference_table$Electrode == e][[1]]
@@ -316,9 +362,9 @@ RAVESubjectBaseRepository <- R6::R6Class(
 
     #' @field reference_name name of reference table
     reference_name = function(v) {
-      if(!missing(v)) {
+      if (!missing(v)) {
         subject <- private$.subject
-        if(v == "noref" || v %in% subject$reference_names) {
+        if (v == "noref" || v %in% subject$reference_names) {
           private$.reference_name <- v
           private$update_electrode_list()
         } else {
@@ -333,11 +379,11 @@ RAVESubjectBaseRepository <- R6::R6Class(
     reference_table = function() {
       subject <- private$.subject
       reference_name <- self$reference_name
-      if(!length(subject$electrodes)) {
+      if (!length(subject$electrodes)) {
         stop("No electrode/channel found under this subject. Please import data first.")
       }
-      if(!isTRUE(reference_name %in% c(subject$reference_names, "_unsaved"))) {
-        if(identical(tolower(self$reference_name), "noref")) {
+      if (!isTRUE(reference_name %in% c(subject$reference_names, "_unsaved"))) {
+        if (identical(tolower(self$reference_name), "noref")) {
           reference_table <- data.frame(
             Electrode = subject$electrodes,
             Group = "default",
@@ -383,7 +429,7 @@ RAVESubjectBaseRepository <- R6::R6Class(
       ))
 
       reference_instances <- structure(
-        lapply(seq_len(nrow(ref_mat)), function(ii){
+        lapply(seq_len(nrow(ref_mat)), function(ii) {
           y <- ref_mat[ii, ]
           new_reference(subject = subject, number = y[[1]], signal_type = y[[2]], quiet = self$quiet)
         }),
@@ -408,7 +454,7 @@ RAVESubjectBaseRepository <- R6::R6Class(
     #' different identifiers); generated from \code{digest_key}
     signature = function() {
       digest_key <- self$digest_key
-      if(is.null(digest_key)) {
+      if (is.null(digest_key)) {
         digest_key <- self$`@marshal`()$data
       }
       structure(
@@ -432,7 +478,7 @@ RAVESubjectBaseRepository <- R6::R6Class(
 #' @param ... passed to \code{\link{RAVESubjectBaseRepository}} constructor
 #' @examples
 #'
-#' if( has_rave_subject("demo/DemoSubject") ) {
+#' if ( has_rave_subject("demo/DemoSubject") ) {
 #'
 #'
 #' repository <- prepare_subject_bare0("demo/DemoSubject",

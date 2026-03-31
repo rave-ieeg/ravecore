@@ -22,7 +22,7 @@ use_spikeinterface <- function(repository, signal_type = "Spike") {
   electrode_coords <- as.matrix(electrode_table[, c("Coord_x", "Coord_y", "Coord_z")])
   dimnames(electrode_coords) <- NULL
 
-  if(nrow(electrode_coords) > 2) {
+  if (nrow(electrode_coords) > 2) {
     pca <- stats::prcomp(electrode_coords, scale. = FALSE, retx = TRUE, center = TRUE, rank. = 2)
     electrode_2d <- pca$x
     dimnames(electrode_2d) <- NULL
@@ -31,12 +31,12 @@ use_spikeinterface <- function(repository, signal_type = "Spike") {
   }
 
   zeros <- rowSums(electrode_2d^2) == 0
-  if(any(zeros)) {
+  if (any(zeros)) {
     electrode_2d[zeros, 2] <- seq_len(sum(zeros)) * 10 + 1000
   }
 
   dups <- duplicated(electrode_2d)
-  if(any(dups)) {
+  if (any(dups)) {
     electrode_2d[dups, 2] <- electrode_2d[dups, 2] + stats::runif(sum(dups), min = -0.0001, 0.0001)
   }
 
@@ -63,7 +63,7 @@ use_spikeinterface <- function(repository, signal_type = "Spike") {
   #   data_list <- container[[block]][[signal_type]]
   #   data <- data_list$data
   #   sample_rate <- data_list$sample_rate
-  #   if(!length(data)) { return(NULL) }
+  #   if (!length(data)) { return(NULL) }
   #
   #   filebase <- data$.filebase
   #   si_path <- file.path(filebase, "spikeinterface", ch, fsep = "/")
@@ -72,7 +72,7 @@ use_spikeinterface <- function(repository, signal_type = "Spike") {
   #     channel = ch,
   #     path = si_path
   #   )
-  #   if(dir.exists(si_path)) {
+  #   if (dir.exists(si_path)) {
   #     tryCatch(
   #       {
   #         rec <- ravecorepy$spike$load_recording(path = si_path)
@@ -118,7 +118,7 @@ use_spikeinterface <- function(repository, signal_type = "Spike") {
   recordings$set_channel_locations(locations = electrode_2d)
 
   electrode_groups <- electrode_table$LabelPrefix
-  if(length(electrode_groups)) {
+  if (length(electrode_groups)) {
     recordings <- ravecorepy$spike$set_channel_groups(recordings, as.integer(as.factor(electrode_groups)))
   }
 
@@ -178,10 +178,10 @@ spike_sort_py <- function(repository, sorter_name = 'mountainsort5', verbose = T
 
   # validate meta information
   meta <- fastmap2()
-  if(use_cache) {
-    if( file_exists(meta_path) ) {
+  if (use_cache) {
+    if ( file_exists(meta_path) ) {
       meta <- load_yaml(meta_path, map = meta)
-      if(
+      if (
         !isTRUE(meta$repository_signature == repository$signature) ||
         length(meta$segment_n_timepoints) != length(repository$blocks) ||
         !identical(meta$sorter_name, sorter_name) ||
@@ -201,7 +201,7 @@ spike_sort_py <- function(repository, sorter_name = 'mountainsort5', verbose = T
 
   # Load original recordings
   recordings <- NULL
-  if(use_cache && dir_exists(orig_path)) {
+  if (use_cache && dir_exists(orig_path)) {
 
     tryCatch({
       recordings <- ravecorepy$spike$load_recording(orig_path)
@@ -209,7 +209,7 @@ spike_sort_py <- function(repository, sorter_name = 'mountainsort5', verbose = T
       # do nothing
     })
   }
-  if(is.null(recordings)) {
+  if (is.null(recordings)) {
     prep_results <- use_spikeinterface(repository)
     recordings <- prep_results$recordings
     recordings$save_to_folder(folder = orig_path, overwrite = TRUE)
@@ -222,12 +222,12 @@ spike_sort_py <- function(repository, sorter_name = 'mountainsort5', verbose = T
 
   # Sorter
   sorting <- NULL
-  if(use_cache && file_exists(sorter_path)) {
+  if (use_cache && file_exists(sorter_path)) {
     tryCatch({
       sorting <- ravecorepy$spike$load_recording(sorter_path)
     }, error = function(e) {})
   }
-  if(is.null(sorting)) {
+  if (is.null(sorting)) {
     sorting <- ravecorepy$spike$run_sorter(
       recording = recordings,
       sorter_name = sorter_name,
@@ -240,28 +240,28 @@ spike_sort_py <- function(repository, sorter_name = 'mountainsort5', verbose = T
 
   # analyzer
   analyzer <- NULL
-  if(use_cache && file_exists(analyzer_path)) {
+  if (use_cache && file_exists(analyzer_path)) {
     tryCatch({
       analyzer <- si$load_sorting_analyzer(analyzer_path)
     }, error = function(e) {
     })
   }
 
-  if(is.null(analyzer)) {
+  if (is.null(analyzer)) {
     recordings_bandpassed <- NULL
-    if(use_cache && dir_exists(preprocess_path)) {
+    if (use_cache && dir_exists(preprocess_path)) {
       tryCatch({
         recordings_bandpassed <- ravecorepy$spike$load_recording(preprocess_path)
       }, error = function(e) {
       })
     }
-    if(is.null(recordings_bandpassed)) {
+    if (is.null(recordings_bandpassed)) {
       recordings_bandpassed <- ravecorepy$spike$bandpass(recordings)
       recordings_bandpassed$save_to_folder(folder = preprocess_path, overwrite = TRUE)
       recordings_bandpassed <- ravecorepy$spike$load_recording(preprocess_path)
     }
 
-    analyzer = si$create_sorting_analyzer(
+    analyzer <- si$create_sorting_analyzer(
       sorting = sorting,
       recording = recordings_bandpassed,
       folder = analyzer_path,
@@ -271,31 +271,37 @@ spike_sort_py <- function(repository, sorter_name = 'mountainsort5', verbose = T
   }
 
   existing_extensions <- NULL
-  if(use_cache) {
+  if (use_cache) {
     existing_extensions <- names(analyzer$extensions)
   }
 
-  if(!"random_spikes" %in% existing_extensions) {
-    analyzer$compute("random_spikes", method="uniform", max_spikes_per_unit = 600L, seed = 42L, save = TRUE)
+  if (!"random_spikes" %in% existing_extensions) {
+    analyzer$compute(
+      "random_spikes",
+      method = "uniform",
+      max_spikes_per_unit = 600L,
+      seed = 42L,
+      save = TRUE
+    )
   }
 
   # Run waveform extraction
-  if(!"waveforms" %in% existing_extensions) {
+  if (!"waveforms" %in% existing_extensions) {
     analyzer$compute("waveforms", ms_before = 1.0, ms_after = 2.0, save = TRUE)
   }
 
   # get wavelet templates
-  if(!"templates" %in% existing_extensions) {
+  if (!"templates" %in% existing_extensions) {
     analyzer$compute("templates", ms_before = 1.0, ms_after = 2.0, save = TRUE)
   }
 
   # noise levels
-  if(!"noise_levels" %in% existing_extensions) {
+  if (!"noise_levels" %in% existing_extensions) {
     analyzer$compute("noise_levels", save = TRUE)
   }
 
   # noise levels
-  if(!"isi_histograms" %in% existing_extensions) {
+  if (!"isi_histograms" %in% existing_extensions) {
     analyzer$compute("isi_histograms", window_ms = 50, bin_ms = 1.0, save = TRUE)
   }
 
@@ -339,7 +345,7 @@ epoch_spike_train <- function(repository, sorted_results, epoch_name, epoch_wind
 
   windows <- ravecore::validate_time_window(epoch_window)
 
-  if(is.character(epoch_name)) {
+  if (is.character(epoch_name)) {
     epoch <- repository$subject$get_epoch(epoch_name)
     epoch_table <- epoch$table
   } else if (is.data.frame(epoch_name)) {
@@ -371,10 +377,10 @@ epoch_spike_train <- function(repository, sorted_results, epoch_name, epoch_wind
     # sub <- split(epoch_table, epoch_table$Block)[[1]]
     block <- sub$Block[[1]]
     cond <- sub$Condition[[1]]
-    if(!isTRUE(block %in% blocks)) { return() }
+    if (!isTRUE(block %in% blocks)) { return() }
     segment <- which(blocks == block)
 
-    if(segment == 1) {
+    if (segment == 1) {
       pad_timepoints <- 0
     } else {
       pad_timepoints <- sum(n_timepoints[seq_len(segment - 1)])
@@ -395,7 +401,7 @@ epoch_spike_train <- function(repository, sorted_results, epoch_name, epoch_wind
           spike_train <- get_spike_train(unit_id = unit_id,
                                          start_time = window[[1]],
                                          end_time = window[[2]])
-          if(!length(spike_train)) { return(NULL) }
+          if (!length(spike_train)) { return(NULL) }
           list(
             Trial = trial,
             Condition = cond,
@@ -407,12 +413,12 @@ epoch_spike_train <- function(repository, sorted_results, epoch_name, epoch_wind
       })
 
       re <- unlist(re, recursive = FALSE, use.names = FALSE)
-      if(!length(re)) { return(NULL) }
+      if (!length(re)) { return(NULL) }
       re
     })
 
     re <- unlist(re, recursive = FALSE, use.names = FALSE)
-    if(!length(re)) { return(NULL) }
+    if (!length(re)) { return(NULL) }
     re <- data.table::rbindlist(re)
     re
   })
@@ -462,7 +468,7 @@ visualize_epoch_spike_train <- function(
 
   # This is to calculate overhead for bins and firing rates
   bin_size <- firerate_bin / 1000
-  if(isTRUE(firerate_smooth)) {
+  if (isTRUE(firerate_smooth)) {
     half_bandwidth <- 0.05
     filter <- stats::dnorm(seq(-half_bandwidth, half_bandwidth, by = bin_size), mean = 0, sd = half_bandwidth / 3) * bin_size
   } else if (isTRUE(firerate_smooth > 0)) {
@@ -481,18 +487,18 @@ visualize_epoch_spike_train <- function(
   bins <- seq(epoch_starts_boundary, by = bin_size, length.out = n_breaks)
   firing_rate_time <- (bins[-1] + bins[-length(bins)]) * 0.5
   is_baseline <- rep(FALSE, length(firing_rate_time))
-  if(use_baseline) {
+  if (use_baseline) {
     baseline_window <- validate_time_window(baseline_window)
-    for(w in baseline_window) {
+    for (w in baseline_window) {
       is_baseline <- is_baseline | firing_rate_time <= w[[2]] & firing_rate_time >= w[[1]]
     }
-    if(!any(is_baseline)) {
+    if (!any(is_baseline)) {
       warning("Baseline is invalid, falling back to average firing rates")
       use_baseline <- FALSE
     }
   }
   # Baseline is still used for visualization purposes
-  if(!use_baseline) {
+  if (!use_baseline) {
     baseline_window <- tryCatch({
       validate_time_window(baseline_window)
     }, error = function(e) {
@@ -501,7 +507,7 @@ visualize_epoch_spike_train <- function(
   }
 
   add_baseline <- function(ylim, col = "gray80", alpha = 0.2) {
-    if(!plot_baseline) { return() }
+    if (!plot_baseline) { return() }
     lapply(baseline_window, function(w) {
 
       graphics::rect(
@@ -526,20 +532,20 @@ visualize_epoch_spike_train <- function(
 
   # Get conditions to analyze
   all_conditions <- sort(unique(spike_train$Condition))
-  if(!length(conditions)) {
+  if (!length(conditions)) {
     conditions <- all_conditions
   } else {
     conditions <- unique(conditions)
     conditions <- conditions[conditions %in% all_conditions]
   }
-  if(!length(conditions)) {
+  if (!length(conditions)) {
     stop("No matching condition or no epoch found. Available conditions are: ", paste(all_conditions, collapse = ", "), ".")
   }
   n_conditions <- length(conditions)
 
 
   # Construct color palettes, make sure the palette number is long enough
-  if(!length(color_palette)) {
+  if (!length(color_palette)) {
     color_palette <- seq_along(conditions)
   } else if (length(color_palette) < n_conditions) {
     color_palette <- rep(color_palette, ceiling(n_conditions / length(color_palette)))
@@ -595,12 +601,12 @@ visualize_epoch_spike_train <- function(
   # waveform time
   waveforms_params <- rpymat::py_to_r(ext_waveforms$params)
   waveform_time <- seq(
-    - waveforms_params$ms_before,
+    -waveforms_params$ms_before,
     by = 1000 / sample_rate,
     length.out = nrow(waveform_samples)
   )
   xlim <- range(pretty(waveform_time))
-  switch (
+  switch(
     waveform_method,
     "quantile" = {
       waveform_mean <- apply(waveform_samples, 1L, stats::median)
@@ -612,17 +618,17 @@ visualize_epoch_spike_train <- function(
 
   hard_lim <- range(waveform_mean, na.rm = TRUE)
   waveform_ylim <- waveform_ylim[is.finite(waveform_ylim)]
-  if(!length(waveform_ylim)) {
+  if (!length(waveform_ylim)) {
     waveform_ylim <- round(stats::quantile(waveform_samples, c(0.001, 0.999)))
-  } else if(length(waveform_ylim) == 1) {
+  } else if (length(waveform_ylim) == 1) {
     waveform_ylim <- c(-1, 1) * abs(waveform_ylim)
   } else {
     waveform_ylim <- range(waveform_ylim)
   }
-  if(waveform_ylim[[1]] > hard_lim[[1]]) {
+  if (waveform_ylim[[1]] > hard_lim[[1]]) {
     waveform_ylim[[1]] <- hard_lim[[1]]
   }
-  if(waveform_ylim[[2]] < hard_lim[[2]]) {
+  if (waveform_ylim[[2]] < hard_lim[[2]]) {
     waveform_ylim[[2]] <- hard_lim[[2]]
   }
 
@@ -651,18 +657,20 @@ visualize_epoch_spike_train <- function(
   graphics::axis(2, c(waveform_ylim, 0, round(hard_lim)), las = 1)
 
   # ---- Plot 1: ISI histogram -------------------------------------------------
-  spike_train_in_sec = rpymat::py_to_r(sorted_results$sorting$get_unit_spike_train(unit_id=unit_id, return_times = TRUE))
+  spike_train_in_sec <- rpymat::py_to_r(sorted_results$sorting$get_unit_spike_train(unit_id = unit_id, return_times = TRUE))
   isis_in_ms <- diff(as.vector(spike_train_in_sec)) * 1000
   max_isis_in_ms <- ceiling(max(isis_in_ms))
-  if(max_isis_in_ms <= isi_max_time) { max_isis_in_ms <- NULL }
+  if (max_isis_in_ms <= isi_max_time) { max_isis_in_ms <- NULL }
   isi_step_size <- abs(isi_step_size)
-  isi_hist <- graphics::hist(isis_in_ms, breaks = c(seq(0, isi_max_time, by = isi_step_size), max_isis_in_ms), plot = FALSE)
+  isi_hist <- graphics::hist(isis_in_ms,
+                             breaks = c(seq(0, isi_max_time, by = isi_step_size), max_isis_in_ms),
+                             plot = FALSE)
 
   # plot histogram in log10 scale
   isi_hist$counts[isi_hist$counts == 1] <- 1.4 # log10(1.4) ~= 0.15; log10(2) ~= 0.3;
   isi_hist$counts[isi_hist$counts < 1] <- 1
   isi_hist$counts <- log10(isi_hist$counts)
-  if(length(max_isis_in_ms)) {
+  if (length(max_isis_in_ms)) {
     isi_hist$counts[[length(isi_hist$counts)]] <- 0
   }
   log_counts <- pretty(c(0, isi_hist$counts))
@@ -689,7 +697,7 @@ visualize_epoch_spike_train <- function(
   )
   graphics::rect(xleft = xleft, xright = xright, ybottom = 0, ytop = isi_hist$counts, col = "gray80", border = graphics::par("bg"))
   xat <- pretty(c(0, isi_max_time))
-  if(xat[[length(xat)]] < isi_max_time) {
+  if (xat[[length(xat)]] < isi_max_time) {
     xat <- c(xat, isi_max_time)
   }
   graphics::axis(1, xat)
@@ -717,7 +725,7 @@ visualize_epoch_spike_train <- function(
     as.integer(sum(trial_info$Condition == cond))
   }, FUN.VALUE = NA_integer_)
   tick_pos <- cumsum(c(0, trial_counts_per_cond))
-  for(ii in seq_along(conditions)) {
+  for (ii in seq_along(conditions)) {
     tick_bd <- tick_pos[c(ii, ii + 1)] + c(1, 0)
     cond <- conditions[[ii]]
     n_trials <- trial_counts_per_cond[[ii]]
@@ -740,7 +748,7 @@ visualize_epoch_spike_train <- function(
 
     })
 
-    if(use_baseline) {
+    if (use_baseline) {
 
       baseline <- colMeans(firing_rates[is_baseline, , drop = FALSE])
       baseline[baseline == 0] <- 1
@@ -760,13 +768,13 @@ visualize_epoch_spike_train <- function(
   # time x trial
   firing_rates <- do.call("cbind", lapply(firing_rate_info, "[[", "firing_rates"))
 
-  if(firerate_smooth) {
+  if (firerate_smooth) {
     firing_rates <- stats::filter(firing_rates, filter)
   }
 
   firing_rate_colors <- sapply(firing_rate_info, "[[", "color")
 
-  if(use_baseline) {
+  if (use_baseline) {
     ylim <- range(pretty(c(-1, max(firing_rates, na.rm = TRUE))))
     ylab <- "% Change - Firing Rate (x 100%)"
   } else {
@@ -802,9 +810,9 @@ visualize_epoch_spike_train <- function(
   # ---- Legends --------------------------------------------------------------
   graphics::par(mar = c(0.1, 0.1, 0.1, 0.1))
   plot(c(0, 1), c(0, 1), axes = FALSE, xlab = "", ylab = "", main = "", type = "n")
-  if(n_conditions <= 3) {
+  if (n_conditions <= 3) {
     ncol <- n_conditions
-  } else if(n_conditions == 4) {
+  } else if (n_conditions == 4) {
     ncol <- 2
   } else {
     ncol <- 3

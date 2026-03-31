@@ -1,5 +1,5 @@
 restore_epoch_container_from_snapshot <- function(container, snapshot) {
-  if(is.null(snapshot)) { return(invisible()) }
+  if (is.null(snapshot)) { return(invisible()) }
   tryCatch({
 
     channel_names <- names(snapshot$data_list)
@@ -66,7 +66,7 @@ RAVESubjectEpochRepository <- R6::R6Class(
       # )
       # private <- self$.__enclos_env__$private
       container <- as.list(private$.data)
-      if(length(container) > 0) {
+      if (length(container) > 0) {
         data_names <- names(container$data_list)
         data_snapshot <- structure(
           names = data_names,
@@ -145,7 +145,7 @@ RAVESubjectEpochRepository <- R6::R6Class(
       self$time_windows <- time_windows
       self$set_epoch(epoch_name, stitch_events)
 
-      if(!lazy_load) {
+      if (!lazy_load) {
         self$mount_data(force = FALSE)
       }
     },
@@ -181,10 +181,10 @@ RAVESubjectEpochRepository <- R6::R6Class(
       #     reference_name = "default", epoch_name = "auditory_onset",
       #     time_windows = c(-1, 2))
       data_type <- private$.data_type
-      if(length(data_type)) {
+      if (length(data_type)) {
         data_path <- dir_create2(file_path(epoch_root, data_type))
 
-        if(verbose) {
+        if (verbose) {
           callback <- function(ii) {
             sprintf("Exporting %s with epochs|Electrode channel %d", data_type, self$electrode_list[[ii]])
           }
@@ -201,7 +201,7 @@ RAVESubjectEpochRepository <- R6::R6Class(
 
             electrode_instance <- self$electrode_instances[[nm]]
             ref_name <- electrode_instance$reference_name
-            if(length(ref_name)) {
+            if (length(ref_name)) {
               ravecore <- asNamespace("ravecore")
               ref_name <- ravecore$parse_svec(gsub("^ref_", "", ref_name))
             }
@@ -212,7 +212,7 @@ RAVESubjectEpochRepository <- R6::R6Class(
             dnames <- dimnames(arr)
             arr <- arr[dimnames = FALSE, drop = FALSE]
 
-            if(length(electrode_instance$reference)) {
+            if (length(electrode_instance$reference)) {
               reference <- electrode_instance$reference$load_data_with_epochs(data_type)
               reference <- reference[dimnames = FALSE, drop = FALSE]
             } else {
@@ -227,7 +227,7 @@ RAVESubjectEpochRepository <- R6::R6Class(
               data = arr,
               reference = reference
             )
-            if("Frequency" %in% names(dnames)) {
+            if ("Frequency" %in% names(dnames)) {
               data$frequency <- dnames$Frequency
             }
 
@@ -261,8 +261,8 @@ RAVESubjectEpochRepository <- R6::R6Class(
       available_epoch_names <- subject$epoch_names
       time_windows <- self$time_windows
 
-      if(missing(epoch_name) || !length(epoch_name) || !length(available_epoch_names)){
-        if(!length(available_epoch_names)){
+      if (missing(epoch_name) || !length(epoch_name) || !length(available_epoch_names)) {
+        if (!length(available_epoch_names)) {
           ravepipeline::logger("No epoch file found in this subject. Please check meta folder and make sure you have generated epoch_*.csv")
         }
         epoch_name <- subject$get_default('epoch_name', default_if_missing = available_epoch_names[[1]])
@@ -272,7 +272,7 @@ RAVESubjectEpochRepository <- R6::R6Class(
           level = "warning")
       }
       epoch_name <- epoch_name[[1]]
-      if(!epoch_name %in% available_epoch_names){
+      if (!epoch_name %in% available_epoch_names) {
         ravepipeline::logger(
           sprintf(
             "Epoch name %s does not exist. Please make sure the epoch table exists under the subject meta folder, with name `epoch_%s.csv`",
@@ -290,16 +290,16 @@ RAVESubjectEpochRepository <- R6::R6Class(
       )
 
 
-      if(length(stitch_events)) {
+      if (length(stitch_events)) {
         # check if the events are in epochs
         available_events <- private$.epoch$available_events
-        if(length(stitch_events) == 1) {
+        if (length(stitch_events) == 1) {
           stitch_events <- c(stitch_events, stitch_events)
         } else {
           stitch_events <- stitch_events[c(1, 2)]
         }
         stitch_events[tolower(stitch_events) %in% c("trial onset")] <- ""
-        if(!all(stitch_events %in% available_events)) {
+        if (!all(stitch_events %in% available_events)) {
           ravepipeline::logger(
             "Cannot find events to stitch: ",
             paste(sQuote(stitch_events[!stitch_events %in% available_events]), collapse = ", "),
@@ -334,7 +334,7 @@ RAVESubjectEpochRepository <- R6::R6Class(
     #' @returns A named map, typically with data arrays, shape/dimension
     #' information
     get_container = function(force = FALSE, ...) {
-      if(private$.data$`@size`() == 0) {
+      if (private$.data$`@size`() == 0) {
         self$mount_data(force = force, ...)
       }
       private$.data
@@ -346,12 +346,28 @@ RAVESubjectEpochRepository <- R6::R6Class(
     #' reloaded from the disk and reference table needs to be updated, use
     #' \code{repo$needs_update <- TRUE}
     needs_update = function(v) {
-      if(!missing(v) && v) {
+      if (!missing(v) && v) {
         private$update_subject()
         self$set_epoch(private$.epoch_name, private$.stitch_events)
         self$mount_data(force = FALSE)
       }
       invisible()
+    },
+
+    #' @field meta_info list of meta information
+    meta_info = function() {
+      re <- super$meta_info
+      re$epoch_name <- deparse1(self$epoch_name)
+      windows <- vapply(self$time_windows, function(window) {
+        sprintf("[%s]", paste(sprintf("%.2f", window), collapse = ", "))
+      }, "")
+      if (length(windows)) {
+        windows <- paste(windows, collapse = ", ")
+      } else {
+        windows <- "(unset)"
+      }
+      re$time_windows <- windows
+      re
     },
 
     #' @field sample_rates a named list of sampling frequencies; the names
@@ -382,10 +398,10 @@ RAVESubjectEpochRepository <- R6::R6Class(
     #' \code{sample_rates} for more accurate number
     sample_rate = function() {
       sample_rates <- self$sample_rates
-      if("LFP" %in% names(sample_rates)) {
+      if ("LFP" %in% names(sample_rates)) {
         return(sample_rates[["LFP"]])
       }
-      if("Spike" %in% names(sample_rates)) {
+      if ("Spike" %in% names(sample_rates)) {
         return(sample_rates[["Spike"]])
       }
       sample_rates[[1]]
@@ -416,16 +432,16 @@ RAVESubjectEpochRepository <- R6::R6Class(
     #' to \code{stitch_events}; default is trial onset
     time_windows = function(v) {
       subject <- self$subject
-      if(!missing(v)) {
+      if (!missing(v)) {
         time_windows <- v
-        if(length(time_windows)) {
+        if (length(time_windows)) {
           time_windows <- validate_time_window(time_windows)
           private$.time_windows <- time_windows
         }
       } else {
         time_windows <- private$.time_windows
       }
-      if(!length(time_windows)) {
+      if (!length(time_windows)) {
         time_windows <- subject$get_default("time_windows", default_if_missing = list(c(-1, 2)))
         ravepipeline::logger("No time_windows specified, using default: ",
                              deparse(time_windows), level = "info")
@@ -501,7 +517,7 @@ RAVESubjectEpochRepository <- R6::R6Class(
 #' default is true
 #' @examples
 #'
-#' if( has_rave_subject("demo/DemoSubject") ) {
+#' if ( has_rave_subject("demo/DemoSubject") ) {
 #'
 #'
 #' repository <- prepare_subject_with_epochs(

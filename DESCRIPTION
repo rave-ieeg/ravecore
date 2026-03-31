@@ -28,7 +28,7 @@ Description: Defines storage standard for Read, process, and analyze
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Language: en-US
 URL: https://rave.wiki, http://rave.wiki/ravecore/
 BugReports: https://github.com/rave-ieeg/ravecore/issues
