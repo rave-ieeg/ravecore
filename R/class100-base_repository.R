@@ -29,7 +29,7 @@ RAVESubjectBaseRepository <- R6::R6Class(
       electrodes <- private$.intended_electrode_list
 
       if (private$.auto_exclude) {
-        included_electrodes <- as.integer(reference_table$Electrode[reference_table$Reference != ''])
+        included_electrodes <- as.integer(reference_table$Electrode[reference_table$Reference != ""])
       } else {
         included_electrodes <- as.integer(reference_table$Electrode)
       }
@@ -142,7 +142,7 @@ RAVESubjectBaseRepository <- R6::R6Class(
       if (is.null(.class)) {
         .class <- "rave_prepare_subject_bare0"
       }
-      class(self) <- unique(c(.class, 'rave_repository', class(self)))
+      class(self) <- unique(c(.class, "rave_repository", class(self)))
       private$.auto_exclude <- isTRUE(as.logical(auto_exclude))
 
       self$quiet <- quiet

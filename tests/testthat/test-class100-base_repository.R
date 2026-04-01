@@ -9,21 +9,21 @@ prepare_subject_bare0_legcy <- function(subject, electrodes, reference_name, ...
   # ----- subject -----
   re$subject <- subject
 
-  if(missing(electrodes)){
+  if (missing(electrodes)) {
     electrodes <- subject$get_default(
       "electrodes", default_if_missing = subject$electrodes)
     message("No electrodes specified, loading all electrodes: ", deparse_svec(electrodes))
   }
-  if(length(electrodes) == 1 && is.character(electrodes)) {
+  if (length(electrodes) == 1 && is.character(electrodes)) {
     electrodes <- sort(parse_svec(electrodes))
   }
 
-  if(missing(reference_name) || !length(reference_name) || !all(reference_name %in% subject$reference_names)) {
+  if (missing(reference_name) || !length(reference_name) || !all(reference_name %in% subject$reference_names)) {
     reference_name <- "noref"
   }
 
-  if(!all(reference_name %in% subject$reference_names)){
-    if( !identical(reference_name, "noref") ) {
+  if (!all(reference_name %in% subject$reference_names)) {
+    if ( !identical(reference_name, "noref") ) {
       warning("No reference file found in this subject. Please check meta folder! Preparing table with no reference.")
     }
     safe_write_csv(
@@ -36,7 +36,7 @@ prepare_subject_bare0_legcy <- function(subject, electrodes, reference_name, ...
       row.names = FALSE
     )
     reference_name <- "noref"
-    # if(!length(subject$reference_names)){
+    # if(!length(subject$reference_names)) {
     #   safe_write_csv(
     #     data.frame(
     #       Electrode = subject$electrodes,
@@ -49,10 +49,10 @@ prepare_subject_bare0_legcy <- function(subject, electrodes, reference_name, ...
     #   reference_name <- "noref"
     # } else {
     #   reference_name <- subject$get_default('reference_name', default_if_missing = subject$reference_names[[1]])
-    #   if(!reference_name %in% subject$reference_names){
+    #   if (!reference_name %in% subject$reference_names) {
     #     reference_name <- subject$reference_names[[1]]
     #   }
-    #   if(reference_name != "noref") {
+    #   if (reference_name != "noref") {
     #     message("No reference_name specified, using reference `", reference_name, "`.")
     #   }
     # }
@@ -62,11 +62,11 @@ prepare_subject_bare0_legcy <- function(subject, electrodes, reference_name, ...
   }
   reference_table <- subject$get_reference(reference_name)
 
-  if("Reference" %in% names(reference_table)){
+  if ("Reference" %in% names(reference_table)) {
     old_electrodes <- electrodes
-    electrodes <- as.integer(reference_table$Electrode[reference_table$Reference != ''])
+    electrodes <- as.integer(reference_table$Electrode[reference_table$Reference != ""])
     electrodes <- old_electrodes[old_electrodes %in% electrodes]
-    if(!setequal(electrodes, old_electrodes)){
+    if (!setequal(electrodes, old_electrodes)) {
       old_electrodes <- deparse_svec(old_electrodes[!old_electrodes %in% electrodes])
       message("The following electrodes are removed because they are either missing or marked as `excluded`: ", old_electrodes)
     }
@@ -104,7 +104,7 @@ prepare_subject_bare0_legcy <- function(subject, electrodes, reference_name, ...
     electrode_signal_types
   ))
   reference_instances <- structure(
-    lapply(seq_len(nrow(ref_mat)), function(ii){
+    lapply(seq_len(nrow(ref_mat)), function(ii) {
       y <- ref_mat[ii, ]
       new_reference(subject = subject, number = y[[1]], signal_type = y[[2]], quiet = quiet)
     }),
@@ -113,7 +113,7 @@ prepare_subject_bare0_legcy <- function(subject, electrodes, reference_name, ...
   re$reference_instances <- drop_nulls(reference_instances)
 
   # ----- electrode_instances -----
-  electrode_instances <- structure(lapply(seq_along(electrode_list), function(ii){
+  electrode_instances <- structure(lapply(seq_along(electrode_list), function(ii) {
     e <- electrode_list[[ii]]
     signal_type <- electrode_signal_types[[ii]]
     ref_name <- reference_table$Reference[reference_table$Electrode == e][[1]]
@@ -135,7 +135,7 @@ prepare_subject_bare0_legcy <- function(subject, electrodes, reference_name, ...
   re$digest_key <- digest_key
   digest_string <- digest(digest_key)
   re$signature <- structure(digest_string, contents = names(digest_key))
-  if(!length(repository_id)) {
+  if (!length(repository_id)) {
     repository_id <- rand_string(4)
   }
   re$repository_id <- repository_id

@@ -144,7 +144,7 @@ use_spikeinterface <- function(repository, signal_type = "Spike") {
 }
 
 
-spike_sort_py <- function(repository, sorter_name = 'mountainsort5', verbose = TRUE, use_cache = TRUE,
+spike_sort_py <- function(repository, sorter_name = "mountainsort5", verbose = TRUE, use_cache = TRUE,
                           save_path = file_path(tempdir(), sprintf("rave_si_%s", repository$signature)),
                           signal_type = "Spike") {
 
@@ -577,7 +577,7 @@ visualize_epoch_spike_train <- function(
   on.exit({ graphics::par(oldpar) })
 
   graphics::layout(
-    matrix(c(3,3,3,4,4,1,1,2,2,5), ncol = 2),
+    matrix(c(3, 3, 3, 4, 4, 1, 1, 2, 2, 5), ncol = 2),
     widths = c(2.5, 1)
   )
 
@@ -637,7 +637,7 @@ visualize_epoch_spike_train <- function(
     waveform_time,
     waveform_samples,
 
-    type = 'l',
+    type = "l",
     lty = 1,
     col = grDevices::adjustcolor("#E5E5E5", alpha.f = waveform_alpha),
     main = sprintf("Spike unit #%d", unit_id),

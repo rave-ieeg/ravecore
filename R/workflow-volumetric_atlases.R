@@ -123,7 +123,7 @@ get_available_morph_to_template <- function(subject) {
 #' @export
 generate_atlases_from_template <- function(
     subject, atlas_folders,
-    template_name = 'mni_icbm152_nlin_asym_09b', any_mni152 = TRUE,
+    template_name = "mni_icbm152_nlin_asym_09b", any_mni152 = TRUE,
     surfaces = TRUE, as_job = FALSE,
     # extra transform from the input to whatever
     extra_transform = NULL, extra_transform_type = c("ants", "native")
@@ -133,21 +133,21 @@ generate_atlases_from_template <- function(
   extra_transform_type <- match.arg(extra_transform_type)
 
   available_mappings <- get_available_morph_to_template(subject)
-  if(!length(available_mappings)) {
+  if (!length(available_mappings)) {
     stop("No non-linear morph available. Please run `ravecore::cmd_run_yael_preprocess` first.")
   }
   template_name <- template_name[[1]]
   template_name0 <- template_name
   template_name <- template_name[template_name %in% available_mappings]
-  if(
+  if (
     any_mni152 &&
-    identical(template_name0, 'mni_icbm152_nlin_asym_09b') &&
+    identical(template_name0, "mni_icbm152_nlin_asym_09b") &&
     !length(template_name)
   ) {
-    template_name <- c('mni_icbm152_nlin_asym_09a', 'mni_icbm152_nlin_asym_09c')
+    template_name <- c("mni_icbm152_nlin_asym_09a", "mni_icbm152_nlin_asym_09c")
     template_name <- template_name[template_name %in% available_mappings]
   }
-  if(!length(template_name)) {
+  if (!length(template_name)) {
     stop("The requested template ", sQuote(template_name0),
          " does not exist for subject ", subject$subject_id,
          ". Available templates are: ",
@@ -155,15 +155,15 @@ generate_atlases_from_template <- function(
   }
 
   # order is a first, then c, then b to not worry about overwrite
-  mni152_templates <- c('mni_icbm152_nlin_asym_09a', 'mni_icbm152_nlin_asym_09c',
-                        'mni_icbm152_nlin_asym_09b')
+  mni152_templates <- c("mni_icbm152_nlin_asym_09a", "mni_icbm152_nlin_asym_09c",
+                        "mni_icbm152_nlin_asym_09b")
 
-  if(missing(atlas_folders) || !length(atlas_folders)) {
+  if (missing(atlas_folders) || !length(atlas_folders)) {
     atlas_root <- ravepipeline::raveio_getopt(
       key = "mni_template_root",
       default = file.path(threeBrain::default_template_directory(), "templates")
     )
-    if( any_mni152 && template_name %in% mni152_templates ) {
+    if ( any_mni152 && template_name %in% mni152_templates ) {
       atlas_folders <- path_abs(file_path(atlas_root, mni152_templates, "atlases"),
                                 must_work = FALSE)
     } else {
@@ -173,19 +173,19 @@ generate_atlases_from_template <- function(
   } else {
     atlas_folders <- path_abs(atlas_folders, must_work = FALSE)
   }
-  if(!any(dir_exists(atlas_folders))) {
+  if (!any(dir_exists(atlas_folders))) {
     stop("The atlas paths are missing. Please make create a directory along one of the following paths and copy-paste template atlases in it. The missing directories are:\n",
          paste0("\n  ", atlas_folders, "\n", collapse = ""))
   }
 
   atlas_folders <- atlas_folders[dir_exists(atlas_folders)]
 
-  if(length(extra_transform)) {
-    if(is.character(extra_transform)) {
+  if (length(extra_transform)) {
+    if (is.character(extra_transform)) {
       extra_transform <- normalizePath(extra_transform, mustWork = TRUE)
     } else {
       extra_transform <- as.matrix(extra_transform[drop = FALSE])
-      if(!identical(as.integer(dim(extra_transform)), c(4L, 4L))) {
+      if (!identical(as.integer(dim(extra_transform)), c(4L, 4L))) {
         stop("`extra_transform` must be a file path to the affine transform or a 4x4 matrix")
       }
     }
@@ -197,8 +197,8 @@ generate_atlases_from_template <- function(
     ravecore <- asNamespace("ravecore")
     yael_process <- ravecore$as_yael_process(subject)
 
-    if(length(extra_transform) && is.character(extra_transform)) {
-      switch (
+    if (length(extra_transform) && is.character(extra_transform)) {
+      switch(
         extra_transform_type,
         "ants" = {
           # LPS to LPS
@@ -229,11 +229,11 @@ generate_atlases_from_template <- function(
         surfaces = surfaces
       )
 
-      if(surfaces && length(atlas_paths) > 0) {
+      if (surfaces && length(atlas_paths) > 0) {
         lapply(atlas_paths, function(atlas_path) {
           gii_path <- gsub("\\.(nii|nii\\.gz)$", ".gii", x = atlas_path, ignore.case = TRUE)
           stl_path <- gsub("\\.(nii|nii\\.gz)$", ".stl", x = atlas_path, ignore.case = TRUE)
-          if(file.exists(gii_path)) {
+          if (file.exists(gii_path)) {
             tryCatch({
               surf <- ieegio::read_surface(gii_path)
               lps <- diag(c(-1, -1, 1, 1)) %*% surf$geometry$transforms[[1]] %*% surf$geometry$vertices
@@ -242,11 +242,11 @@ generate_atlases_from_template <- function(
                 faces = t(surf$geometry$faces),
                 face_start = surf$geometry$face_start
               )
-              ieegio::write_surface(surf, con = stl_path, type = "geometry", format = 'freesurfer')
+              ieegio::write_surface(surf, con = stl_path, type = "geometry", format = "freesurfer")
             })
           }
 
-          if(is.matrix(point_transform)) {
+          if (is.matrix(point_transform)) {
             relpath <- ravecore$path_rel(atlas_path, start = atlas_root)
             extrapath_nii <- file.path(atlas_extra, relpath)
             ravecore$dir_create2(dirname(extrapath_nii))
@@ -257,7 +257,7 @@ generate_atlases_from_template <- function(
             ieegio::write_volume(volume, con = extrapath_nii)
 
             # transform surface
-            if(file.exists(gii_path)) {
+            if (file.exists(gii_path)) {
               extrapath_gii <- file.path(atlas_extra, ravecore$path_rel(gii_path, start = atlas_root))
               surf <- ieegio::read_surface(gii_path)
               ras_pos <- point_transform %*% surf$geometry$transforms[[1]] %*% surf$geometry$vertices
@@ -267,7 +267,7 @@ generate_atlases_from_template <- function(
                 faces = t(surf$geometry$faces),
                 face_start = surf$geometry$face_start
               )
-              ieegio::write_surface(surf_gii, con = extrapath_gii, type = "geometry", format = 'gifti')
+              ieegio::write_surface(surf_gii, con = extrapath_gii, type = "geometry", format = "gifti")
 
               # STL
               extrapath_stl <- gsub("\\.gii$", ".stl", x = extrapath_gii, ignore.case = TRUE)
@@ -276,7 +276,7 @@ generate_atlases_from_template <- function(
                 faces = t(surf$geometry$faces),
                 face_start = surf$geometry$face_start
               )
-              ieegio::write_surface(surf_stl, con = extrapath_stl, type = "geometry", format = 'freesurfer')
+              ieegio::write_surface(surf_stl, con = extrapath_stl, type = "geometry", format = "freesurfer")
             }
 
           }
@@ -293,7 +293,7 @@ generate_atlases_from_template <- function(
   }
 
 
-  if( as_job ) {
+  if ( as_job ) {
     job_id <- ravepipeline::start_job(
       fun = job_fun,
       method = "rs_job",

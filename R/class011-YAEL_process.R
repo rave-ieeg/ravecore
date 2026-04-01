@@ -32,14 +32,14 @@ NULL
 call_rpyants <- function(.name, ...) {
   rpyANTs <- asNamespace("rpyANTs")
   re <- rpyANTs[[.name]]
-  if(is.function(re)) {
+  if (is.function(re)) {
     re <- re(...)
   }
   return(re)
 }
 
 rpyants_builtin_templates <- function() {
-  call_rpyants('BUILTIN_TEMPLATES')
+  call_rpyants("BUILTIN_TEMPLATES")
 }
 
 
@@ -70,7 +70,7 @@ YAELProcess <- R6::R6Class(
     .image_types = character(),
     .impl = function() {
       rpyants <- call_rpyants("load_rpyants")
-      if(length(formals(rpyants$registration$YAELPreprocess)) >= 3) {
+      if (length(formals(rpyants$registration$YAELPreprocess)) >= 3) {
         rpyants$registration$YAELPreprocess(
           private$.subject_code, self$work_path, as.list(self$image_types)
         )
@@ -131,9 +131,9 @@ YAELProcess <- R6::R6Class(
     #' are doing
     #' @param ... reserved for legacy code
     initialize = function(subject, image_types, imaging_path = NULL, ...) {
-      if(missing(subject)) {
+      if (missing(subject)) {
         subject <- list(...)$subject_code
-        if(!length(subject)) {
+        if (!length(subject)) {
           stop("YAELProcess: `subject` is missing. Please provide a RAVE subject ID")
         }
         ravepipeline::logger(
@@ -144,8 +144,8 @@ YAELProcess <- R6::R6Class(
       }
 
       # On windows, throw a warning if running with rstudioapi
-      if( rstudio_main_session(os = "windows") ) {
-        if(shiny_is_running()) {
+      if ( rstudio_main_session(os = "windows") ) {
+        if (shiny_is_running()) {
           level <- "fatal"
         } else {
           level <- "warning"
@@ -153,7 +153,7 @@ YAELProcess <- R6::R6Class(
         ravepipeline::logger("Avoid running YAELProcess directly in RStudio interactive sessions. Try to save the script and run it in a separate R session (e.g. from terminal or the native R GUI). RStudio has a bug that might crash when launching the process. There is nothing I can do about it :/", level = level)
       }
 
-      if(!is.character(subject) || grepl("/", subject, fixed = TRUE)) {
+      if (!is.character(subject) || grepl("/", subject, fixed = TRUE)) {
         # user passed a subject ID
         subject <- as_rave_subject(subject, strict = FALSE)
       } else {
@@ -168,20 +168,20 @@ YAELProcess <- R6::R6Class(
 
       private$.subject_code <- subject$subject_code
       private$.project_name <- subject$project_name
-      if(length(imaging_path) && !is.na(imaging_path)) {
+      if (length(imaging_path) && !is.na(imaging_path)) {
         private$.work_path <- imaging_path
       } else {
         private$.work_path <- path_abs(subject$imaging_path, must_work = FALSE)
       }
 
-      if(missing(image_types)) {
+      if (missing(image_types)) {
         image_types <- YAEL_IMAGE_TYPES
       }
 
       existing_modalities <- NULL
 
       input_path <- file.path(self$work_path, "inputs", "anat")
-      if(dir.exists(input_path)) {
+      if (dir.exists(input_path)) {
         input_images <- list.files(
           input_path,
           all.files = FALSE,
@@ -218,21 +218,21 @@ YAELProcess <- R6::R6Class(
                                overwrite = FALSE,
                                on_error = c("warning", "error", "ignore") ) {
       path <- path_abs(path, must_work = TRUE)
-      if(length(type) != 1) {
+      if (length(type) != 1) {
         type <- match.arg(type)
       }
       on_error <- match.arg(on_error)
       yael_py <- private$.impl()
       dir_create2(self$work_path)
-      if(!type %in% private$.image_types) {
+      if (!type %in% private$.image_types) {
         private$.image_types <- c(private$.image_types, type)
       }
 
       tryCatch({
         yael_py$set_image(path = path, type = type, overwrite = isTRUE(overwrite))
-        if( type == "T1w" ) {
+        if ( type == "T1w" ) {
           path <- self$get_input_image("T1w")
-          if(length(path)) {
+          if (length(path)) {
             mri_dir <- file.path(self$work_path, "inputs", "MRI")
             dir_create2(mri_dir)
             file.copy(path, to = file.path(mri_dir, "MRI_RAW.nii.gz"), overwrite = TRUE)
@@ -254,7 +254,7 @@ YAELProcess <- R6::R6Class(
     #' @param type type of the image
     #' @returns Absolute path if the image
     get_input_image = function(type = YAEL_IMAGE_TYPES) {
-      if(length(type) != 1) {
+      if (length(type) != 1) {
         type <- match.arg(type)
       }
       yael_py <- private$.impl()
@@ -286,7 +286,7 @@ YAELProcess <- R6::R6Class(
       verbose <- isTRUE(verbose)
       yael_py <- private$.impl()
       yael_py$register_to_T1w(type = image_type, reverse = reverse, verbose = verbose)
-      if( image_type == "CT" ) {
+      if ( image_type == "CT" ) {
         # write down extras for YAEL localization module
         mapping <- self$get_native_mapping(
           image_type = "CT", relative = FALSE)
@@ -315,7 +315,7 @@ YAELProcess <- R6::R6Class(
     #' @returns A list of moving and fixing images, with rigid transformations
     #' from different formats.
     get_native_mapping = function(image_type = YAEL_IMAGE_TYPES, relative = FALSE) {
-      if(length(image_type) != 1) {
+      if (length(image_type) != 1) {
         image_type <- match.arg(image_type)
       }
       yael_py <- private$.impl()
@@ -345,7 +345,7 @@ YAELProcess <- R6::R6Class(
                                               "fGATIR", "preopCT"),
                                native_type = "T1w",
                                use_antspynet = TRUE,
-                               verbose = TRUE, ...){
+                               verbose = TRUE, ...) {
       template_name <- match.arg(template_name)
       # camel version for BIDS
       template_info <- call_rpyants("template_urls")[[template_name]]
@@ -353,9 +353,9 @@ YAELProcess <- R6::R6Class(
       template_folder <- call_rpyants("ensure_template", template_name)
       template_path <- path_abs(file.path(template_folder, "T1.nii.gz"), must_work = TRUE)
       template_mask <- path_abs(file.path(template_folder, "T1_brainmask.nii.gz"), must_work = FALSE)
-      if(!file.exists(template_mask)) { template_mask <- NULL }
+      if (!file.exists(template_mask)) { template_mask <- NULL }
       use_images <- unique(use_images)
-      if(any(use_images %in% "all")) {
+      if (any(use_images %in% "all")) {
         use_images <- "all"
       } else {
         use_images <- unname(as.list(use_images))
@@ -374,7 +374,7 @@ YAELProcess <- R6::R6Class(
         verbose = verbose,
         ...
       )
-      return (invisible(
+      return(invisible(
         call_rpyants("to_r", yael_py$get_template_mapping(
           template_name = template_name2,
           native_type = native_type
@@ -433,7 +433,7 @@ YAELProcess <- R6::R6Class(
       template_name <- match.arg(template_name)
       template_name2 <- camel_template_name(template_name)
       yael_py <- private$.impl()
-      if( interpolator == "auto" ) {
+      if ( interpolator == "auto" ) {
         yael_py$transform_image_from_template(
           path = template_roi_path,
           template_name = template_name2,
@@ -496,7 +496,7 @@ YAELProcess <- R6::R6Class(
       # verbose <- T
       # template_path <- call_rpyants("ensure_template", name = template_name)
 
-      if( interpolator == "auto" ) {
+      if ( interpolator == "auto" ) {
         yael_py$transform_image_to_template(
           path = native_roi_path,
           template_name = template_name2,
@@ -536,10 +536,10 @@ YAELProcess <- R6::R6Class(
       template_name <- match.arg(template_name)
       template_name2 <- camel_template_name(template_name)
 
-      if( length(atlas_folder) != 1 || is.na(atlas_folder) || !nzchar(atlas_folder) ) {
+      if ( length(atlas_folder) != 1 || is.na(atlas_folder) || !nzchar(atlas_folder) ) {
         atlas_folder <- file.path(call_rpyants("ensure_template", name = template_name), "atlases")
       }
-      if(!dir.exists(atlas_folder)) {
+      if (!dir.exists(atlas_folder)) {
         stop("No atlases for template [", template_name, "]. Please place your atlas files under \n\t", atlas_folder)
       }
 
@@ -557,10 +557,10 @@ YAELProcess <- R6::R6Class(
         all.files = FALSE,
         full.names = TRUE
       )
-      if(isFALSE(surfaces)) { return(invisible(volume_files)) }
+      if (isFALSE(surfaces)) { return(invisible(volume_files)) }
       paths <- ravepipeline::lapply_jobs(volume_files, function(path) {
         dname <- dirname(path)
-        fname <- gsub("\\.(nii|nii\\.gz)$", '', basename(path), ignore.case = TRUE)
+        fname <- gsub("\\.(nii|nii\\.gz)$", "", basename(path), ignore.case = TRUE)
         fname <- sprintf("%s.gii", fname)
         dst_path <- file.path(dname, fname)
         try(silent = TRUE, {
@@ -583,7 +583,7 @@ YAELProcess <- R6::R6Class(
         threshold_lb = threshold_lb,
         threshold_ub = threshold_ub
       ), callback = function(path) {
-        fname <- gsub("\\.(nii|nii\\.gz)$", '', basename(path), ignore.case = TRUE)
+        fname <- gsub("\\.(nii|nii\\.gz)$", "", basename(path), ignore.case = TRUE)
         sprintf("Generating surfaces | %s", fname)
       })
       invisible(volume_files)
@@ -604,9 +604,9 @@ YAELProcess <- R6::R6Class(
       template_name <- match.arg(template_name)
       template_name2 <- camel_template_name(template_name)
 
-      if(is.vector(native_ras)) {
+      if (is.vector(native_ras)) {
         native_ras <- matrix(native_ras, ncol = 3, byrow = TRUE)
-      } else if(!is.matrix(native_ras)) {
+      } else if (!is.matrix(native_ras)) {
         native_ras <- as.matrix(native_ras)
       }
       dimnames(native_ras) <- NULL
@@ -614,8 +614,8 @@ YAELProcess <- R6::R6Class(
       invalid_rows <- is.na(rowMeans(native_ras, na.rm = FALSE))
       any_invalid <- any(invalid_rows)
 
-      if(any_invalid) {
-        native_ras[invalid_rows,] <- 0.0
+      if (any_invalid) {
+        native_ras[invalid_rows, ] <- 0.0
       }
 
       yael_py <- private$.impl()
@@ -624,7 +624,7 @@ YAELProcess <- R6::R6Class(
         native_type = native_type, verbose = isTRUE(verbose)
       )
       res <- call_rpyants("to_r", res)
-      if(any_invalid) {
+      if (any_invalid) {
         res[invalid_rows, ] <- NA_real_
       }
       res
@@ -645,13 +645,13 @@ YAELProcess <- R6::R6Class(
     ) {
       template_name <- match.arg(template_name)
       template_name2 <- camel_template_name(template_name)
-      if(length(native_type) != 1) {
+      if (length(native_type) != 1) {
         native_type <- match.arg(native_type)
       }
 
-      if(is.vector(template_ras)) {
+      if (is.vector(template_ras)) {
         template_ras <- matrix(template_ras, ncol = 3, byrow = TRUE)
-      } else if(!is.matrix(template_ras)) {
+      } else if (!is.matrix(template_ras)) {
         template_ras <- as.matrix(template_ras)
       }
       dimnames(template_ras) <- NULL
@@ -659,8 +659,8 @@ YAELProcess <- R6::R6Class(
       invalid_rows <- is.na(rowMeans(template_ras, na.rm = FALSE))
       any_invalid <- any(invalid_rows)
 
-      if(any_invalid) {
-        template_ras[invalid_rows,] <- 0.0
+      if (any_invalid) {
+        template_ras[invalid_rows, ] <- 0.0
       }
 
       yael_py <- private$.impl()
@@ -669,7 +669,7 @@ YAELProcess <- R6::R6Class(
         native_type = native_type, verbose = isTRUE(verbose)
       )
       res <- call_rpyants("to_r", res)
-      if(any_invalid) {
+      if (any_invalid) {
         res[invalid_rows, ] <- NA_real_
       }
       res
@@ -693,7 +693,7 @@ YAELProcess <- R6::R6Class(
       surf_dir <- file.path(ants_dir, "surf")
 
       mr_path <- self$get_input_image("T1w")
-      if(length(mr_path) != 1 || is.na(mr_path) || !file.exists(mr_path)) {
+      if (length(mr_path) != 1 || is.na(mr_path) || !file.exists(mr_path)) {
         stop("T1w image is not set. Please set the input image via\n\tself$set_input_image('/path/to/T1-weighted/MRI.nii.gz', type = 'T1w')")
       }
 
@@ -702,7 +702,7 @@ YAELProcess <- R6::R6Class(
       # T1.mgz (freesurfer style so users don't need to have to re-localize)
       threeBrain::conform_volume(mr_path, save_to = file.path(mri_dir, "T1.mgz"))
 
-      if(!length(template_name)) {
+      if (!length(template_name)) {
         return(invisible())
       }
       template_name <- match.arg(template_name)
@@ -711,7 +711,7 @@ YAELProcess <- R6::R6Class(
       # brainmask
       brainmask_dst <- file.path(mri_dir, "brainmask.nii.gz")
       template_mask <- file.path(template_path, "T1_brainmask.nii.gz")
-      if(file.exists(template_mask)) {
+      if (file.exists(template_mask)) {
         mask <- self$transform_image_from_template(
           template_roi_path = template_mask,
           template_name = template_name,
@@ -729,7 +729,7 @@ YAELProcess <- R6::R6Class(
       nu$to_file(path_abs(file.path(mri_dir, "nu.nii.gz"), must_work = FALSE))
 
       # skull-strip
-      if(length(mask)) {
+      if (length(mask)) {
         skullstrip <- nu * mask
         # normalize to 0-255
         arr <- skullstrip[]
@@ -750,7 +750,7 @@ YAELProcess <- R6::R6Class(
                                                relative = FALSE)
           n2t <- mapping$native_to_template$transformlist
           affine_path <- n2t[[length(n2t)]]
-          if(length(affine_path) && file.exists(affine_path)) {
+          if (length(affine_path) && file.exists(affine_path)) {
             # extract the affine transform (native to MNI152)
             transform <- rpyANTs::as_ANTsTransform(affine_path)[]
             scan_ras_to_mni305 <- solve(MNI305_to_MNI152) %*% transform
@@ -780,15 +780,15 @@ YAELProcess <- R6::R6Class(
       # surfaces
       lh_pial_dst <- file.path(surf_dir, "lh.pial.T1")
       rh_pial_dst <- file.path(surf_dir, "rh.pial.T1")
-      if( add_surfaces ) {
+      if ( add_surfaces ) {
         template_brain <- threeBrain::threeBrain(path = file.path(template_path, "fs"),
                                                  subject_code = template_name)
-        if(!is.null(template_brain) && length(template_brain$surfaces$pial)) {
+        if (!is.null(template_brain) && length(template_brain$surfaces$pial)) {
 
           # Left hemisphere
           surf_file <- file.path(template_brain$base_path, "surf", c("lh.pial.T1", "lh.pial"))
           surf_file <- surf_file[file.exists(surf_file)]
-          if(length(surf_file)) {
+          if (length(surf_file)) {
             surf_file <- surf_file[[1]]
             surface <- threeBrain::read.fs.surface(surf_file)
             # apply transform template tkr -> scanner
@@ -809,7 +809,7 @@ YAELProcess <- R6::R6Class(
           # Right hemisphere
           surf_file <- file.path(template_brain$base_path, "surf", c("rh.pial.T1", "rh.pial"))
           surf_file <- surf_file[file.exists(surf_file)]
-          if(length(surf_file)) {
+          if (length(surf_file)) {
             surf_file <- surf_file[[1]]
             surface <- threeBrain::read.fs.surface(surf_file)
             # apply transform template tkr -> scanner
@@ -830,14 +830,14 @@ YAELProcess <- R6::R6Class(
         }
 
         writeLines(con = file.path(ants_dir, "README.txt"), text = c(
-          sprintf("Generated by %s at %s.", paste(Sys.info()[['user']], collapse = ""), strftime(Sys.time())),
+          sprintf("Generated by %s at %s.", paste(Sys.info()[["user"]], collapse = ""), strftime(Sys.time())),
           sprintf("This folder is created by morphing template `%s` with native T1w MRI via `ANTs` SYN algorithm.", template_name),
           "The surfaces are just coarsed estimation for visualization purposes, and **may not be accurate**.",
           "Please use `FreeSurfer` for better cortical surface reconstruction."
         ))
       } else {
-        if(file.exists(lh_pial_dst)) { unlink(lh_pial_dst) }
-        if(file.exists(rh_pial_dst)) { unlink(rh_pial_dst) }
+        if (file.exists(lh_pial_dst)) { unlink(lh_pial_dst) }
+        if (file.exists(rh_pial_dst)) { unlink(rh_pial_dst) }
       }
       return(invisible())
     },
@@ -864,14 +864,14 @@ YAELProcess <- R6::R6Class(
                          coord_sys = c("scannerRAS", "tkrRAS", "MNI152", "MNI305"), ...) {
       coord_sys <- match.arg(coord_sys)
       subject <- self$get_subject(strict = FALSE)
-      if(is.na(subject$freesurfer_path)) {
+      if (is.na(subject$freesurfer_path)) {
         return(NULL)
       }
       brain <- threeBrain::threeBrain(path = subject$freesurfer_path, subject_code = self$subject_code, ...)
-      if(isTRUE(electrodes)) {
+      if (isTRUE(electrodes)) {
         tryCatch({
           brain$set_electrodes(electrodes = subject$get_electrode_table())
-        }, error = function(e){})
+        }, error = function(e) {})
       } else if (is.data.frame(electrodes) || is.character(electrodes)) {
         brain$set_electrodes(electrodes = electrodes, coord_sys = coord_sys)
       }
@@ -887,7 +887,7 @@ YAELProcess <- R6::R6Class(
 
     #' @field image_types allowed image types
     image_types = function(v) {
-      if(!missing(v) && length(v)) {
+      if (!missing(v) && length(v)) {
         image_types <- c(private$.image_types, as.character(unlist(v)))
         image_types <- unname(unlist(image_types))
         private$.image_types <- image_types
@@ -934,8 +934,8 @@ YAELProcess <- R6::R6Class(
 #'
 #' @export
 as_yael_process <- function(subject) {
-  if(!inherits(subject, 'RAVESubject') && is.character(subject)) {
-    if(!grepl("/", subject)) {
+  if (!inherits(subject, "RAVESubject") && is.character(subject)) {
+    if (!grepl("/", subject)) {
       subject <- sprintf("YAEL/%s", subject)
     }
   }

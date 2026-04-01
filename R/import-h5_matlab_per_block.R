@@ -15,7 +15,7 @@
 #' @export
 import_from_h5_mat_per_block <- function(
     subject, blocks, electrodes, sample_rate, add = FALSE,
-    data_type = 'LFP', skip_validation = FALSE, ...) {
+    data_type = "LFP", skip_validation = FALSE, ...) {
 
   # DIPSAUS DEBUG START
   # subject <- "test@bids:ds005953/03"
@@ -24,7 +24,7 @@ import_from_h5_mat_per_block <- function(
   # check_content = TRUE
   # skip_validation = FALSE
   # sample_rate <- 2000
-  # list2env(list(add = FALSE, data_type = 'LFP'), .GlobalEnv)
+  # list2env(list(add = FALSE, data_type = "LFP"), .GlobalEnv)
 
   subject <- restore_subject_instance(subject, strict = FALSE)
   pretools <- subject$preprocess_settings
@@ -33,9 +33,9 @@ import_from_h5_mat_per_block <- function(
 
   # ---- Validation ---------------------------------------------
 
-  if(!add && isTRUE(pretools$`@freeze_lfp_ecog`)){
+  if (!add && isTRUE(pretools$`@freeze_lfp_ecog`)) {
     # LFP has been imported, just stop
-    stop(sprintf('Subject `%s` has been imported previously. Double-import channels to subject is prohibited in RAVE as it will break the data integrity. Please consider either removing the subject or changing to another project', subject$subject_id))
+    stop(sprintf("Subject `%s` has been imported previously. Double-import channels to subject is prohibited in RAVE as it will break the data integrity. Please consider either removing the subject or changing to another project", subject$subject_id))
   }
 
   validation <- validate_raw_h5_mat_per_block(
@@ -45,9 +45,9 @@ import_from_h5_mat_per_block <- function(
     check_content = !skip_validation
   )
 
-  if(!validation$passed) {
+  if (!validation$passed) {
     error_messages <- validation$errors
-    if(!length(error_messages)) {
+    if (!length(error_messages)) {
       stop("RAVE encountered unknown error during the validation. Please report this issue to RAVE.")
     }
     stop(paste(
@@ -61,7 +61,7 @@ import_from_h5_mat_per_block <- function(
   # ---- Initialize subject and reload -------------------------------------------
   # Reload pretools with read_only FALSE
   pretools <- RAVEPreprocessSettings$new(subject = subject$subject_id, read_only = FALSE)
-  if(!add){
+  if (!add) {
     pretools$set_blocks(blocks = blocks)
   }
   pretools$set_electrodes(electrodes, type = data_type, add = add)
@@ -70,7 +70,7 @@ import_from_h5_mat_per_block <- function(
   pretools$save()
 
   progress <- ravepipeline::rave_progress(
-    title = sprintf('Importing %s', subject$subject_id),
+    title = sprintf("Importing %s", subject$subject_id),
     max = 2 + length(blocks),
     shiny_auto_close = FALSE
   )
@@ -85,7 +85,7 @@ import_from_h5_mat_per_block <- function(
 
   # ---- Import signal data ------------------------------------------------------
 
-  save_path <- file.path(subject$preprocess_path, 'voltage')
+  save_path <- file.path(subject$preprocess_path, "voltage")
   save_path <- dir_create2(save_path)
 
 
@@ -96,7 +96,7 @@ import_from_h5_mat_per_block <- function(
     progress$inc(message = "Processing recording block", detail = block)
 
     progress2 <- ravepipeline::rave_progress(
-      title = 'Importing electrode channels',
+      title = "Importing electrode channels",
       max = length(electrodes),
       shiny_auto_close = FALSE
     )
@@ -115,10 +115,10 @@ import_from_h5_mat_per_block <- function(
 
       progress2$inc(sprintf("Writing channel %s", e))
 
-      cfile <- file.path(save_path, sprintf('electrode_%d.h5', e))
+      cfile <- file.path(save_path, sprintf("electrode_%d.h5", e))
       path <- block_data$paths
 
-      if(which.min(block_signals_dim) == 1) {
+      if (which.min(block_signals_dim) == 1) {
         signal <- block_signals[block_data$channels == e, , drop = TRUE]
       } else {
         signal <- block_signals[, block_data$channels == e, drop = TRUE]
@@ -154,7 +154,7 @@ import_from_h5_mat_per_block <- function(
   progress$inc(detail = "Finalizing...")
 
   # Now set user conf
-  for(e in electrodes){
+  for (e in electrodes) {
     pretools$data[[e]]$data_imported <- TRUE
   }
   pretools$data$format <- which(unname(IMPORT_FORMATS) == "native_matlab2")
@@ -193,11 +193,11 @@ import_from_h5_mat_per_block <- function(
     # When electrodes are imported correctly
     electrode_table <- subject$get_electrode_table(simplify = FALSE, warn = FALSE)
 
-    if(all(subject$electrodes %in% electrode_table$Electrode)) {
+    if (all(subject$electrodes %in% electrode_table$Electrode)) {
 
       saved <- TRUE
 
-      if(!any(electrode_table$Electrode %in% subject$electrodes)) {
+      if (!any(electrode_table$Electrode %in% subject$electrodes)) {
         electrode_table <- electrode_table[electrode_table$Electrode %in% subject$electrodes, , drop = FALSE]
         electrode_table <- electrode_table[order(electrode_table$Electrode), ]
         save_meta2(
@@ -209,9 +209,9 @@ import_from_h5_mat_per_block <- function(
       }
 
       # Try to import
-      if( brain_model_exists ) {
+      if ( brain_model_exists ) {
         import_electrode_table(
-          path = file.path(subject$meta_path, 'electrodes.csv'),
+          path = file.path(subject$meta_path, "electrodes.csv"),
           subject = subject, use_fs = brain_model_exists)
       }
 
@@ -224,7 +224,7 @@ import_from_h5_mat_per_block <- function(
   })
 
 
-  if(!saved) {
+  if (!saved) {
     ravepipeline::logger("Cannot import from existing electrodes.csv, creating a new one", level = "info")
     tbl <- data.frame(
       Electrode = subject$electrodes,

@@ -19,7 +19,7 @@ RAVEProjectImpl <- S7::new_class(
           return("RAVE project name must be a string")
         }
         if (!nzchar(value) ||
-            !grepl("^[a-z]", value, ignore.case = TRUE)) {
+              !grepl("^[a-z]", value, ignore.case = TRUE)) {
           return("RAVE project name must not be empty and must starts with a character")
         }
         if (grepl("[^a-zA-Z0-9_-]", value)) {
@@ -41,16 +41,16 @@ RAVEProjectImpl <- S7::new_class(
     parent_path = S7::new_property(
       class = S7::new_union(S7::class_character, NULL, bidsr::BIDSProject),
       setter = function(self, value) {
-        if(self@format_standard == "bids" && !S7::S7_inherits(value, bidsr::BIDSProject)) {
+        if (self@format_standard == "bids" && !S7::S7_inherits(value, bidsr::BIDSProject)) {
           value <- bidsr::bids_project(path = value)
         }
         S7::prop(self, "parent_path") <- value
         self
       },
       validator = function(value) {
-        if(is.null(value)) { return() }
-        if(S7::S7_inherits(value, bidsr::BIDSProject)) { return() }
-        if(length(value) != 1 || is.na(value)) {
+        if (is.null(value)) { return() }
+        if (S7::S7_inherits(value, bidsr::BIDSProject)) { return() }
+        if (length(value) != 1 || is.na(value)) {
           return("RAVE project parent folder must be either a `bidsr::BIDSProject`, a `string` or `NULL`")
         }
       }
@@ -59,15 +59,15 @@ RAVEProjectImpl <- S7::new_class(
       class = S7::class_character,
       getter = function(self) {
         parent_path <- self@parent_path
-        switch (
+        switch(
           self@format_standard,
           "bids" = {
-            if(S7::S7_inherits(parent_path, bidsr::BIDSProject)) {
+            if (S7::S7_inherits(parent_path, bidsr::BIDSProject)) {
               parent_path <- file_path(format(parent_path, storage = "derivative"), "rave", "data_dir")
             }
           },
           {
-            if(is.null(parent_path)) {
+            if (is.null(parent_path)) {
               parent_path <- ravepipeline::raveio_getopt(key = "data_dir")
             }
           }
@@ -78,18 +78,18 @@ RAVEProjectImpl <- S7::new_class(
   ),
   validator = function(self) {
     # For BIDS derivative, parent_path must be specified
-    if(self@format_standard == "bids" && is.null(self@parent_path)) {
+    if (self@format_standard == "bids" && is.null(self@parent_path)) {
       return("RAVE project parent path must not be NULL for BIDS format")
     }
-    if(S7::S7_inherits(self@parent_path, bidsr::BIDSProject) && self@format_standard == "native") {
+    if (S7::S7_inherits(self@parent_path, bidsr::BIDSProject) && self@format_standard == "native") {
       return("RAVE project parent path is specified as a BIDS derivative, but the format is `native`. Please specify either native format or BIDS, not both.")
     }
   }
 )
 
 S7::method(format.generic, RAVEProjectImpl) <- function(x, ...) {
-  if(x@format_standard == "bids") {
-    if(S7::S7_inherits(x@parent_path, bidsr::BIDSProject)) {
+  if (x@format_standard == "bids") {
+    if (S7::S7_inherits(x@parent_path, bidsr::BIDSProject)) {
       re <- sprintf("%s@bids:%s", x@name, x@parent_path@name)
     } else {
       re <- sprintf("%s@bids", x@name)
@@ -121,7 +121,7 @@ S7::method(format.generic, RAVEProjectImpl) <- function(x, ...) {
 #' class
 #' @export
 RAVEProject <- R6::R6Class(
-  classname = 'RAVEProject',
+  classname = "RAVEProject",
   class = TRUE,
   portable = TRUE,
   inherit = RAVESerializable,
@@ -134,7 +134,7 @@ RAVEProject <- R6::R6Class(
     #' @param ... internal arguments
     `@marshal` = function(...) {
       parent_path <- private$impl@parent_path
-      if(length(parent_path)) {
+      if (length(parent_path)) {
         parent_path <- format(parent_path)
       }
       list(
@@ -162,21 +162,21 @@ RAVEProject <- R6::R6Class(
 
     #' @description override print method
     #' @param ... ignored
-    print = function(...){
-      cat('RAVE project <', self$name, '>\n', sep = '')
-      cat('  Format standard:', self$format_standard, '\n')
-      cat('  Directory:', self$path, '\n')
-      cat('  Subjects :', paste(self$subjects(), collapse = ', '), '\n')
+    print = function(...) {
+      cat("RAVE project <", self$name, ">\n", sep = "")
+      cat("  Format standard:", self$format_standard, "\n")
+      cat("  Directory:", self$path, "\n")
+      cat("  Subjects :", paste(self$subjects(), collapse = ", "), "\n")
       nms <- names(self)
       nms <- nms[!nms %in% r6_reserved_fields]
-      cat('Field/Method:', paste(nms, collapse = ', '), "\n")
+      cat("Field/Method:", paste(nms, collapse = ", "), "\n")
     },
 
     #' @description override format method
     #' @param ... ignored
     format = function(...) {
-      if(self$format_standard == "bids") {
-        if(S7::S7_inherits(private$impl@parent_path, bidsr::BIDSProject)) {
+      if (self$format_standard == "bids") {
+        if (S7::S7_inherits(private$impl@parent_path, bidsr::BIDSProject)) {
           re <- sprintf("%s@bids:%s", self$name, private$impl@parent_path@name)
         } else {
           re <- sprintf("%s@bids", self$name)
@@ -192,26 +192,26 @@ RAVEProject <- R6::R6Class(
     #' @param strict whether to check project path
     #' @param parent_path \code{NULL}, a path to the project parent folder
     #' for native projects, or the path to 'BIDS' root directory.
-    initialize = function(project_name, strict = TRUE, parent_path = NULL){
+    initialize = function(project_name, strict = TRUE, parent_path = NULL) {
       # project_name can be:
       # name, name@native, name@bids, name@bids:dataset_name
       format <- "native"
-      if(grepl("@", project_name)) {
+      if (grepl("@", project_name)) {
         project_name <- strsplit(project_name, "@", fixed = TRUE)[[1]]
         format <- project_name[[2]]
         project_name <- project_name[[1]]
       }
-      if(length(parent_path) == 1 && is.character(parent_path)) {
-        if(S7::S7_inherits(parent_path, bidsr::BIDSProject)) {
+      if (length(parent_path) == 1 && is.character(parent_path)) {
+        if (S7::S7_inherits(parent_path, bidsr::BIDSProject)) {
           format <- "bids"
         }
       }
-      if(startsWith(tolower(format), "bids")) {
+      if (startsWith(tolower(format), "bids")) {
 
-        if( length(parent_path) == 1 && !S7::S7_inherits(parent_path, bidsr::BIDSProject) ) {
+        if ( length(parent_path) == 1 && !S7::S7_inherits(parent_path, bidsr::BIDSProject) ) {
           parent_path <- bidsr::bids_project(path = parent_path, strict = strict)
           strs <- strsplit(format, ":", fixed = TRUE)[[1]]
-          if(length(strs) == 2 && !identical(tolower(parent_path@name), tolower(strs[[2]]))) {
+          if (length(strs) == 2 && !identical(tolower(parent_path@name), tolower(strs[[2]]))) {
             ravepipeline::logger(
               level = "warning",
               "Project `", project_name, "` indicates a BIDS dataset with name `",
@@ -224,15 +224,13 @@ RAVEProject <- R6::R6Class(
         } else {
           # name@bids:dataset_name
           format <- strsplit(format, ":", fixed = TRUE)[[1]]
-          if(length(format) > 1) {
+          if (length(format) > 1) {
             bids_dataset <- format[[2]]
             # TODO: check if bids_dataset is legit
-            if(!grepl("^[a-zA-Z0-9_-]+$", bids_dataset)) {
+            if (!grepl("^[a-zA-Z0-9_-]+$", bids_dataset)) {
               stop("Invalid BIDS dataset name: `", bids_dataset, "`. The dataset name must only include letters and digits.")
             }
-            parent_path <- bidsr::bids_project(
-              file_path(ravepipeline::raveio_getopt("bids_data_dir"), format[[2]]),
-              strict = strict)
+            parent_path <- bidsr::bids_project(file_path(ravepipeline::raveio_getopt("bids_data_dir"), format[[2]]), strict = strict)
           }
         }
 
@@ -242,23 +240,23 @@ RAVEProject <- R6::R6Class(
       }
       private$impl <- RAVEProjectImpl(name = project_name, parent_path = parent_path, format_standard = format)
 
-      if(strict && !dir.exists(private$impl@path)){
+      if (strict && !dir.exists(private$impl@path)) {
         ravepipeline::logger(sprintf("RAVE project does not exist:\n  %s", private$impl@path), level = "warning")
       }
     },
 
     #' @description get all imported subjects within project
     #' @returns character vector
-    subjects = function(){
+    subjects = function() {
       re <- list.dirs(self$path, full.names = FALSE, recursive = FALSE)
-      switch (
+      switch(
         self$format_standard,
         "bids" = {
           re <- re[grepl("^sub-", re, ignore.case = TRUE)]
           re <- gsub("^sub-", "", re, ignore.case = TRUE)
         },
         {
-          re <- re[grepl('^[a-zA-Z]+', re)]
+          re <- re[grepl("^[a-zA-Z]+", re)]
         }
       )
       return(re)
@@ -267,9 +265,9 @@ RAVEProject <- R6::R6Class(
     #' @description whether a specific subject exists in this project
     #' @param subject_code character, subject name
     #' @returns true or false whether subject is in the project
-    has_subject = function(subject_code){
+    has_subject = function(subject_code) {
       parent_path <- self$path
-      switch (
+      switch(
         self$format_standard,
         "bids" = {
           subject_code <- gsub("^sub-", "", subject_code, ignore.case = TRUE)
@@ -283,14 +281,14 @@ RAVEProject <- R6::R6Class(
     #' @param module_id character, 'RAVE' module ID
     #' @param must_work whether the directory must exist; if not exists,
     #' should a new one be created?
-    group_path = function(module_id, must_work = FALSE){
-      if(!length(module_id)) {
+    group_path = function(module_id, must_work = FALSE) {
+      if (!length(module_id)) {
         path <- file_path(self$path, "_project_data")
       } else {
         path <- file_path(self$path, "_project_data", module_id)
       }
 
-      if(must_work){
+      if (must_work) {
         dir_create2(path, check = FALSE)
       }
       path_abs(path, must_work = FALSE)
@@ -319,17 +317,17 @@ RAVEProject <- R6::R6Class(
   active = list(
 
     #' @field path project folder, absolute path
-    path = function(){
+    path = function() {
       private$impl@path
     },
 
     #' @field name project name, character
-    name = function(){
+    name = function() {
       private$impl@name
     },
 
     #' @field pipeline_path path to pipeline scripts under project's folder
-    pipeline_path = function(){
+    pipeline_path = function() {
       file_path(private$impl@path, "_project_pipelines")
     },
 
@@ -441,11 +439,11 @@ RAVEProject <- R6::R6Class(
 #'
 #'
 #' @export
-as_rave_project <- function(x, ...){
+as_rave_project <- function(x, ...) {
   # For compability
-  if(missing(x)) {
+  if (missing(x)) {
     project <- list(...)$project
-    if(length(project) == 1) {
+    if (length(project) == 1) {
       return(as_rave_project(x = project, ...))
     }
   }
@@ -495,25 +493,25 @@ as_rave_project.RAVEProject <- function(x, ...) {
 #' @export
 get_projects <- local({
   re <- NULL
-  function(refresh = TRUE){
-    if(refresh || !length(re)){
-      native_dir <- ravepipeline::raveio_getopt('data_dir')
-      bids_dir <- ravepipeline::raveio_getopt('bids_data_dir')
+  function(refresh = TRUE) {
+    if (refresh || !length(re)) {
+      native_dir <- ravepipeline::raveio_getopt("data_dir")
+      bids_dir <- ravepipeline::raveio_getopt("bids_data_dir")
 
-      if(file_exists(native_dir)) {
+      if (file_exists(native_dir)) {
         native_projects <- list.dirs(native_dir, full.names = FALSE, recursive = FALSE)
-        native_projects <- native_projects[grepl('^[a-zA-Z0-9]+', native_projects)]
+        native_projects <- native_projects[grepl("^[a-zA-Z0-9]+", native_projects)]
       } else {
         native_projects <- NULL
       }
 
-      if(file_exists(bids_dir)) {
+      if (file_exists(bids_dir)) {
         bids_datasets <- list.dirs(bids_dir, full.names = FALSE, recursive = FALSE)
         bids_rave_projects <- lapply(bids_datasets, function(dset) {
           rave_dir <- file_path(bids_dir, dset, "derivatives", "rave", "data_dir")
-          if(!dir_exists(rave_dir)) { return() }
+          if (!dir_exists(rave_dir)) { return() }
           rave_projects <- list.dirs(rave_dir, full.names = FALSE, recursive = FALSE)
-          rave_projects <- rave_projects[grepl('^[a-zA-Z0-9]+', rave_projects)]
+          rave_projects <- rave_projects[grepl("^[a-zA-Z0-9]+", rave_projects)]
           sprintf("%s@bids:%s", rave_projects, dset)
         })
       } else {

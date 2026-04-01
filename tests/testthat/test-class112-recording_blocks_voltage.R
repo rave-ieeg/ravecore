@@ -1,7 +1,7 @@
 prepare_subject_with_blocks_legacy <- function(
     subject, electrodes, reference_name, blocks, raw = FALSE,
     signal_type = "LFP", time_frequency = (!raw && signal_type == "LFP"),
-    quiet = raw, env = parent.frame(), repository_id = NULL, ...){
+    quiet = raw, env = parent.frame(), repository_id = NULL, ...) {
 
   # DIPSAUS DEBUG START
   # subject <- "test/Walker"
@@ -10,7 +10,7 @@ prepare_subject_with_blocks_legacy <- function(
   # signal_type <- "LFP"
   # raw <- TRUE
 
-  if(!isTRUE(signal_type %in% SIGNAL_TYPES)) {
+  if (!isTRUE(signal_type %in% SIGNAL_TYPES)) {
     stop("`prepare_subject_with_blocks`: signal type must be a string of length 1, and must be from the following list: ", paste(SIGNAL_TYPES, collapse = ", "))
   }
 
@@ -21,7 +21,7 @@ prepare_subject_with_blocks_legacy <- function(
   re$raw_signal <- raw
   subject <- as_rave_subject(subject)
 
-  if( raw && time_frequency ) {
+  if ( raw && time_frequency ) {
     message("Loading raw voltage traces, time-frequency data will not be loaded.")
     time_frequency <- FALSE
   }
@@ -32,7 +32,7 @@ prepare_subject_with_blocks_legacy <- function(
   # ----- subject -----
   re$subject <- subject
 
-  if(missing(electrodes)){
+  if (missing(electrodes)) {
     electrodes <- subject$get_default(
       "electrodes", default_if_missing = subject$electrodes)
     message("No electrodes specified, trying to get electrodes: ", deparse_svec(electrodes))
@@ -41,39 +41,39 @@ prepare_subject_with_blocks_legacy <- function(
   potential_elecs <- subject$electrodes[subject$electrode_types == signal_type]
   electrodes <- electrodes[electrodes %in% potential_elecs]
 
-  if(!length(electrodes)) {
+  if (!length(electrodes)) {
     stop("No valid electrode is selected.")
   }
   re$electrode_list <- electrodes
 
   # check blocks
-  if(missing(blocks)) {
+  if (missing(blocks)) {
     blocks <- subject$get_default(
       "blocks", default_if_missing = subject$blocks)
     message("No blocks specified, loading default blocks: ", paste(blocks, collapse = ", "))
   }
   blocks <- blocks[blocks %in% subject$blocks]
-  if(!length(blocks)) {
+  if (!length(blocks)) {
     stop("No valid block is selected")
   }
 
   # check reference_name
-  if( raw ) {
-    if( !missing(reference_name) ) {
+  if ( raw ) {
+    if ( !missing(reference_name) ) {
       message("Raw signal is to be loaded, reference is ignored.")
     }
     reference_name <- "noref"
   } else {
-    if(missing(reference_name)) {
+    if (missing(reference_name)) {
       reference_name <- subject$get_default(
         "reference_name", default_if_missing = "No reference")
       message("No reference table specified, loading default reference: ", paste(reference_name, collapse = ", "))
     }
-    if(length(reference_name)) {
+    if (length(reference_name)) {
       reference_name <- reference_name[reference_name %in% subject$reference_names]
     }
   }
-  if(!length(reference_name)) {
+  if (!length(reference_name)) {
     catgl("The signal will be as-is with no reference.", level = "DEFAULT")
     re$reference_name <- "noref"
     re$reference_table <- data.frame(
@@ -91,9 +91,9 @@ prepare_subject_with_blocks_legacy <- function(
   ref_table <- re$reference_table[re$reference_table$Electrode %in% electrodes, ]
 
   # check if wavelet is required
-  if( time_frequency ) {
+  if ( time_frequency ) {
 
-    if(!any(subject$has_wavelet)) {
+    if (!any(subject$has_wavelet)) {
       stop("Please run Wavelet module first.")
     }
     e <- subject$electrodes[subject$electrodes %in% electrodes & subject$has_wavelet][[1]]
@@ -106,7 +106,7 @@ prepare_subject_with_blocks_legacy <- function(
     }), names = blocks)
 
   } else {
-    if(!any(subject$preprocess_settings$data_imported)) {
+    if (!any(subject$preprocess_settings$data_imported)) {
       stop("Please import data first.")
     }
     wavelet_ntimepoints <- list()
@@ -116,7 +116,7 @@ prepare_subject_with_blocks_legacy <- function(
                             subject$preprocess_settings$data_imported][[1]]
   elec <- new_electrode(subject = subject, number = e, quiet = quiet)
   voltage_ntimepoints <- structure(lapply(blocks, function(block) {
-    if( raw ) {
+    if ( raw ) {
       dat <- ieegio::io_read_h5(elec$preprocess_file, sprintf("raw/%s", block), ram = FALSE)
     } else {
       dat <- ieegio::io_read_h5(elec$voltage_file, sprintf("raw/voltage/%s", block), ram = FALSE)
@@ -136,13 +136,13 @@ prepare_subject_with_blocks_legacy <- function(
   re$electrode_table$isLoaded <- re$electrode_table$Electrode %in% electrodes
 
   # create reference instances
-  if( raw ) {
+  if ( raw ) {
     ref_names <- "noref"
     refs <- list()
   } else {
     ref_names <- unique(re$reference_table$Reference)
     ref_names <- ref_names[!ref_names %in% c("noref", "")]
-    if(length(ref_names)) {
+    if (length(ref_names)) {
       refs <- structure(lapply(ref_names, function(ref_name) {
         new_reference(subject = subject, number = ref_name)
       }), names = ref_names)
@@ -156,12 +156,12 @@ prepare_subject_with_blocks_legacy <- function(
   # load electrode data
   electrode_instances <- structure(lapply(electrodes, function(e) {
     re <- new_electrode(subject = subject, number = e, quiet = quiet)
-    if(!raw && is.data.frame(ref_table) && nrow(ref_table)) {
+    if (!raw && is.data.frame(ref_table) && nrow(ref_table)) {
       sel <- ref_table$Electrode == e
-      if(length(sel) && any(sel)) {
+      if (length(sel) && any(sel)) {
         ref_name <- ref_table$Reference[sel][[1]]
         ref <- refs[[ref_name]]
-        if(!is.null(ref)) {
+        if (!is.null(ref)) {
           re$set_reference(reference = ref)
         }
       }
@@ -174,7 +174,7 @@ prepare_subject_with_blocks_legacy <- function(
   wavelet_params <- subject$preprocess_settings$wavelet_params
 
   # get sample rates
-  if(is.list(wavelet_params) && length(wavelet_params$downsample_to)) {
+  if (is.list(wavelet_params) && length(wavelet_params$downsample_to)) {
     wavelet_srate <- wavelet_params$downsample_to
   } else {
     wavelet_srate <- 100
@@ -194,7 +194,7 @@ prepare_subject_with_blocks_legacy <- function(
     block_data <- fastmap2()
 
     voltage_ntps <- voltage_ntimepoints[[block]]
-    if( raw ) {
+    if ( raw ) {
       voltage_filebase <- file.path(cache_root_path, block, "raw-voltage")
     } else {
       voltage_filebase <- file.path(cache_root_path, block, "voltage")
@@ -241,7 +241,7 @@ prepare_subject_with_blocks_legacy <- function(
       data = voltage_array
     )
 
-    if(time_frequency) {
+    if (time_frequency) {
       wavelet_ntps <- wavelet_ntimepoints[[block]]
       wavelet_filebase <- file.path(cache_root_path, block, "wavelet")
       wavelet_dnames <- list(
@@ -295,16 +295,16 @@ prepare_subject_with_blocks_legacy <- function(
   # load data: calculate missing electrodes from the first block
   voltage_cached <- block_data[[1]]$voltage$data$get_header("cached_electrodes", default = NULL)
   voltage_more <- electrodes[!electrodes %in% voltage_cached]
-  if(length(voltage_more)) {
+  if (length(voltage_more)) {
     voltage_more <- lapply(
       electrode_instances[sprintf("e_%d", voltage_more)],
       function(inst) {
-        if( raw ) {
+        if ( raw ) {
           s <- inst$load_blocks(blocks = blocks, type = "raw-voltage", simplify = FALSE)
         } else {
           s <- inst$load_blocks(blocks = blocks, type = "voltage", simplify = FALSE)
         }
-        for(block in blocks) {
+        for (block in blocks) {
           block_data[[block]]$voltage$data[, subject_electrodes == inst$number] <- s[[block]]
         }
         inst$number
@@ -312,20 +312,20 @@ prepare_subject_with_blocks_legacy <- function(
     )
     voltage_more <- unlist(voltage_more)
     voltage_cached <- unique(c(voltage_cached, voltage_more))
-    for(block in blocks) {
+    for (block in blocks) {
       block_data[[block]]$voltage$data$set_header("cached_electrodes", voltage_cached, save = TRUE)
     }
   }
 
-  if(time_frequency) {
+  if (time_frequency) {
     wavelet_cached <- block_data[[1]]$wavelet$data$get_header("cached_electrodes", default = NULL)
     wavelet_more <- electrodes[!electrodes %in% wavelet_cached]
-    if(length(wavelet_more)) {
+    if (length(wavelet_more)) {
       wavelet_more <- lapply_async(
         electrode_instances[sprintf("e_%d", wavelet_more)],
         function(inst) {
           s <- inst$load_blocks(blocks = blocks, type = "wavelet-coefficient", simplify = FALSE)
-          for(block in blocks) {
+          for (block in blocks) {
             block_data[[block]]$wavelet$data[, , subject_electrodes == inst$number] <- t(s[[block]])
           }
           inst$number
@@ -336,7 +336,7 @@ prepare_subject_with_blocks_legacy <- function(
       )
       wavelet_more <- unlist(wavelet_more)
       wavelet_cached <- unique(c(wavelet_cached, wavelet_more))
-      for(block in blocks) {
+      for (block in blocks) {
         block_data[[block]]$wavelet$data$set_header("cached_electrodes", wavelet_cached, save = TRUE)
       }
     }
@@ -357,7 +357,7 @@ prepare_subject_with_blocks_legacy <- function(
   )
   digest_string <- ravepipeline::digest(digest_key)
   re$signature <- structure(digest_string, contents = names(digest_key))
-  if(!length(repository_id)) {
+  if (!length(repository_id)) {
     repository_id <- ravecore:::rand_string(4)
   }
   re$repository_id <- repository_id
@@ -385,7 +385,7 @@ testthat::test_that("RAVESubjectRecordingBlockVoltageRepository", {
   )
 
   repo_new0 <- RAVESubjectRecordingBlockVoltageRepository$new(
-    subject = 'demo/DemoSubject',
+    subject = "demo/DemoSubject",
     electrodes = 13:16,
     reference_name = "default",
     blocks = c("008", "010"),
@@ -495,7 +495,7 @@ testthat::test_that("RAVESubjectRecordingBlockVoltageRepository - downsampled", 
   })
 
   repo_new0 <- RAVESubjectRecordingBlockVoltageRepository$new(
-    subject = 'demo/DemoSubject',
+    subject = "demo/DemoSubject",
     electrodes = 13:16,
     reference_name = "default",
     blocks = c("008", "010"),

@@ -39,8 +39,8 @@
 py_nipy_coreg <- function(
     ct_path, mri_path, clean_source = TRUE, inverse_target = TRUE,
     precenter_source = TRUE, smooth = 0, reg_type = c("rigid", "affine"),
-    interp = c("pv", "tri"), similarity = c('crl1', 'cc', 'cr', 'mi', 'nmi', 'slr'),
-    optimizer = c('powell', 'steepest', 'cg', 'bfgs', 'simplex'),
+    interp = c("pv", "tri"), similarity = c("crl1", "cc", "cr", "mi", "nmi", "slr"),
+    optimizer = c("powell", "steepest", "cg", "bfgs", "simplex"),
     tol = 0.0001, dry_run = FALSE) {
   # ct_path = "/Users/dipterix/Dropbox (PENN Neurotrauma)/RAVE/Samples/raw/PAV010/rave-imaging/coregistration/CT_RAW.nii"
   # mri_path = "/Users/dipterix/Dropbox (PENN Neurotrauma)/RAVE/Samples/raw/PAV010/rave-imaging/coregistration/MRI_reference.nii"
@@ -63,7 +63,7 @@ py_nipy_coreg <- function(
   template <- readLines(system.file("python-scripts/nipy-coregistration.py", package = "ravecore"))
 
   cmd <- ravepipeline::glue(paste(template, collapse = "\n"), .sep = "\n",
-                            .open = '{{', .close = '}}', .trim = FALSE, .null = "")
+                            .open = "{{", .close = "}}", .trim = FALSE, .null = "")
 
   work_dir <- dirname(ct_path)
   tmpf <- tempfile(fileext = ".py", pattern = "nipy-coregistration-", tmpdir = work_dir)
@@ -81,8 +81,8 @@ py_nipy_coreg <- function(
 cmd_run_nipy_coreg <- function(
     subject, ct_path, mri_path, clean_source = TRUE, inverse_target = TRUE,
     precenter_source = TRUE, reg_type = c("rigid", "affine"),
-    interp = c("pv", "tri"), similarity = c('crl1', 'cc', 'cr', 'mi', 'nmi', 'slr'),
-    optimizer = c('powell', 'steepest', 'cg', 'bfgs', 'simplex'),
+    interp = c("pv", "tri"), similarity = c("crl1", "cc", "cr", "mi", "nmi", "slr"),
+    optimizer = c("powell", "steepest", "cg", "bfgs", "simplex"),
     dry_run = FALSE, verbose = FALSE) {
 
   subject <- restore_subject_instance(subject, strict = FALSE)
@@ -141,10 +141,10 @@ cmd_run_nipy_coreg <- function(
     execute = execute,
     command = rscript_path()
   )
-  if( verbose ) {
+  if ( verbose ) {
     message(cmd)
   }
-  if(dry_run) {
+  if (dry_run) {
     return(invisible(re))
   }
 

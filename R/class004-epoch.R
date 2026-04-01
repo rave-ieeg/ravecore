@@ -36,7 +36,7 @@
 #'
 #' @export
 RAVEEpoch <- R6::R6Class(
-  classname = 'RAVEEpoch',
+  classname = "RAVEEpoch",
   lock_objects = FALSE,
   class = TRUE,
   portable = TRUE,
@@ -76,8 +76,8 @@ RAVEEpoch <- R6::R6Class(
         return()
       })
       cnames <- names(table)
-      cnames <- cnames[!cnames %in% c(BASIC_EPOCH_TABLE_COLUMNS, 'X')]
-      cnames <- cnames[grepl('^X\\.[0-9]+$', cnames)]
+      cnames <- cnames[!cnames %in% c(BASIC_EPOCH_TABLE_COLUMNS, "X")]
+      cnames <- cnames[grepl("^X\\.[0-9]+$", cnames)]
       epoch$.columns <- cnames
       return(epoch)
     },
@@ -101,28 +101,28 @@ RAVEEpoch <- R6::R6Class(
     #' @param subject \code{RAVESubject} instance or character
     #' @param name character, make sure \code{"epoch_<name>.csv"} is in meta
     #' folder
-    initialize = function(subject, name){
+    initialize = function(subject, name) {
 
       stopifnot2(
-        grepl('^[a-zA-Z0-9_]', name),
-        msg = 'epoch name can only contain letters[a-zA-Z] digits[0-9] and underscore[_]')
+        grepl("^[a-zA-Z0-9_]", name),
+        msg = "epoch name can only contain letters[a-zA-Z] digits[0-9] and underscore[_]")
 
       self$subject <- RAVESubject$new(subject, strict = FALSE)
       self$name <- name
 
       self$data <- fastmap2()
 
-      if(name %in% self$subject$epoch_names){
+      if (name %in% self$subject$epoch_names) {
         # load epoch
-        table <- data.table::as.data.table(self$subject$meta_data('epoch', name))
+        table <- data.table::as.data.table(self$subject$meta_data("epoch", name))
         lapply(seq_len(nrow(table)), function(ii) {
-          row <- table[ii,]
+          row <- table[ii, ]
           self$data[[as.character(row$Trial)]] <- row
           return()
         })
         cnames <- names(table)
-        cnames <- cnames[!cnames %in% c(BASIC_EPOCH_TABLE_COLUMNS, 'X')]
-        cnames <- cnames[!grepl('^X\\.[0-9]+$', cnames)]
+        cnames <- cnames[!cnames %in% c(BASIC_EPOCH_TABLE_COLUMNS, "X")]
+        cnames <- cnames[!grepl("^X\\.[0-9]+$", cnames)]
         self$.columns <- cnames
       }
       self$update_table()
@@ -132,15 +132,15 @@ RAVEEpoch <- R6::R6Class(
     #' @description get \code{ith} trial
     #' @param i trial number
     #' @param df whether to return as data frame or a list
-    trial_at = function(i, df = TRUE){
+    trial_at = function(i, df = TRUE) {
       cnames <- self$columns
-      is_event <- grepl('^Event_.+$', cnames)
+      is_event <- grepl("^Event_.+$", cnames)
 
       re <- as.list(self$data[[as.character(i)]])[cnames]
-      if(any(is_event)) {
+      if (any(is_event)) {
         re[is_event] <- as.numeric(re[is_event])
       }
-      if(df){
+      if (df) {
         re <- data.table::as.data.table(re, stringsAsFactors = FALSE)
       }
       re
@@ -148,12 +148,12 @@ RAVEEpoch <- R6::R6Class(
 
     #' @description manually update table field
     #' @returns \code{self$table}
-    update_table = function(){
+    update_table = function() {
       cnames <- self$columns
-      is_event <- grepl('^Event_.+$', cnames)
+      is_event <- grepl("^Event_.+$", cnames)
       re <- unname(self$data[as.character(self$trials)])
 
-      if(length(re)) {
+      if (length(re)) {
         re <- lapply(re, function(item) {
           item <- as.list(item)[cnames]
           item[is_event] <- as.numeric(item[is_event])
@@ -183,18 +183,18 @@ RAVEEpoch <- R6::R6Class(
     #' @param Trial positive integer, trial number
     #' @param Condition character, trial condition
     #' @param ... other key-value pairs corresponding to other optional columns
-    set_trial = function(Block, Time, Trial, Condition, ...){
+    set_trial = function(Block, Time, Trial, Condition, ...) {
       Trial <- as.integer(Trial)
       stopifnot2(isTRUE(Trial > 0), msg = "Invalid trial number, must be positive integer")
 
       stopifnot2(is.numeric(Time), msg = "Time must be numerical")
 
-      stopifnot2(Block %in% self$subject$blocks, msg = sprintf('Invalid block [%s]', Block))
+      stopifnot2(Block %in% self$subject$blocks, msg = sprintf("Invalid block [%s]", Block))
       self$data[[as.character(Trial)]] <- list(Block = Block, Time = Time, Trial = Trial, Condition = Condition, ...)
 
       dotnames <- ...names()
       more_cols <- setdiff(dotnames, self$.columns)
-      if(length(more_cols)){
+      if (length(more_cols)) {
         self$.columns <- c(self$.columns, more_cols)
       }
       self$trial_at(Trial)
@@ -215,13 +215,13 @@ RAVEEpoch <- R6::R6Class(
                                  missing = c("warning", "error", "none")) {
       missing <- match.arg(missing)
       event <- trimws(tolower(paste(event, collapse = " ")))
-      if(event %in% c("trial onset", "", "default")) {
+      if (event %in% c("trial onset", "", "default")) {
         return("Time")
       }
       cname <- sprintf(c("Event_%s", "Event%s"), event)
       cnames <- self$columns
       re <- cnames[tolower(cnames) %in% tolower(cname)]
-      if( length(re) ) {
+      if ( length(re) ) {
         return(re[[1]])
       }
       msg <- sprintf("Cannot find event `%s`. Returning default `Time`.", event)
@@ -252,13 +252,13 @@ RAVEEpoch <- R6::R6Class(
       stopifnot(length(condition_type) == 1)
       missing <- match.arg(missing)
       condition_type <- tolower(condition_type)
-      if( condition_type %in% c("", "default") ) {
+      if ( condition_type %in% c("", "default") ) {
         return("Condition")
       }
       cname <- sprintf(c("Condition_%s", "Condition%s"), condition_type)
       cnames <- self$columns
       re <- cnames[tolower(cnames) %in% tolower(cname)]
-      if( length(re) ) {
+      if ( length(re) ) {
         return(re[[1]])
       }
       msg <- sprintf("Cannot find condition type `%s`. Returning default `Condition`", condition_type)
@@ -274,17 +274,17 @@ RAVEEpoch <- R6::R6Class(
   active = list(
 
     #' @field columns columns of trial table
-    columns = function(){
+    columns = function() {
       unique(c(BASIC_EPOCH_TABLE_COLUMNS, self$.columns))
     },
 
     #' @field n_trials total number of trials
-    n_trials = function(){
+    n_trials = function() {
       length(self$data)
     },
 
     #' @field trials trial numbers
-    trials = function(){
+    trials = function() {
       sort(as.integer(names(self$data)))
     },
 
@@ -292,7 +292,7 @@ RAVEEpoch <- R6::R6Class(
     available_events = function() {
       cnames <- self$columns
       cnames <- cnames[startsWith(cnames, "Event")]
-      if(!length(cnames)) { return("") }
+      if (!length(cnames)) { return("") }
       unique(c("", gsub("^Event[_]{0,1}", "", cnames)))
     },
 
@@ -301,7 +301,7 @@ RAVEEpoch <- R6::R6Class(
     available_condition_type = function() {
       cnames <- self$columns
       cnames <- cnames[startsWith(cnames, "Condition")]
-      if(!length(cnames)) { return("") }
+      if (!length(cnames)) { return("") }
       unique(c("", gsub("^Condition[_]{0,1}", "", cnames)))
     }
   )

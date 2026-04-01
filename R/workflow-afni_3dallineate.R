@@ -38,13 +38,13 @@ cmd_run_3dAllineate <- function(
       unset = default_afni_path,
       type = "afni"
     )
-    if(length(afni) != 1 || is.na(afni) || !isTRUE(dir.exists(afni))) {
+    if (length(afni) != 1 || is.na(afni) || !isTRUE(dir.exists(afni))) {
       afni <- NULL
-    } else if(!identical(default_afni_path, afni)) {
+    } else if (!identical(default_afni_path, afni)) {
       ravepipeline::raveio_setopt("afni_path", afni)
     }
     afni
-  }, error = function(e){ NULL })
+  }, error = function(e) { NULL })
 
   has_afni <- !is.null(afni_path)
 
@@ -54,8 +54,12 @@ cmd_run_3dAllineate <- function(
   )
   log_file <- strftime(Sys.time(), "log-3dAllineate-%y%m%d-%H%M%S.log")
 
-  template <- c(readLines(system.file('shell-templates/afni-3dallineate-coregistration.sh',
-                                      package = "ravecore")), "")
+  template <- c(readLines(
+    system.file(
+      "shell-templates/afni-3dallineate-coregistration.sh",
+      package = "ravecore"
+    )
+  ), "")
   # template <- readLines('inst/shell-templates/afni-3dallineate-coregistration.sh')
   workdir <- normalizePath(
     file.path(subject$imaging_path, "coregistration"),
@@ -90,10 +94,10 @@ cmd_run_3dAllineate <- function(
     execute = execute,
     command = "bash"
   )
-  if( verbose ) {
+  if ( verbose ) {
     message(cmd)
   }
-  if(dry_run) {
+  if (dry_run) {
     return(invisible(re))
   }
 

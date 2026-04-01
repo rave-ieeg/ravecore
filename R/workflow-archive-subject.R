@@ -73,24 +73,24 @@ archive_subject <- function(
   subject_code <- subject$subject_code
   rename <- FALSE
   config <- as.list(config)
-  if(is.list(config$rename)) {
+  if (is.list(config$rename)) {
     new_project_name <- config$rename$project_name
     new_subject_code <- config$rename$subject_code
 
-    if( is.character(new_project_name) && length(new_project_name) == 1 && !is.na(new_project_name) &&
+    if ( is.character(new_project_name) && length(new_project_name) == 1 && !is.na(new_project_name) &&
         nzchar(new_project_name) && grepl("^[a-zA-Z][a-zA-Z0-9_-]{0,}$", new_project_name)) {
       project_name <- new_project_name
       rename <- TRUE
     }
 
-    if( is.character(new_subject_code) && length(new_subject_code) == 1 && !is.na(new_subject_code) &&
+    if ( is.character(new_subject_code) && length(new_subject_code) == 1 && !is.na(new_subject_code) &&
         nzchar(new_subject_code) && grepl("^[a-zA-Z][a-zA-Z0-9_-]{0,}$", new_subject_code)) {
       subject_code <- new_subject_code
       rename <- TRUE
     }
   }
 
-  if(rename) {
+  if (rename) {
     config$rename <- list(
       project_name = project_name,
       subject_code = subject_code
@@ -101,25 +101,25 @@ archive_subject <- function(
 
   # check if all raw folders should be included
   include_all_raw <- FALSE
-  if(is.list(config$orignal_signals)) {
+  if (is.list(config$orignal_signals)) {
     include_all_raw <- isTRUE(config$orignal_signals$include_all)
   }
 
   # check if cache is allowed
   include_cache <- TRUE
-  if( is.list(config$processed_data) ) {
+  if ( is.list(config$processed_data) ) {
     include_cache <- !isFALSE(config$processed_data$include_cache)
   }
 
 
-  if(length(work_path) != 1 || !is.character(work_path) || is.na(work_path) ||
+  if (length(work_path) != 1 || !is.character(work_path) || is.na(work_path) ||
      !dir.exists(work_path)) {
     root_dir <- file.path(tempdir(check = TRUE), "archive", subject$project_name, subject$subject_code, "archive")
   } else {
     root_dir <- file.path(work_path, "archive")
   }
 
-  if(file.exists(root_dir)) {
+  if (file.exists(root_dir)) {
     unlink(root_dir, recursive = TRUE, force = TRUE)
   }
   root_dir <- dir_create2(root_dir)
@@ -137,7 +137,7 @@ archive_subject <- function(
   )
 
   copy_file <- function(from, to, ...) {
-    if(file.exists(from)) {
+    if (file.exists(from)) {
       file.copy(from, dir_create2(to), overwrite = TRUE, recursive = TRUE,
                 copy.mode = FALSE, copy.date = TRUE)
       return(TRUE)
@@ -153,14 +153,14 @@ archive_subject <- function(
     type = "data_dir",
     level = "subject",
     # subject/rave/...
-    src = 'meta_data',
-    dst = '/rave'
+    src = "meta_data",
+    dst = "/rave"
   )
 
-  if("orignal_signals" %in% includes) {
+  if ("orignal_signals" %in% includes) {
 
     # find original blocks
-    if(include_all_raw) {
+    if (include_all_raw) {
       blocks <- subject$preprocess_settings$all_blocks
       blocks <- blocks[!(
         startsWith(blocks, "rave-imaging") |
@@ -180,8 +180,8 @@ archive_subject <- function(
     block_files <- subject$preprocess_settings$get_block_paths(blocks)
 
     path_orignal_signals <- dir_create2(file.path(root_dir, "orignal_signals"))
-    if(length(block_files)) {
-      for(block_file in block_files) {
+    if (length(block_files)) {
+      for (block_file in block_files) {
         # FIXME: consider BIDS
         copy_file(
           from = block_file,
@@ -199,7 +199,7 @@ archive_subject <- function(
 
   }
 
-  if("processed_data" %in% includes) {
+  if ("processed_data" %in% includes) {
 
     path_processed_data <- dir_create2(file.path(root_dir, "processed_data"))
 
@@ -216,7 +216,7 @@ archive_subject <- function(
       from = file.path(subject$rave_path, "meta"),
       to = path_processed_data
     )
-    if( include_cache ) {
+    if ( include_cache ) {
       copy_file(
         from = file.path(subject$rave_path, "data"),
         to = path_processed_data
@@ -231,7 +231,7 @@ archive_subject <- function(
         full.names = FALSE
       )
       fs <- fs[!startsWith(fs, "cache")]
-      for(f in fs) {
+      for (f in fs) {
         copy_file(
           from = file.path(subject$rave_path, "data", f),
           to = file.path(path_processed_data, "data")
@@ -247,13 +247,13 @@ archive_subject <- function(
       type = "data_dir",
       level = "subject",
       # subject/rave/...
-      src = 'processed_data',
-      dst = '/rave'
+      src = "processed_data",
+      dst = "/rave"
     )
 
   }
 
-  if("pipelines" %in% includes) {
+  if ("pipelines" %in% includes) {
     path_pipelines <- dir_create2(file.path(root_dir, "pipelines"))
 
     pipeline_folders <-
@@ -265,7 +265,7 @@ archive_subject <- function(
         include.dirs = TRUE,
         no.. = TRUE
       )
-    for(f in pipeline_folders) {
+    for (f in pipeline_folders) {
       copy_file(
         from = file.path(subject$rave_path, "pipeline", f),
         to = path_pipelines
@@ -281,7 +281,7 @@ archive_subject <- function(
         include.dirs = TRUE,
         no.. = TRUE
       )
-    for(f in pipeline_folders) {
+    for (f in pipeline_folders) {
       copy_file(
         from = file.path(subject$pipeline_path, f),
         to = path_pipelines
@@ -297,7 +297,7 @@ archive_subject <- function(
 
   }
 
-  if("rave_imaging" %in% includes) {
+  if ("rave_imaging" %in% includes) {
     # get rave-imaging folder
     path_imaging <- dir_create2(file.path(root_dir, "rave_imaging"))
     subject_imaging_path <- subject$imaging_path
@@ -306,8 +306,8 @@ archive_subject <- function(
       type = "raw_data_dir",
       level = "subject",
       # subject/rave/...
-      src = 'rave_imaging',
-      dst = '/rave-imaging'
+      src = "rave_imaging",
+      dst = "/rave-imaging"
     )
 
     # copy coregistration
@@ -351,9 +351,9 @@ archive_subject <- function(
       to = path_imaging
     )
 
-    if(!(has_fs || has_ants)) {
+    if (!(has_fs || has_ants)) {
       fs_path <- subject$freesurfer_path
-      if(length(fs_path) == 1 && !is.na(fs_path) && nzchar(fs_path) && file.exists(fs_path)) {
+      if (length(fs_path) == 1 && !is.na(fs_path) && nzchar(fs_path) && file.exists(fs_path)) {
         fs <- list.files(
           fs_path,
           all.files = FALSE,
@@ -362,7 +362,7 @@ archive_subject <- function(
           include.dirs = TRUE,
           no.. = FALSE
         )
-        for(f in fs) {
+        for (f in fs) {
           copy_file(
             from = f,
             to = file.path(path_imaging, "fs")
@@ -375,7 +375,7 @@ archive_subject <- function(
 
   }
 
-  if("notes" %in% includes) {
+  if ("notes" %in% includes) {
     path_notes <- dir_create2(file.path(root_dir, "notes"))
 
 
@@ -388,12 +388,12 @@ archive_subject <- function(
       type = "data_dir",
       level = "subject",
       # subject/rave/...
-      src = 'notes',
-      dst = '/'
+      src = "notes",
+      dst = "/"
     )
   }
 
-  if("user_generated" %in% includes) {
+  if ("user_generated" %in% includes) {
     path_user_generated <- dir_create2(file.path(root_dir, "user_generated"))
     # user_generated
 
@@ -411,8 +411,8 @@ archive_subject <- function(
       type = "data_dir",
       level = "subject",
       # subject/rave/...
-      src = 'user_generated',
-      dst = '/rave'
+      src = "user_generated",
+      dst = "/rave"
     )
   }
 
@@ -425,7 +425,7 @@ archive_subject <- function(
 
   zipfile_name <- sprintf("./%s.zip", rand_string(10))
 
-  if(length(zip_flags)) {
+  if (length(zip_flags)) {
     utils::zip(zipfile = zipfile_name, files = "./archive", flags = zip_flags)
   } else {
     utils::zip(zipfile = zipfile_name, files = "./archive")
@@ -437,8 +437,8 @@ archive_subject <- function(
   # hence no on.exit is needed, see Line 423
   setwd(current_wd)
 
-  if(!missing(path) && !is.na(path) && length(path) == 1) {
-    if(file.exists(path)) {
+  if (!missing(path) && !is.na(path) && length(path) == 1) {
+    if (file.exists(path)) {
       backup_file(path, remove = TRUE)
     }
     file_move(zipfile_name, path)
@@ -488,15 +488,15 @@ install_subject <- function(
     dry_run = FALSE, force_project = NA, force_subject = NA,
     ...) {
 
-  if(path %in% names(template_subjects)) {
+  if (path %in% names(template_subjects)) {
     item <- template_subjects[[path]]
-    if(isTRUE(item$version == 1)){
+    if (isTRUE(item$version == 1)) {
       # use rave::download_sample_data (RAVE 1.0)
       # RAVE 1.0 uses non-CRAN package
 
       # We need to check availability as users installed from CRAN directly
       # wouldn't have this package.
-      if(!package_installed("rave")) {
+      if (!package_installed("rave")) {
         stop("This subject is a RAVE 1.0 subject. Please follow https://rave.wiki to install RAVE before installing this subject.")
       }
 
@@ -511,7 +511,7 @@ install_subject <- function(
     backup <- FALSE
   }
 
-  if(startsWith(path, "http") || startsWith(path, "ftp")) {
+  if (startsWith(path, "http") || startsWith(path, "ftp")) {
     current_timeout <- getOption("timeout", 60)
     options("timeout" = 3600)
     on.exit({
@@ -519,12 +519,12 @@ install_subject <- function(
     })
 
     zipfile <- file.path(tempdir(check = TRUE), sprintf("%s.zip", ravepipeline::digest(path)))
-    if(file.exists(zipfile)) {
-      if(!use_cache) {
+    if (file.exists(zipfile)) {
+      if (!use_cache) {
         unlink(zipfile, force = TRUE)
       }
     }
-    if(!file.exists(zipfile)) {
+    if (!file.exists(zipfile)) {
       suppressWarnings({
         utils::download.file(path, destfile = zipfile, cacheOK = use_cache, ...)
       })
@@ -533,18 +533,18 @@ install_subject <- function(
 
   }
 
-  if(!dir.exists(path) && file.exists(path)) {
+  if (!dir.exists(path) && file.exists(path)) {
     # this is a zip file
     extract_path <- file.path(
       tempdir(check = TRUE),
       paste0(gsub("\\.zip", "", basename(path), ignore.case = TRUE), "_UNZIP")
     )
-    if(dir.exists(extract_path)) {
-      if(!use_cache) {
+    if (dir.exists(extract_path)) {
+      if (!use_cache) {
         unlink(extract_path, recursive = TRUE, force = TRUE)
       }
     }
-    if(!dir.exists(extract_path)) {
+    if (!dir.exists(extract_path)) {
       utils::unzip(path, overwrite = TRUE, exdir = extract_path)
       on.exit({
         unlink(extract_path, recursive = TRUE, force = TRUE)
@@ -553,18 +553,18 @@ install_subject <- function(
     path <- extract_path
   }
 
-  if(dir.exists(file.path(path, "archive"))) {
+  if (dir.exists(file.path(path, "archive"))) {
     path <- file.path(path, "archive")
   }
 
   # check if this is RAVE 2.0
-  if(!file.exists(file.path(path, "rave-archive.yaml"))) {
+  if (!file.exists(file.path(path, "rave-archive.yaml"))) {
     stop("This is not a valid RAVE 2.0 subject.")
   }
 
   meta <- load_yaml(file.path(path, "rave-archive.yaml"))
 
-  if(is.list(meta$user_config$rename)) {
+  if (is.list(meta$user_config$rename)) {
     project_name <- c(meta$user_config$rename$project_name, meta$original_project_name)[[1]]
     subject_code <- c(meta$user_config$rename$subject_code, meta$original_subject_code)[[1]]
   } else {
@@ -573,17 +573,17 @@ install_subject <- function(
   }
 
   force <- FALSE
-  if(!is.na(force_project)) {
+  if (!is.na(force_project)) {
     message("Forcing project -> ", force_project)
     project_name <- force_project
     force <- TRUE
   }
-  if(!is.na(force_subject)) {
+  if (!is.na(force_subject)) {
     message("Forcing subject -> ", force_subject)
     subject_code <- force_subject
     force <- TRUE
   }
-  if(force) {
+  if (force) {
     on.exit({
       ravepipeline::logger(
         level = "warning",
@@ -595,17 +595,17 @@ install_subject <- function(
   # check if this subject exists
   subject <- RAVESubject$new(project_name = project_name, subject_code = subject_code, strict = FALSE)
 
-  if(file.exists(subject$path) || file.exists(subject$preprocess_settings$raw_path)) {
-    if(dry_run) {
+  if (file.exists(subject$path) || file.exists(subject$preprocess_settings$raw_path)) {
+    if (dry_run) {
       ravepipeline::logger(
         level = "info",
         use_glue = TRUE,
         "[Dry-run message]: Subject [{project_name}/{subject_code}] exists. This subject will be { ifelse(backup, 'replaced', 'REMOVED') }."
       )
     } else {
-      if(!overwrite) {
+      if (!overwrite) {
         ans <- 0
-        if(ask && interactive()) {
+        if (ask && interactive()) {
           ravepipeline::logger(
             level = "info",
             use_glue = TRUE,
@@ -616,7 +616,7 @@ install_subject <- function(
             "No"
           ))
         }
-        if( !isTRUE(ans == 1) ) {
+        if ( !isTRUE(ans == 1) ) {
           ravepipeline::logger(
             level = "warning",
             use_glue = TRUE,
@@ -626,11 +626,11 @@ install_subject <- function(
         }
       }
 
-      if( backup ) {
-        if(file.exists(subject$preprocess_settings$raw_path)) {
+      if ( backup ) {
+        if (file.exists(subject$preprocess_settings$raw_path)) {
           new_path <- backup_file(subject$preprocess_settings$raw_path, remove = FALSE)
         }
-        if(file.exists(subject$path)) {
+        if (file.exists(subject$path)) {
           file_move(subject$path, file.path(dirname(subject$path), basename(new_path)))
         }
       }
@@ -646,10 +646,10 @@ install_subject <- function(
       path_rel <- ravecore$path_rel
 
       copy_file_into <- function(from, to, src_root = NA, file_type = NA, ...) {
-        if(file.exists(from)) {
+        if (file.exists(from)) {
 
-          if(dry_run) {
-            if(!is.na(src_root)) {
+          if (dry_run) {
+            if (!is.na(src_root)) {
               from <- file_path("/", path_rel(from, start = src_root))
             }
             ravepipeline::logger(
@@ -671,10 +671,10 @@ install_subject <- function(
       }
 
       copy_file_rename <- function(from, to, src_root = NA, file_type = NA, ...) {
-        if(file.exists(from)) {
+        if (file.exists(from)) {
 
-          if(dry_run) {
-            if(!is.na(src_root)) {
+          if (dry_run) {
+            if (!is.na(src_root)) {
               from <- file_path("/", path_rel(from, start = src_root))
             }
             ravepipeline::logger(
@@ -687,12 +687,12 @@ install_subject <- function(
             )
             return(TRUE)
           }
-          if(dir_exists(from)) {
+          if (dir_exists(from)) {
             # copy folders
             dir.create(to, showWarnings = FALSE, recursive = TRUE)
             fs <- list.files(from, recursive = FALSE, include.dirs = TRUE,
                              full.names = TRUE, all.files = FALSE, no.. = TRUE)
-            for(f in fs) {
+            for (f in fs) {
               file.copy(f, to = to, overwrite = TRUE, recursive = TRUE,
                         copy.mode = FALSE, copy.date = TRUE)
             }
@@ -730,15 +730,15 @@ install_subject <- function(
       )
 
       # exceptions for BIDS
-      if(subject$preprocess_settings$raw_path2_type == "bids") {
+      if (subject$preprocess_settings$raw_path2_type == "bids") {
 
         file_copied <- FALSE
-        switch (
+        switch(
           paste(item$src, collapse = ""),
           "orignal_signals" = {
 
             target_folder <- file_path(subject$preprocess_settings$raw_path2, "ieeg")
-            for(f in fs) {
+            for (f in fs) {
               try(
                 silent = TRUE, {
                   parsed <- bidsr::parse_path_bids_entity(
@@ -754,11 +754,11 @@ install_subject <- function(
             }
           }
         )
-        if( file_copied ) {
+        if ( file_copied ) {
           return()
         }
       }
-      for(f in fs) {
+      for (f in fs) {
         copy_file_into(from = f, to = dst_path, src_root = path, file_type = item$type)
       }
 
@@ -771,7 +771,7 @@ install_subject <- function(
       path = path
     ),
     callback = function(nm) {
-      if(dry_run) {
+      if (dry_run) {
         sprintf("Installing subject (dry-run) | Installing %s...", nm)
       } else {
         sprintf("Installing subject | Installing %s...", nm)
@@ -795,12 +795,12 @@ install_subject <- function(
   #     include.dirs = TRUE,
   #     no.. = TRUE
   #   )
-  #   for(f in fs) {
+  #   for (f in fs) {
   #     copy_file(f, to = dst_path)
   #   }
   # })
 
-  if(dry_run) {
+  if (dry_run) {
 
     ravepipeline::logger(
       level = "info",

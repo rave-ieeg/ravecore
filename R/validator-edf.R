@@ -2,7 +2,7 @@ validate_raw_edf <- function(subject, blocks, electrodes, check_content = TRUE, 
 
   # DIPSAUS DEBUG START
   # subject <- "demo@bids:ds005574/02"
-  # blocks = c('sub-02_task-podcast')
+  # blocks = c("sub-02_task-podcast")
   # electrodes = 1:10
   # check_content = TRUE
 
@@ -19,7 +19,7 @@ validate_raw_edf <- function(subject, blocks, electrodes, check_content = TRUE, 
   }
 
 
-  if(missing(electrodes)){
+  if (missing(electrodes)) {
     electrodes <- NULL
   } else {
     electrodes <- parse_svec(electrodes)
@@ -35,22 +35,22 @@ validate_raw_edf <- function(subject, blocks, electrodes, check_content = TRUE, 
 
   })
 
-  data_paths <- switch (
+  data_paths <- switch(
     format_standard,
-    'bids' = {
+    "bids" = {
       lapply(blocks, function(block) {
         # Parse block
         with_validation({
 
           blockfiles <- subject$preprocess_settings$get_block_paths(block)
-          if(!length(blockfiles)) {
+          if (!length(blockfiles)) {
             validation_errors$add(sprintf("No data file for BIDS entity collection/RAVE block is found: `%s`", block))
             return()
           }
 
           blockfiles <- blockfiles[endsWith(tolower(blockfiles), ".edf")]
 
-          if(!length(blockfiles)) {
+          if (!length(blockfiles)) {
             validation_errors$add(sprintf("Files with BIDS entities `%s` found, but no EDF(+) files (.edf) found.", block))
             return()
           }
@@ -70,9 +70,9 @@ validate_raw_edf <- function(subject, blocks, electrodes, check_content = TRUE, 
         with_validation({
 
           bpath <- file_path(raw_root, block)
-          files <- list.files(bpath, pattern = '\\.(edf)$', ignore.case = TRUE)
+          files <- list.files(bpath, pattern = "\\.(edf)$", ignore.case = TRUE)
 
-          if(!length(files)) {
+          if (!length(files)) {
             validation_errors$add(sprintf(
               "No EDF(+) file (.edf) in block `%s`",
               block
@@ -86,10 +86,10 @@ validate_raw_edf <- function(subject, blocks, electrodes, check_content = TRUE, 
   )
   names(data_paths) <- blocks
 
-  temporary_path <- dir_create2(file_path(subject$cache_path, 'edf'))
+  temporary_path <- dir_create2(file_path(subject$cache_path, "edf"))
 
   progress <- ravepipeline::rave_progress(
-    title = 'Validating EDF files',
+    title = "Validating EDF files",
     max = length(blocks) + 1,
     shiny_auto_close = FALSE
   )
@@ -105,10 +105,10 @@ validate_raw_edf <- function(subject, blocks, electrodes, check_content = TRUE, 
       with_validation({
 
         paths <- data_paths[[block]]
-        if(length(paths) == 0) { return(FALSE) }
+        if (length(paths) == 0) { return(FALSE) }
         info <- list(paths = paths)
         valid <- TRUE
-        if( check_content && length(electrodes) > 0 ){
+        if ( check_content && length(electrodes) > 0 ) {
 
           header_info <- ieegio::read_edf(
             paths[[1]], extract_path = temporary_path,
@@ -123,12 +123,12 @@ validate_raw_edf <- function(subject, blocks, electrodes, check_content = TRUE, 
 
           info$header <- channel_table
 
-          if( length(electrodes) > 0 ) {
+          if ( length(electrodes) > 0 ) {
             channel_exist <- electrodes %in% channel_table$Channel
 
             info$channel_exist <- channel_exist
 
-            if(!all(channel_exist)) {
+            if (!all(channel_exist)) {
               validation_errors$add(sprintf(
                 "Channel %s are missing from block %s",
                 deparse_svec(electrodes[!channel_exist]), block
@@ -143,7 +143,7 @@ validate_raw_edf <- function(subject, blocks, electrodes, check_content = TRUE, 
 
             channels <- channel_table$Channel[sel]
             dup_channels <- duplicated(channels)
-            if(any(dup_channels)) {
+            if (any(dup_channels)) {
               validation_errors$add(sprintf(
                 "Channel [%s] have duplicated entries in block `%s`. RAVE does not know which .nev/ns3/ns5 file to read the channel data",
                 deparse_svec(channels[dup_channels]), block
@@ -164,7 +164,7 @@ validate_raw_edf <- function(subject, blocks, electrodes, check_content = TRUE, 
 
   progress$inc("Collecting results...")
 
-  if(length(validation_errors)) {
+  if (length(validation_errors)) {
     return(list(
       passed = FALSE,
       errors = unlist(validation_errors$as_list())

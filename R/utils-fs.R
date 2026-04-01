@@ -2,7 +2,7 @@
 # Correct path if prefix has incorrect cases (works on case-sensitive os)
 correct_filepath <- function(path) {
   stopifnot(length(path) == 1)
-  if(file_exists(path)) { return(path) }
+  if (file_exists(path)) { return(path) }
   # path_prefix = "bidsr.rproj"
   dir <- dirname(path)
   prefix <- basename(path)
@@ -15,7 +15,7 @@ correct_filepath <- function(path) {
     no.. = TRUE
   )
   sel <- toupper(files) == toupper(prefix)
-  if(!any(sel)) { return(NA) }
+  if (!any(sel)) { return(NA) }
 
   return(files[sel][[1]])
 }
@@ -65,7 +65,7 @@ path_abs <- function(path, must_work = NA) {
   #   "././../../../../../../../..//a/.././",
   #   "C://system32"
   # )
-  if(!length(path)) { return(character(0L)) }
+  if (!length(path)) { return(character(0L)) }
   path <- path_expand(path)
 
   path <- unlist(lapply(path_split(path), function(p) {
@@ -86,8 +86,8 @@ dir_exists <- function(path) {
 
 file_delete <- function(path, use_base_r = FALSE, ...) {
   path <- path_expand(path)
-  if( use_base_r ) {
-    if( dir_exists(path) ) {
+  if ( use_base_r ) {
+    if ( dir_exists(path) ) {
       unlink(x = path, recursive = TRUE, ...)
     } else if (file_exists(path)) {
       unlink(path, recursive = FALSE, ...)
@@ -106,14 +106,14 @@ path_to_nearest_file <- function(filename, start, root = NA, ignore_cases = FALS
   # filename <- "rave"
   # start = "."
 
-  if( ignore_cases ) {
+  if ( ignore_cases ) {
     filename <- tolower(filename)
     start <- tolower(start)
   }
 
-  if(file_exists(start)) {
-    if(is_file(start)) {
-      if( basename(start) == filename ) {
+  if (file_exists(start)) {
+    if (is_file(start)) {
+      if ( basename(start) == filename ) {
         # start is a file and is the filename
         return(start)
       }
@@ -121,25 +121,25 @@ path_to_nearest_file <- function(filename, start, root = NA, ignore_cases = FALS
     }
     # now start is a folder
     tmp <- file_path(start, filename)
-    if( file_exists(tmp) ) {
+    if ( file_exists(tmp) ) {
       return(tmp)
     }
     # folder does not have this file
   }
-  if(!is_absolute_path(start)) {
+  if (!is_absolute_path(start)) {
     start <- path_abs(start)
   }
   start_ <- path_dir(start)
 
-  if(!is.na(root)) {
-    if(!is_absolute_path(root)) {
+  if (!is.na(root)) {
+    if (!is_absolute_path(root)) {
       root <- path_abs(root)
     }
-    if(!path_has_parent(start_, root)) {
+    if (!path_has_parent(start_, root)) {
       return(NA_character_)
     }
   } else {
-    if(start_ == start) {
+    if (start_ == start) {
       return(NA_character_)
     }
   }
@@ -148,15 +148,15 @@ path_to_nearest_file <- function(filename, start, root = NA, ignore_cases = FALS
 
 
 file_assert <- function(path, dir_ok = FALSE, follow = TRUE) {
-  if(length(path) != 1 || is.na(path)) {
+  if (length(path) != 1 || is.na(path)) {
     stop("File path must be length of 1 and cannot be N/A")
   }
-  if( dir_ok ) {
-    if(!file_exists(path)) {
+  if ( dir_ok ) {
+    if (!file_exists(path)) {
       stop("File or directory `", path, "` is missing.")
     }
   } else {
-    if( !is_file(path, follow = follow) ) {
+    if ( !is_file(path, follow = follow) ) {
       stop("File `", path, "` is missing.")
     }
   }
@@ -195,20 +195,20 @@ path_ext <- function(path, archive_ext = ARCHIVE_EXTENSIONS) {
   }
 
   vapply(strsplit(basename(path), ".", fixed = TRUE), function(x) {
-    if(isTRUE(is.na(x))) { return(NA_character_) }
-    if(length(x) == 1) { return("") }
-    if(x[[1]] == "") {
+    if (isTRUE(is.na(x))) { return(NA_character_) }
+    if (length(x) == 1) { return("") }
+    if (x[[1]] == "") {
       x <- x[-c(1, 2)]
     } else {
       x <- x[-1]
     }
-    if(!length(x)) { return("") }
+    if (!length(x)) { return("") }
     sel <- which(!tolower(x) %in% tolower(archive_ext))
-    if(!length(sel)) {
+    if (!length(sel)) {
       return(paste(x, collapse = "."))
     }
     sel <- max(sel)
-    if(sel == length(x)) {
+    if (sel == length(x)) {
       return(x[[sel]])
     }
     paste(x[seq.int(sel, length(x))], collapse = ".")
@@ -227,7 +227,7 @@ dir_create2 <- function(x, showWarnings = FALSE, recursive = TRUE, check = TRUE,
     dir.create(x, showWarnings = showWarnings, recursive = recursive, ...)
   }
   if (check && !dir.exists(x)) {
-    stop('Cannot create directory at ', shQuote(x))
+    stop("Cannot create directory at ", shQuote(x))
   }
   invisible(path_abs(x))
 }
@@ -252,10 +252,10 @@ dir_create2 <- function(x, showWarnings = FALSE, recursive = TRUE, check = TRUE,
 #' @export
 backup_file <- function(path, remove = FALSE, quiet = FALSE) {
 
-  if(length(path) != 1 || is.na(path)) {
+  if (length(path) != 1 || is.na(path)) {
     return(invisible(FALSE))
   }
-  if(!file.exists(path)){ return(invisible(FALSE)) }
+  if (!file.exists(path)) { return(invisible(FALSE)) }
 
   path <- normalizePath(path, mustWork = TRUE, winslash = "/")
 
@@ -267,7 +267,7 @@ backup_file <- function(path, remove = FALSE, quiet = FALSE) {
   bname <- basename(path)
   dname <- dirname(path)
 
-  if(ext == '') {
+  if (ext == "") {
     bname <- gsub("[/]+$", "", bname)
   } else {
     bname <- substr(bname, start = 1L, stop = nchar(bname) - nchar(ext) - 1)
@@ -285,16 +285,16 @@ backup_file <- function(path, remove = FALSE, quiet = FALSE) {
   if (!quiet) {
     ravepipeline::logger(
       use_glue = TRUE,
-      level = 'info',
+      level = "info",
       "{ifelse(remove, 'Moving', 'Copying')} {ifelse(is_dir, 'directory', 'file')} {basename(path)}\n  => {bname2}"
     )
   }
   path2 <- file.path(dname, bname2)
 
-  if( remove ) {
+  if ( remove ) {
     file_move(path = path, new_path = path2)
   } else {
-    if(is_dir) {
+    if (is_dir) {
       dir_create2(path2)
       file.copy(
         from = list.files(
@@ -337,13 +337,13 @@ backup_file <- function(path, remove = FALSE, quiet = FALSE) {
 #' cache_root()
 #'
 #' @export
-cache_root <- function(check = FALSE){
-  re <- ravepipeline::raveio_getopt(key = 'tensor_temp_path', default = NULL)
-  if(!length(re)){
-    re <- '~/rave_data/cache_dir/'
-    ravepipeline::raveio_setopt(key = 'tensor_temp_path', value = re)
+cache_root <- function(check = FALSE) {
+  re <- ravepipeline::raveio_getopt(key = "tensor_temp_path", default = NULL)
+  if (!length(re)) {
+    re <- "~/rave_data/cache_dir/"
+    ravepipeline::raveio_setopt(key = "tensor_temp_path", value = re)
   }
-  if(check){
+  if (check) {
     re <- dir_create2(re)
   }
   re
@@ -362,13 +362,13 @@ ravedash_session_root <- function() {
 
 #' @rdname cache_path
 #' @export
-clear_cached_files <- function(subject_code, quiet = FALSE){
+clear_cached_files <- function(subject_code, quiet = FALSE) {
 
   miss_subject <- missing(subject_code)
-  if(miss_subject) {
+  if (miss_subject) {
     clear_dir <- function(dir) {
-      if(!dir.exists(dir)) { return() }
-      if(!quiet){
+      if (!dir.exists(dir)) { return() }
+      if (!quiet) {
         ravepipeline::logger("Clearing ", dir, level = "trace")
       }
       unlink(dir, recursive = TRUE)
@@ -378,11 +378,11 @@ clear_cached_files <- function(subject_code, quiet = FALSE){
     stopifnot2(grepl("^[a-zA-Z0-9_-]{1,}$", subject_code), msg = "clear_cached_files: Invalid subject_code, only letter, digits, _, - are allowed. Subject code cannot be blank as well.")
 
     clear_dir <- function(dir) {
-      if(!dir.exists(dir)) { return() }
+      if (!dir.exists(dir)) { return() }
 
       blpath <- file.path(dir, "_baselined_arrays_")
-      if(dir.exists(blpath)) {
-        if(!quiet){ ravepipeline::logger("Clearing ", blpath, level = "info") }
+      if (dir.exists(blpath)) {
+        if (!quiet) { ravepipeline::logger("Clearing ", blpath, level = "info") }
         unlink(blpath, recursive = TRUE)
       }
 
@@ -398,14 +398,24 @@ clear_cached_files <- function(subject_code, quiet = FALSE){
       rfiles <- rdirs[dir.exists(rdirs)]
       rdirs <- rdirs[dir.exists(rdirs)]
 
-      if(length(rfiles)) {
-        if(!quiet){ ravepipeline::logger("Clearing {length(rfiles)} files with name {subject_code}",
-                          level = "trace", use_glue = TRUE) }
+      if (length(rfiles)) {
+        if (!quiet) {
+          ravepipeline::logger(
+            "Clearing {length(rfiles)} files with name {subject_code}",
+            level = "trace",
+            use_glue = TRUE
+          )
+        }
         unlink(rfiles)
       }
-      if(length(rdirs)) {
-        if(!quiet){ ravepipeline::logger("Clearing {length(rdirs)} directories with name {subject_code}",
-                          level = "trace", use_glue = TRUE) }
+      if (length(rdirs)) {
+        if (!quiet) {
+          ravepipeline::logger(
+            "Clearing {length(rdirs)} directories with name {subject_code}",
+            level = "trace",
+            use_glue = TRUE
+          )
+        }
         unlink(rdirs, recursive = TRUE)
       }
 
@@ -414,10 +424,10 @@ clear_cached_files <- function(subject_code, quiet = FALSE){
 
   }
 
-  clear_dir('~/rave_data/cache_dir/')
-  clear_dir(tools::R_user_dir('raveio', "cache"))
-  clear_dir(tools::R_user_dir('ravepipeline', "cache"))
-  clear_dir(tools::R_user_dir('ravecore', "cache"))
+  clear_dir("~/rave_data/cache_dir/")
+  clear_dir(tools::R_user_dir("raveio", "cache"))
+  clear_dir(tools::R_user_dir("ravepipeline", "cache"))
+  clear_dir(tools::R_user_dir("ravecore", "cache"))
   clear_dir(cache_root())
   clear_dir(ravedash_session_root())
 
@@ -433,11 +443,11 @@ clear_cached_files <- function(subject_code, quiet = FALSE){
   # )
   #
   # if(isTRUE(dir.exists(ravetools_path))) {
-  #   if(!quiet){ catgl("Clearing ", ravetools_path, level = "DEFAULT") }
+  #   if (!quiet) { catgl("Clearing ", ravetools_path, level = "DEFAULT") }
   #   unlink(ravetools_path, recursive = TRUE)
   # }
 
-  if(!quiet){
+  if (!quiet) {
     ravepipeline::logger("Done", level = "trace")
   }
 }

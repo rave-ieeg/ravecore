@@ -35,13 +35,13 @@ cmd_execute <- function(script, script_path, command = "bash", dry_run = FALSE, 
   writeLines(script, con = script_path)
 
   # Back up the script
-  if(backup) {
+  if (backup) {
     backup_dir <- file.path(dirname(script_path), "backups")
     backup_path <- backup_file(script_path, remove = FALSE, quiet = TRUE)
-    if(!isFALSE(backup_path) && isTRUE(file.exists(backup_path))) {
+    if (!isFALSE(backup_path) && isTRUE(file.exists(backup_path))) {
       backup_dir <- dir_create2(backup_dir)
       to_path <- file.path(backup_dir, basename(backup_path))
-      if(file.exists(to_path)) {
+      if (file.exists(to_path)) {
         unlink(backup_path)
       } else {
         file_move(backup_path, to_path)
@@ -51,12 +51,12 @@ cmd_execute <- function(script, script_path, command = "bash", dry_run = FALSE, 
 
   script_path <- normalizePath(script_path)
 
-  if( dry_run ) {
+  if ( dry_run ) {
     args <- paste(args, collapse = " ")
-    if(nzchar(args)) {
+    if (nzchar(args)) {
       args <- sprintf("%s ", args)
     }
-    if( .Platform$OS.type == "windows" ) {
+    if ( .Platform$OS.type == "windows" ) {
       command <- gsub("/", "\\", command)
     }
     cmd <- sprintf("%s %s%s", shQuote(command), args, shQuote(script_path))
@@ -73,12 +73,15 @@ cmd_execute <- function(script, script_path, command = "bash", dry_run = FALSE, 
 
 
 validate_nii <- function(path) {
-  if(missing(path) || length(path) != 1 || is.na(path) || !file.exists(path) ||
-     dir.exists(path)) {
+  if (missing(path) ||
+        length(path) != 1 ||
+        is.na(path) ||
+        !file.exists(path) ||
+        dir.exists(path)) {
     stop("`validate_nii`: `path` is not a valid file path.")
   }
   path <- normalizePath(path, winslash = "/")
-  if(!grepl("\\.nii($|\\.gz$)", path, ignore.case = TRUE)) {
+  if (!grepl("\\.nii($|\\.gz$)", path, ignore.case = TRUE)) {
     stop("`validate_nii`: `path` is not a valid NifTi file (.nii or .nii.gz)")
   }
   path
@@ -95,7 +98,7 @@ cmd_run_r <- function(
     ...) {
 
   force(dry_run)
-  if(!quoted) {
+  if (!quoted) {
     expr <- substitute(expr)
   }
 
@@ -134,10 +137,10 @@ cmd_run_r <- function(
     execute = execute,
     command = rscript_path()
   )
-  if( verbose ) {
+  if ( verbose ) {
     message(cmd)
   }
-  if(dry_run) {
+  if (dry_run) {
     return(invisible(re))
   }
 

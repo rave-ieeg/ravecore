@@ -1,8 +1,8 @@
 snapshot_table <- function(x, target_path, digit_cnames = NULL, digits = 2, caption = NULL, title = "Table") {
   # cache_table <- function(x, subject, name, digit_cnames = NULL, digits = 2) {
 
-  if(!is.data.frame(x) || !nrow(x)) {
-    if(file.exists(target_path)) {
+  if (!is.data.frame(x) || !nrow(x)) {
+    if (file.exists(target_path)) {
       unlink(target_path)
     }
     return(invisible(0L))
@@ -15,7 +15,7 @@ snapshot_table <- function(x, target_path, digit_cnames = NULL, digits = 2, capt
   digit_cnames <- digit_cnames[digit_cnames %in% table_names]
 
   # if DT installed
-  if(package_installed("DT")) {
+  if (package_installed("DT")) {
     DT <- asNamespace("DT")
     htmlwidgets <- asNamespace("htmlwidgets")
     htmltools <- asNamespace("htmltools")
@@ -34,7 +34,7 @@ snapshot_table <- function(x, target_path, digit_cnames = NULL, digits = 2, capt
         paging = TRUE
       )
     )
-    if(length(digit_cnames)) {
+    if (length(digit_cnames)) {
       widget <- DT$formatRound(widget, digits = digits, columns = digit_cnames)
     }
     css <- "
@@ -96,7 +96,7 @@ NULL
 snapshot_subject <- function(x, target_path = NULL, quick = FALSE) {
   subject <- restore_subject_instance(x)
 
-  if(length(target_path) != 1) {
+  if (length(target_path) != 1) {
     target_path <- file_path(subject$project$group_path("project_overview"), "snapshot", subject$subject_code)
   }
 
@@ -104,7 +104,7 @@ snapshot_subject <- function(x, target_path = NULL, quick = FALSE) {
 
   # brain object
   brain <- rave_brain(subject)
-  if(length(brain)) {
+  if (length(brain)) {
     brain$set_electrode_values()
     widget <- brain$plot(controllers = list("Display Data" = "LabelPrefix"))
     threeBrain::save_brain(widget, file.path(target_abspath, "viewer.html"))
@@ -175,7 +175,7 @@ snapshot_subject <- function(x, target_path = NULL, quick = FALSE) {
   )
 
   # validation
-  if(quick) {
+  if (quick) {
     validation_method <- "basic"
   } else {
     validation_method <- "normal"
@@ -208,7 +208,7 @@ snapshot_project <- function(x, target_path = NULL, template_subjects = NULL, qu
   # target_path = tempfile()
 
   project <- ravecore::as_rave_project(x)
-  if(length(target_path) != 1) {
+  if (length(target_path) != 1) {
     target_path <- file_path(project$group_path("project_overview"), "snapshot")
   }
 
@@ -219,7 +219,7 @@ snapshot_project <- function(x, target_path = NULL, template_subjects = NULL, qu
   subject_codes <- project$subjects()
 
   # Prepare for the template subject
-  if(!length(template_subjects)) {
+  if (!length(template_subjects)) {
     template_subjects <- ravepipeline::raveio_getopt("threeBrain_template_subject",
                                                      default = "N27")
   }
@@ -241,7 +241,7 @@ snapshot_project <- function(x, target_path = NULL, template_subjects = NULL, qu
                                            subject_code = subject_code,
                                            strict = FALSE)
       target_path_subject <- ravecore$file_path(target_path, subject$subject_code)
-      if(!quick || !file_exists(file_path(target_path_subject, "snapshot.rds"))) {
+      if (!quick || !file_exists(file_path(target_path_subject, "snapshot.rds"))) {
         snapshot <- ravecore$snapshot_subject(subject, target_path = target_path_subject, quick = quick)
       }
 

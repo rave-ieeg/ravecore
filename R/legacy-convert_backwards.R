@@ -14,7 +14,7 @@ rave_legacy_subject_format_conversion <- function(
 
   subject <- restore_subject_instance(subject, strict = FALSE)
 
-  if(!all(subject$electrode_types %in% "LFP")) {
+  if (!all(subject$electrode_types %in% "LFP")) {
     warning("RAVE 1.0 only support analyzing signals with time-frequency decomposition. Electrodes with non-LFP signals will be ignored.")
   }
 
@@ -30,17 +30,17 @@ rave_legacy_subject_format_conversion <- function(
   validation <- validate_subject(subject = subject, verbose = verbose, version = 2, method = "normal")
 
   # check the following validation results
-  if(!all(sapply(validation$preprocess[c(
+  if (!all(sapply(validation$preprocess[c(
     "electrodes_set", "data_imported", "notch_filtered",
     "has_wavelet", "blocks_set", "sample_rate_set")], function(x) {
       isTRUE(x$valid)
     }))) {
     stop("Please finish the following preprocess pipelines before converting: data import, Notch filter, Wavelet")
   }
-  if(!isTRUE(validation$voltage_data$voltage_data$valid)) {
+  if (!isTRUE(validation$voltage_data$voltage_data$valid)) {
     stop(sprintf("Subject [%s] fails the validation: voltage data are invalid", subject$subject_id))
   }
-  if(!isTRUE(validation$power_phase_data$power_phase$valid)) {
+  if (!isTRUE(validation$power_phase_data$power_phase$valid)) {
     stop(sprintf("Subject [%s] fails the validation: power/phase data are invalid", subject$subject_id))
   }
 
@@ -73,7 +73,7 @@ rave_legacy_subject_format_conversion <- function(
     h5path <- file.path(power_path, sprintf("%s.h5", e))
     ieegio::io_write_h5("invalid", file = h5path, name = "reference", ctype = "character", quiet = TRUE)
     # if(etype %in% c("LFP")) {
-    #   for(block in blocks) {
+    #   for (block in blocks) {
     #     s <- load_h5(h5path, name = sprintf("/raw/power/%s", block), ram = TRUE)
     #     save_h5(s, file = h5path, name = sprintf("/ref/power/%s", block), chunk = c(nrow(s), 1024), quiet = TRUE)
     #   }
@@ -83,13 +83,13 @@ rave_legacy_subject_format_conversion <- function(
     h5path <- file.path(phase_path, sprintf("%s.h5", e))
     ieegio::io_write_h5("invalid", file = h5path, name = "reference", ctype = "character", quiet = TRUE)
     # if(etype %in% c("LFP")) {
-    #   for(block in blocks) {
+    #   for (block in blocks) {
     #     s <- load_h5(h5path, name = sprintf("/raw/phase/%s", block), ram = TRUE)
     #     save_h5(s, file = h5path, name = sprintf("/ref/phase/%s", block), chunk = c(nrow(s), 1024), quiet = TRUE)
     #   }
     # }
 
-    if(etype %in% c("LFP")) {
+    if (etype %in% c("LFP")) {
       return(re)
     } else {
       return()
@@ -111,7 +111,7 @@ rave_legacy_subject_format_conversion <- function(
   block_lengths <- block_lengths[[1]]
   volt_srate <- subject$raw_sample_rates[electrode_types %in% "LFP"][[1]]
   wave_srate <- subject$power_sample_rate
-  tp_tbl <- do.call("rbind", lapply(blocks, function(block){
+  tp_tbl <- do.call("rbind", lapply(blocks, function(block) {
     l <- block_lengths[[block]]
     l <- floor((l - 1) / volt_srate * wave_srate) + 1
     data.frame(
@@ -128,7 +128,7 @@ rave_legacy_subject_format_conversion <- function(
   utils::write.csv(data.frame(
     Electrode = electrodes,
     Reference = "invalid"
-  ), file = file.path(cache_path, 'cached_reference.csv'))
+  ), file = file.path(cache_path, "cached_reference.csv"))
 
   # 3. add keywords to rave.yaml
   progress$inc("Registering preprocessing information")

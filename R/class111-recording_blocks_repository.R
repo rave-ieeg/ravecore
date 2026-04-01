@@ -1,5 +1,5 @@
 restore_block_container_from_snapshot <- function(container, snapshot) {
-  if(is.null(snapshot)) { return(invisible()) }
+  if (is.null(snapshot)) { return(invisible()) }
   tryCatch({
 
     block_names <- names(snapshot)
@@ -55,7 +55,7 @@ RAVESubjectRecordingBlockRepository <- R6::R6Class(
       object <- super$`@marshal`()
       object$r6_generator <- "RAVESubjectRecordingBlockRepository"
       object$data$blocks <- private$.blocks
-      if(length(private$.data)) {
+      if (length(private$.data)) {
         block_names <- names(private$.data)
         container_snapshot <- structure(
           names = block_names,
@@ -125,9 +125,9 @@ RAVESubjectRecordingBlockRepository <- R6::R6Class(
 
       subject <- as_rave_subject(subject, strict = strict)
 
-      if(is.null(blocks)) { blocks <- subject$blocks }
+      if (is.null(blocks)) { blocks <- subject$blocks }
       blocks <- blocks[blocks %in% subject$blocks]
-      if(!length(blocks)) {
+      if (!length(blocks)) {
         stop("No block is chosen. Please load one or more blocks: ", paste(sQuote(subject$blocks), collapse = ", "))
       }
 
@@ -140,7 +140,7 @@ RAVESubjectRecordingBlockRepository <- R6::R6Class(
 
       private$.blocks <- blocks
 
-      if(!lazy_load) {
+      if (!lazy_load) {
         self$mount_data(force = FALSE)
       }
     },
@@ -168,11 +168,11 @@ RAVESubjectRecordingBlockRepository <- R6::R6Class(
       # save data
       data_type <- private$.data_type
 
-      if(length(data_type)) {
+      if (length(data_type)) {
         electrode_list <- self$electrode_list
         data_path <- file_path(block_root, data_type)
 
-        if(verbose) {
+        if (verbose) {
           callback <- function(block) {
             sprintf("Exporting %s with blocks|Block %s", data_type, block)
           }
@@ -233,7 +233,7 @@ RAVESubjectRecordingBlockRepository <- R6::R6Class(
         )
 
         summary[[data_type]] <- list(
-          path = sprintf('with_blocks/%s', data_type)
+          path = sprintf("with_blocks/%s", data_type)
         )
         summary$contains[["RAVE Repository Types"]] <- c(summary$contains[["RAVE Repository Types"]], data_type)
       }
@@ -248,7 +248,7 @@ RAVESubjectRecordingBlockRepository <- R6::R6Class(
     #' @returns A named map, typically with data arrays, shape/dimension
     #' information
     get_container = function(force = FALSE, ...) {
-      if(private$.data$`@size`() == 0) {
+      if (private$.data$`@size`() == 0) {
         self$mount_data(force = force, ...)
       }
       private$.data
@@ -268,7 +268,7 @@ RAVESubjectRecordingBlockRepository <- R6::R6Class(
     #' reloaded from the disk and reference table needs to be updated, use
     #' \code{repo$needs_update <- TRUE}
     needs_update = function(v) {
-      if(!missing(v) && v) {
+      if (!missing(v) && v) {
         private$update_subject()
         self$mount_data(force = FALSE)
       }

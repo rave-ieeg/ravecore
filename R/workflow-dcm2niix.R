@@ -21,16 +21,16 @@
 #   crop <- match.arg(crop)
 #
 #   dst_path <- dirname(prefix)
-#   if(!overwrite && dir.exists(dst_path) &&
+#   if (!overwrite && dir.exists(dst_path) &&
 #      length(list.files(dst_path, pattern = "\\.nii($|\\.gz$)", ignore.case = TRUE))) {
 #     stop("`ravecore::dcm2niix`: destination folder already exists. Please specify `overwrite=TRUE` to remove the previous results.")
 #   }
-#   if(missing(src_path) || length(src_path) != 1 || is.na(src_path) || !file.exists(src_path)) {
+#   if (missing(src_path) || length(src_path) != 1 || is.na(src_path) || !file.exists(src_path)) {
 #     stop("`ravecore::dcm2niix`: Blank or invalid `src_path` specified.")
 #   }
 #
 #   # Check if source file is a nifti file
-#   if( grepl("\\.(nii|nii\\.gz)$", src_path, ignore.case = TRUE) ) {
+#   if ( grepl("\\.(nii|nii\\.gz)$", src_path, ignore.case = TRUE) ) {
 #     # nii file, do not use dcm2niix!
 #
 #     cat(file = log_path, "Copying ", src_path, " to ", dst_path, "\n")
@@ -56,7 +56,7 @@
 #     unset = default_dcm2niix_path,
 #     type = "dcm2niix"
 #   )
-#   if(length(dcm2niix) != 1 || is.na(dcm2niix) || !isTRUE(file.exists(dcm2niix))) {
+#   if (length(dcm2niix) != 1 || is.na(dcm2niix) || !isTRUE(file.exists(dcm2niix))) {
 #     dcm2niix <- NULL
 #   } else if (!identical(default_dcm2niix_path, dcm2niix)) {
 #     ravepipeline::raveio_setopt("dcm2niix_path", dcm2niix)
@@ -64,12 +64,12 @@
 #   has_dcm2niix <- !is.null(dcm2niix)
 #
 #   # Generate script
-#   if(!has_dcm2niix) {
+#   if (!has_dcm2niix) {
 #     dcm2niix <- "dcm2niix"
 #   }
 #
 #   merge <- c("-m n ", "-m y ", "")[[which(c("No", "Yes", "Auto") == merge)]]
-#   float <- c('-p y ', '-p n ')[[which(c("Yes", "No") == float)]]
+#   float <- c("-p y ", "-p n ")[[which(c("Yes", "No") == float)]]
 #   crop <- c("-x n", "-x y", "-x i")[[which(c("No", "Yes", "Ignore") == crop)]]
 #
 #   dir_create2(dst_path)
@@ -151,15 +151,15 @@ cmd_run_dcm2niix <- function(subject, src_path, type = c("MRI", "CT"),
     mustWork = FALSE, winslash = "/"
   )
 
-  if(!overwrite && dir.exists(dest_path) &&
+  if (!overwrite && dir.exists(dest_path) &&
      length(list.files(dest_path, pattern = "\\.nii($|\\.gz$)", ignore.case = TRUE))) {
     stop("`cmd_run_dcm2niix`: destination folder already exists. Please specify `overwrite=TRUE` to remove the previous results.")
   }
-  if(missing(src_path) || length(src_path) != 1 || is.na(src_path) || !file.exists(src_path)) {
+  if (missing(src_path) || length(src_path) != 1 || is.na(src_path) || !file.exists(src_path)) {
     stop("`cmd_run_dcm2niix`: Blank or invalid `src_path` specified.")
   } else {
     src_path <- normalizePath(src_path, mustWork = TRUE, winslash = "/")
-    if(startsWith(src_path, dest_path)) {
+    if (startsWith(src_path, dest_path)) {
       # no need to import
       stop(sprintf("`cmd_run_dcm2niix`: `src_path` cannot be from within the following subject path [raw]/rave-imageing/inputs/%s", type))
     }
@@ -177,7 +177,7 @@ cmd_run_dcm2niix <- function(subject, src_path, type = c("MRI", "CT"),
   log_file <- strftime(Sys.time(), "log-dcm2niix-%y%m%d-%H%M%S.log")
 
   # Check if source file is a nifti file
-  if( grepl("\\.(nii|nii\\.gz)$", src_path, ignore.case = TRUE) ) {
+  if ( grepl("\\.(nii|nii\\.gz)$", src_path, ignore.case = TRUE) ) {
     # nii file, do not use dcm2niix!
 
     script_path <- normalizePath(
@@ -241,7 +241,7 @@ re <- list(
       unset = default_dcm2niix_path,
       type = "dcm2niix"
     )
-    if(length(dcm2niix) != 1 || is.na(dcm2niix) || !isTRUE(file.exists(dcm2niix))) {
+    if (length(dcm2niix) != 1 || is.na(dcm2niix) || !isTRUE(file.exists(dcm2niix))) {
       dcm2niix <- NULL
     } else if (!identical(default_dcm2niix_path, dcm2niix)) {
       ravepipeline::raveio_setopt("dcm2niix_path", dcm2niix)
@@ -249,18 +249,18 @@ re <- list(
     has_dcm2niix <- !is.null(dcm2niix)
 
     # Generate script
-    if(!has_dcm2niix) {
+    if (!has_dcm2niix) {
       dcm2niix <- "dcm2niix"
     }
 
     merge <- c("-m n ", "-m y ", "")[[which(c("No", "Yes", "Auto") == merge)]]
-    float <- c('-p y ', '-p n ')[[which(c("Yes", "No") == float)]]
+    float <- c("-p y ", "-p n ")[[which(c("Yes", "No") == float)]]
     crop <- c("-x n", "-x y", "-x i")[[which(c("No", "Yes", "Ignore") == crop)]]
 
     args <- paste0(merge, float, crop)
 
     template <- c(
-      readLines(system.file('shell-templates/dcm2niix-mri-ct.sh', package = "ravecore")),
+      readLines(system.file("shell-templates/dcm2niix-mri-ct.sh", package = "ravecore")),
       ""
     )
 
@@ -284,7 +284,7 @@ re <- list(
       script = cmd,
       script_path = script_path,
       dry_run = dry_run,
-      dcm2niix = if(has_dcm2niix) { dcm2niix } else { NULL },
+      dcm2niix = if (has_dcm2niix) { dcm2niix } else { NULL },
       log_file = file.path(log_path, log_file, fsep = "/"),
       src_path = src_path,
       dest_path = dest_path,
@@ -296,20 +296,20 @@ re <- list(
 execute <- function(..., args = NULL, stdout = "", stderr = "",
                     command = re$command) {
   initialize_imaging_paths(subject)
-  if(!identical(stdout, "") || !identical(stderr, "")) {
+  if (!identical(stdout, "") || !identical(stderr, "")) {
     dir_create2(log_path)
   }
-  if( grepl("rscript", command, ignore.case = TRUE) ) {
+  if ( grepl("rscript", command, ignore.case = TRUE) ) {
     args <- c("--no-save", "--no-restore", args)
   }
   cmd_execute(script = cmd, script_path = script_path, command = command, args = args, stdout = stdout, stderr = stderr, ...)
 }
 re$execute <- execute
 
-if( verbose ) {
+if ( verbose ) {
   message(cmd)
 }
-if(dry_run) {
+if (dry_run) {
   return(invisible(re))
 }
 

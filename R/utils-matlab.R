@@ -1,17 +1,17 @@
-read_mat <- function(file, ram = TRUE, engine = c("r", "py")){
+read_mat <- function(file, ram = TRUE, engine = c("r", "py")) {
   engine <- match.arg(engine)
   file <- normalizePath(file, mustWork = TRUE, winslash = "/")
   # Check if the file is HDF5 format
 
-  if(engine == "r") {
-    if( ieegio::io_h5_valid(file) ){
+  if (engine == "r") {
+    if ( ieegio::io_h5_valid(file) ) {
 
       dset_names <- ieegio::io_h5_names(file)
-      re <- sapply(dset_names, function(nm){
+      re <- sapply(dset_names, function(nm) {
         y <- load_h5(file, name = nm, ram = ram)
         y
       }, simplify = FALSE, USE.NAMES = TRUE)
-    }else{
+    } else {
       # re <- R.matlab::readMat(file)
       re <- ieegio::io_read_mat(con = file, method = "R.matlab")
     }
@@ -37,7 +37,7 @@ read_mat <- function(file, ram = TRUE, engine = c("r", "py")){
       mat73$loadmat(filename = file)
     })
     re <- fastmap2()
-    for(nm in names(dat)) {
+    for (nm in names(dat)) {
       re[[nm]] <- rpymat::py_to_r(dat[[nm]])
     }
   }
@@ -45,24 +45,24 @@ read_mat <- function(file, ram = TRUE, engine = c("r", "py")){
   re
 }
 
-read_mat2 <- function(file, ram = TRUE, engine = c("r", "py")){
+read_mat2 <- function(file, ram = TRUE, engine = c("r", "py")) {
   engine <- match.arg(engine)
   file <- normalizePath(file, mustWork = TRUE, winslash = "/")
   # Check if the file is HDF5 format
 
-  if(engine == "r") {
-    if( ieegio::io_h5_valid(file) ){
+  if (engine == "r") {
+    if ( ieegio::io_h5_valid(file) ) {
 
       dset_names <- ieegio::io_h5_names(file)
       re <- fastmap2()
-      lapply(dset_names, function(nm){
+      lapply(dset_names, function(nm) {
         y <- load_h5(file, name = nm, ram = ram)
         nm_path <- strsplit(nm, "/")[[1]]
         d <- re
-        for(ii in seq_along(nm_path)){
+        for (ii in seq_along(nm_path)) {
           nm <- nm_path[[ii]]
-          if(ii != length(nm_path)){
-            if(!inherits(d[[nm]], 'fastmap2')){
+          if (ii != length(nm_path)) {
+            if (!inherits(d[[nm]], "fastmap2")) {
               d[[nm]] <- fastmap2()
             }
             d <- d[[nm]]
@@ -72,7 +72,7 @@ read_mat2 <- function(file, ram = TRUE, engine = c("r", "py")){
         }
         NULL
       })
-    } else{
+    } else {
       re <- list_to_fastmap2(
         ieegio::io_read_mat(con = file, method = "R.matlab")
       )
@@ -102,12 +102,12 @@ read_mat2 <- function(file, ram = TRUE, engine = c("r", "py")){
     re <- fastmap2()
 
     iterate <- function(x, prefix = "") {
-      if(!inherits(x, "python.builtin.dict")) {
+      if (!inherits(x, "python.builtin.dict")) {
         re[[ gsub("^/", "", prefix) ]] <- rpymat::py_to_r(x)
         return()
       }
       nms <- names(x)
-      for(nm in nms) {
+      for (nm in nms) {
         Recall(x[[nm]], prefix = sprintf("%s/%s", prefix, nm))
       }
     }
@@ -116,7 +116,7 @@ read_mat2 <- function(file, ram = TRUE, engine = c("r", "py")){
   re
 }
 
-load_h5 <- function(file, name, read_only = TRUE, ram = FALSE, quiet = FALSE){
+load_h5 <- function(file, name, read_only = TRUE, ram = FALSE, quiet = FALSE) {
   return(ieegio::io_read_h5(
     file = file,
     name = name,

@@ -26,36 +26,36 @@
 #' y$delete(force = TRUE)
 #'
 #' @export
-collapse2 <- function(x, keep, method = c("mean", "sum"), ...){
+collapse2 <- function(x, keep, method = c("mean", "sum"), ...) {
   UseMethod("collapse2")
 }
 
 #' @rdname collapse2
 #' @export
-collapse2.FileArray <- function(x, keep, method = c("mean", "sum"), ...){
+collapse2.FileArray <- function(x, keep, method = c("mean", "sum"), ...) {
   method <- match.arg(method)
   dm <- dim(x)
   ndims <- length(dm)
   stopifnot(all(keep %in% seq_len(ndims)))
-  if(setequal(keep, seq_len(ndims))){
-    return(aperm(x[drop=FALSE], keep))
+  if (setequal(keep, seq_len(ndims))) {
+    return(aperm(x[drop = FALSE], keep))
   }
   pdim <- dm
   pdim[[ndims]] <- 1
   is_mean <- method == "mean"
 
-  if(ndims %in% keep){
+  if (ndims %in% keep) {
     pdim <- pdim[-ndims]
     lidx <- which(keep == ndims)[[1]]
     keep_alt <- keep[-lidx]
-    re <- filearray::fmap2(list(x), fun = function(v, ...){
+    re <- filearray::fmap2(list(x), fun = function(v, ...) {
       v <- array(v[[1]], dim = pdim)
       ravetools::collapse(v, keep_alt, average = is_mean)
     }, .input_size = prod(pdim), .buffer_count = dm[[ndims]], .simplify = TRUE)
     redim <- dim(re)
     rendim <- length(redim)
-    if(rendim > 1 && rendim != lidx){
-      if(lidx == 1){
+    if (rendim > 1 && rendim != lidx) {
+      if (lidx == 1) {
         od <- c(rendim, seq_along(keep_alt))
       } else {
         od <- seq_along(keep_alt)
@@ -64,7 +64,7 @@ collapse2.FileArray <- function(x, keep, method = c("mean", "sum"), ...){
       re <- aperm(re, od)
     }
   } else {
-    re <- filearray::fmap2(list(x), fun = function(v, ...){
+    re <- filearray::fmap2(list(x), fun = function(v, ...) {
       v <- array(v[[1]], dim = pdim)
       ravetools::collapse(v, keep, average = is_mean)
     }, .input_size = prod(pdim), .buffer_count = dm[[ndims]], .simplify = TRUE)
@@ -72,12 +72,12 @@ collapse2.FileArray <- function(x, keep, method = c("mean", "sum"), ...){
   }
 
   dnames <- dimnames(x)
-  if(length(keep) > 1){
+  if (length(keep) > 1) {
     dim(re) <- dm[keep]
-    if(length(dnames) == ndims){
+    if (length(dnames) == ndims) {
       dimnames(re) <- dnames[keep]
     }
-  } else if(length(dnames) == ndims){
+  } else if (length(dnames) == ndims) {
     names(re) <- dnames[[keep]]
   }
 
@@ -94,19 +94,19 @@ collapse2.RAVEFileArray <- function(x, keep, method = c("mean", "sum"), ...) {
 
 #' @rdname collapse2
 #' @export
-collapse2.Tensor <- function(x, keep, method = c("mean", "sum"), ...){
+collapse2.Tensor <- function(x, keep, method = c("mean", "sum"), ...) {
   method <- match.arg(method)
   x$collapse(keep = keep, method = method)
 }
 
 #' @rdname collapse2
 #' @export
-collapse2.array <- function(x, keep, method = c("mean", "sum"), ...){
+collapse2.array <- function(x, keep, method = c("mean", "sum"), ...) {
   method <- match.arg(method)
   ndims <- length(dim(x))
   keep <- as.integer(keep)
   stopifnot(all(keep %in% seq_len(ndims)))
-  if(setequal(keep, seq_len(ndims))){
+  if (setequal(keep, seq_len(ndims))) {
     return(aperm(x, keep))
   }
   ravetools::collapse(x, keep, average = method == "mean")
@@ -172,13 +172,13 @@ collapse2.array <- function(x, keep, method = c("mean", "sum"), ...){
 #'
 #'
 #' @export
-collapse_power <- function(x, analysis_index_cubes){
+collapse_power <- function(x, analysis_index_cubes) {
   UseMethod("collapse_power")
 }
 
 #' @rdname collapse_power
 #' @export
-collapse_power.array <- function(x, analysis_index_cubes){
+collapse_power.array <- function(x, analysis_index_cubes) {
 
   dm <- dim(x)
   ndims <- length(dm)
@@ -186,7 +186,7 @@ collapse_power.array <- function(x, analysis_index_cubes){
   nelec <- dm[[ndims]]
   group_names <- names(analysis_index_cubes)
 
-  analysis_index_cubes <- lapply(analysis_index_cubes, function(cube){
+  analysis_index_cubes <- lapply(analysis_index_cubes, function(cube) {
     cube$Frequency %?<-% seq_len(dm[[1]])
     cube$Time %?<-% seq_len(dm[[2]])
     cube$Trial %?<-% seq_len(dm[[3]])
@@ -194,7 +194,7 @@ collapse_power.array <- function(x, analysis_index_cubes){
     cube
   })
 
-  lapply(analysis_index_cubes, function(cube){
+  lapply(analysis_index_cubes, function(cube) {
     re <- fastmap2()
     cube_data <- x[cube$Frequency, cube$Time, cube$Trial, cube$Electrode, drop = FALSE]
     # freq_time_elec <- ravetools::collapse(cube_data, keep = c(1, 2), average = TRUE)
@@ -221,7 +221,7 @@ collapse_power.array <- function(x, analysis_index_cubes){
 
 #' @rdname collapse_power
 #' @export
-collapse_power.FileArray <- function(x, analysis_index_cubes){
+collapse_power.FileArray <- function(x, analysis_index_cubes) {
 
   dm <- dim(x)
   ndims <- length(dm)
@@ -229,7 +229,7 @@ collapse_power.FileArray <- function(x, analysis_index_cubes){
   nelec <- dm[[ndims]]
   group_names <- names(analysis_index_cubes)
 
-  analysis_index_cubes <- lapply(analysis_index_cubes, function(cube){
+  analysis_index_cubes <- lapply(analysis_index_cubes, function(cube) {
     cube$Frequency %?<-% seq_len(dm[[1]])
     cube$Time %?<-% seq_len(dm[[2]])
     cube$Trial %?<-% seq_len(dm[[3]])
@@ -243,14 +243,14 @@ collapse_power.FileArray <- function(x, analysis_index_cubes){
 
   # freq_time_trial <- array(0, pdim)
 
-  fun <- function(e){
+  fun <- function(e) {
     v <- array(x[, , , e, drop = FALSE], pdim)
     # freq_time_trial <<- freq_time_trial + v
     re <- list()
-    for(ii in seq_along(analysis_index_cubes)){
+    for (ii in seq_along(analysis_index_cubes)) {
       cube <- analysis_index_cubes[[ii]]
 
-      if(e %in% cube$Electrode){
+      if (e %in% cube$Electrode) {
         # print(cube)
         # print(dim(v))
         cube_data <- v[cube$Frequency, cube$Time, cube$Trial, drop = FALSE]
@@ -277,22 +277,22 @@ collapse_power.FileArray <- function(x, analysis_index_cubes){
 
   # initial_names <- rownames(initial_collapse)
   #
-  # initial_collapse <- structure(lapply(seq_along(initial_names), function(ii){
+  # initial_collapse <- structure(lapply(seq_along(initial_names), function(ii) {
   #   simplify2array(initial_collapse[ii,], higher = TRUE)
   # }), names = initial_names)
 
   structure(
-    lapply(seq_along(analysis_index_cubes), function(ii){
+    lapply(seq_along(analysis_index_cubes), function(ii) {
       cube <- analysis_index_cubes[[ii]]
       re <- fastmap2()
       re$name <- group_names[[ii]]
       re$cube_index <- cube
 
-      for(nm in c("freq_time_elec", "time_trial_elec", "freq_trial_elec",
+      for (nm in c("freq_time_elec", "time_trial_elec", "freq_trial_elec",
                   "freq_elec", "time_elec", "trial_elec")) {
         re[[nm]] <- simplify2array(
           drop_nulls(
-            lapply(initial_collapse, '[[',
+            lapply(initial_collapse, "[[",
                    sprintf("%s_%s", nm, ii))
           ),
           higher = TRUE
@@ -319,9 +319,9 @@ collapse_power.FileArray <- function(x, analysis_index_cubes){
 }
 
 #' @export
-print.power_collapse_list <- function(x, ...){
+print.power_collapse_list <- function(x, ...) {
   name <- x$name
-  if(!length(name)){ name <- "(unnamed)" }
+  if (!length(name)) { name <- "(unnamed)" }
   cat("Collapse list of <", name, ">\n", sep = "")
   NextMethod("print")
 }

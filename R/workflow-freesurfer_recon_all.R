@@ -65,19 +65,19 @@ cmd_run_freesurfer_recon_all <- function(
     "-autorecon2-cp", "-autorecon2-wm", "-autorecon2-pial"
   )
   args <- all_args[all_args %in% args]
-  if('-all' %in% args) {
-    args <- '-all'
-  } else if(!length(args)) {
+  if ("-all" %in% args) {
+    args <- "-all"
+  } else if (!length(args)) {
     stop("`cmd_run_freesurfer_recon_all`: recon-all flag is invalid")
   }
 
-  if(missing(mri_path) || length(mri_path) != 1 || is.na(mri_path) || !file.exists(mri_path) ||
+  if (missing(mri_path) || length(mri_path) != 1 || is.na(mri_path) || !file.exists(mri_path) ||
      dir.exists(mri_path)) {
     stop("`cmd_run_freesurfer_recon_all`: `mri_path` is not a valid path.")
   }
   mri_path <- normalizePath(mri_path, winslash = "/", mustWork = TRUE)
 
-  if(!grepl("\\.nii($|\\.gz$)", mri_path, ignore.case = TRUE)) {
+  if (!grepl("\\.nii($|\\.gz$)", mri_path, ignore.case = TRUE)) {
     stop("`cmd_run_freesurfer_recon_all`: `mri_path` is not a valid NifTi file.")
   }
 
@@ -91,16 +91,16 @@ cmd_run_freesurfer_recon_all <- function(
       unset = default_fs_path,
       type = "freesurfer"
     )
-    if(length(freesurfer) != 1 || is.na(freesurfer) || !isTRUE(dir.exists(freesurfer))) {
+    if (length(freesurfer) != 1 || is.na(freesurfer) || !isTRUE(dir.exists(freesurfer))) {
       freesurfer <- NULL
-    } else if(!identical(default_fs_path, freesurfer)) {
+    } else if (!identical(default_fs_path, freesurfer)) {
       ravepipeline::raveio_setopt("freesurfer_path", freesurfer)
     }
     freesurfer
-  }, error = function(e){ NULL })
+  }, error = function(e) { NULL })
 
   has_freesurfer <- !is.null(freesurfer_home)
-  if(has_freesurfer) {
+  if (has_freesurfer) {
     freesurfer_home <- normalizePath(freesurfer_home, winslash = "/")
   }
   cmd_recon <- "recon-all"
@@ -112,7 +112,7 @@ cmd_run_freesurfer_recon_all <- function(
   log_file <- strftime(Sys.time(), "log-recon-all-%y%m%d-%H%M%S.log")
 
   # Always use a temporary working path since the target directory might contain spaces
-  if(length(work_path) != 1 || is.na(work_path) || !dir.exists(work_path)) {
+  if (length(work_path) != 1 || is.na(work_path) || !dir.exists(work_path)) {
     work_path_symlink <- file.path(
       tools::R_user_dir("ravecore", which = "cache"),
       "FreeSurfer",
@@ -125,7 +125,7 @@ cmd_run_freesurfer_recon_all <- function(
 
   work_path_actual <- path_abs(subject$preprocess_settings$raw_path, must_work = FALSE)
 
-  template <- c(readLines(system.file('shell-templates/recon-all-t1.sh', package = "ravecore")), "")
+  template <- c(readLines(system.file("shell-templates/recon-all-t1.sh", package = "ravecore")), "")
   cmd <- ravepipeline::glue(paste(template, collapse = "\n"), .sep = "\n", .open = "{{", .close = "}}", .trim = FALSE)
 
   script_path <- normalizePath(
@@ -147,10 +147,10 @@ cmd_run_freesurfer_recon_all <- function(
     execute = execute,
     command = "bash"
   )
-  if( verbose ) {
+  if ( verbose ) {
     message(cmd)
   }
-  if(dry_run) {
+  if (dry_run) {
     return(invisible(re))
   }
 
@@ -172,13 +172,13 @@ cmd_run_freesurfer_recon_all_clinical <- function(
 
   ncores <- ravepipeline::raveio_getopt("max_worker", default = 1L)
 
-  if(missing(mri_path) || length(mri_path) != 1 || is.na(mri_path) || !file.exists(mri_path) ||
+  if (missing(mri_path) || length(mri_path) != 1 || is.na(mri_path) || !file.exists(mri_path) ||
      dir.exists(mri_path)) {
     stop("`cmd_run_freesurfer_recon_all_clinical`: `mri_path` is not a valid path.")
   }
   mri_path <- normalizePath(mri_path, winslash = "/")
 
-  if(!grepl("\\.nii($|\\.gz$)", mri_path, ignore.case = TRUE)) {
+  if (!grepl("\\.nii($|\\.gz$)", mri_path, ignore.case = TRUE)) {
     stop("`cmd_run_freesurfer_recon_all_clinical`: `mri_path` is not a valid `NIfTI` file.")
   }
 
@@ -191,16 +191,16 @@ cmd_run_freesurfer_recon_all_clinical <- function(
       unset = default_fs_path,
       type = "freesurfer"
     )
-    if(length(freesurfer) != 1 || is.na(freesurfer) || !isTRUE(dir.exists(freesurfer))) {
+    if (length(freesurfer) != 1 || is.na(freesurfer) || !isTRUE(dir.exists(freesurfer))) {
       freesurfer <- NULL
-    } else if(!identical(default_fs_path, freesurfer)) {
+    } else if (!identical(default_fs_path, freesurfer)) {
       ravepipeline::raveio_setopt("freesurfer_path", freesurfer)
     }
     freesurfer
-  }, error = function(e){ NULL })
+  }, error = function(e) { NULL })
 
   has_freesurfer <- !is.null(freesurfer_home)
-  if(has_freesurfer) {
+  if (has_freesurfer) {
     freesurfer_home <- normalizePath(freesurfer_home, winslash = "/")
   }
   cmd_recon <- "recon-all-clinical.sh"
@@ -212,7 +212,7 @@ cmd_run_freesurfer_recon_all_clinical <- function(
   log_file <- strftime(Sys.time(), "log-recon-all-clinical-%y%m%d-%H%M%S.log")
 
   # Always use a temporary working path since the target directory might contain spaces
-  if(length(work_path) != 1 || is.na(work_path) || !dir.exists(work_path)) {
+  if (length(work_path) != 1 || is.na(work_path) || !dir.exists(work_path)) {
     work_path_symlink <- file.path(
       tools::R_user_dir("ravecore", which = "cache"),
       "FreeSurfer", subject$subject_code, fsep = "/")
@@ -222,7 +222,7 @@ cmd_run_freesurfer_recon_all_clinical <- function(
 
   work_path_actual <- subject$preprocess_settings$raw_path
 
-  template <- c(readLines(system.file('shell-templates/recon-all-clinical.sh', package = "ravecore")), "")
+  template <- c(readLines(system.file("shell-templates/recon-all-clinical.sh", package = "ravecore")), "")
   cmd <- ravepipeline::glue(paste(template, collapse = "\n"), .sep = "\n", .open = "{{", .close = "}}", .trim = FALSE)
 
   script_path <- normalizePath(
@@ -244,10 +244,10 @@ cmd_run_freesurfer_recon_all_clinical <- function(
     execute = execute,
     command = "bash"
   )
-  if( verbose ) {
+  if ( verbose ) {
     message(cmd)
   }
-  if(dry_run) {
+  if (dry_run) {
     return(invisible(re))
   }
 

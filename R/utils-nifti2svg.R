@@ -9,19 +9,19 @@ base64_plot_slice <- function(
   which <- match.arg(which)
 
   underlay <- ieegio::as_ieegio_volume(x)
-  if(is.null(underlay_range)) {
+  if (is.null(underlay_range)) {
     underlay_range <- range(underlay[], na.rm = TRUE)
   }
 
-  if(!is.null(overlay)) {
+  if (!is.null(overlay)) {
     overlay <- ieegio::as_ieegio_volume(overlay)
 
-    if(is.null(overlay_range)) {
+    if (is.null(overlay_range)) {
       overlay_range <- range(overlay[], na.rm = TRUE)
     }
   }
 
-  which_axis <- switch (
+  which_axis <- switch(
     which,
     "axial" = "S",
     "coronal" = "A",
@@ -53,7 +53,7 @@ base64_plot_slice <- function(
   )
 
   overlay_base64 <- NULL
-  if(!is.null(overlay)) {
+  if (!is.null(overlay)) {
     overlay_base64 <- ravepipeline::base64_plot(
       width = 512, height = 512,
       {
@@ -190,7 +190,7 @@ plot_volume_slices <- function(
   which <- match.arg(which)
   ndepths <- length(depths)
   nc <- as.integer(nc)
-  if(is.na(nc)) {
+  if (is.na(nc)) {
     mfr <- grDevices::n2mfrow(ndepths)
     nr <- mfr[[1]]
     nc <- mfr[[2]]
@@ -199,12 +199,12 @@ plot_volume_slices <- function(
   }
 
   x <- ieegio::as_ieegio_volume(x)
-  if(is.null(underlay_range)) {
+  if (is.null(underlay_range)) {
     underlay_range <- range(x[], na.rm = TRUE)
   }
-  if(!is.null(overlay)) {
+  if (!is.null(overlay)) {
     overlay <- ieegio::as_ieegio_volume(overlay)
-    if(is.null(overlay_range)) {
+    if (is.null(overlay_range)) {
       overlay_range <- range(overlay[], na.rm = TRUE)
     }
   }
@@ -224,11 +224,11 @@ plot_volume_slices <- function(
   call <- as.call(plot_args)
 
   interleave <- isTRUE(as.logical(interleave))
-  if(is.na(overlay_alpha)) {
+  if (is.na(overlay_alpha)) {
     overlay_alpha <- ifelse(interleave, 1, 0.5)
   }
 
-  interleave_transition_str <- switch (
+  interleave_transition_str <- switch(
     interleave_transition,
     "linear" = "0;1;0",
     {
@@ -251,16 +251,16 @@ plot_volume_slices <- function(
           svg_x = (col - 1) * image_size, svg_y = (row - 1) * image_size
         ),
         local({
-          if(length(base64_images$overlay_base64)) {
+          if (length(base64_images$overlay_base64)) {
             format(
               base64_images$overlay_base64, type = "html_svg",
               opacity = overlay_alpha, width = image_size, height = image_size,
               svg_x = (col - 1) * image_size, svg_y = (row - 1) * image_size,
-              if(interleave) {
+              if (interleave) {
                 htmltools::tags$animate(
                   attributeName = "opacity",
                   # ease-on-out
-                  values=interleave_transition_str,
+                  values = interleave_transition_str,
                   dur = sprintf("%.2fs", interleave_period),
                   repeatCount = "indefinite"
                 )
@@ -281,10 +281,14 @@ plot_volume_slices <- function(
     # height = sprintf("%.0f", image_size * nr),
     width = "100%",
     viewBox = sprintf("0 0 %.0f, %.0f", image_size * nc, image_size * nr),
-    preserveAspectRatio="xMidYMid meet",
-    xmlns="http://www.w3.org/2000/svg",
-    `xmlns:xlink`="http://www.w3.org/1999/xlink",
-    htmltools::tags$rect(width="100%", height="100%", fill="black"),
+    preserveAspectRatio = "xMidYMid meet",
+    xmlns = "http://www.w3.org/2000/svg",
+    `xmlns:xlink` = "http://www.w3.org/1999/xlink",
+    htmltools::tags$rect(
+      width = "100%",
+      height = "100%",
+      fill = "black"
+    ),
     htmltools::tagList(svg_content)
   )
   structure(

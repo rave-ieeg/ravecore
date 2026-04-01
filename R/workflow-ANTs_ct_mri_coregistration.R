@@ -33,26 +33,26 @@
 ants_coreg <- function(
     ct_path, mri_path, coreg_path = NULL,
     reg_type = c("DenseRigid", "Rigid", "SyN", "Affine", "TRSAA", "SyNCC", "SyNOnly"),
-    aff_metric = c('mattes', 'meansquares', 'GC'),
-    syn_metric = c('mattes', 'meansquares', 'demons', 'CC'),
+    aff_metric = c("mattes", "meansquares", "GC"),
+    syn_metric = c("mattes", "meansquares", "demons", "CC"),
     verbose = TRUE, ...) {
 
-  if( length(reg_type) > 1 ) {
+  if ( length(reg_type) > 1 ) {
     reg_type <- match.arg(reg_type)
   }
   aff_metric <- match.arg(aff_metric)
   syn_metric <- match.arg(syn_metric)
 
   # DIPSAUS DEBUG START
-  # ct_path <- '~/Dropbox (PennNeurosurgery)/RAVE/Samples/raw/PAV010/rave-imaging/coregistration_[backup_20230219_185631]/CT_RAW.nii'
-  # mri_path <- '~/Dropbox (PennNeurosurgery)/RAVE/Samples/raw/PAV010/rave-imaging/coregistration_[backup_20230303_164930]/MRI_reference.nii.gz'
+  # ct_path <- "~/Dropbox (PennNeurosurgery)/RAVE/Samples/raw/PAV010/rave-imaging/coregistration_[backup_20230219_185631]/CT_RAW.nii"
+  # mri_path <- "~/Dropbox (PennNeurosurgery)/RAVE/Samples/raw/PAV010/rave-imaging/coregistration_[backup_20230303_164930]/MRI_reference.nii.gz"
   # aff_metric <- "mattes"
   # syn_metric <- "mattes"
   # verbose <- TRUE
-  # reg_type <- 'DenseRigid'
-  # coreg_path <- '~/Dropbox (PennNeurosurgery)/RAVE/Samples/raw/PAV010/rave-imaging/coregistration/'
+  # reg_type <- "DenseRigid"
+  # coreg_path <- "~/Dropbox (PennNeurosurgery)/RAVE/Samples/raw/PAV010/rave-imaging/coregistration/"
 
-  if(length(coreg_path) != 1) {
+  if (length(coreg_path) != 1) {
     coreg_path <- dirname(ct_path)
   }
 
@@ -60,7 +60,7 @@ ants_coreg <- function(
   ct_img <- rpyANTs::as_ANTsImage(ct_path)
   mri_img <- rpyANTs::as_ANTsImage(mri_path)
 
-  if(file.exists(coreg_path)) {
+  if (file.exists(coreg_path)) {
     backup_file(coreg_path, remove = TRUE, quiet = TRUE)
   }
   dir_create2(coreg_path)
@@ -74,7 +74,7 @@ ants_coreg <- function(
     t(rpyANTs::py_to_r(ct_img$direction)) *
       as.double(rpyANTs::py_to_r(ct_img$spacing))
   )
-  ct_ijk_to_lps <- rbind(cbind(ct_ijk_to_lps, as.double(rpyANTs::py_to_r(ct_img$origin))), c(0,0,0,1))
+  ct_ijk_to_lps <- rbind(cbind(ct_ijk_to_lps, as.double(rpyANTs::py_to_r(ct_img$origin))), c(0, 0, 0, 1))
 
   transform <- rpyANTs::ants_registration(
     fixed = mri_img,
@@ -105,9 +105,9 @@ ants_coreg <- function(
   )
   results$linear <- FALSE
 
-  if( grepl("(rigid|affine)", reg_type, ignore.case = TRUE) ) {
-    for(f in forward) {
-      if(endsWith(f, "mat")) {
+  if ( grepl("(rigid|affine)", reg_type, ignore.case = TRUE) ) {
+    for (f in forward) {
+      if (endsWith(f, "mat")) {
         lps_to_lps <- rpyANTs::as_ANTsTransform(file.path(coreg_path, f))
         ct_ijk_to_mri_lps <- solve(as.matrix(lps_to_lps)) %*% ct_ijk_to_lps
         ct_ijk_to_mri_ras <- diag(c(-1, -1, 1, 1)) %*% ct_ijk_to_mri_lps
@@ -133,8 +133,8 @@ ants_coreg <- function(
 cmd_run_ants_coreg <- function(
     subject, ct_path, mri_path,
     reg_type = c("DenseRigid", "Rigid", "SyN", "Affine", "TRSAA", "SyNCC", "SyNOnly"),
-    aff_metric = c('mattes', 'meansquares', 'GC'),
-    syn_metric = c('mattes', 'meansquares', 'demons', 'CC'),
+    aff_metric = c("mattes", "meansquares", "GC"),
+    syn_metric = c("mattes", "meansquares", "demons", "CC"),
     verbose = TRUE, dry_run = FALSE) {
 
   # DIPSAUS DEBUG START
@@ -145,9 +145,9 @@ cmd_run_ants_coreg <- function(
   # verbose <- TRUE
   # subject <- "devel/PAV006"
   # dry_run <- FALSE
-  # aff_metric <- syn_metric <- 'mattes'
+  # aff_metric <- syn_metric <- "mattes"
 
-  if( length(reg_type) > 1 ) {
+  if ( length(reg_type) > 1 ) {
     reg_type <- match.arg(reg_type)
   }
   aff_metric <- match.arg(aff_metric)
@@ -196,10 +196,10 @@ cmd_run_ants_coreg <- function(
     execute = execute,
     command = rscript_path()
   )
-  if( verbose ) {
+  if ( verbose ) {
     message(cmd)
   }
-  if(dry_run) {
+  if (dry_run) {
     return(invisible(re))
   }
 

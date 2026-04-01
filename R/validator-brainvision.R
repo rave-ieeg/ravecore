@@ -13,7 +13,7 @@ validate_raw_brainvision <- function(subject, blocks, electrodes, check_content 
   }
 
 
-  if(missing(electrodes)){
+  if (missing(electrodes)) {
     electrodes <- NULL
   } else {
     electrodes <- parse_svec(electrodes)
@@ -29,9 +29,9 @@ validate_raw_brainvision <- function(subject, blocks, electrodes, check_content 
 
   })
 
-  data_paths <- switch (
+  data_paths <- switch(
     format_standard,
-    'bids' = {
+    "bids" = {
       lapply(blocks, function(block) {
         # Parse block
         with_validation({
@@ -47,7 +47,7 @@ validate_raw_brainvision <- function(subject, blocks, electrodes, check_content 
             )
           )
           sel <- block_names_from_bids_entities(query_results$parsed) %in% block
-          if(!any(sel)) {
+          if (!any(sel)) {
             validation_errors$add(sprintf("No data file for BIDS entity collection/RAVE block is found: `%s`", block))
             return()
           }
@@ -55,7 +55,7 @@ validate_raw_brainvision <- function(subject, blocks, electrodes, check_content 
 
           is_brainvision <- tolower(query_results$extension) %in% c("dat", "eeg", "vhdr", "vmrk")
 
-          if(!any(is_brainvision)) {
+          if (!any(is_brainvision)) {
             validation_errors$add(sprintf("Files with BIDS entities `%s` found, but no BrainVision files (.dat, .eeg, .vhdr, .vmrk) found.", block))
             return()
           }
@@ -80,18 +80,18 @@ validate_raw_brainvision <- function(subject, blocks, electrodes, check_content 
         with_validation({
 
           bpath <- file_path(raw_root, block)
-          files <- list.files(bpath, pattern = '\\.(vhdr)$', ignore.case = TRUE)
+          files <- list.files(bpath, pattern = "\\.(vhdr)$", ignore.case = TRUE)
 
-          if(!length(files)) {
+          if (!length(files)) {
             validation_errors$add(sprintf(
               "No BrainVision file (.vhdr) in block `%s`",
               block
             ))
             return()
           }
-          if(length(files) > 1) {
+          if (length(files) > 1) {
             validation_errors$add(sprintf(
-              'Found more than one BrainVision (.vhdr) file in the block `%s`. Please reduce to one file per block folder',
+              "Found more than one BrainVision (.vhdr) file in the block `%s`. Please reduce to one file per block folder",
               block
             ))
             return()
@@ -113,24 +113,24 @@ validate_raw_brainvision <- function(subject, blocks, electrodes, check_content 
       with_validation({
 
         paths <- data_paths[[block]]
-        if(length(paths) == 0) { return(FALSE) }
+        if (length(paths) == 0) { return(FALSE) }
         info <- list(paths = paths)
         valid <- TRUE
         path <- paths[[1]]
-        if( check_content || length(electrodes) > 0 ){
+        if ( check_content || length(electrodes) > 0 ) {
 
           header_info <- ieegio::read_brainvis(file = path, extract_path = nullfile(), header_only = TRUE, verbose = TRUE)
           header_info$ChannelInfos
 
           info$header <- header_info
 
-          if( length(electrodes) > 0 ) {
+          if ( length(electrodes) > 0 ) {
             n_channels <- header_info$CommonInfos$NumberOfChannels
             channel_exist <- electrodes %in% seq_len(n_channels)
 
             info$channel_exist <- channel_exist
 
-            if(!all(channel_exist)) {
+            if (!all(channel_exist)) {
               validation_errors$add(sprintf(
                 "Channel %s are missing from block %s",
                 deparse_svec(electrodes[!channel_exist]), block
@@ -151,7 +151,7 @@ validate_raw_brainvision <- function(subject, blocks, electrodes, check_content 
     })
   )
 
-  if(length(validation_errors)) {
+  if (length(validation_errors)) {
     return(list(
       passed = FALSE,
       errors = unlist(validation_errors$as_list())

@@ -77,12 +77,12 @@ validate_result_new <- function(
   valid <- as.logical(valid)
   stopifnot(length(valid) == 1)
 
-  if(inherits(message, "condition")) {
+  if (inherits(message, "condition")) {
     message <- message$message
   }
 
-  if(isFALSE(valid)) {
-    if(!length(message)) {
+  if (isFALSE(valid)) {
+    if (!length(message)) {
       message <- sprintf("`%s` is invalid", name)
     }
 
@@ -98,8 +98,8 @@ validate_result_new <- function(
       ),
       class = c("RAVEValidationError", "RAVEValidation", "error", "condition")
     )
-  } else if(is.na(valid)) {
-    if(!length(message)) {
+  } else if (is.na(valid)) {
+    if (!length(message)) {
       message <- sprintf("`%s` is skipped", name)
     }
     re <- structure(
@@ -128,7 +128,7 @@ validate_result_new <- function(
       class = c("RAVEValidationSuccess", "RAVEValidation", "condition")
     )
   }
-  if(.verbose) {
+  if (.verbose) {
     print(re)
   }
   return(re)
@@ -138,7 +138,7 @@ validate_from_expression <- function(
     name, expr, env = parent.frame(), quoted = FALSE,
     description = name, ..., .verbose = FALSE) {
 
-  if(!quoted) {
+  if (!quoted) {
     expr <- substitute(expr)
   }
   valid <- FALSE
@@ -151,7 +151,7 @@ validate_from_expression <- function(
     e
   })
 
-  if(valid) {
+  if (valid) {
     message <- NULL
   } else {
     message <- value
@@ -166,7 +166,7 @@ validate_from_expression <- function(
 #' @export
 print.RAVEValidation <- function(x, use_logger = TRUE, ...) {
   valid <- x$valid
-  if(isTRUE(valid)) {
+  if (isTRUE(valid)) {
     valid <- "yes"
   } else if (is.na(valid)) {
     valid <- "N/A (skipped)"
@@ -177,12 +177,12 @@ print.RAVEValidation <- function(x, use_logger = TRUE, ...) {
   msg <- sprintf("%s... valid: %s%s", x$description, valid, ifelse(
     isTRUE(x$valid), "", sprintf("\n  reason: %s", x$message)
   ))
-  if(use_logger) {
-    if(isTRUE(x$valid)) {
+  if (use_logger) {
+    if (isTRUE(x$valid)) {
       level <- "trace"
     } else if (is.na(x$valid)) {
       level <- "info"
-    } else if(identical(x$severity, "minor")) {
+    } else if (identical(x$severity, "minor")) {
       level <- "warning"
     } else {
       level <- "error"
@@ -203,11 +203,11 @@ validate_subject_paths <- function(subject, verbose = TRUE, other_checks = NULL)
                   "data_path", "preprocess_path", "freesurfer_path", "meta_path",
                   "rave_path", "path")
 
-  low_priority <- c('freesurfer_path', 'note_path', 'cache_path', 'pipeline_path')
+  low_priority <- c("freesurfer_path", "note_path", "cache_path", "pipeline_path")
 
   check_path <- function(path, descr, path_name) {
     severity <- ifelse(path_name %in% low_priority, "minor", "major")
-    if(length(path) != 1 || is.na(path) || path %in% c(".", "/", "") ||
+    if (length(path) != 1 || is.na(path) || path %in% c(".", "/", "") ||
        !dir.exists(path)) {
       re <- validate_result_new(
         name = path_name,
@@ -252,7 +252,7 @@ validate_subject_paths <- function(subject, verbose = TRUE, other_checks = NULL)
   )
 
   path_valid <- list_to_fastmap2(path_valid)
-  if(inherits(other_checks, "fastmap2")) {
+  if (inherits(other_checks, "fastmap2")) {
     other_checks$paths <- path_valid
   }
 
@@ -266,12 +266,12 @@ validate_subject_preprocess <- function(subject, verbose = TRUE, other_checks = 
 
   re <- fastmap2()
 
-  if(inherits(other_checks, "fastmap2")) {
+  if (inherits(other_checks, "fastmap2")) {
     other_checks$preprocess <- re
   }
 
 
-  if(!isTRUE(preproc$valid())) {
+  if (!isTRUE(preproc$valid())) {
     re$preprocess_validity <-
       validate_result_new(
         name = "preprocess_validity",
@@ -286,7 +286,7 @@ validate_subject_preprocess <- function(subject, verbose = TRUE, other_checks = 
   # Whether electrode channels are set
   has_electrode <- TRUE
   electrodes <- preproc$electrodes
-  if(!length(electrodes)) {
+  if (!length(electrodes)) {
     re$electrodes_set <- validate_result_new(
       name = "electrodes_set",
       valid = FALSE,
@@ -308,7 +308,7 @@ validate_subject_preprocess <- function(subject, verbose = TRUE, other_checks = 
   }
 
   # subject blocks
-  if(!length(preproc$blocks)) {
+  if (!length(preproc$blocks)) {
     re$blocks_set <- validate_result_new(
       name = "blocks_set",
       valid = FALSE,
@@ -330,7 +330,7 @@ validate_subject_preprocess <- function(subject, verbose = TRUE, other_checks = 
 
   # sample rates
   srates <- preproc$sample_rates
-  if(!isTRUE(all(srates > 1))) {
+  if (!isTRUE(all(srates > 1))) {
     invalids <- preproc$electrodes[!(srates > 1)]
     re$sample_rate_set <- validate_result_new(
       name = "sample_rate_set",
@@ -352,12 +352,12 @@ validate_subject_preprocess <- function(subject, verbose = TRUE, other_checks = 
     )
   }
 
-  if(!has_electrode) {
+  if (!has_electrode) {
     return(invisible(re))
   }
 
   # Whether data has been imported yet
-  if(!all(preproc$data_imported)) {
+  if (!all(preproc$data_imported)) {
     invalids <- electrodes[!preproc$data_imported]
     re$data_imported <- validate_result_new(
       name = "data_imported",
@@ -382,7 +382,7 @@ validate_subject_preprocess <- function(subject, verbose = TRUE, other_checks = 
   notch_sel <- preproc$electrode_types %in% c("LFP", "EKG")
   notch_electrodes <- electrodes[notch_sel]
   notch_filtered <- preproc$notch_filtered[notch_sel]
-  if(!length(notch_electrodes)) {
+  if (!length(notch_electrodes)) {
     re$notch_filtered <- validate_result_new(
       name = "notch_filtered",
       valid = NA,
@@ -392,7 +392,7 @@ validate_subject_preprocess <- function(subject, verbose = TRUE, other_checks = 
       message = "no LFP, EKG channels found",
       .verbose = verbose
     )
-  } else if(!all(notch_filtered)) {
+  } else if (!all(notch_filtered)) {
     invalids <- electrodes[!notch_filtered]
     re$notch_filtered <- validate_result_new(
       name = "notch_filtered",
@@ -421,7 +421,7 @@ validate_subject_preprocess <- function(subject, verbose = TRUE, other_checks = 
   wavelet_sel <- preproc$electrode_types %in% c("LFP")
   wavelet_electrodes <- electrodes[wavelet_sel]
   has_wavelet <- preproc$has_wavelet[wavelet_sel]
-  if(!length(wavelet_electrodes)) {
+  if (!length(wavelet_electrodes)) {
     re$has_wavelet <- validate_result_new(
       name = "has_wavelet",
       valid = NA,
@@ -430,7 +430,7 @@ validate_subject_preprocess <- function(subject, verbose = TRUE, other_checks = 
       message = "no LFP channels found",
       .verbose = verbose
     )
-  } else if(!all(has_wavelet)) {
+  } else if (!all(has_wavelet)) {
     invalids <- wavelet_electrodes[!has_wavelet]
     re$has_wavelet <- validate_result_new(
       name = "has_wavelet",
@@ -453,7 +453,7 @@ validate_subject_preprocess <- function(subject, verbose = TRUE, other_checks = 
   }
 
   # Check if epoch files exist
-  if(length(subject$epoch_names)) {
+  if (length(subject$epoch_names)) {
     re$has_epoch <- validate_result_new(
       name = "file existence: epoch_xxx.csv",
       valid = TRUE,
@@ -474,7 +474,7 @@ validate_subject_preprocess <- function(subject, verbose = TRUE, other_checks = 
   }
 
   # Check if reference files exist
-  if(length(subject$reference_names)) {
+  if (length(subject$reference_names)) {
     re$has_reference <- validate_result_new(
       name = "file existence: reference_xxx.csv",
       valid = TRUE,
@@ -496,7 +496,7 @@ validate_subject_preprocess <- function(subject, verbose = TRUE, other_checks = 
 
   # check if electrodes.csv exists
   electrode_file <- file.path(subject$meta_path, "electrodes.csv")
-  if(file.exists(electrode_file)) {
+  if (file.exists(electrode_file)) {
     re$has_electrode_file <- validate_result_new(
       name = "file existence: electrodes.csv",
       valid = TRUE,
@@ -525,15 +525,15 @@ validate_subject_meta <- function(subject, verbose = TRUE, other_checks = NULL) 
   re <- fastmap2()
   valid_preproc <- NULL
 
-  if(inherits(other_checks, "fastmap2")) {
+  if (inherits(other_checks, "fastmap2")) {
     other_checks$meta <- re
     valid_preproc <- other_checks$preprocess
   }
-  if(is.null(valid_preproc)) {
+  if (is.null(valid_preproc)) {
     valid_preproc <- validate_subject_preprocess(subject, verbose = FALSE, other_checks = other_checks)
   }
 
-  if(!isTRUE(valid_preproc$electrodes_set$valid)) {
+  if (!isTRUE(valid_preproc$electrodes_set$valid)) {
     # no electrode
     re$meta_data_valid <- validate_result_new(
       name = "meta_data_valid",
@@ -549,7 +549,7 @@ validate_subject_meta <- function(subject, verbose = TRUE, other_checks = NULL) 
   electrodes <- valid_preproc$electrodes_set$value
 
   # electrodes.csv
-  if(isTRUE(valid_preproc$has_electrode_file$valid)) {
+  if (isTRUE(valid_preproc$has_electrode_file$valid)) {
 
     re$meta_electrode_table <- validate_from_expression(
       name = "electrodes.csv",
@@ -564,22 +564,22 @@ validate_subject_meta <- function(subject, verbose = TRUE, other_checks = NULL) 
         cols <- c("Electrode", "Coord_x", "Coord_y", "Coord_z", "Label")
         cols <- cols[!cols %in% names(tbl)]
 
-        if(length(cols)) {
+        if (length(cols)) {
           stop("electrodes.csv is mising the following column(s): ",
                paste(cols, collapse = ", "))
         }
 
         miss_e <- electrodes[!electrodes %in% tbl$Electrode]
-        if(length(miss_e)) {
+        if (length(miss_e)) {
           stop("The following electrodes are missing from the electrode table (column: Electrode): ", deparse_svec(miss_e))
         }
         tbl$Electrode <- as.integer(tbl$Electrode)
 
-        if(any(is.na(tbl$Electrode))) {
+        if (any(is.na(tbl$Electrode))) {
           stop("electrode channel number must be an integer")
         }
 
-        if(any(duplicated(tbl$Electrode))) {
+        if (any(duplicated(tbl$Electrode))) {
           stop("duplicated electrode number is detected")
         }
 
@@ -590,10 +590,10 @@ validate_subject_meta <- function(subject, verbose = TRUE, other_checks = NULL) 
   }
 
   # epoch files (only check csv, not time-stamp: leave it later)
-  if(isTRUE(valid_preproc$has_epoch$valid)) {
+  if (isTRUE(valid_preproc$has_epoch$valid)) {
 
     epoch_names <- subject$epoch_names
-    for(epoch_name in epoch_names) {
+    for (epoch_name in epoch_names) {
       vname <- sprintf("meta_epoch_%s", epoch_name)
       re[[vname]] <- validate_from_expression(
         name = sprintf("epoch_%s.csv", epoch_name),
@@ -604,13 +604,13 @@ validate_subject_meta <- function(subject, verbose = TRUE, other_checks = NULL) 
         expr = {
           tbl <- subject$meta_data(meta_type = "epoch", meta_name = epoch_name)
 
-          if(!nrow(tbl)) {
+          if (!nrow(tbl)) {
             stop("this epoch contains no trial")
           }
 
           nms <- c("Block", "Time", "Trial", "Condition")
           nms <- nms[!nms %in% names(tbl)]
-          if(length(nms)) {
+          if (length(nms)) {
             stop("epoch table is missing the following columns: ",
                  paste(nms, collapse = ", "))
           }
@@ -618,29 +618,29 @@ validate_subject_meta <- function(subject, verbose = TRUE, other_checks = NULL) 
           # check if block is valid
           tbl_blocks <- unique(tbl$Block)
           tbl_blocks <- tbl_blocks[!tbl_blocks %in% subject$blocks]
-          if(length(tbl_blocks)) {
-            stop("the following blocks exist in the epoch table but invalid or not imported: ", paste(tbl_blocks, collapse = ', '))
+          if (length(tbl_blocks)) {
+            stop("the following blocks exist in the epoch table but invalid or not imported: ", paste(tbl_blocks, collapse = ", "))
           }
 
-          if(!is.numeric(tbl$Time)) {
+          if (!is.numeric(tbl$Time)) {
             stop("epoch table onset time (colume: Time) contains non-numeric")
           }
-          if(!all(as.integer(tbl$Trial) == tbl$Trial)) {
+          if (!all(as.integer(tbl$Trial) == tbl$Trial)) {
             stop("epoch table trial index (colume: Trial) must be all positive integers")
           }
 
-          if(any(duplicated(tbl$Trial))) {
+          if (any(duplicated(tbl$Trial))) {
             stop("duplicated trial number is detected in the epoch file")
           }
 
           # check event column
           nms <- names(tbl)
           sel <- grepl("^Event_[a-zA-Z0-9_]", nms, ignore.case = FALSE)
-          if(any(sel)) {
+          if (any(sel)) {
             nms <- nms[sel]
             events <- gsub("^Event_", "", nms)
-            for(ii in seq_along(nms)) {
-              if(!is.numeric(tbl[[nms[[ii]]]])) {
+            for (ii in seq_along(nms)) {
+              if (!is.numeric(tbl[[nms[[ii]]]])) {
                 stop(sprintf("detected event [%s] in the epoch table (colume: [%s]) containing non-numerical values", events[[ii]], nms[[ii]]))
               }
             }
@@ -654,10 +654,10 @@ validate_subject_meta <- function(subject, verbose = TRUE, other_checks = NULL) 
   }
 
   # reference files (only check against electrodes.csv, no actual data validation)
-  if(valid_preproc$has_reference$valid) {
+  if (valid_preproc$has_reference$valid) {
 
     reference_names <- subject$reference_names
-    for(reference_name in reference_names) {
+    for (reference_name in reference_names) {
       vname <- sprintf("meta_reference_%s", reference_name)
       re[[vname]] <- validate_from_expression(
         name = sprintf("reference_%s.csv", reference_name),
@@ -668,35 +668,35 @@ validate_subject_meta <- function(subject, verbose = TRUE, other_checks = NULL) 
         expr = {
           tbl <- subject$meta_data(meta_type = "reference", meta_name = reference_name)
 
-          if(!nrow(tbl)) {
+          if (!nrow(tbl)) {
             stop("this reference table is empty")
           }
 
           nms <- c("Electrode", "Group", "Reference", "Type")
           nms <- nms[!nms %in% names(tbl)]
-          if(length(nms)) {
+          if (length(nms)) {
             stop("reference table is missing the following columns: ",
                  paste(nms, collapse = ", "))
           }
 
           # check electrodes
           miss_e <- electrodes[!electrodes %in% tbl$Electrode]
-          if(length(miss_e)) {
+          if (length(miss_e)) {
             stop("the reference parameters are missing for the following electrode channels: ", deparse_svec(miss_e))
           }
 
-          if(any(duplicated(tbl$Electrode))) {
+          if (any(duplicated(tbl$Electrode))) {
             stop("duplicated electrode number detected in the reference file")
           }
           # Check if none-LFP channels have references
           non_lfp_channels <- subject$electrodes[!subject$electrode_types %in% "LFP"]
           lfp_channels <- subject$electrodes[subject$electrode_types %in% "LFP"]
 
-          if(length(non_lfp_channels)) {
+          if (length(non_lfp_channels)) {
             non_lfp_sel <- tbl$Electrode %in% non_lfp_channels
             non_lfp_ref <- trimws(tbl$Reference[non_lfp_sel])
             non_lfp_ref <- non_lfp_ref[!non_lfp_ref %in% c("", "noref")]
-            if(length(non_lfp_ref)) {
+            if (length(non_lfp_ref)) {
               stop("Non-LFP channels should have no reference (RAVE does not reference microwire or auxiliary channels)")
             }
           }
@@ -704,21 +704,21 @@ validate_subject_meta <- function(subject, verbose = TRUE, other_checks = NULL) 
           ref_names <- unique(tbl$Reference)
           ref_checks <- lapply(ref_names, function(ref_name) {
             ref_name <- trimws(ref_name)
-            if(ref_name %in% c("noref", "")) { return() }
+            if (ref_name %in% c("noref", "")) { return() }
             ref_chan <- gsub("ref_", "", ref_name)
-            if(grepl("^[0-9]+$", ref_chan)) {
+            if (grepl("^[0-9]+$", ref_chan)) {
               ref_chan <- as.integer(ref_chan)
-              if(!ref_chan %in% lfp_channels) {
+              if (!ref_chan %in% lfp_channels) {
                 return(sprintf("Referencing channel `%s` required but it's not a LFP channel", ref_chan))
               }
             }
             e <- new_reference(subject = subject, number = ref_name)
-            if(!isTRUE(e$exists)) {
+            if (!isTRUE(e$exists)) {
               return(sprintf("Cannot find reference data file for `%s`", ref_name))
             }
           })
           ref_checks <- unlist(ref_checks)
-          if(length(ref_checks)) {
+          if (length(ref_checks)) {
             stop(paste(ref_checks, collapse = "; "))
           }
         }
@@ -736,15 +736,15 @@ validate_subject_voltage <- function(subject, version = 2, verbose = TRUE, other
 
   re <- fastmap2()
   valid_preproc <- NULL
-  if(inherits(other_checks, "fastmap2")) {
+  if (inherits(other_checks, "fastmap2")) {
     other_checks$voltage_data <- re
     valid_preproc <- other_checks$preprocess
   }
-  if(is.null(valid_preproc)) {
+  if (is.null(valid_preproc)) {
     valid_preproc <- validate_subject_preprocess(subject, verbose = FALSE,
                                                  other_checks = other_checks)
   }
-  if(!isTRUE(valid_preproc$data_imported$valid)) {
+  if (!isTRUE(valid_preproc$data_imported$valid)) {
     re$voltage_data <- validate_result_new(
       name = "voltage_data",
       valid = FALSE,
@@ -762,17 +762,17 @@ validate_subject_voltage <- function(subject, version = 2, verbose = TRUE, other
 
   # preprocessing voltage
   re$voltage_preprocessing <- validate_from_expression(
-    name = 'voltage_preprocessing',
+    name = "voltage_preprocessing",
     .verbose = verbose,
     description = sprintf(
       "Subject [%s] preprocessing voltage data",
       subject$subject_id),
     expr = {
       preprocess_path <- subject$preprocess_path
-      pre_elecs <- file.path(preprocess_path, 'voltage',
-                             sprintf('electrode_%d.h5', electrodes))
+      pre_elecs <- file.path(preprocess_path, "voltage",
+                             sprintf("electrode_%d.h5", electrodes))
       fe <- file.exists(pre_elecs)
-      if(!all(fe)) {
+      if (!all(fe)) {
         miss_e <- electrodes[!fe]
         stop("the following electrode channels are set but cannot find data files; please import the channel data: ", deparse_svec(miss_e))
       }
@@ -781,10 +781,10 @@ validate_subject_voltage <- function(subject, version = 2, verbose = TRUE, other
 
       signal_lengths <- ravepipeline::lapply_jobs(
         seq_along(electrodes),
-        function(ii){
+        function(ii) {
           e <- electrodes[[ii]]
-          pre_elec <- file.path(preprocess_path, 'voltage',
-                                sprintf('electrode_%d.h5', e))
+          pre_elec <- file.path(preprocess_path, "voltage",
+                                sprintf("electrode_%d.h5", e))
 
           electrode_type <- electrode_types[[ii]]
           has_notch <- notch_filtered[[ii]]
@@ -794,38 +794,38 @@ validate_subject_voltage <- function(subject, version = 2, verbose = TRUE, other
           }, error = function(e) {
             NULL
           })
-          if(!length(h5names)) {
+          if (!length(h5names)) {
             return(rep(-1, length(blocks)))
           }
 
           # check length of raw (unreferenced)
-          signal_lengths <- sapply(blocks, function(b){
+          signal_lengths <- sapply(blocks, function(b) {
             raw_len <- tryCatch({
-              name <- sprintf('raw/%s', b)
+              name <- sprintf("raw/%s", b)
               stopifnot(name %in% h5names)
               ptr <- ieegio::io_read_h5(pre_elec, name = name, ram = FALSE)
               l <- length(ptr)
               ptr$close()
               return(l)
-            }, error = function(e){-1})
+            }, error = function(e) {-1})
 
-            if( raw_len <= 0 ){
+            if ( raw_len <= 0 ) {
               return(raw_len)
             }
 
-            if(has_notch && electrode_type %in% c("EKG", "LFP")){
+            if (has_notch && electrode_type %in% c("EKG", "LFP")) {
               notch_len <- tryCatch({
-                name <- sprintf('notch/%s', b)
+                name <- sprintf("notch/%s", b)
                 stopifnot(name %in% h5names)
                 ptr <- ieegio::io_read_h5(pre_elec, name = name, ram = FALSE)
                 l <- length(ptr)
                 ptr$close()
                 return(l)
-              }, error = function(e){-1})
-            }else{
+              }, error = function(e) {-1})
+            } else {
               notch_len <- raw_len
             }
-            if( raw_len != notch_len ){
+            if ( raw_len != notch_len ) {
               return(0)
             }
             return(raw_len)
@@ -840,21 +840,21 @@ validate_subject_voltage <- function(subject, version = 2, verbose = TRUE, other
           blocks = blocks
         ),
         callback = function(ii) {
-          sprintf('Checking preprocess data|electrode %d', electrodes[[ii]])
+          sprintf("Checking preprocess data|electrode %d", electrodes[[ii]])
         }
       )
 
-      signal_lengths <- do.call('rbind', signal_lengths)
+      signal_lengths <- do.call("rbind", signal_lengths)
       # check corrupted file - raw preprocess
       corrupted <- rowSums(signal_lengths < 0) > 0
       unequallen <- rowSums(signal_lengths == 0) > 0
 
 
-      if(any(corrupted)){
+      if (any(corrupted)) {
         stop(
           "Corrupted preprocess files found in these electrodes ",
           deparse_svec(electrodes[corrupted]))
-      }else if(any(unequallen)){
+      }else if (any(unequallen)) {
         stop(
           "Notch filter produces different lengths compared to original signals in these electrodes ",
           deparse_svec(electrodes[unequallen]))
@@ -869,7 +869,7 @@ validate_subject_voltage <- function(subject, version = 2, verbose = TRUE, other
     }
   )
 
-  if(!isTRUE(re$voltage_preprocessing$valid)) {
+  if (!isTRUE(re$voltage_preprocessing$valid)) {
     re$voltage_data <- validate_result_new(
       name = "voltage_data",
       .verbose = TRUE,
@@ -889,16 +889,16 @@ validate_subject_voltage <- function(subject, version = 2, verbose = TRUE, other
   preproc_path <- file.path(subject$preprocess_path, "voltage")
 
   re$voltage_data <- validate_from_expression(
-    name = 'voltage_data',
+    name = "voltage_data",
     .verbose = verbose,
     description = sprintf(
       "Subject [%s] voltage data exists after preprocessing",
       subject$subject_id),
     expr = {
       all_channels <- subject$electrodes
-      preproc_files <- file.path(preproc_path, sprintf('electrode_%d.h5', all_channels))
+      preproc_files <- file.path(preproc_path, sprintf("electrode_%d.h5", all_channels))
       fe <- file.exists(preproc_files)
-      if(!all(fe)) {
+      if (!all(fe)) {
         stop(
           "cannot find voltage data under [preprocess/voltage/] for the following electrode channels: ",
           deparse_svec(electrodes[!fe])
@@ -906,9 +906,9 @@ validate_subject_voltage <- function(subject, version = 2, verbose = TRUE, other
       }
 
       lfp_channels <- subject$electrodes[subject$electrode_types %in% "LFP"]
-      volt_files <- file.path(volt_path, sprintf('%d.h5', lfp_channels))
+      volt_files <- file.path(volt_path, sprintf("%d.h5", lfp_channels))
       fe <- file.exists(volt_files)
-      if(!all(fe)) {
+      if (!all(fe)) {
         stop(
           "cannot find voltage data under [data/voltage/] for the following electrode channels: ",
           deparse_svec(electrodes[!fe])
@@ -924,7 +924,7 @@ validate_subject_voltage <- function(subject, version = 2, verbose = TRUE, other
             return(c(TRUE, TRUE, TRUE))
           }
           signal_length <- data.matrix(preproc_tbl[ii, blocks, drop = FALSE])
-          voltage_file <- file.path(volt_path, sprintf('%d.h5', e))
+          voltage_file <- file.path(volt_path, sprintf("%d.h5", e))
 
           # file missing?
           if (!file.exists(voltage_file)) {
@@ -941,7 +941,7 @@ validate_subject_voltage <- function(subject, version = 2, verbose = TRUE, other
           # check length of raw (unreferenced)
           raw_lens <- sapply(blocks, function(b) {
             tryCatch({
-              name <- sprintf('raw/voltage/%s', b)
+              name <- sprintf("raw/voltage/%s", b)
               stopifnot(name %in% data_names)
               raw <- ieegio::io_read_h5(voltage_file, name, ram = FALSE)
               l <- length(raw)
@@ -954,7 +954,7 @@ validate_subject_voltage <- function(subject, version = 2, verbose = TRUE, other
 
           ref_lens <- sapply(blocks, function(b) {
             tryCatch({
-              name <- sprintf('ref/voltage/%s', b)
+              name <- sprintf("ref/voltage/%s", b)
               stopifnot(name %in% data_names)
               raw <- ieegio::io_read_h5(voltage_file, name, ram = FALSE)
               l <- length(raw)
@@ -977,21 +977,30 @@ validate_subject_voltage <- function(subject, version = 2, verbose = TRUE, other
           electrodes = electrodes
         ),
         callback = function(ii) {
-          sprintf('Checking LFP data|channel %d', electrodes[[ii]])
+          sprintf("Checking LFP data|channel %d", electrodes[[ii]])
         }
       )
 
-      lfp_length_valid <- do.call('rbind', lfp_length_valid)
+      lfp_length_valid <- do.call("rbind", lfp_length_valid)
 
-      if(!all(lfp_length_valid[,1])) {
-        stop("voltage data under [data/voltage/] might be corrupted or preprocess unfinished: ", deparse_svec(electrodes[!lfp_length_valid[,1]]))
+      if (!all(lfp_length_valid[, 1])) {
+        stop(
+          "voltage data under [data/voltage/] might be corrupted or preprocess unfinished: ",
+          deparse_svec(electrodes[!lfp_length_valid[, 1]])
+        )
       }
-      if(!all(lfp_length_valid[,2])) {
-        stop("the following electrodes have inconsistent signal lengths [data/voltage/] vs [raw]: ", deparse_svec(electrodes[!lfp_length_valid[,2]]))
+      if (!all(lfp_length_valid[, 2])) {
+        stop(
+          "the following electrodes have inconsistent signal lengths [data/voltage/] vs [raw]: ",
+          deparse_svec(electrodes[!lfp_length_valid[, 2]])
+        )
       }
 
-      if(version < 2 && !all(lfp_length_valid[,3])) {
-        stop("the following electrodes have inconsistent cache lengths [data/voltage/]: ", deparse_svec(electrodes[!lfp_length_valid[,3]]))
+      if (version < 2 && !all(lfp_length_valid[, 3])) {
+        stop(
+          "the following electrodes have inconsistent cache lengths [data/voltage/]: ",
+          deparse_svec(electrodes[!lfp_length_valid[, 3]])
+        )
       }
 
       all_length_valid <- ravepipeline::lapply_jobs(
@@ -999,7 +1008,7 @@ validate_subject_voltage <- function(subject, version = 2, verbose = TRUE, other
         function(ii) {
           e <- preproc_tbl$Electrode[[ii]]
           signal_length <- data.matrix(preproc_tbl[ii, blocks, drop = FALSE])
-          pre_voltage_file <- file.path(preproc_path, sprintf('electrode_%d.h5', e))
+          pre_voltage_file <- file.path(preproc_path, sprintf("electrode_%d.h5", e))
 
           # file missing?
           if (!file.exists(pre_voltage_file)) {
@@ -1016,7 +1025,7 @@ validate_subject_voltage <- function(subject, version = 2, verbose = TRUE, other
           # check length of raw (unreferenced)
           raw_lens <- sapply(blocks, function(b) {
             tryCatch({
-              name <- sprintf('raw/%s', b)
+              name <- sprintf("raw/%s", b)
               stopifnot(name %in% data_names)
               raw <- ieegio::io_read_h5(pre_voltage_file, name, ram = FALSE)
               l <- length(raw)
@@ -1029,7 +1038,7 @@ validate_subject_voltage <- function(subject, version = 2, verbose = TRUE, other
 
           notch_lens <- sapply(blocks, function(b) {
             tryCatch({
-              name <- sprintf('notch/%s', b)
+              name <- sprintf("notch/%s", b)
               stopifnot(name %in% data_names)
               raw <- ieegio::io_read_h5(pre_voltage_file, name, ram = FALSE)
               l <- length(raw)
@@ -1049,21 +1058,30 @@ validate_subject_voltage <- function(subject, version = 2, verbose = TRUE, other
           electrodes = electrodes
         ),
         callback = function(ii) {
-          sprintf('Checking preprocess data|channel %d', electrodes[[ii]])
+          sprintf("Checking preprocess data|channel %d", electrodes[[ii]])
         }
       )
 
-      all_length_valid <- do.call('rbind', all_length_valid)
+      all_length_valid <- do.call("rbind", all_length_valid)
 
-      if(!all(all_length_valid[,1])) {
-        stop("voltage data under [preprocess/voltage/] might be corrupted or preprocess unfinished: ", deparse_svec(electrodes[!all_length_valid[,1]]))
+      if (!all(all_length_valid[, 1])) {
+        stop(
+          "voltage data under [preprocess/voltage/] might be corrupted or preprocess unfinished: ",
+          deparse_svec(electrodes[!all_length_valid[, 1]])
+        )
       }
-      if(!all(all_length_valid[,2])) {
-        stop("the following electrodes have inconsistent signal lengths [preprocess/voltage/]: ", deparse_svec(electrodes[!all_length_valid[,2]]))
+      if (!all(all_length_valid[, 2])) {
+        stop(
+          "the following electrodes have inconsistent signal lengths [preprocess/voltage/]: ",
+          deparse_svec(electrodes[!all_length_valid[, 2]])
+        )
       }
 
-      if(!all(all_length_valid[,3])) {
-        stop("the following electrodes have inconsistent cache lengths [preprocess/voltage/] [before vs after notch filter]: ", deparse_svec(electrodes[!all_length_valid[,3]]))
+      if (!all(all_length_valid[, 3])) {
+        stop(
+          "the following electrodes have inconsistent cache lengths [preprocess/voltage/] [before vs after notch filter]: ",
+          deparse_svec(electrodes[!all_length_valid[, 3]])
+        )
       }
 
 
@@ -1078,17 +1096,17 @@ validate_subject_power_phase <- function(subject, version = 2, verbose = TRUE, o
 
   re <- fastmap2()
   valid_preproc <- NULL
-  if(inherits(other_checks, "fastmap2")) {
+  if (inherits(other_checks, "fastmap2")) {
     other_checks$power_phase_data <- re
     valid_preproc <- other_checks$voltage_data
   }
-  if(is.null(valid_preproc)) {
+  if (is.null(valid_preproc)) {
     valid_preproc <- validate_subject_voltage(
       subject, verbose = FALSE, version = version,
       other_checks = other_checks)
   }
 
-  if(!isTRUE(valid_preproc$voltage_preprocessing$valid)) {
+  if (!isTRUE(valid_preproc$voltage_preprocessing$valid)) {
     re$power_phase <- validate_result_new(
       name = "power_phase",
       valid = NA,
@@ -1105,7 +1123,7 @@ validate_subject_power_phase <- function(subject, version = 2, verbose = TRUE, o
   tbl$PowerSrate <- subject$power_sample_rate
   sel <- tbl$Type %in% c("LFP")
 
-  if(!any(sel) || any(is.na(tbl$PowerSrate[sel]))) {
+  if (!any(sel) || any(is.na(tbl$PowerSrate[sel]))) {
     re$power_phase <- validate_result_new(
       name = "power_phase",
       valid = NA,
@@ -1118,7 +1136,7 @@ validate_subject_power_phase <- function(subject, version = 2, verbose = TRUE, o
   }
 
   # sample rates must be consistent for all LFP electrodes
-  if(length(unique(tbl$PowerSrate[sel])) != 1) {
+  if (length(unique(tbl$PowerSrate[sel])) != 1) {
     re$power_phase <- validate_result_new(
       name = "power_phase",
       valid = FALSE,
@@ -1134,12 +1152,12 @@ validate_subject_power_phase <- function(subject, version = 2, verbose = TRUE, o
   # go into files
   check_data <- function(dtype) {
     wavelet_params <- subject$preprocess_settings$wavelet_params
-    if(!is.list(wavelet_params)) {
+    if (!is.list(wavelet_params)) {
       stop("cannot retrieve frequency information")
     }
     frequencies <- wavelet_params$frequencies
     n_freq <- length(frequencies)
-    if(!n_freq) {
+    if (!n_freq) {
       stop("zero frequency detected")
     }
     blocks <- subject$blocks
@@ -1150,18 +1168,18 @@ validate_subject_power_phase <- function(subject, version = 2, verbose = TRUE, o
     dpath <- file.path(subject$data_path, dtype)
     fs <- file.path(dpath, sprintf("%d.h5", tbl$Electrode[sel]))
     fe <- file.exists(fs)
-    if(!all(fe)) {
+    if (!all(fe)) {
       miss_e <- tbl$Electrode[sel][!fe]
       stop(sprintf("Cannot find %s data for the following electrode channels under [data/%s] directory: %s", dtype, dtype, deparse_svec(miss_e)))
     }
 
     dtype_checks <- ravepipeline::lapply_jobs(which(sel), function(ii) {
       e <- tbl$Electrode[[ii]]
-      f <- file.path(dpath, sprintf('%d.h5', e))
+      f <- file.path(dpath, sprintf("%d.h5", e))
 
       el <- expected_length[ii, ]
 
-      if(!file.exists(f)){
+      if (!file.exists(f)) {
         return(c(FALSE, FALSE, FALSE, FALSE, FALSE))
       }
       h5names <- tryCatch({
@@ -1169,49 +1187,49 @@ validate_subject_power_phase <- function(subject, version = 2, verbose = TRUE, o
       }, error = function(e) {
         NULL
       })
-      if(!length(h5names)) {
+      if (!length(h5names)) {
         return(c(FALSE, FALSE, FALSE, FALSE, FALSE))
       }
 
       # check length
-      raw_lens <- sapply(blocks, function(b){
+      raw_lens <- sapply(blocks, function(b) {
         tryCatch({
-          name <- sprintf('raw/%s/%s', dtype, b)
+          name <- sprintf("raw/%s/%s", dtype, b)
           stopifnot(name %in% h5names)
           raw <- ieegio::io_read_h5(f, name, ram = FALSE)
           dm <- dim(raw)
           raw$close()
-          if(length(dm) != 2) { return(c(0, 0)) }
+          if (length(dm) != 2) { return(c(0, 0)) }
           dm
-        }, error = function(e){
+        }, error = function(e) {
           c(0, 0)
         })
       })
-      ref_lens <- sapply(blocks, function(b){
+      ref_lens <- sapply(blocks, function(b) {
         tryCatch({
-          name <- sprintf('ref/%s/%s', dtype, b)
+          name <- sprintf("ref/%s/%s", dtype, b)
           stopifnot(name %in% h5names)
           raw <- ieegio::io_read_h5(f, name, ram = FALSE)
           dm <- dim(raw)
           raw$close()
-          if(length(dm) != 2) { return(c(0, 0)) }
+          if (length(dm) != 2) { return(c(0, 0)) }
           dm
-        }, error = function(e){
+        }, error = function(e) {
           c(0, 0)
         })
       })
 
       c(
         isTRUE(all(raw_lens > 0)),
-        isTRUE(all(raw_lens[1,] == n_freq)),
-        isTRUE(all(raw_lens[1,] == n_freq)),
+        isTRUE(all(raw_lens[1, ] == n_freq)),
+        isTRUE(all(raw_lens[1, ] == n_freq)),
 
         # not strict, but works in 99.999% cases
         isTRUE(all(abs(raw_lens[2, ] - el) < 10)),
         isTRUE(all(ref_lens[2, ] == raw_lens[2, ]))
       )
     }, callback = function(ii) {
-      sprintf('Checking %s data|electrode %d', dtype, tbl$Electrode[[ii]])
+      sprintf("Checking %s data|electrode %d", dtype, tbl$Electrode[[ii]])
     }, .globals = list(
       tbl = tbl,
       dpath = dpath,
@@ -1223,29 +1241,59 @@ validate_subject_power_phase <- function(subject, version = 2, verbose = TRUE, o
     dtype_checks <- do.call("rbind", dtype_checks)
 
     lfp_s <- tbl$Electrode[sel]
-    if(!all(dtype_checks[,1])) {
-      stop(sprintf("The following electrode channels may have corrupted %s data files ([data/%s:unreferenced]): %s", dtype, dtype, deparse_svec(lfp_s[!dtype_checks[,1]])))
+    if (!all(dtype_checks[, 1])) {
+      stop(
+        sprintf(
+          "The following electrode channels may have corrupted %s data files ([data/%s:unreferenced]): %s",
+          dtype,
+          dtype,
+          deparse_svec(lfp_s[!dtype_checks[, 1]])
+        )
+      )
     }
-    if(!all(dtype_checks[,2])) {
-      stop(sprintf("The following electrode channels have inconsistent number of frequencies to expected ([data/%s:unreferenced]): %s", dtype, deparse_svec(lfp_s[!dtype_checks[,2]])))
+    if (!all(dtype_checks[, 2])) {
+      stop(
+        sprintf(
+          "The following electrode channels have inconsistent number of frequencies to expected ([data/%s:unreferenced]): %s",
+          dtype,
+          deparse_svec(lfp_s[!dtype_checks[, 2]])
+        )
+      )
     }
-    if(!all(dtype_checks[,4])) {
-      stop(sprintf("The following electrode channels have inconsistent number of time-points to expected ([data/%s:unreferenced]): %s", dtype, deparse_svec(lfp_s[!dtype_checks[,4]])))
+    if (!all(dtype_checks[, 4])) {
+      stop(
+        sprintf(
+          "The following electrode channels have inconsistent number of time-points to expected ([data/%s:unreferenced]): %s",
+          dtype,
+          deparse_svec(lfp_s[!dtype_checks[, 4]])
+        )
+      )
     }
-    if(version < 2) {
-
-      if(!all(dtype_checks[,3])) {
-        stop(sprintf("The following electrode channels have inconsistent number of frequencies to expected ([data/%s:referenced]): %s", dtype, deparse_svec(lfp_s[!dtype_checks[,3]])))
+    if (version < 2) {
+      if (!all(dtype_checks[, 3])) {
+        stop(
+          sprintf(
+            "The following electrode channels have inconsistent number of frequencies to expected ([data/%s:referenced]): %s",
+            dtype,
+            deparse_svec(lfp_s[!dtype_checks[, 3]])
+          )
+        )
       }
-      if(!all(dtype_checks[,5])) {
-        stop(sprintf("The following electrode channels have inconsistent number of time-points to expected ([data/%s:referenced]): %s", dtype, deparse_svec(lfp_s[!dtype_checks[,5]])))
+      if (!all(dtype_checks[, 5])) {
+        stop(
+          sprintf(
+            "The following electrode channels have inconsistent number of time-points to expected ([data/%s:referenced]): %s",
+            dtype,
+            deparse_svec(lfp_s[!dtype_checks[, 5]])
+          )
+        )
       }
 
     }
 
   }
   re$power_data <- validate_from_expression(
-    name = 'power_data',
+    name = "power_data",
     .verbose = verbose,
     description = sprintf(
       "Subject [%s] has valid power data", subject$subject_id),
@@ -1254,7 +1302,7 @@ validate_subject_power_phase <- function(subject, version = 2, verbose = TRUE, o
     }
   )
   re$phase_data <- validate_from_expression(
-    name = 'phase_data',
+    name = "phase_data",
     .verbose = verbose,
     description = sprintf(
       "Subject [%s] has valid phase data", subject$subject_id),
@@ -1280,17 +1328,17 @@ validate_subject_epoch <- function(subject, verbose = TRUE, other_checks = NULL)
 
   re <- fastmap2()
   valid_preproc <- NULL
-  if(inherits(other_checks, "fastmap2")) {
+  if (inherits(other_checks, "fastmap2")) {
     other_checks$epoch_tables <- re
     valid_preproc <- other_checks$voltage_data
   }
-  if(is.null(valid_preproc)) {
+  if (is.null(valid_preproc)) {
     valid_preproc <- validate_subject_voltage(
       subject, verbose = FALSE,
       other_checks = other_checks)
   }
 
-  if(!isTRUE(valid_preproc$voltage_preprocessing$valid)) {
+  if (!isTRUE(valid_preproc$voltage_preprocessing$valid)) {
     re$epoch <- validate_result_new(
       name = "epoch",
       valid = NA,
@@ -1307,10 +1355,10 @@ validate_subject_epoch <- function(subject, verbose = TRUE, other_checks = NULL)
   tbl_names <- names(tbl)
   max_time <- tbl[, blocks, drop = FALSE] / tbl$SampleRate
   session_maxtime <- sapply(blocks, function(b) {
-    if(!b %in% tbl_names) { return(NULL) }
+    if (!b %in% tbl_names) { return(NULL) }
     x <- max_time[[b]]
     x <- x[!is.na(x)]
-    if(length(x)) { max(x) } else { NULL }
+    if (length(x)) { max(x) } else { NULL }
   }, simplify = FALSE, USE.NAMES = TRUE)
   session_maxtime <- drop_nulls(session_maxtime)
   session_maxtstr <- paste(
@@ -1326,11 +1374,11 @@ validate_subject_epoch <- function(subject, verbose = TRUE, other_checks = NULL)
     cols <- names(epoch_tbl)
     cols <- cols[grepl("(^Event_[a-zA-Z0-9_]+$)|(^Time$)", cols)]
 
-    for(col in cols) {
+    for (col in cols) {
       invalid_trials <- lapply(subs, function(sub) {
         block <- sub$Block[[1]]
         max_time <- session_maxtime[[block]]
-        if(length(max_time) != 1 || max_time <= 0) {
+        if (length(max_time) != 1 || max_time <= 0) {
           stop(sprintf(
             "cannot obtain the duration of session block [%s] from epoch [%s]",
             block, epoch))
@@ -1339,7 +1387,7 @@ validate_subject_epoch <- function(subject, verbose = TRUE, other_checks = NULL)
         sub$Trial[is.na(x) | x > max_time | x <= 0 ]
       })
       invalid_trials <- unlist(invalid_trials)
-      if(length(invalid_trials)) {
+      if (length(invalid_trials)) {
         stop(sprintf(
           "found invalid time in column [%s] from epoch [%s]; please make sure the onset/event time does not exceed the maximum duration of that session: %s",
           col, epoch, session_maxtstr
@@ -1349,7 +1397,7 @@ validate_subject_epoch <- function(subject, verbose = TRUE, other_checks = NULL)
     return()
 
   }
-  for(epoch in subject$epoch_names){
+  for (epoch in subject$epoch_names) {
     re[[epoch]] <- validate_from_expression(
       name = sprintf("epoch_%s.csv", epoch),
       .verbose = verbose,
@@ -1372,17 +1420,17 @@ validate_subject_reference <- function(subject, verbose = TRUE, other_checks = N
 
   re <- fastmap2()
   valid_preproc <- NULL
-  if(inherits(other_checks, "fastmap2")) {
+  if (inherits(other_checks, "fastmap2")) {
     other_checks$reference_tables <- re
     valid_preproc <- other_checks$voltage_data
   }
-  if(is.null(valid_preproc)) {
+  if (is.null(valid_preproc)) {
     valid_preproc <- validate_subject_voltage(
       subject, verbose = FALSE,
       other_checks = other_checks)
   }
 
-  if(!isTRUE(valid_preproc$voltage_preprocessing$valid)) {
+  if (!isTRUE(valid_preproc$voltage_preprocessing$valid)) {
     re$reference <- validate_result_new(
       name = "reference",
       valid = NA,
@@ -1403,29 +1451,29 @@ validate_subject_reference <- function(subject, verbose = TRUE, other_checks = N
   lfp_channels <- subject$electrodes[subject$electrode_types %in% "LFP"]
 
   check_reference <- function(reference) {
-    ref_tbl <- subject$meta_data(meta_type = 'references', meta_name = reference)
+    ref_tbl <- subject$meta_data(meta_type = "references", meta_name = reference)
     ref_names <- unique(ref_tbl$Reference)
     ref_names <- trimws(ref_names)
     ref_names <- ref_names[!ref_names %in% c("", "noref")]
-    if(!length(ref_names)) {
+    if (!length(ref_names)) {
       return()
     }
-    lapply(ref_names, function(ref_name){
+    lapply(ref_names, function(ref_name) {
 
       ref_name <- trimws(ref_name)
       ref_chan <- gsub("ref_", "", ref_name)
-      if(grepl("^[0-9]+$", ref_chan)) {
+      if (grepl("^[0-9]+$", ref_chan)) {
         ref_chan <- as.integer(ref_chan)
-        if(!ref_chan %in% lfp_channels) {
+        if (!ref_chan %in% lfp_channels) {
           return(sprintf("Referencing channel `%s` required but it's not a LFP channel", ref_chan))
         }
       }
 
       e <- new_reference(subject, ref_name)
-      if(!isTRUE(e$valid)) {
+      if (!isTRUE(e$valid)) {
         stop("reference data [data/reference/", ref_name, ".h5] is missing")
       }
-      if(!is.character(e$number)) {
+      if (!is.character(e$number)) {
         # reference to single electrode, redundant as it has been checked
         # in power_phase
         return()
@@ -1433,66 +1481,66 @@ validate_subject_reference <- function(subject, verbose = TRUE, other_checks = N
       # check HDF5 file
       ref_file <- e$voltage_file
       h5names <- gsub("^/", "", ieegio::io_h5_names(ref_file))
-      if(!length(h5names)) {
+      if (!length(h5names)) {
         stop("reference data [data/reference/", ref_name, ".h5] is corrupted")
       }
       # voltage
       volt_names <- sprintf("voltage/%s", blocks)
       sel <- volt_names %in% h5names
-      if(!all(sel)) {
+      if (!all(sel)) {
         stop("reference data [data/reference/", ref_name, ".h5] is does not contain voltage data for the following blocks: ", paste(blocks[!sel], collapse = ", "))
       }
       # get signal length for the type
       signal_lengths <- tbl[tbl$Type %in% e$type, blocks, drop = FALSE]
-      if(!nrow(signal_lengths)) {
+      if (!nrow(signal_lengths)) {
         stop(sprintf("reference %s has signal type [%s], but no electrode channel of such type is found: this reference might be obsolete", ref_name, e$type))
       }
       signal_lengths <- signal_lengths[1, , drop = FALSE]
 
-      for(block in blocks) {
+      for (block in blocks) {
         explen <- signal_lengths[[block]]
         ptr <- load_h5(file = ref_file, name = sprintf("voltage/%s", block), read_only = TRUE, ram = FALSE)
         actlen <- length(ptr)
         ptr$close()
-        if(explen != actlen) {
+        if (explen != actlen) {
           stop(sprintf("reference %s has inconsistent voltage length in block [%s]: expected: %.0f vs. actual: %.0f", ref_name, block, explen, actlen))
         }
       }
 
-      if(e$type %in% c("LFP", "EKG")) {
+      if (e$type %in% c("LFP", "EKG")) {
 
-        if(!n_freq) {
+        if (!n_freq) {
           stop("cannot obtain frequency information from preprocessing log files")
         }
-        if(!isTRUE(power_srate > 1)) {
+        if (!isTRUE(power_srate > 1)) {
           stop("cannot obtain power/phase sample rates from preprocessing log files")
         }
 
         # wavelet coefficients
         wave_names <- sprintf("wavelet/coef/%s", blocks)
         sel <- wave_names %in% h5names
-        if(!all(sel)) {
+        if (!all(sel)) {
           stop("reference data [data/reference/", ref_name, ".h5] is does not contain time-frequency decomposition data for the following blocks: ", paste(blocks[!sel], collapse = ", "))
         }
         # get signal length for the type
         signal_lengths <- (tbl[, blocks, drop = FALSE] - 1) * (power_srate / tbl$SampleRate)
         signal_lengths <- signal_lengths[tbl$Type %in% e$type, , drop = FALSE]
-        if(!nrow(signal_lengths)) {
+        if (!nrow(signal_lengths)) {
           stop(sprintf("reference %s has signal type [%s], but no electrode channel of such type is found: this reference might be obsolete", ref_name, e$type))
         }
         signal_lengths <- signal_lengths[1, , drop = FALSE]
-        for(block in blocks) {
+        for (block in blocks) {
           expdim <- c(n_freq, signal_lengths[[block]], 2)
           ptr <- load_h5(file = ref_file, name = sprintf("wavelet/coef/%s", block), read_only = TRUE, ram = FALSE)
           actdim <- dim(ptr)
           ptr$close()
-          if(length(actdim) != 3 || actdim[[3]] != 2) {
+          if (length(actdim) != 3 || actdim[[3]] != 2) {
             stop(sprintf("reference %s has corrupted wavelet data in block [%s]", ref_name, block))
           }
-          if(expdim[[1]] != actdim[[1]]) {
+          if (expdim[[1]] != actdim[[1]]) {
             stop(sprintf("reference %s has inconsistent wavelet frequencies in block [%s]: expected: %.0f vs. actual: %.0f", ref_name, block, expdim[[1]], actdim[[1]]))
           }
-          if(abs(expdim[[2]] - actdim[[2]]) > 10) {
+          if (abs(expdim[[2]] - actdim[[2]]) > 10) {
             stop(sprintf("reference %s has inconsistent wavelet time-points in block [%s]: expected: %.0f vs. actual: %.0f", ref_name, block, floor(expdim[[2]]) + 1, actdim[[2]]))
           }
         }
@@ -1503,7 +1551,7 @@ validate_subject_reference <- function(subject, verbose = TRUE, other_checks = N
 
   }
 
-  for(reference in subject$reference_names){
+  for (reference in subject$reference_names) {
     re[[reference]] <- validate_from_expression(
       name = sprintf("reference_%s.csv", reference),
       .verbose = verbose,
@@ -1540,7 +1588,7 @@ validate_subject <- function(
   validate_subject_preprocess(subject = subject, verbose = verbose, other_checks = results)
   validate_subject_meta(subject = subject, verbose = verbose, other_checks = results)
 
-  if(method %in% c("normal", "all")) {
+  if (method %in% c("normal", "all")) {
     validate_subject_voltage(subject = subject, verbose = verbose, other_checks = results, version = version)
     validate_subject_power_phase(subject = subject, verbose = verbose, other_checks = results, version = version)
 

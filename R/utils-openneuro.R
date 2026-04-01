@@ -88,7 +88,7 @@ install_openneuro <- function(
 ) {
 
 
-  if(!dir_exists(rpymat::env_path())) {
+  if (!dir_exists(rpymat::env_path())) {
     stop("Conda is not configured for RAVE. Please run `ravemanager::configure_python()` to set it up.")
   }
 
@@ -96,13 +96,13 @@ install_openneuro <- function(
   # Make sure the inputs are correct
   force(accession_number)
 
-  if(length(subject_codes)) {
+  if (length(subject_codes)) {
     subject_codes <- gsub("^sub-", "", subject_codes, ignore.case = TRUE)
     subject_codes <- sprintf("sub-%s", subject_codes)
   }
 
-  if(length(parent_folder)) {
-    if(!dir_exists(parent_folder)) {
+  if (length(parent_folder)) {
+    if (!dir_exists(parent_folder)) {
       stop("Parent folder does not exist: ", parent_folder)
     }
   } else {
@@ -120,7 +120,7 @@ install_openneuro <- function(
 
   target_dir <- file_path(parent_folder, accession_number)
 
-  if(length(subject_codes)) {
+  if (length(subject_codes)) {
     openneuro$download(
       dataset = accession_number,
       target_dir = target_dir,

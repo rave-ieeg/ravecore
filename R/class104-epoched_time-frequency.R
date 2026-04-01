@@ -123,19 +123,19 @@ RAVESubjectEpochTimeFreqBaseRepository <- R6::R6Class(
       # electrodes <- 13
 
       workers <- 0
-      if(self$`@restored`) { workers <- 1 }
+      if (self$`@restored`) { workers <- 1 }
 
       data_type <- private$.data_type
-      if(length(data_type) == 0) { return(self) }
+      if (length(data_type) == 0) { return(self) }
 
       # determine electrodes to load
-      if(length(electrodes) == 1 && is.na(electrodes)) {
+      if (length(electrodes) == 1 && is.na(electrodes)) {
         # Do not load data, just fill in the meta
         electrodes <- integer()
       } else {
         electrodes <- parse_svec(electrodes)
         electrodes <- electrodes[electrodes %in% self$electrode_list]
-        if(!length(electrodes)) {
+        if (!length(electrodes)) {
           electrodes <- self$electrode_list
         }
       }
@@ -143,9 +143,9 @@ RAVESubjectEpochTimeFreqBaseRepository <- R6::R6Class(
       # check data_list
       nms <- sprintf("e_%d", electrodes)
 
-      if( length(private$.data) > 0 && !force ) {
+      if ( length(private$.data) > 0 && !force ) {
         exist_list <- names(private$.data$data_list)
-        if(all(nms %in% exist_list)) { return(self) }
+        if (all(nms %in% exist_list)) { return(self) }
       }
 
       all_electrode_instances <- self$electrode_instances
@@ -153,7 +153,7 @@ RAVESubjectEpochTimeFreqBaseRepository <- R6::R6Class(
 
       # fine references to load
       ref_names <- lapply(electrode_instances, function(inst) {
-        if(isTRUE(inst$reference_name %in% c("noref", ""))) { return(NULL) }
+        if (isTRUE(inst$reference_name %in% c("noref", ""))) { return(NULL) }
         sprintf("%s_%s", inst$reference_name, inst$type)
       })
       ref_names <- unlist(unique(ref_names))
@@ -162,7 +162,7 @@ RAVESubjectEpochTimeFreqBaseRepository <- R6::R6Class(
       reference_instances <- self$reference_instances[ref_names]
 
       # Load reference first
-      if(length(reference_instances)) {
+      if (length(reference_instances)) {
         ravepipeline::lapply_jobs(
           reference_instances,
           function(inst) {
@@ -213,7 +213,7 @@ RAVESubjectEpochTimeFreqBaseRepository <- R6::R6Class(
       )
 
       private$.data$data_list <- as.list(private$.data$data_list)
-      if(length(data_list)) {
+      if (length(data_list)) {
         private$.data$data_list[nms] <- data_list[nms]
       }
 
@@ -237,7 +237,7 @@ RAVESubjectEpochTimeFreqBaseRepository <- R6::R6Class(
     #' @field time time in seconds for each trial
     time = function() {
       srate <- self$sample_rate
-      tidx <- unlist(lapply(self$time_windows, function(x){
+      tidx <- unlist(lapply(self$time_windows, function(x) {
         x <- round(x * srate)
         seq(x[1], x[2])
       }))
@@ -392,7 +392,7 @@ RAVESubjectEpochTimeFreqCoefRepository <- R6::R6Class(
     #' @field wavelet not used anymore, see \code{coefficients}
     wavelet = function() {
       ravepipeline::logger(
-        level = 'warning',
+        level = "warning",
         "Please use `repository$coefficients` instead of `repository$wavelet`"
       )
       self$coefficients

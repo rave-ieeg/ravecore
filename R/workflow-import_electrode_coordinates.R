@@ -1,4 +1,4 @@
-import_electrode_table <- function (path, subject, use_fs = NA, dry_run = FALSE, ...) {
+import_electrode_table <- function(path, subject, use_fs = NA, dry_run = FALSE, ...) {
 
   subject <- restore_subject_instance(subject, strict = FALSE)
   electrodes <- subject$electrodes
@@ -7,7 +7,7 @@ import_electrode_table <- function (path, subject, use_fs = NA, dry_run = FALSE,
   if (!"Electrode" %in% nms) {
     ravepipeline::logger("`import_electrode_table` cannot find column `Electrode` (case-sensitive).", level = "fatal")
   }
-  if(length(electrodes)) {
+  if (length(electrodes)) {
     # subject has electrode channels set
     new_tbl <- new_tbl[new_tbl$Electrode %in% electrodes, ]
   }
@@ -36,16 +36,16 @@ import_electrode_table <- function (path, subject, use_fs = NA, dry_run = FALSE,
     nms2 <- names(new_tbl)
     nms1 <- nms1[nms1 %in% nms2]
     nms2 <- nms2[!nms2 %in% nms1]
-    for(nm in nms2) {
-      if(is.character(new_tbl[[nm]])) {
+    for (nm in nms2) {
+      if (is.character(new_tbl[[nm]])) {
         new_items[[nm]] <- ""
-      } else if(is.numeric(new_tbl[[nm]])) {
+      } else if (is.numeric(new_tbl[[nm]])) {
         new_items[[nm]] <- 0
       } else {
         new_items[[nm]] <- NA
       }
     }
-    new_items <- new_items[,names(new_tbl)]
+    new_items <- new_items[, names(new_tbl)]
     new_tbl <- rbind(new_tbl, new_items)
   }
   new_tbl <- new_tbl[order(new_tbl$Electrode), ]
@@ -56,14 +56,14 @@ import_electrode_table <- function (path, subject, use_fs = NA, dry_run = FALSE,
   has_mni152 <- all(c("MNI152_x", "MNI152_y", "MNI152_z") %in% nms)
   if (!any(has_tkrRAS, has_T1RAS, has_mni305, has_mni152)) {
     ravepipeline::logger(
-      level = 'warning',
+      level = "warning",
       "`import_electrode_table`: No coordinates found. The coordinates are set to the origin. If you want to import coordinates. Please make sure to have at least one of the following coordinates in your file:\n  T1R, T1A, T1S (scanner T1 RAS)\n  Coord_x, Coord_y, Coord_z (FreeSurfer tkrRAS)\n  MNI305_x, MNI305_y, MNI305_z (MNI305 RAS)\n  MNI152_x, MNI152_y, MNI152_z (MNI152 RAS)\nImporting anyway..."
     )
     save_meta2(data = new_tbl, meta_type = "electrodes",
                project_name = subject$project_name,
                subject_code = subject$subject_code)
     ravepipeline::logger(
-      level = 'info',
+      level = "info",
       use_glue = TRUE,
       "`import_electrode_table`: Done importing {subject$subject_id} - meta/electrodes.csv. However, the coordinates are blank."
     )
@@ -159,7 +159,7 @@ import_electrode_table <- function (path, subject, use_fs = NA, dry_run = FALSE,
   brain$set_electrodes(new_tbl)
   new_tbl2 <- tryCatch({
     brain$calculate_template_coordinates()
-  }, error = function(e){
+  }, error = function(e) {
     new_tbl
   })
   # Reorder
@@ -168,7 +168,7 @@ import_electrode_table <- function (path, subject, use_fs = NA, dry_run = FALSE,
   nms1 <- nms1[nms1 %in% nms]
   nms2 <- nms[!nms %in% nms1]
   new_tbl2 <- new_tbl2[, c(nms1, nms2)]
-  if( dry_run ) {
+  if ( dry_run ) {
     return(new_tbl2)
   }
   save_meta2(new_tbl2, meta_type = "electrodes",

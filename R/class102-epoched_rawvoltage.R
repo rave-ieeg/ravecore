@@ -120,15 +120,15 @@ RAVESubjectEpochRawVoltageRepository <- R6::R6Class(
       # self$`@restored` <- TRUE
 
       workers <- 0
-      if(self$`@restored`) { workers <- 1 }
+      if (self$`@restored`) { workers <- 1 }
 
-      if(length(electrodes) == 1 && is.na(electrodes)) {
+      if (length(electrodes) == 1 && is.na(electrodes)) {
         # Do not load data, just fill in the meta
         electrodes <- integer()
       } else {
         electrodes <- parse_svec(electrodes)
         electrodes <- electrodes[electrodes %in% self$electrode_list]
-        if(!length(electrodes)) {
+        if (!length(electrodes)) {
           electrodes <- self$electrode_list
         }
       }
@@ -136,9 +136,9 @@ RAVESubjectEpochRawVoltageRepository <- R6::R6Class(
       # check data_list
       nms <- sprintf("e_%d", electrodes)
 
-      if( length(private$.data) > 0 && !force ) {
+      if ( length(private$.data) > 0 && !force ) {
         exist_list <- names(private$.data$data_list)
-        if(all(nms %in% exist_list)) { return(self) }
+        if (all(nms %in% exist_list)) { return(self) }
       }
 
       all_electrode_instances <- self$electrode_instances
@@ -180,7 +180,7 @@ RAVESubjectEpochRawVoltageRepository <- R6::R6Class(
       )
 
       private$.data$data_list <- as.list(private$.data$data_list)
-      if(length(data_list)) {
+      if (length(data_list)) {
         private$.data$data_list[nms] <- data_list[nms]
       }
 
@@ -215,12 +215,12 @@ RAVESubjectEpochRawVoltageRepository <- R6::R6Class(
     #' @field reference_table reference table, all channels will be marked as no reference
     reference_table = function() {
       subject <- private$.subject
-      if(!length(subject$electrodes)) {
+      if (!length(subject$electrodes)) {
         stop("No electrode/channel found under this subject. Please import data first.")
       }
       reference_name <- "noref"
-      if(!isTRUE(reference_name %in% subject$reference_names)) {
-        if(identical(tolower(self$reference_name), "noref")) {
+      if (!isTRUE(reference_name %in% subject$reference_names)) {
+        if (identical(tolower(self$reference_name), "noref")) {
           reference_table <- data.frame(
             Electrode = subject$electrodes,
             Group = "default",

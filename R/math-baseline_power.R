@@ -82,7 +82,7 @@ power_baseline <- function(
     x, baseline_windows,
     method = c("percentage", "sqrt_percentage", "decibel", "zscore", "sqrt_zscore"),
     units = c("Trial", "Frequency", "Electrode"), ...
-){
+) {
   UseMethod("power_baseline")
 }
 
@@ -93,29 +93,29 @@ power_baseline.rave_prepare_power <- function(
     method = c("percentage", "sqrt_percentage", "decibel", "zscore", "sqrt_zscore"),
     units = c("Frequency", "Trial", "Electrode"),
     electrodes, ...
-){
+) {
   method <- match.arg(method)
   force(baseline_windows)
 
-  if(missing(electrodes)){
+  if (missing(electrodes)) {
     electrodes <- x$electrode_list
   } else {
     electrodes <- electrodes[electrodes %in% x$electrode_list]
-    if(!length(electrodes)) {
+    if (!length(electrodes)) {
       stop("`power_baseline`: none of electrodes specified can be found in the loaded repository")
     }
   }
 
   sample_rates <- x$sample_rates
 
-  # if(!inherits(x$baselined, "fastmap2")){
+  # if(!inherits(x$baselined, "fastmap2")) {
   #   x$baselined <- fastmap2()
   # }
 
   # Prepare global variables
   baseline_windows <- validate_time_window(baseline_windows)
   units <- units[!units %in% "Time"]
-  if(!length(units) || !all(units %in% c("Frequency", "Trial", "Electrode"))){
+  if (!length(units) || !all(units %in% c("Frequency", "Trial", "Electrode"))) {
     stop('`units` must contain 1-3 of the followings: "Frequency", "Trial", "Electrode" (case-sensitive)')
   }
   unit_dims <- c(1L, 3L, 4L)[c("Frequency", "Trial", "Electrode") %in% units]
@@ -131,7 +131,7 @@ power_baseline.rave_prepare_power <- function(
   # dm <- dim(sub_list[[1]])
   # dm[[4]] <- length(sub_elec)
 
-  time_index <- unique(unlist(lapply(baseline_windows, function(w){
+  time_index <- unique(unlist(lapply(baseline_windows, function(w) {
     which(x$power$dimnames$Time >= w[[1]] & x$power$dimnames$Time <= w[[2]])
   })))
 
@@ -160,9 +160,9 @@ power_baseline.rave_prepare_power <- function(
     )
     ravepipeline::logger("Using existing cache", level = "trace")
     res
-  }, error = function(e){
+  }, error = function(e) {
     # message(e$message)
-    if(dir.exists(filebase)){ unlink(filebase, recursive = TRUE, force = TRUE) }
+    if (dir.exists(filebase)) { unlink(filebase, recursive = TRUE, force = TRUE) }
     dir_create2(dirname(filebase))
     res <- filearray::filearray_create(
       filebase = filebase,
@@ -186,15 +186,15 @@ power_baseline.rave_prepare_power <- function(
     res
   })
 
-  if("Electrode" %in% units){
+  if ("Electrode" %in% units) {
     # Check electrode with baselines
     todo_elec <- sub_elec[!sub_elec %in% res$.header$electrodes]
 
-    if(length(todo_elec)) {
+    if (length(todo_elec)) {
 
       res$set_header("ready", FALSE)
 
-      input_list <- lapply(todo_elec, function(e){
+      input_list <- lapply(todo_elec, function(e) {
         idx <- which(x$electrode_list == e)
         list(
           index = idx,
@@ -251,7 +251,7 @@ power_baseline.rave_prepare_power <- function(
   power$baselined <- res
   return(x)
   #
-  #   if("Electrode" %in% units){
+  #   if ("Electrode" %in% units) {
   #
   #
   #
@@ -288,24 +288,24 @@ power_baseline.FileArray <- function(
     method = c("percentage", "sqrt_percentage", "decibel", "zscore", "sqrt_zscore"),
     units = c("Frequency", "Trial", "Electrode"),
     filebase = NULL, ...
-){
+) {
   method <- match.arg(method)
   # x <- filearray::filearray_load('/Users/dipterix/rave_data/cache_dir/_binded_arrays_/75131880730a1e599bbcd63c798f62b6/power/LFP'); baseline_windows <- c(-1,2); units = c("Trial", "Frequency", "Electrode"); data_only = FALSE; filebase = tempfile(); method = 'percentage'
   baseline_windows <- validate_time_window(baseline_windows)
   dnames <- dimnames(x)
   dm <- dim(x)
   dnn <- c("Frequency", "Time", "Trial", "Electrode")
-  if(!identical(names(dnames), dnn)){
+  if (!identical(names(dnames), dnn)) {
     stop('The dimension names are inconsistent, should be c("Frequency", "Time", "Trial", "Electrode")')
   }
   units <- units[!units %in% "Time"]
-  if(!length(units) || !all(units %in% dnn)){
+  if (!length(units) || !all(units %in% dnn)) {
     stop('`units` must contain 1-3 of the followings: "Frequency", "Trial", "Electrode" (case-sensitive)')
   }
 
   unit_dims <- c(1L, 3L, 4L)[c("Frequency", "Trial", "Electrode") %in% units]
   dnames$Time <- as.numeric(dnames$Time)
-  time_index <- unique(unlist(lapply(baseline_windows, function(w){
+  time_index <- unique(unlist(lapply(baseline_windows, function(w) {
     which(dnames$Time >= w[[1]] & dnames$Time <= w[[2]])
   })))
 
@@ -324,7 +324,7 @@ power_baseline.FileArray <- function(
   )
   signature <- ravepipeline::digest(digest_key)
 
-  if(!length(filebase)){
+  if (!length(filebase)) {
     filebase <- file.path(cache_root(), "_baselined_arrays_", signature)
   }
   dir_create2(dirname(filebase))
@@ -340,8 +340,8 @@ power_baseline.FileArray <- function(
     )
     # No need to baseline again, the settings haven't changed
     return(res)
-  }, error = function(e){
-    if(dir.exists(filebase)){ unlink(filebase, recursive = TRUE, force = TRUE) }
+  }, error = function(e) {
+    if (dir.exists(filebase)) { unlink(filebase, recursive = TRUE, force = TRUE) }
     res <- filearray::filearray_create(filebase, dm, type = "float", partition_size = 1)
     res$.mode <- "readwrite"
     res$.header$rave_signature <- signature
@@ -363,9 +363,9 @@ power_baseline.FileArray <- function(
   x_wrapper <- ravepipeline::RAVEFileArray$new(x, temporary = FALSE)
 
 
-  if("Electrode" %in% units){
+  if ("Electrode" %in% units) {
 
-    ravepipeline::lapply_jobs(seq_len(dm[[length(dm)]]), function(ii){
+    ravepipeline::lapply_jobs(seq_len(dm[[length(dm)]]), function(ii) {
       res <- res_wrapper$`@impl`
       res[, , , ii] <-
         ravetools::baseline_array(
@@ -408,7 +408,7 @@ power_baseline.array <- function(
     x, baseline_windows,
     method = c("percentage", "sqrt_percentage", "decibel", "zscore", "sqrt_zscore"),
     units = c("Trial", "Frequency", "Electrode"), ...
-){
+) {
   method <- match.arg(method)
   baseline_windows <- validate_time_window(baseline_windows)
   dm <- dim(x)
@@ -418,13 +418,13 @@ power_baseline.array <- function(
              msg = 'The dimension names are inconsistent, must contain 4 modes: "Frequency", "Time", "Trial", "Electrode"')
 
   dnames$Time <- as.numeric(dnames$Time)
-  time_index <- unique(unlist(lapply(baseline_windows, function(w){
+  time_index <- unique(unlist(lapply(baseline_windows, function(w) {
     which(dnames$Time >= w[[1]] & dnames$Time <= w[[2]])
   })))
   time_margin <- which(dnn == "Time")
 
   units <- units[!units %in% "Time"]
-  if(!length(units) || !all(units %in% dnn)){
+  if (!length(units) || !all(units %in% dnn)) {
     stop('`units` must contain 1-3 of the followings: "Frequency", "Trial", "Electrode" (case-sensitive)')
   }
   unit_dims <- which(dnn %in% units)

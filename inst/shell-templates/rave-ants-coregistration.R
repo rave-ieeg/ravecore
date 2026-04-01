@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript --no-save --no-restore
 
 # check if rpyANTs is configured
-if( !isTRUE(rpyANTs::ants_available()) ) {
+if (!isTRUE(rpyANTs::ants_available())) {
   rpyANTs::install_ants()
 }
 
@@ -25,7 +25,7 @@ verbose <- TRUE
 coreg_path <- file.path(work_path, "coregistration")
 
 deriv_path <- file.path(work_path, "derivative")
-if(!dir.exists(deriv_path)) {
+if (!dir.exists(deriv_path)) {
   dir.create(deriv_path, showWarnings = FALSE, recursive = TRUE)
 }
 
@@ -40,7 +40,7 @@ outputs <- list(
 )
 
 is_linear <- grepl("(rigid|affine)", reg_type, ignore.case = TRUE)
-if( is_linear ) {
+if ( is_linear ) {
   outputs$CT_IJK_to_MR_RAS <- list(
     type = "transform",
     dimension = "4x4",
@@ -161,7 +161,7 @@ file.copy(
   copy.date = TRUE
 )
 
-if( is_linear ) {
+if ( is_linear ) {
   file.copy(
     from = file.path(coreg_path, "CT_IJK_to_MR_RAS.txt"),
     to = file.path(deriv_path, "transform-ctIJK2mrRAS.txt"),

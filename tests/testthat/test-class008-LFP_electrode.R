@@ -2,11 +2,11 @@ test_that("LFP_electrode", {
 
   testthat::skip_on_cran()
   testthat::skip_if_not({
-    subject <- as_rave_subject('demo/DemoSubject', strict = FALSE)
+    subject <- as_rave_subject("demo/DemoSubject", strict = FALSE)
     file.exists(subject$path)
   })
 
-  self <- LFP_electrode$new(subject = 'demo/DemoSubject', number = 14)
+  self <- LFP_electrode$new(subject = "demo/DemoSubject", number = 14)
   private <- self$.__enclos_env__$private
 
   testthat::expect_equal(self$h5_fname, "14.h5")

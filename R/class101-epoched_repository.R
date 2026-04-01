@@ -240,7 +240,7 @@ RAVESubjectEpochRepository <- R6::R6Class(
         container <- self$get_container()
         dames <- container$dimnames
         summary[[data_type]] <- list(
-          path = sprintf('with_epochs/%s', data_type),
+          path = sprintf("with_epochs/%s", data_type),
           names = names(container$dimnames),
           shape = as.integer(unname(container$dim))
         )
@@ -265,7 +265,7 @@ RAVESubjectEpochRepository <- R6::R6Class(
         if (!length(available_epoch_names)) {
           ravepipeline::logger("No epoch file found in this subject. Please check meta folder and make sure you have generated epoch_*.csv")
         }
-        epoch_name <- subject$get_default('epoch_name', default_if_missing = available_epoch_names[[1]])
+        epoch_name <- subject$get_default("epoch_name", default_if_missing = available_epoch_names[[1]])
         ravepipeline::logger(
           "Epoch name is unspecified, choosing a default one: ", epoch_name,
           ". This is not recommended. Please specify epoch names explicitly!",

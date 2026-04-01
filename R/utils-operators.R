@@ -1,4 +1,4 @@
-`%?<-%` <- function (lhs, value) {
+`%?<-%` <- function(lhs, value) {
   env <- parent.frame()
   lhs <- substitute(lhs)
   isnull <- tryCatch({
@@ -12,12 +12,11 @@
 }
 
 
-`%OF%` <- function (lhs, rhs)
+`%OF%` <- function(lhs, rhs)
 {
   if (length(rhs)) {
     de <- rhs[[1]]
-  }
-  else {
+  } else {
     de <- rhs
   }
   lhs <- lhs[!is.na(lhs)]

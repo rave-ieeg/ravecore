@@ -3,7 +3,7 @@
 #' @description \code{R6} class definition
 #' @export
 RAVESubject <- R6::R6Class(
-  classname = 'RAVESubject',
+  classname = "RAVESubject",
   class = TRUE,
   portable = TRUE,
   inherit = RAVESerializable,
@@ -47,8 +47,8 @@ RAVESubject <- R6::R6Class(
 
     #' @description override print method
     #' @param ... ignored
-    print = function(...){
-      cat('RAVE subject <', self$subject_id, '>\n', sep = '')
+    print = function(...) {
+      cat("RAVE subject <", self$subject_id, ">\n", sep = "")
     },
 
     #' @description constructor
@@ -57,13 +57,13 @@ RAVESubject <- R6::R6Class(
     #' @param strict whether to check if subject folders exist
     #' @param parent_path parent path if no default path is used, this is for
     #' the root directory if subject is in 'BIDS' format
-    initialize = function(project_name, subject_code = NULL, strict = TRUE, parent_path = NULL){
-      if(length(subject_code) != 1) {
+    initialize = function(project_name, subject_code = NULL, strict = TRUE, parent_path = NULL) {
+      if (length(subject_code) != 1) {
         private$impl <- restore_subject_impl(subject_id = project_name)
       } else {
         project <- as_rave_project(project_name, strict = FALSE)
         project_impl <- project$`@impl`
-        if( project_impl@format_standard == "bids" ) {
+        if ( project_impl@format_standard == "bids" ) {
           # reload project as parent_path can be shared, in case the project needs it
           project <- as_rave_project(project_name, strict = FALSE, parent_path = parent_path)
           project_impl <- project$`@impl`
@@ -75,10 +75,10 @@ RAVESubject <- R6::R6Class(
         private$impl <- subject_impl
       }
 
-      if(strict) {
+      if (strict) {
         # check paths
         project_subject_path <- rave_path(private$impl, storage = "project_subject")
-        if(!dir_exists(project_subject_path)) {
+        if (!dir_exists(project_subject_path)) {
           stop(sprintf("RAVE subject folder is missing for [%s]", private$impl@id))
         }
       }
@@ -98,52 +98,52 @@ RAVESubject <- R6::R6Class(
     #' @seealso \code{\link{load_meta2}}
     #' @returns data frame
     meta_data = function(
-      meta_type = c('electrodes', 'frequencies', 'time_points', 'epoch', 'references'),
-      meta_name = 'default', strict = TRUE
-    ){
+      meta_type = c("electrodes", "frequencies", "time_points", "epoch", "references"),
+      meta_name = "default", strict = TRUE
+    ) {
       meta_type <- match.arg(meta_type)
       meta_file <- rave_path(private$impl, storage = meta_type, meta_name = meta_name)
-      if(length(meta_file) != 1 || is.na(meta_file) || !file_exists(meta_file)) {
-        if(strict) {
+      if (length(meta_file) != 1 || is.na(meta_file) || !file_exists(meta_file)) {
+        if (strict) {
           stop(sprintf("Invalid metadata path for type [%s] and name [%s]", meta_type, paste(meta_name, collapse = "")))
         } else {
           return(NULL)
         }
       }
 
-      switch (
+      switch(
         meta_type,
         "electrodes" = {
           return(load_electrodes_csv(meta_file))
         },
         "time_points" = {
-          return(safe_read_csv(meta_file, colClasses = c(Block = 'character')))
+          return(safe_read_csv(meta_file, colClasses = c(Block = "character")))
         },
         "frequencies" = {
-          return(safe_read_csv(meta_file, colClasses = c(Frequency = 'numeric')))
+          return(safe_read_csv(meta_file, colClasses = c(Frequency = "numeric")))
         },
         "epoch" = {
-          default_cols <- c('Block', 'Time', 'Trial', 'Condition', 'Duration', 'ExcludedElectrodes')
-          epochs <- utils::read.csv(meta_file, header = TRUE, stringsAsFactors = FALSE, colClasses = 'character')
+          default_cols <- c("Block", "Time", "Trial", "Condition", "Duration", "ExcludedElectrodes")
+          epochs <- utils::read.csv(meta_file, header = TRUE, stringsAsFactors = FALSE, colClasses = "character")
 
           # check blocks in case block leading 0s are removed by excel
-          preprocess_yaml <- file_path(rave_path(private$impl, storage = "preprocess"), 'rave.yaml')
-          if(file_exists(preprocess_yaml)) {
+          preprocess_yaml <- file_path(rave_path(private$impl, storage = "preprocess"), "rave.yaml")
+          if (file_exists(preprocess_yaml)) {
             preproc_info <- load_yaml(preprocess_yaml)
-            if(length(preproc_info$blocks)){
+            if (length(preproc_info$blocks)) {
               pass_test <- TRUE
-              # let's check block!
+              # let"s check block!
               invalid_blocks <- !epochs$Block %in% preproc_info$blocks
-              if(any(invalid_blocks)){
+              if (any(invalid_blocks)) {
                 t1 <- data.frame(idx = seq_along(epochs$Block), block = epochs$Block, stringsAsFactors = FALSE)
                 numeric_blocks <- suppressWarnings({ as.numeric(preproc_info$blocks) })
                 t2 <- data.frame(block = preproc_info$blocks, numblock = numeric_blocks, value = preproc_info$blocks, stringsAsFactors = FALSE)
-                t1 <- merge(t1, t2, all.x = TRUE, by.x = 'block', by.y = 'block')
-                t1 <- merge(t1[, c('block', 'idx', 'value')], t2, all.x = TRUE, by.x = 'block', by.y = 'numblock', suffixes = c('1', '2'))
+                t1 <- merge(t1, t2, all.x = TRUE, by.x = "block", by.y = "block")
+                t1 <- merge(t1[, c("block", "idx", "value")], t2, all.x = TRUE, by.x = "block", by.y = "numblock", suffixes = c("1", "2"))
                 sel <- is.na(t1$value1)
                 t1$value1[sel] <- t1$value2[sel]
 
-                if(any(is.na(t1$value1))){
+                if (any(is.na(t1$value1))) {
                   # block cannot find
                   # TODO
                 }
@@ -158,18 +158,18 @@ RAVESubject <- R6::R6Class(
           epochs$Duration %?<-% NA
           epochs$Duration <- as.numeric(epochs$Duration)
 
-          epochs$Condition %?<-% 'NoCondition'
-          epochs$Condition[is.na(epochs$Condition)] <- 'NoCondition'
+          epochs$Condition %?<-% "NoCondition"
+          epochs$Condition[is.na(epochs$Condition)] <- "NoCondition"
           epochs$Condition <- as.character(epochs$Condition)
 
-          epochs$ExcludedElectrodes %?<-% ''
+          epochs$ExcludedElectrodes %?<-% ""
           # sort column orders
           nms <- names(epochs)
           nms <- c(default_cols, nms[!nms %in% default_cols])
           epochs <- epochs[, nms]
           # get column names with leading "Event_xxx"
-          events <- nms[grepl('^Event_.+', nms)]
-          for(evt in events){
+          events <- nms[grepl("^Event_.+", nms)]
+          for (evt in events) {
             epochs[[evt]] <- as.numeric(epochs[[evt]])
           }
           return(epochs)
@@ -181,7 +181,7 @@ RAVESubject <- R6::R6Class(
         },
         "time_excluded" = {
           # file <- file.path(meta_dir, 'time_excluded.csv')
-          return(safe_read_csv(meta_file, header = TRUE, stringsAsFactors = FALSE, colClasses = c('character', 'numeric', 'numeric')))
+          return(safe_read_csv(meta_file, header = TRUE, stringsAsFactors = FALSE, colClasses = c("character", "numeric", "numeric")))
         },
         "references" = {
           ref_tbl <- safe_read_csv(meta_file, header = TRUE, stringsAsFactors = FALSE)
@@ -195,7 +195,7 @@ RAVESubject <- R6::R6Class(
           NULL
         }
       )
-      if(strict) {
+      if (strict) {
         stop(sprintf("Invalid metadata path for type [%s] and name [%s]", meta_type, paste(meta_name, collapse = "")))
       } else {
         return(NULL)
@@ -209,24 +209,24 @@ RAVESubject <- R6::R6Class(
     #' @param refresh whether to reload reference table before obtaining data,
     #' default is false
     #' @returns integer vector of valid electrodes
-    valid_electrodes = function(reference_name = NULL, refresh = FALSE){
-      if(missing(reference_name) || is.null(reference_name)) {
+    valid_electrodes = function(reference_name = NULL, refresh = FALSE) {
+      if (missing(reference_name) || is.null(reference_name)) {
         reference_name <- "default" %OF% c(self$reference_names, "noref")
       }
-      if(refresh){
+      if (refresh) {
         private$.reference_tables[[reference_name]] <- self$meta_data(
-          meta_type = 'references', meta_name = reference_name, strict = FALSE)
+          meta_type = "references", meta_name = reference_name, strict = FALSE)
       } else {
         private$.reference_tables[[reference_name]] %?<-% self$meta_data(
-          meta_type = 'references', meta_name = reference_name, strict = FALSE)
+          meta_type = "references", meta_name = reference_name, strict = FALSE)
       }
       ref_table <- private$.reference_tables[[reference_name]]
-      as.integer(ref_table$Electrode[ref_table$Reference != ''])
+      as.integer(ref_table$Electrode[ref_table$Reference != ""])
     },
 
     #' @description create subject's directories on hard disk
     #' @param include_freesurfer whether to create 'FreeSurfer' path
-    initialize_paths = function(include_freesurfer = TRUE){
+    initialize_paths = function(include_freesurfer = TRUE) {
       dir_create2(self$rave_path)
       dir_create2(self$preprocess_path)
       dir_create2(self$data_path)
@@ -245,8 +245,8 @@ RAVESubject <- R6::R6Class(
       # save preprocess
       self$preprocess_settings$save()
 
-      if(include_freesurfer){
-        if(is.na(self$freesurfer_path) || !dir_exists(self$freesurfer_path)){
+      if (include_freesurfer) {
+        if (is.na(self$freesurfer_path) || !dir_exists(self$freesurfer_path)) {
           dir_create2(self$imaging_path)
         }
       }
@@ -258,7 +258,7 @@ RAVESubject <- R6::R6Class(
     #' @param value value of the key
     #' @param namespace file name of the note (without post-fix)
     #' @returns The same as \code{value}
-    set_default = function(key, value, namespace = "default"){
+    set_default = function(key, value, namespace = "default") {
 
       stopifnot2(is.character(key) && length(key) == 1, msg = "`key` must be a character of length 1")
       stopifnot2(is.character(namespace) && length(namespace) == 1, msg = "`namespace` must be a character of length 1")
@@ -266,14 +266,14 @@ RAVESubject <- R6::R6Class(
       stopifnot2(!grepl("[^A-Za-z0-9_-]", namespace), msg = "`namespace` can only contain letters, digits, dash (-), and/or underscore (_)")
 
       force(value)
-      if(!dir_exists(self$note_path)){
+      if (!dir_exists(self$note_path)) {
         dir_create2(self$note_path)
       }
       default_path <- file.path(self$note_path, sprintf("%s.json", namespace))
       default_path_backup <- file.path(self$note_path, sprintf("%s.yaml", namespace))
       defaults <- fastmap2()
       exists <- FALSE
-      if(file.exists(default_path)){
+      if (file.exists(default_path)) {
         try(silent = TRUE, {
           load_json(default_path, map = defaults)
           exists <- TRUE
@@ -288,12 +288,12 @@ RAVESubject <- R6::R6Class(
       }
 
       old_val <- defaults[[key]]
-      if(is.null(old_val)) {
+      if (is.null(old_val)) {
         defaults[[key]] <- structure(
           list(), entry_value = value, timestamp = Sys.time(),
           class = "raveio-subject-entry"
         )
-      } else if( !identical(attr(old_val, "entry_value"), value) ){
+      } else if ( !identical(attr(old_val, "entry_value"), value) ) {
         defaults[[key]] <- structure(
           list(), entry_value = value, timestamp = Sys.time(),
           previous_value = old_val, class = "raveio-subject-entry"
@@ -311,7 +311,7 @@ RAVESubject <- R6::R6Class(
       entries <- structure(
         lapply(entry_names, function(nm) {
           val <- defaults[[nm]]
-          if(inherits(val, "raveio-subject-entry")) {
+          if (inherits(val, "raveio-subject-entry")) {
             return(attr(val, "entry_value"))
           }
           return(val)
@@ -333,7 +333,7 @@ RAVESubject <- R6::R6Class(
     #' @returns A named list of key-value pairs, or if one key is specified and
     #' \code{simplify=TRUE}, then only the value will be returned.
     get_default = function(..., default_if_missing = NULL, simplify = TRUE,
-                           namespace = "default"){
+                           namespace = "default") {
       stopifnot2(is.character(namespace) && length(namespace) == 1, msg = "`namespace` must be a character of length 1")
       stopifnot2(!grepl("[^A-Za-z0-9_-]", namespace), msg = "`namespace` can only contain letters, digits, dash (-), and/or underscore (_)")
       default_path <- file_path(self$note_path, sprintf("%s.json", namespace))
@@ -342,29 +342,29 @@ RAVESubject <- R6::R6Class(
       defaults <- fastmap2(missing_default = default_if_missing)
 
       exists <- FALSE
-      if(file.exists(default_path)){
+      if (file.exists(default_path)) {
         tryCatch({
           load_json(con = default_path, map = defaults)
           exists <- TRUE
-        }, error = function(){})
+        }, error = function() {})
       }
 
       if (!exists && file.exists(default_path_backup)) {
         tryCatch({
           load_yaml(default_path_backup, map = defaults)
           exists <- TRUE
-        }, error = function(){})
+        }, error = function() {})
       }
 
       ndots <- ...length()
-      if(ndots == 0) {
+      if (ndots == 0) {
         simplify <- FALSE
       }
       re <- defaults[...]
       re <- structure(
         names = names(re),
         lapply(re, function(val) {
-          if(inherits(val, "raveio-subject-entry")) {
+          if (inherits(val, "raveio-subject-entry")) {
             return(attr(val, "entry_value"))
           } else {
             return(val)
@@ -372,7 +372,7 @@ RAVESubject <- R6::R6Class(
         })
       )
 
-      if(simplify && length(re) == 1){
+      if (simplify && length(re) == 1) {
         re <- re[[1]]
       }
       re
@@ -394,7 +394,7 @@ RAVESubject <- R6::R6Class(
     #' is the value of the corresponding entry.
     get_note_summary = function(namespaces, include_history = FALSE) {
 
-      if(missing(namespaces)) {
+      if (missing(namespaces)) {
         # get all possible namespaces
         namespaces <- list.files(
           path = self$note_path,
@@ -408,16 +408,16 @@ RAVESubject <- R6::R6Class(
         )
         namespaces <- unique(gsub(pattern = "\\.(json|yaml)$", replacement = "",
                                   x = namespaces, ignore.case = TRUE))
-        if("default" %in% namespaces) {
+        if ("default" %in% namespaces) {
           namespaces <- unique(c("default", namespaces))
         }
       }
 
       entries <- fastqueue2()
       extract_entries <- function(entry, name, namespace, is_root = FALSE) {
-        if(inherits(entry, "raveio-subject-entry")) {
+        if (inherits(entry, "raveio-subject-entry")) {
           timestamp <- attr(entry, "timestamp")
-          if(!inherits(timestamp, "POSIXct")) {
+          if (!inherits(timestamp, "POSIXct")) {
             timestamp <- NA
           }
           item <- list(
@@ -440,9 +440,9 @@ RAVESubject <- R6::R6Class(
         entries$add(item)
 
         # add previous record
-        if( include_history ) {
+        if ( include_history ) {
           previous_entry <- attr(entry, "previous_value")
-          if(!is.null(previous_entry)) {
+          if (!is.null(previous_entry)) {
             Recall(entry = previous_entry, name = name, namespace = namespace, is_root = FALSE)
           }
         }
@@ -456,7 +456,7 @@ RAVESubject <- R6::R6Class(
 
         exists <- FALSE
 
-        if(file.exists(default_path)){
+        if (file.exists(default_path)) {
           try({
             load_json(con = default_path, map = defaults)
             exists <- TRUE
@@ -470,10 +470,10 @@ RAVESubject <- R6::R6Class(
           })
         }
 
-        if(!exists) { return(NULL) }
+        if (!exists) { return(NULL) }
 
-        for(nm in names(defaults)) {
-          if(nm != "") {
+        for (nm in names(defaults)) {
+          if (nm != "") {
             try({ extract_entries(defaults[[nm]], name = nm, namespace = namespace, is_root = TRUE) })
           }
         }
@@ -502,34 +502,34 @@ RAVESubject <- R6::R6Class(
     #' @returns If \code{as_table} is \code{FALSE}, then returns as
     #' \code{\link{RAVEEpoch}} instance; otherwise returns epoch table; will
     #' raise errors when file is missing or the epoch is invalid.
-    get_epoch = function(epoch_name = "default", as_table = FALSE, trial_starts = 0){
-      if(length(epoch_name) != 1){
+    get_epoch = function(epoch_name = "default", as_table = FALSE, trial_starts = 0) {
+      if (length(epoch_name) != 1) {
         stop("Only one epoch is allowed at a time.")
       }
-      if(!isTRUE(epoch_name %in% self$epoch_names)){
+      if (!isTRUE(epoch_name %in% self$epoch_names)) {
         stop("Subject ", self$subject_id, " has no epoch name called: ",
              sQuote(epoch_name), "\n  Please check folder\n    ",
              self$meta_path, "\n  and make sure ",
              sQuote(sprintf("epoch_%s.csv", epoch_name)), " exists.")
       }
       epoch <- RAVEEpoch$new(subject = self, name = epoch_name)
-      if(!length(epoch$trials)){
+      if (!length(epoch$trials)) {
         stop("Cannot load epoch file correctly: \n  > Epoch file is missing or corrupted, or there is no trial in the epoch file. \nA typical RAVE-epoch file contains 4 columns (case-sensitive): \n  Block (characters), Time (numerical), Trial (integer), Condition (characters).")
       }
       # trial starts from -1 sec but only 0.5 seconds are allowed
-      invalid_trials <- unlist(lapply(epoch$trials, function(ii){
+      invalid_trials <- unlist(lapply(epoch$trials, function(ii) {
         info <- epoch$trial_at(ii, df = FALSE)
-        if(info$Time + trial_starts < 0){
+        if (info$Time + trial_starts < 0) {
           return(ii)
         }
         return()
       }))
 
-      if(any(invalid_trials)){
+      if (any(invalid_trials)) {
         stop("Trial ", deparse_svec(invalid_trials), " start too soon after the beginning of the sessions (less than ", sprintf("%.2f seconds", -trial_starts), "). Please adjust the trial start time (i.e. ", sQuote("Pre"), " if you are using the RAVE application).")
       }
 
-      if( as_table ){
+      if ( as_table ) {
         epoch <- epoch$table
       }
       epoch
@@ -542,21 +542,21 @@ RAVESubject <- R6::R6Class(
     #' @returns If \code{simplify} is true, returns a vector of reference
     #' electrode names, otherwise returns the whole table; will
     #' raise errors when file is missing or the reference is invalid.
-    get_reference = function(reference_name, simplify = FALSE){
-      if(length(reference_name) != 1){
+    get_reference = function(reference_name, simplify = FALSE) {
+      if (length(reference_name) != 1) {
         stop("Only one reference is allowed at a time.")
       }
-      if(!isTRUE(reference_name %in% c(self$reference_names, "_unsaved"))){
+      if (!isTRUE(reference_name %in% c(self$reference_names, "_unsaved"))) {
         stop("Subject ", self$subject_id, " has no reference name called: ", sQuote(reference_name), "\n  Please check folder\n    ", self$meta_path, "\n  and make sure ", sQuote(sprintf("reference_%s.csv", reference_name)), " exists.")
       }
 
-      reference_table <- self$meta_data(meta_type = 'reference', meta_name = reference_name)
+      reference_table <- self$meta_data(meta_type = "reference", meta_name = reference_name)
 
-      if(!is.data.frame(reference_table)){
+      if (!is.data.frame(reference_table)) {
         stop("Cannot load reference file correctly. A typical RAVE-reference file contains 4 columns (case-sensitive): Electrode (integer), Group (characters), Reference (characters), Type (characters).")
       }
 
-      if(simplify){
+      if (simplify) {
         return(reference_table$Reference)
       }
       reference_table
@@ -575,10 +575,10 @@ RAVESubject <- R6::R6Class(
     #' returns a table. If \code{subset} is true, then the table will be
     #' subset and only rows with electrodes to be loaded will be kept.
     get_electrode_table = function(electrodes, reference_name,
-                                   subset = FALSE, simplify = FALSE, warn = TRUE){
+                                   subset = FALSE, simplify = FALSE, warn = TRUE) {
       preproc <- self$preprocess_settings
       all_electrodes <- self$electrodes
-      if(missing(reference_name) || !length(reference_name) ||
+      if (missing(reference_name) || !length(reference_name) ||
          is.na(reference_name) || identical(reference_name, ".fake")) {
         valid_electrodes <- all_electrodes
         reference_table <- NULL
@@ -590,14 +590,14 @@ RAVESubject <- R6::R6Class(
                                level = "warning", use_glue = TRUE)
           NULL
         })
-        if(is.data.frame(reference_table)) {
+        if (is.data.frame(reference_table)) {
           valid_electrodes <- self$valid_electrodes(reference_name = reference_name)
         } else {
           valid_electrodes <- all_electrodes
         }
       }
 
-      if(missing(electrodes)){
+      if (missing(electrodes)) {
         load_electrodes <- valid_electrodes
       } else {
         # Get electrodes to be loaded
@@ -606,20 +606,20 @@ RAVESubject <- R6::R6Class(
 
       electrode_table <- self$meta_data("electrodes", strict = FALSE)
 
-      if(!is.data.frame(electrode_table)){
+      if (!is.data.frame(electrode_table)) {
 
-        if(length(self$electrodes)) {
+        if (length(self$electrodes)) {
 
-          if(private$impl@project@format_standard == "bids") {
+          if (private$impl@project@format_standard == "bids") {
             bids_table <- get_bids_electrodes_table(self)
-            if(nrow(bids_table) >= max(self$electrodes)) {
+            if (nrow(bids_table) >= max(self$electrodes)) {
               bids_table <- bids_table[self$electrodes, ]
               bids_table$SignalType <- self$electrode_types
               electrode_table <- bids_table
             }
           }
 
-          if(!is.data.frame(electrode_table)) {
+          if (!is.data.frame(electrode_table)) {
             electrode_table <- data.frame(
               Electrode = self$electrodes,
               Coord_x = 0,
@@ -633,7 +633,7 @@ RAVESubject <- R6::R6Class(
                      project_name = self$project_name,
                      subject_code = self$subject_code)
           electrode_table <- self$meta_data("electrodes")
-          if(warn) {
+          if (warn) {
             ravepipeline::logger("Cannot load electrode.csv correctly. A basic RAVE-electrode file contains 5 columns (case-sensitive): Electrode (integer), Coord_x (numerical), Coord_y (numerical), Coord_y (numerical), Label (characters). Creating a blank electrode file.", level = "warning")
           }
         } else {
@@ -642,18 +642,18 @@ RAVESubject <- R6::R6Class(
 
       }
 
-      if(!is.null(reference_table)){
-        electrode_table <- merge(electrode_table, reference_table, by = 'Electrode', all.x = TRUE, all.y = FALSE)
+      if (!is.null(reference_table)) {
+        electrode_table <- merge(electrode_table, reference_table, by = "Electrode", all.x = TRUE, all.y = FALSE)
         electrode_table$isLoaded <- electrode_table$Electrode %in% load_electrodes
-        if(subset){
+        if (subset) {
           electrode_table <- electrode_table[electrode_table$isLoaded, ]
         }
-        if(length(electrode_table$Reference)) {
+        if (length(electrode_table$Reference)) {
           electrode_table$Reference[is.na(electrode_table$Reference)] <- "noref"
         }
       }
 
-      if(simplify){
+      if (simplify) {
         return(electrode_table$Electrode)
       }
       electrode_table
@@ -664,12 +664,12 @@ RAVESubject <- R6::R6Class(
     #' @param simplify whether to simplify as vector
     #' @returns If \code{simplify} is true, returns a vector of frequencies;
     #' otherwise returns a table.
-    get_frequency = function(simplify = TRUE){
-      frequency_table <- self$meta_data('frequencies')
-      if(!is.data.frame(frequency_table)){
+    get_frequency = function(simplify = TRUE) {
+      frequency_table <- self$meta_data("frequencies")
+      if (!is.data.frame(frequency_table)) {
         stop("Cannot load frequency table. Please run wavelet first.")
       }
-      if(simplify){
+      if (simplify) {
         return(frequency_table$Frequency)
       }
       frequency_table
@@ -686,10 +686,10 @@ RAVESubject <- R6::R6Class(
     list_pipelines = function(pipeline_name, cache = FALSE, check = TRUE, all = FALSE) {
 
       registry <- NULL
-      if( cache ) {
+      if ( cache ) {
         # use cached registry
         registry_path <- file.path(self$pipeline_path, "pipeline-registry.csv")
-        if(file.exists(registry_path)) {
+        if (file.exists(registry_path)) {
           registry <- tryCatch({
             registry <- data.table::fread(
               registry_path,
@@ -704,18 +704,18 @@ RAVESubject <- R6::R6Class(
               ), na.strings = "n/a"
             )
             stopifnot(all(c("project", "subject", "pipeline_name", "timestamp", "label", "directory") %in% names(registry)))
-            if(nrow(registry)) {
-              if(!length(registry$policy)) {
+            if (nrow(registry)) {
+              if (!length(registry$policy)) {
                 registry$policy <- "default"
               }
-              if(!length(registry$version)) {
+              if (!length(registry$version)) {
                 registry$version <- "0.0.0.9000"
               }
             }
             registry
           }, error = function(...) { NULL })
-          if(nrow(registry)) {
-            if(check) {
+          if (nrow(registry)) {
+            if (check) {
               registry <- registry[registry$pipeline_name == pipeline_name, ]
               registry <- registry[dir.exists(file.path(self$pipeline_path, registry$pipeline_name, registry$directory)), ]
             }
@@ -723,7 +723,7 @@ RAVESubject <- R6::R6Class(
         }
       }
 
-      if(!is.data.frame(registry) || nrow(registry) == 0) {
+      if (!is.data.frame(registry) || nrow(registry) == 0) {
         pipeline_paths <- file.path(self$pipeline_path, pipeline_name)
         prefix <- sprintf("^%s-", pipeline_name)
         re <- list.files(
@@ -736,7 +736,7 @@ RAVESubject <- R6::R6Class(
           recursive = FALSE,
           full.names = FALSE
         )
-        if( check && length(re) ) {
+        if ( check && length(re) ) {
           re <- re[dir.exists(file.path(pipeline_paths, re))]
         }
         re <- lapply(re, function(name) {
@@ -747,7 +747,7 @@ RAVESubject <- R6::R6Class(
             label <- paste(item[-idx], collapse = "-")
             # check fork policy
             path_fork_info <- file.path(pipeline_paths, name, "_fork_info")
-            if(file.exists(path_fork_info)) {
+            if (file.exists(path_fork_info)) {
               info <- readRDS(path_fork_info)
             } else {
               info <- list(
@@ -771,7 +771,7 @@ RAVESubject <- R6::R6Class(
         registry <- data.table::rbindlist(re)
       }
 
-      if(!all && is.data.frame(registry) && nrow(registry) > 0) {
+      if (!all && is.data.frame(registry) && nrow(registry) > 0) {
         # remove duplicated labels
         registry <- registry[order(registry$label, registry$timestamp, decreasing = TRUE, na.last = TRUE), ]
         registry <- data.table::rbindlist(lapply(split(registry, registry$label), function(sub) {
@@ -790,7 +790,7 @@ RAVESubject <- R6::R6Class(
       # directory <- "power_explorer-NA-20240822T184419"
       pipeline_name <- strsplit(directory, "-", fixed = TRUE)[[1]][[1]]
       pipeline_path <- file.path(self$pipeline_path, pipeline_name, directory)
-      if(!file.exists(pipeline_path)) {
+      if (!file.exists(pipeline_path)) {
         stop("Unable to find pipeline [", directory, "] from subject ", self$subject_id)
       }
       ravepipeline::pipeline_from_path(pipeline_path)
@@ -806,37 +806,37 @@ RAVESubject <- R6::R6Class(
 
     #' @field project project instance of current subject; see
     #' \code{\link{RAVEProject}}
-    project = function(){
+    project = function() {
       as_rave_project(private$impl@project, strict = FALSE)
     },
 
     #' @field project_name character string of project name
-    project_name = function(){
+    project_name = function() {
       format(private$impl@project)
     },
 
     #' @field subject_code character string of subject code
-    subject_code = function(){
+    subject_code = function() {
       private$impl@subject_raw@code
     },
 
     #' @field subject_id subject ID: \code{"project/subject"}
-    subject_id = function(){
+    subject_id = function() {
       private$impl@id
     },
 
     #' @field path subject root path
-    path = function(){
+    path = function() {
       rave_path(private$impl, storage = "project_subject")
     },
 
     #' @field rave_path 'rave' directory under subject root path
-    rave_path = function(){
+    rave_path = function() {
       file_path(rave_path(private$impl, storage = "project_subject"), "rave")
     },
 
     #' @field meta_path meta data directory for current subject
-    meta_path = function(){
+    meta_path = function() {
       rave_path(private$impl, storage = "meta")
     },
 
@@ -847,109 +847,109 @@ RAVESubject <- R6::R6Class(
 
     #' @field freesurfer_path 'FreeSurfer' directory for current subject. If
     #' no path exists, values will be \code{NA}
-    freesurfer_path = function(){
+    freesurfer_path = function() {
       rave_path(private$impl, storage = "freesurfer")
     },
 
     #' @field preprocess_path preprocess directory under subject 'rave' path
-    preprocess_path = function(){
+    preprocess_path = function() {
       rave_path(private$impl, storage = "preprocess")
     },
 
     #' @field data_path data directory under subject 'rave' path
-    data_path = function(){
+    data_path = function() {
       rave_path(private$impl, storage = "signals")
     },
 
     #' @field cache_path path to 'FST' copies under subject 'data' path
-    cache_path = function(){
+    cache_path = function() {
       rave_path(private$impl, storage = "cache")
     },
 
     #' @field pipeline_path path to pipeline scripts under subject's folder
-    pipeline_path = function(){
+    pipeline_path = function() {
       rave_path(private$impl, storage = "pipelines")
     },
 
     #' @field report_path path to pipeline scripts under subject's folder
-    report_path = function(){
+    report_path = function() {
       rave_path(private$impl, storage = "reports")
     },
 
     #' @field note_path path that stores 'RAVE' related subject notes
-    note_path = function(){
+    note_path = function() {
       rave_path(private$impl, storage = "notes")
     },
 
     #' @field epoch_names possible epoch names
-    epoch_names = function(){
-      regexp <- '^epoch_([a-zA-Z0-9_]+)\\.[cC][sS][vV]$'
+    epoch_names = function() {
+      regexp <- "^epoch_([a-zA-Z0-9_]+)\\.[cC][sS][vV]$"
       fs <- list.files(self$meta_path, pattern = regexp, ignore.case = TRUE)
       match_info <- regexec(regexp, fs)
       nms <- unlist(lapply(regmatches(fs, match_info), function(m) { m[[2]] }))
       nms <- sort(unique(nms))
-      if(length(nms)) {
+      if (length(nms)) {
         nms <- nms[!startsWith(nms, "_")]
       }
       nms
     },
 
     #' @field reference_names possible reference names
-    reference_names = function(){
-      regexp <- '^reference_([a-zA-Z0-9_]+)\\.[cC][sS][vV]$'
+    reference_names = function() {
+      regexp <- "^reference_([a-zA-Z0-9_]+)\\.[cC][sS][vV]$"
       fs <- list.files(self$meta_path, pattern = regexp, ignore.case = TRUE)
       match_info <- regexec(regexp, fs)
       nms <- unlist(lapply(regmatches(fs, match_info), function(m) { m[[2]] }))
       nms <- sort(unique(nms))
-      if(length(nms)) {
+      if (length(nms)) {
         nms <- nms[!startsWith(nms, "_")]
       }
       nms
     },
 
     #' @field reference_path reference path under 'rave' folder
-    reference_path = function(){
+    reference_path = function() {
       rave_path(private$impl, storage = "reference")
     },
 
     #' @field preprocess_settings preprocess instance; see
     #' \code{\link{RAVEPreprocessSettings}}
-    preprocess_settings = function(){
+    preprocess_settings = function() {
       private$.preprocess
     },
 
     #' @field blocks subject experiment blocks in current project
-    blocks = function(){
+    blocks = function() {
       private$.preprocess$blocks
     },
 
     #' @field electrodes all electrodes, no matter excluded or not
-    electrodes = function(){
+    electrodes = function() {
       private$.preprocess$electrodes
     },
 
     #' @field raw_sample_rates voltage sample rate
-    raw_sample_rates = function(){
+    raw_sample_rates = function() {
       private$.preprocess$sample_rates
     },
 
     #' @field power_sample_rate power spectrum sample rate
-    power_sample_rate = function(){
+    power_sample_rate = function() {
       private$.preprocess$wavelet_params$downsample_to
     },
 
     #' @field has_wavelet whether electrodes have wavelet transforms
-    has_wavelet = function(){
+    has_wavelet = function() {
       private$.preprocess$has_wavelet
     },
 
     #' @field notch_filtered whether electrodes are Notch-filtered
-    notch_filtered = function(){
+    notch_filtered = function() {
       private$.preprocess$notch_filtered
     },
 
     #' @field electrode_types electrode signal types
-    electrode_types = function(){
+    electrode_types = function() {
       private$.preprocess$electrode_types
     },
 
@@ -989,15 +989,15 @@ new_rave_subject <- function(project_name, subject_code, strict = TRUE) {
 
 #' @rdname new_rave_subject
 #' @export
-as_rave_subject <- function(subject_id, strict = TRUE, reload = TRUE){
-  if(inherits(subject_id, 'RAVESubject')){
-    if(reload) {
+as_rave_subject <- function(subject_id, strict = TRUE, reload = TRUE) {
+  if (inherits(subject_id, "RAVESubject")) {
+    if (reload) {
       return(restore_subject_instance(subject_id$subject_id, strict = strict))
     } else {
       return(subject_id)
     }
-  } else if(inherits(subject_id, 'RAVEPreprocessSettings')) {
-    if(reload) {
+  } else if (inherits(subject_id, "RAVEPreprocessSettings")) {
+    if (reload) {
       return(restore_subject_instance(subject_id$subject$subject_id, strict = strict))
     } else {
       return(subject_id$subject)
@@ -1012,8 +1012,8 @@ as_rave_subject <- function(subject_id, strict = TRUE, reload = TRUE){
 #' @export
 has_rave_subject <- function(subject_id) {
 
-  if(!is.character(subject_id)) {
-    if( inherits(subject_id, 'RAVEPreprocessSettings') ) {
+  if (!is.character(subject_id)) {
+    if ( inherits(subject_id, "RAVEPreprocessSettings") ) {
       subject_id <- subject_id$subject$subject_id
     } else {
       subject_id <- subject_id$subject_id
@@ -1032,10 +1032,10 @@ has_rave_subject <- function(subject_id) {
 
 
 restore_subject_instance <- function(subject_id, strict = FALSE) {
-  if(inherits(subject_id, 'RAVESubject')){
+  if (inherits(subject_id, "RAVESubject")) {
     return(subject_id)
   } else {
-    if(inherits(subject_id, "Subject")) {
+    if (inherits(subject_id, "Subject")) {
       # RAVE 1.0 subject instance
       stopifnot2(is.character(subject_id$id),
                  msg = "`as_rave_subject`: Cannot find subject ID from the given input")
@@ -1051,10 +1051,10 @@ restore_subject_instance <- function(subject_id, strict = FALSE) {
 }
 
 initialize_imaging_paths <- function(subject) {
-  # subject <- 'demo/DemoSubject'
+  # subject <- "demo/DemoSubject"
   subject <- restore_subject_instance(subject, strict = FALSE)
   root_path <- subject$imaging_path
-  if(length(root_path) != 1 || is.na(root_path)) {
+  if (length(root_path) != 1 || is.na(root_path)) {
     root_path <- file.path(subject$preprocess_settings$raw_path, "rave-imaging")
   }
   dir_create2(file.path(root_path, "coregistration"))
@@ -1078,7 +1078,7 @@ as_bids_subject <- function(subject, strict = FALSE) {
 get_bids_electrodes_table <- function(subject) {
   bids_subject <- as_bids_subject(subject)
   bids_raw_path <- bidsr::resolve_bids_path(bids_subject, storage = "raw")
-  if(!dir_exists(bids_raw_path)) { return(NULL) }
+  if (!dir_exists(bids_raw_path)) { return(NULL) }
 
   query <- bidsr::query_bids(bids_subject, list(
     storage = "raw",
@@ -1089,7 +1089,7 @@ get_bids_electrodes_table <- function(subject) {
 
   # find electrodes.tsv
   sel <- tolower(query$extension) == "tsv" & tolower(query$suffix) == "electrodes"
-  if(!any(sel)) { return(NULL) }
+  if (!any(sel)) { return(NULL) }
 
   electrode_file <- query$parsed[sel][[1]]
   electrode_file <- bidsr::resolve_bids_path(x = bids_subject@project,
@@ -1105,7 +1105,7 @@ get_bids_electrodes_table <- function(subject) {
   #                                            format(query$parsed[sel][[1]]),
   #                                            storage = "raw")
   #   channel_tabular <- bidsr::as_bids_tabular(channel_file)
-  #   if(is.integer(channel_tabular$content$name)) {
+  #   if (is.integer(channel_tabular$content$name)) {
   #     # Label of the channel. When a corresponding electrode is specified in
   #     # _electrodes.tsv, the name of that electrode MAY be specified here and
   #     # the reference electrode name MAY be provided in the reference column.
@@ -1122,7 +1122,7 @@ get_bids_electrodes_table <- function(subject) {
     Radius = content$size / 2
   )
   brain <- rave_brain(subject, include_electrodes = FALSE)
-  if(length(brain)) {
+  if (length(brain)) {
     brain$set_electrodes(electrodes = tbl, coord_sys = "scannerRAS")
     tbl <- brain$electrodes$raw_table
   } else {

@@ -36,7 +36,7 @@ StreamSignalPlot <- R6::R6Class(
       end_time <- start_time + duration
       font_size <- self$channel_ticksize
 
-      if(!is.data.frame(annot_table) || nrow(annot_table) == 0) {
+      if (!is.data.frame(annot_table) || nrow(annot_table) == 0) {
         return(list(
           margin_top = font_size * 6 + 16,
           vlines = list(),
@@ -48,7 +48,7 @@ StreamSignalPlot <- R6::R6Class(
       n_annots <- nrow(annot_table)
 
       annot_colors <- annot_table$color
-      if(length(annot_colors)) {
+      if (length(annot_colors)) {
         annot_colors[annot_colors == "#FFFFFF00"] <- graphics::par("fg")
       } else {
         annot_colors <- rep(graphics::par("fg"), n_annots)
@@ -59,7 +59,7 @@ StreamSignalPlot <- R6::R6Class(
 
       events <- lapply(seq_len(n_annots), function(ii) {
         t0 <- annot_table$time[[ii]]
-        if(t0 > end_time || t0 < start_time) { return(NULL) }
+        if (t0 > end_time || t0 < start_time) { return(NULL) }
 
         label <- annot_table$label[[ii]]
 
@@ -92,7 +92,7 @@ StreamSignalPlot <- R6::R6Class(
       })
       events <- events[!vapply(events, is.null, FALSE)]
 
-      if(!length(events)) {
+      if (!length(events)) {
         return(list(
           margin_top = font_size * 6 + 16,
           vlines = list(),
@@ -113,15 +113,15 @@ StreamSignalPlot <- R6::R6Class(
   active = list(
 
     channel_names = function(v) {
-      if(!missing(v)) {
+      if (!missing(v)) {
         v <- as.character(v)
-        if(length(v) != length(private$.channel_names)) {
+        if (length(v) != length(private$.channel_names)) {
           stop("Inconsistent number of channels to visualize.")
         }
-        if(anyDuplicated(v) || anyNA(v)) {
+        if (anyDuplicated(v) || anyNA(v)) {
           stop("Channel names cannot be duplicated nor N/A")
         }
-        if(!identical(private$.channel_names, v)) {
+        if (!identical(private$.channel_names, v)) {
           private$.channel_needs_update[private$.channel_names != v] <- TRUE
           private$.channel_names <- v
           self$needs_update <- TRUE
@@ -131,15 +131,15 @@ StreamSignalPlot <- R6::R6Class(
     },
 
     channel_colors = function(v) {
-      if(!missing(v)) {
+      if (!missing(v)) {
         v[!is.na(v)] <- grDevices::adjustcolor(v[!is.na(v)])
         n_channels <- length(private$.channel_names)
-        if(length(v) == 1) {
+        if (length(v) == 1) {
           v <- rep(v, n_channels)
-        } else if(length(v) != n_channels) {
+        } else if (length(v) != n_channels) {
           stop("Inconsistent number of colors.")
         }
-        if(!identical(private$.channel_color, v)) {
+        if (!identical(private$.channel_color, v)) {
           private$.channel_needs_update[private$.channel_color != v] <- TRUE
           private$.channel_color <- v
           self$needs_update <- TRUE
@@ -149,16 +149,16 @@ StreamSignalPlot <- R6::R6Class(
     },
 
     channel_linewidth = function(v) {
-      if(!missing(v)) {
+      if (!missing(v)) {
         v <- as.double(v)
         v[!is.finite(v)] <- 1
         n_channels <- length(private$.channel_names)
-        if(length(v) == 1) {
+        if (length(v) == 1) {
           v <- rep(v, n_channels)
-        } else if(length(v) != n_channels) {
+        } else if (length(v) != n_channels) {
           stop("Inconsistent number of linewidths.")
         }
-        if(!identical(private$.channel_lwd, v)) {
+        if (!identical(private$.channel_lwd, v)) {
           private$.channel_needs_update[private$.channel_lwd != v] <- TRUE
           private$.channel_lwd <- v
           self$needs_update <- TRUE
@@ -169,17 +169,17 @@ StreamSignalPlot <- R6::R6Class(
 
     channel_gap = function(v) {
       gap <- private$.channel_gap
-      if(!missing(v)) {
+      if (!missing(v)) {
         v <- unname(as.numeric(v)[[1]])
         stopifnot(is.finite(v))
-        if(!isTRUE(gap == v)) {
+        if (!isTRUE(gap == v)) {
           private$.channel_gap <- v
           gap <- v
           private$.channel_gap_needs_update <- TRUE
           private$.channel_needs_update[] <- TRUE
           self$needs_update <- TRUE
         }
-      } else if( gap <= 0 ) {
+      } else if ( gap <= 0 ) {
         # automatic
         gap <- stats::quantile(abs(unlist(private$.data)), na.rm = TRUE, probs = 0.999) * 2
       }
@@ -187,10 +187,10 @@ StreamSignalPlot <- R6::R6Class(
     },
 
     channel_ticksize = function(v) {
-      if(!missing(v)) {
+      if (!missing(v)) {
         v <- as.integer(v)[[1]]
         stopifnot(isTRUE(v > 0))
-        if(private$.ytick_size != v) {
+        if (private$.ytick_size != v) {
           private$.ytick_size <- v
           private$.axes_needs_update <- TRUE
           self$needs_update <- TRUE
@@ -200,10 +200,10 @@ StreamSignalPlot <- R6::R6Class(
     },
 
     start_time = function(v) {
-      if(!missing(v)) {
+      if (!missing(v)) {
         v <- as.numeric(v)[[1]]
         stopifnot(is.finite(v))
-        if(private$.start_time != v) {
+        if (private$.start_time != v) {
           private$.start_time <- v
           private$.channel_needs_update[] <- TRUE
           private$.annotations_needs_update <- TRUE
@@ -214,18 +214,18 @@ StreamSignalPlot <- R6::R6Class(
     },
 
     sample_rates = function(v) {
-      if(!missing(v)) {
+      if (!missing(v)) {
         v <- as.double(v)
-        if(anyNA(v) || any(v <= 0)) {
+        if (anyNA(v) || any(v <= 0)) {
           stop("Sample rates cannot be N/A or negative")
         }
         n_channels <- length(private$.channel_names)
-        if(length(v) == 1) {
+        if (length(v) == 1) {
           v <- rep(v, n_channels)
-        } else if(length(v) != n_channels) {
+        } else if (length(v) != n_channels) {
           stop("Inconsistent number of sample rates.")
         }
-        if(!identical(private$.sample_rates, v)) {
+        if (!identical(private$.sample_rates, v)) {
           private$.sample_rates <- v
           private$.channel_needs_update[] <- TRUE
           self$needs_update <- TRUE
@@ -243,10 +243,10 @@ StreamSignalPlot <- R6::R6Class(
       max(self$durations)
     },
 
-    title = function(v){
-      if(!missing(v)) {
+    title = function(v) {
+      if (!missing(v)) {
         v <- paste(as.character(v), collapse = " ")
-        if(!identical(private$.xlab, v)) {
+        if (!identical(private$.xlab, v)) {
           private$.title <- v
           private$.axes_needs_update <- TRUE
           self$needs_update <- TRUE
@@ -256,9 +256,9 @@ StreamSignalPlot <- R6::R6Class(
     },
 
     xlab = function(v) {
-      if(!missing(v)) {
+      if (!missing(v)) {
         v <- paste(as.character(v), collapse = " ")
-        if(!identical(private$.xlab, v)) {
+        if (!identical(private$.xlab, v)) {
           private$.xlab <- v
           private$.axes_needs_update <- TRUE
           self$needs_update <- TRUE
@@ -268,9 +268,9 @@ StreamSignalPlot <- R6::R6Class(
     },
 
     ylab = function(v) {
-      if(!missing(v)) {
+      if (!missing(v)) {
         v <- paste(as.character(v), collapse = " ")
-        if(!identical(private$.ylab, v)) {
+        if (!identical(private$.ylab, v)) {
           private$.ylab <- v
           private$.axes_needs_update <- TRUE
           self$needs_update <- TRUE
@@ -280,19 +280,19 @@ StreamSignalPlot <- R6::R6Class(
     },
 
     annotations = function(v) {
-      if(!missing(v)) {
-        if( length(v) ) {
+      if (!missing(v)) {
+        if ( length(v) ) {
           # time, event, group, color
-          if(!is.data.frame(v)) {
+          if (!is.data.frame(v)) {
             stop("Annotations must be NULL or a data frame")
           }
-          if(!all(c("time", "label") %in% names(v)) || !is.numeric(v$time)) {
+          if (!all(c("time", "label") %in% names(v)) || !is.numeric(v$time)) {
             stop("Annotation must have column `time` (numeric) and `label` (character)")
           }
           v <- v[!is.na(v$time), ]
-          if(nrow(v)) {
+          if (nrow(v)) {
             v$label <- as.character(v$label)
-            if(length(v$color)) {
+            if (length(v$color)) {
               v$color <- grDevices::adjustcolor(v$color)
             }
           } else {
@@ -328,7 +328,7 @@ StreamSignalPlot <- R6::R6Class(
 
       required_packages <- c("plotly", "shiny")
       missing_packages <- required_packages[!package_installed(required_packages)]
-      if(length(missing_packages)) {
+      if (length(missing_packages)) {
         stop(
           "Signal plot with streaming data requires installing package ",
           paste(sQuote(missing_packages), collapse = ", "),
@@ -336,12 +336,12 @@ StreamSignalPlot <- R6::R6Class(
         )
       }
 
-      if(missing(n_channels)) {
+      if (missing(n_channels)) {
         n_channels <- length(channel_names)
       } else {
         stopifnot(length(channel_names) == n_channels)
       }
-      if(anyDuplicated(channel_names)) {
+      if (anyDuplicated(channel_names)) {
         stop("Channel names must be unique")
       }
 
@@ -356,9 +356,9 @@ StreamSignalPlot <- R6::R6Class(
       # private <- list()
 
       stopifnot(all(sample_rates > 0))
-      if(length(sample_rates) == 1) {
+      if (length(sample_rates) == 1) {
         sample_rates <- rep(sample_rates, n_channels)
-      } else if(length(sample_rates) != n_channels) {
+      } else if (length(sample_rates) != n_channels) {
         stop("Channel `sample_rates` must have length of 1 or the same size as the total channel count")
       }
 
@@ -387,7 +387,7 @@ StreamSignalPlot <- R6::R6Class(
 
     get_channel_info = function(n) {
       n_channels <- length(private$.channel_names)
-      if(is.numeric(n)) {
+      if (is.numeric(n)) {
         stopifnot(isTRUE(n >= 1 && n <= n_channels))
         list(
           index = n,
@@ -395,7 +395,7 @@ StreamSignalPlot <- R6::R6Class(
         )
       } else {
         idx <- which(private$.channel_names == n)
-        if(!length(idx)) {
+        if (!length(idx)) {
           stop("Cannot find channel by name ", paste(n, collapse = ""))
         }
         list(
@@ -419,12 +419,12 @@ StreamSignalPlot <- R6::R6Class(
       idx <- ch_info$index
 
       sample_rate <- self$sample_rates[[idx]]
-      if(is.na(start_time)) {
+      if (is.na(start_time)) {
         start_time <- self$start_time
       }
 
       start_index <- round((start_time - self$start_time) * sample_rate) + 1L
-      if(is.na(duration)) {
+      if (is.na(duration)) {
         duration <- self$max_duration
       }
       len <- ceiling(duration * sample_rate)
@@ -432,24 +432,24 @@ StreamSignalPlot <- R6::R6Class(
       signal <- private$.data[[ch_info$index]]
 
       end_index <- start_index + len - 1L
-      if(fill) {
-        if(end_index <= 0 || start_index > length(signal))  {
+      if (fill) {
+        if (end_index <= 0 || start_index > length(signal))  {
           return(rep(NA_real_, len))
         }
         signal[seq.int(start_index, by = 1L, length.out = len)]
       } else {
 
-        if(end_index <= 0 || start_index > length(signal))  {
+        if (end_index <= 0 || start_index > length(signal))  {
           return(structure(NA_real_, time = start_time))
         }
 
-        if( start_index <= 0 ) {
+        if ( start_index <= 0 ) {
           start_index <- 1L
         }
-        if( end_index > length(signal) ) {
+        if ( end_index > length(signal) ) {
           end_index <- length(signal)
         }
-        if(end_index <= start_index) {
+        if (end_index <= start_index) {
           end_index <- start_index + 1L
         }
         time_idx <- seq.int(start_index, by = 1L, to = end_index)
@@ -471,7 +471,7 @@ StreamSignalPlot <- R6::R6Class(
     },
 
     proxy_update_annotations = function(proxy, start_time, duration) {
-      if(!private$.annotations_needs_update) { return() }
+      if (!private$.annotations_needs_update) { return() }
       # annotations
       event_decor <- private$prepare_annotations(start_time, duration)
 
@@ -492,7 +492,7 @@ StreamSignalPlot <- R6::R6Class(
     proxy_update_channels = function(proxy, start_time, duration) {
 
       channels_to_update <- which(private$.channel_needs_update)
-      if(!length(channels_to_update)) { return() }
+      if (!length(channels_to_update)) { return() }
 
       channel_gap <- self$channel_gap
       channel_names <- self$channel_names
@@ -514,7 +514,7 @@ StreamSignalPlot <- R6::R6Class(
         tm <- attr(s, "time")
 
         # s <- private$.data[[channel_ii]]
-        if(ratio > 1 && length(s) > 20) {
+        if (ratio > 1 && length(s) > 20) {
           s <- ravetools::decimate(s, ratio)
           tm <- tm[[1]] + (seq_along(s) - 1L) * (ratio / sample_rates[[channel_ii]])
         }
@@ -567,7 +567,7 @@ StreamSignalPlot <- R6::R6Class(
         "yaxis.tickvals" = rev(seq_len(n_channels) - 1) * channel_gap,
         "yaxis.ticktext" = channel_names
       )
-      if(private$.channel_gap_needs_update || !isTRUE(private$.channel_gap > 0)) {
+      if (private$.channel_gap_needs_update || !isTRUE(private$.channel_gap > 0)) {
         relayout_list[["yaxis.range"]] <- c(-channel_gap, channel_gap * n_channels)
         private$.channel_gap_needs_update <- FALSE
       }
@@ -583,7 +583,7 @@ StreamSignalPlot <- R6::R6Class(
       total_timepoints <- vapply(private$.data, length, 0L)
       ratio <- ceiling(sum(total_timepoints) * duration / self$max_duration / self$MAX_POINTS)
 
-      if(isTRUE(ratio > 1)) {
+      if (isTRUE(ratio > 1)) {
         title_text <- sprintf("%s (decimate=%d)", self$title, ratio)
       } else {
         title_text <- self$title
@@ -604,26 +604,26 @@ StreamSignalPlot <- R6::R6Class(
     update = function(proxy, start_time = NA, duration = NA) {
       start_time0 <- self$start_time
       duration0 <- self$max_duration
-      if(isTRUE(start_time == start_time0)) {
+      if (isTRUE(start_time == start_time0)) {
         start_time <- NA
       }
-      if(is.na(start_time) && !is.na(duration) && isTRUE(duration == duration0)) {
+      if (is.na(start_time) && !is.na(duration) && isTRUE(duration == duration0)) {
         duration <- NA
       }
-      if(!is.na(start_time) || !is.na(duration)) {
+      if (!is.na(start_time) || !is.na(duration)) {
         self$needs_update <- TRUE
         private$.annotations_needs_update <- TRUE
         private$.channel_needs_update[] <- TRUE
       }
-      if(!self$needs_update) { return(invisible(self)) }
+      if (!self$needs_update) { return(invisible(self)) }
 
-      if(is.na(start_time)) {
+      if (is.na(start_time)) {
         start_time <- start_time0
       }
 
-      if(is.na(duration)) {
+      if (is.na(duration)) {
         duration <- start_time0 + duration0 - start_time
-        if(duration <= 0) { duration <- 0.1 }
+        if (duration <= 0) { duration <- 0.1 }
       }
 
       self$proxy_update_annotations(proxy = proxy,
@@ -639,7 +639,7 @@ StreamSignalPlot <- R6::R6Class(
     },
 
     render = function() {
-      if(self$needs_update) {
+      if (self$needs_update) {
 
         # prepare initial plot data
         channel_names <- private$.channel_names
@@ -662,7 +662,7 @@ StreamSignalPlot <- R6::R6Class(
         plot_data <- lapply(seq_len(n_channels), function(ii) {
           channel_name <- channel_names[[ii]]
           channel_data <- private$.data[[ii]]
-          if(ratio > 1 && length(channel_data) > 20) {
+          if (ratio > 1 && length(channel_data) > 20) {
             channel_data <- ravetools::decimate(channel_data, ratio)
             time <- (seq_along(channel_data) - 1) * (ratio / sample_rates[[ii]])
           } else {
@@ -695,7 +695,7 @@ StreamSignalPlot <- R6::R6Class(
 
         event_decor <- private$prepare_annotations()
 
-        if(isTRUE(ratio > 1)) {
+        if (isTRUE(ratio > 1)) {
           title_text <- sprintf("%s (decimate=%d)", self$title, ratio)
         } else {
           title_text <- self$title

@@ -40,13 +40,13 @@
 #' }
 #' @export
 RAVEAbstarctElectrode <- R6::R6Class(
-  classname = 'RAVEAbstarctElectrode',
+  classname = "RAVEAbstarctElectrode",
   inherit = RAVESerializable,
   portable = TRUE,
   cloneable = TRUE,
   private = list(
     intervals = list(),
-    .type = 'Unknown',
+    .type = "Unknown",
     .location = "Others",
     .power_enabled = FALSE,
     .is_reference = FALSE
@@ -74,7 +74,7 @@ RAVEAbstarctElectrode <- R6::R6Class(
     #' @param subject character or \code{\link{RAVESubject}} instance
     #' @param number current electrode number or reference ID
     #' @param quiet reserved, whether to suppress warning messages
-    initialize = function(subject, number, quiet = FALSE){
+    initialize = function(subject, number, quiet = FALSE) {
       self$subject <- restore_subject_instance(subject)
       self$number <- number
       self$reference <- NULL
@@ -83,28 +83,28 @@ RAVEAbstarctElectrode <- R6::R6Class(
 
     #' @description set reference for instance
     #' @param reference \code{NULL} or \code{RAVEAbstarctElectrode} instance
-    set_reference = function(reference){
+    set_reference = function(reference) {
       stopifnot2(
         is.null(reference) || (
-          inherits(reference, 'RAVEAbstarctElectrode') &&
+          inherits(reference, "RAVEAbstarctElectrode") &&
             reference$type == self$type
         ),
-        msg = sprintf('set_reference must receive either NULL or a electrode of the same type (%s)', sQuote(self$type))
+        msg = sprintf("set_reference must receive either NULL or a electrode of the same type (%s)", sQuote(self$type))
       )
 
       self$reference <- reference
-      if(!is.null(reference)){
+      if (!is.null(reference)) {
 
         self_epoch <- !is.null(self$epoch)
         ref_epoch <- !is.null(reference$epoch)
 
-        if(self_epoch && ref_epoch && !identical(self$epoch$name, reference$epoch$name)){
+        if (self_epoch && ref_epoch && !identical(self$epoch$name, reference$epoch$name)) {
           # compare epoch names
           stop("Electrode ", self$number, " has different epoch name to its reference: ",
                self$epoch$name, " != ", reference$epoch$name, ".")
-        } else if (self_epoch && !ref_epoch){
+        } else if (self_epoch && !ref_epoch) {
           self$reference$epoch <- self$epoch
-        } else if (!self_epoch && ref_epoch){
+        } else if (!self_epoch && ref_epoch) {
           self$epoch <- self$reference$epoch
         }
         self$reference$trial_intervals <- self$trial_intervals
@@ -122,11 +122,11 @@ RAVEAbstarctElectrode <- R6::R6Class(
     #' representing the events if time is not relative to trial onset. Please
     #' remove the prefix. For example, for a column named \code{"Event_name"},
     #' the event name is \code{"name"}.
-    set_epoch = function(epoch, stitch_events = NULL){
-      if(!inherits(epoch, 'RAVEEpoch')){
+    set_epoch = function(epoch, stitch_events = NULL) {
+      if (!inherits(epoch, "RAVEEpoch")) {
         epoch <- RAVEEpoch$new(subject = self$subject, name = epoch)
       }
-      if(!is.null(self$reference)){
+      if (!is.null(self$reference)) {
         self$reference$epoch <- epoch
         self$reference$stitch_events <- stitch_events
       }
@@ -136,13 +136,13 @@ RAVEAbstarctElectrode <- R6::R6Class(
 
     #' @description method to clear cache on hard drive
     #' @param ... implemented by child instances
-    clear_cache = function(...){
+    clear_cache = function(...) {
       .NotYetImplemented()
     },
 
     #' @description method to clear memory
     #' @param ... implemented by child instances
-    clear_memory = function(...){
+    clear_memory = function(...) {
       .NotYetImplemented()
     },
 
@@ -157,8 +157,8 @@ RAVEAbstarctElectrode <- R6::R6Class(
 
     #' @description alias of \code{load_data_with_epochs} for legacy code
     #' @param type see \code{load_data_with_epochs}
-    load_data = function(type){
-      if(length(type) > 1) {
+    load_data = function(type) {
+      if (length(type) > 1) {
         type <- type[[1]]
       }
       self$load_data_with_epochs(type = type)
@@ -188,7 +188,7 @@ RAVEAbstarctElectrode <- R6::R6Class(
     #' @description alias of \code{load_data_with_blocks} for legacy code
     #' @param blocks,type,simplify see \code{load_data_with_blocks}
     load_blocks = function(blocks, type, simplify = TRUE) {
-      if(length(type) > 1) {
+      if (length(type) > 1) {
         type <- type[[1]]
       }
       self$load_data_with_blocks(blocks = blocks, type = type, simplify = simplify)
@@ -204,7 +204,7 @@ RAVEAbstarctElectrode <- R6::R6Class(
 
     #' @field type signal type of the electrode, such as 'LFP', 'Spike', and
     #' 'EKG'; default is 'Unknown'
-    type = function(){
+    type = function() {
       private$.type
     },
 
@@ -213,21 +213,21 @@ RAVEAbstarctElectrode <- R6::R6Class(
     #' this usually requires transforming the electrode raw voltage signals
     #' using signal processing methods such as 'Fourier', 'wavelet', 'Hilbert',
     #' 'Multitaper', etc.
-    power_enabled = function(){
+    power_enabled = function() {
       private$.power_enabled
     },
 
     #' @field is_reference whether this instance is a reference electrode
-    is_reference = function(){
+    is_reference = function() {
       private$.is_reference
     },
 
 
     #' @field location location type of the electrode, see
     #' \code{\link{LOCATION_TYPES}} for details
-    location = function(v){
-      if(!missing(v)){
-        if(!v %in% LOCATION_TYPES){
+    location = function(v) {
+      if (!missing(v)) {
+        if (!v %in% LOCATION_TYPES) {
           ravepipeline::logger("Unsupported electrode location type: ",
                                v, ". Use `Others` instead.", level = "warning")
           v <- "Others"
@@ -238,43 +238,43 @@ RAVEAbstarctElectrode <- R6::R6Class(
     },
 
     #' @field exists whether electrode exists in subject
-    exists = function(){
+    exists = function() {
       self$number %in% self$subject$electrodes
     },
 
     #' @field preprocess_file path to preprocess 'HDF5' file
-    preprocess_file = function(){
-      file.path(self$subject$preprocess_path, "voltage", sprintf('electrode_%s.h5', self$number))
+    preprocess_file = function() {
+      file.path(self$subject$preprocess_path, "voltage", sprintf("electrode_%s.h5", self$number))
     },
 
     #' @field power_file path to power 'HDF5' file
-    power_file = function(){
-      file.path(self$subject$data_path, 'power', sprintf('%s.h5', self$number))
+    power_file = function() {
+      file.path(self$subject$data_path, "power", sprintf("%s.h5", self$number))
     },
 
     #' @field phase_file path to phase 'HDF5' file
-    phase_file = function(){
-      file.path(self$subject$data_path, 'phase', sprintf('%s.h5', self$number))
+    phase_file = function() {
+      file.path(self$subject$data_path, "phase", sprintf("%s.h5", self$number))
     },
 
     #' @field voltage_file path to voltage 'HDF5' file
-    voltage_file = function(){
-      file.path(self$subject$data_path, 'voltage', sprintf('%s.h5', self$number))
+    voltage_file = function() {
+      file.path(self$subject$data_path, "voltage", sprintf("%s.h5", self$number))
     },
 
     #' @field reference_name reference electrode name
-    reference_name = function(){
-      if(is.null(self$reference)){
-        'noref'
+    reference_name = function() {
+      if (is.null(self$reference)) {
+        "noref"
       } else {
-        ref <- gsub('(\\.h5$)|(^ref_)', "", as.character(self$reference$number))
-        sprintf('ref_%s', ref)
+        ref <- gsub("(\\.h5$)|(^ref_)", "", as.character(self$reference$number))
+        sprintf("ref_%s", ref)
       }
     },
 
     #' @field epoch_name current epoch name
-    epoch_name = function(){
-      if(!length(self$epoch)){
+    epoch_name = function() {
+      if (!length(self$epoch)) {
         stop("No epoch assigned. Please use `$set_epoch` method to set epoch.")
       }
       self$epoch$name
@@ -282,19 +282,19 @@ RAVEAbstarctElectrode <- R6::R6Class(
 
     #' @field cache_root run-time cache path; \code{NA} if epoch or trial
     #' intervals are missing
-    cache_root = function(){
-      if(!length(self$epoch_name)){
+    cache_root = function() {
+      if (!length(self$epoch_name)) {
         # return(file.path(cache_path, self$subject$project_name,
         #                  self$subject$subject_code, "_whole_block_", nb))
         stop("No epoch assigned. Please use `$set_epoch` method to set epoch.")
       }
-      if(!length(self$trial_intervals)){
+      if (!length(self$trial_intervals)) {
         stop("No trial intervals added. Please set trial intervals, for example, by:\n",
              "  x$trial_intervals <- list(c(-1,2)) \n",
              "to load 1 second before onset and 2 seconds after onset.")
       }
       stitch_events <- self$stitch_events
-      if(length(stitch_events) == 2) {
+      if (length(stitch_events) == 2) {
         available_events <- tolower(self$epoch$available_events)
         stitch_events_pre <- tolower(stitch_events[[1]]) %OF% available_events
         stitch_events_post <- tolower(stitch_events[[2]]) %OF% available_events
@@ -304,13 +304,13 @@ RAVEAbstarctElectrode <- R6::R6Class(
       }
 
       intv <- paste(
-        sapply(self$trial_intervals, function(x){
+        sapply(self$trial_intervals, function(x) {
           re <- sprintf("%s%.3f", c("M", "", "P")[sign(x) + 2], abs(x))
           re <- gsub("[.]{0,1}[0]+$", "", re)
-          if(stitch_events_pre != "") {
+          if (stitch_events_pre != "") {
             re[[1]] <- sprintf("%s-%s", stitch_events_pre, re[[1]])
           }
-          if(stitch_events_post != "") {
+          if (stitch_events_post != "") {
             re[[2]] <- sprintf("%s-%s", stitch_events_post, re[[2]])
           }
           paste(re, collapse = "_")
@@ -329,15 +329,15 @@ RAVEAbstarctElectrode <- R6::R6Class(
     },
 
     #' @field trial_intervals trial intervals relative to epoch onset
-    trial_intervals = function(v){
-      if(!missing(v)){
-        if(!length(v)){
+    trial_intervals = function(v) {
+      if (!missing(v)) {
+        if (!length(v)) {
           private$intervals <- list()
         } else {
           private$intervals <- validate_time_window(v)
         }
 
-        if(!is.null(self$reference)){
+        if (!is.null(self$reference)) {
           self$reference$trial_intervals <- private$intervals
         }
 
@@ -413,18 +413,18 @@ RAVEAbstarctElectrode <- R6::R6Class(
 #'
 #' }
 #' @export
-new_electrode <- function(subject, number, signal_type, ...){
+new_electrode <- function(subject, number, signal_type, ...) {
   number <- as.integer(number)
   stopifnot(length(number) && !is.na(number))
 
   subject <- restore_subject_instance(subject, strict = FALSE)
   signal_type_expected <- subject$electrode_types[subject$electrodes == number]
 
-  if(missing(signal_type)){
+  if (missing(signal_type)) {
     signal_type <- signal_type_expected
   } else {
     signal_type <- match.arg(signal_type, choices = SIGNAL_TYPES)
-    if(signal_type_expected != signal_type){
+    if (signal_type_expected != signal_type) {
       ravepipeline::logger(sprintf(
         "Electrode `%s` has signal type `%s` but loaded as `%s`. This might cause some issues later",
         number, signal_type_expected, signal_type), level = "warning")
@@ -435,7 +435,7 @@ new_electrode <- function(subject, number, signal_type, ...){
                    envir = ns_ravecore(),
                    inherits = FALSE)
 
-  if(!inherits(generator, "R6ClassGenerator")){
+  if (!inherits(generator, "R6ClassGenerator")) {
     stop("Cannot find class definition for electrode with ", signal_type, " signal type.")
   }
   generator$new(subject = subject, number = number, ...)
@@ -443,15 +443,15 @@ new_electrode <- function(subject, number, signal_type, ...){
 
 #' @rdname new_electrode
 #' @export
-new_reference <- function(subject, number, signal_type, ...){
-  if(!length(number) || number == "noref"){ return(NULL) }
+new_reference <- function(subject, number, signal_type, ...) {
+  if (!length(number) || number == "noref") { return(NULL) }
 
   subject <- restore_subject_instance(subject, strict = FALSE)
 
-  if(missing(signal_type)){
+  if (missing(signal_type)) {
     elec <- parse_svec(gsub("[^0-9 ,-]", "", number))
     sel <- subject$electrodes %in% elec
-    if(!any(sel)){
+    if (!any(sel)) {
       stop("Cannot determine the signal type of ", number, ". Please specify `signal_type`")
     }
     signal_type <- subject$electrode_types[sel][[1]]
@@ -463,7 +463,7 @@ new_reference <- function(subject, number, signal_type, ...){
                    envir = ns_ravecore(),
                    inherits = FALSE)
 
-  if(!inherits(generator, "R6ClassGenerator")){
+  if (!inherits(generator, "R6ClassGenerator")) {
     stop("Cannot find class definition for reference with ", signal_type, " signal type.")
   }
   generator$new(subject = subject, number = number, ...)
@@ -533,27 +533,27 @@ new_reference <- function(subject, number, signal_type, ...){
 #'
 #' }
 #' @export
-new_electrode <- function(subject, number, signal_type, ...){
+new_electrode <- function(subject, number, signal_type, ...) {
   number <- as.integer(number)
   stopifnot(length(number) && !is.na(number))
 
   subject <- restore_subject_instance(subject, strict = FALSE)
   signal_type_expected <- subject$electrode_types[subject$electrodes == number]
 
-  if(missing(signal_type)){
+  if (missing(signal_type)) {
     signal_type <- signal_type_expected
   } else {
     signal_type <- match.arg(signal_type, choices = SIGNAL_TYPES)
-    if(signal_type_expected != signal_type){
+    if (signal_type_expected != signal_type) {
       ravepipeline::logger("Electrode {number} has signal type {signal_type_expected} but loaded as {signal_type}. This might cause some issues later", level = "warning", use_glue = TRUE)
     }
   }
 
   generator <- get(sprintf("%s_electrode", signal_type),
-                   envir = asNamespace('ravecore'),
+                   envir = asNamespace("ravecore"),
                    inherits = FALSE)
 
-  if(!inherits(generator, "R6ClassGenerator")){
+  if (!inherits(generator, "R6ClassGenerator")) {
     ravepipeline::logger("Cannot find class definition for electrode with ", signal_type, " signal type.", level = "fatal")
   }
   generator$new(subject = subject, number = number, ...)
@@ -561,15 +561,15 @@ new_electrode <- function(subject, number, signal_type, ...){
 
 #' @rdname new_electrode
 #' @export
-new_reference <- function(subject, number, signal_type, ...){
-  if(!length(number) || number == "noref"){ return(NULL) }
+new_reference <- function(subject, number, signal_type, ...) {
+  if (!length(number) || number == "noref") { return(NULL) }
 
   subject <- restore_subject_instance(subject, strict = FALSE)
 
-  if(missing(signal_type)){
+  if (missing(signal_type)) {
     elec <- parse_svec(gsub("[^0-9 ,-]", "", number))
     sel <- subject$electrodes %in% elec
-    if(!any(sel)){
+    if (!any(sel)) {
       ravepipeline::logger("Cannot determine the signal type of ", number, ". Please specify `signal_type` explicitly", level = "fatal")
     }
     signal_type <- subject$electrode_types[sel][[1]]
@@ -578,10 +578,10 @@ new_reference <- function(subject, number, signal_type, ...){
   }
 
   generator <- get(sprintf("%s_reference", signal_type),
-                   envir = asNamespace('ravecore'),
+                   envir = asNamespace("ravecore"),
                    inherits = FALSE)
 
-  if(!inherits(generator, "R6ClassGenerator")){
+  if (!inherits(generator, "R6ClassGenerator")) {
     ravepipeline::logger("Cannot find class definition for reference with ", signal_type, " signal type.", level = "fatal")
   }
   generator$new(subject = subject, number = number, ...)

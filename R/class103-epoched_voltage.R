@@ -117,15 +117,15 @@ RAVESubjectEpochVoltageRepository <- R6::R6Class(
       # private$.data$data_list
 
       workers <- 0
-      if(self$`@restored`) { workers <- 1 }
+      if (self$`@restored`) { workers <- 1 }
 
-      if(length(electrodes) == 1 && is.na(electrodes)) {
+      if (length(electrodes) == 1 && is.na(electrodes)) {
         # Do not load data, just fill in the meta
         electrodes <- integer()
       } else {
         electrodes <- parse_svec(electrodes)
         electrodes <- electrodes[electrodes %in% self$electrode_list]
-        if(!length(electrodes)) {
+        if (!length(electrodes)) {
           electrodes <- self$electrode_list
         }
       }
@@ -133,16 +133,16 @@ RAVESubjectEpochVoltageRepository <- R6::R6Class(
       # check data_list
       nms <- sprintf("e_%d", electrodes)
 
-      if( length(private$.data) > 0 && !force ) {
+      if ( length(private$.data) > 0 && !force ) {
         exist_list <- names(private$.data$data_list)
-        if(all(nms %in% exist_list)) { return(self) }
+        if (all(nms %in% exist_list)) { return(self) }
       }
 
       all_electrode_instances <- self$electrode_instances
       electrode_instances <- all_electrode_instances[nms]
 
       ref_names <- lapply(electrode_instances, function(inst) {
-        if(isTRUE(inst$reference_name %in% c("noref", ""))) { return(NULL) }
+        if (isTRUE(inst$reference_name %in% c("noref", ""))) { return(NULL) }
         sprintf("%s_%s", inst$reference_name, inst$type)
       })
       ref_names <- unlist(unique(ref_names))
@@ -150,7 +150,7 @@ RAVESubjectEpochVoltageRepository <- R6::R6Class(
 
       reference_instances <- self$reference_instances[ref_names]
 
-      if(length(reference_instances)) {
+      if (length(reference_instances)) {
         ravepipeline::lapply_jobs(
           reference_instances,
           function(inst) {
@@ -199,7 +199,7 @@ RAVESubjectEpochVoltageRepository <- R6::R6Class(
       )
 
       private$.data$data_list <- as.list(private$.data$data_list)
-      if(length(data_list)) {
+      if (length(data_list)) {
         private$.data$data_list[nms] <- data_list[nms]
       }
 

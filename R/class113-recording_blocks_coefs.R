@@ -86,7 +86,7 @@ RAVESubjectRecordingBlockTimeFreqBaseRepository <- R6::R6Class(
       # self$mount_data(electrodes = 16, force = FALSE)
 
       data_type <- private$.data_type
-      if(!length(data_type)) { return(self) }
+      if (!length(data_type)) { return(self) }
 
       blocks <- self$blocks
       subject <- self$subject
@@ -99,13 +99,13 @@ RAVESubjectRecordingBlockTimeFreqBaseRepository <- R6::R6Class(
       # determine electrodes to load
       electrodes <- parse_svec(electrodes)
       electrodes <- electrodes[electrodes %in% self$electrode_list]
-      if(!length(electrodes)) {
+      if (!length(electrodes)) {
         electrodes <- self$electrode_list
       }
 
       missing_wavelet <- subject$electrodes[!subject$has_wavelet]
       missing_wavelet <- missing_wavelet[missing_wavelet %in% electrodes]
-      if(length(missing_wavelet)) {
+      if (length(missing_wavelet)) {
         stop("Cannot find time-frequency coefficients from channel ", deparse_svec(missing_wavelet))
       }
 
@@ -124,7 +124,7 @@ RAVESubjectRecordingBlockTimeFreqBaseRepository <- R6::R6Class(
 
       all_electrodes <- as.integer(subject$electrodes)
 
-      if(force || length(electrode_instances) * length(blocks) > 10) {
+      if (force || length(electrode_instances) * length(blocks) > 10) {
         callback <- function(block) {
           sprintf("Loading %s | Recording block %s", data_type, block)
         }
@@ -142,13 +142,13 @@ RAVESubjectRecordingBlockTimeFreqBaseRepository <- R6::R6Class(
 
           stype <- inst$type
 
-          if(is.null(cached_arrays[[stype]])) {
+          if (is.null(cached_arrays[[stype]])) {
             # this is a sample electrode channel, load anyway
             sample_signal <- inst$load_data_with_blocks(blocks = block,
                                                         type = data_type,
                                                         simplify = TRUE)
             dm <- dim(sample_signal)
-            if(!length(dm)) { dm <- length(sample_signal) }
+            if (!length(dm)) { dm <- length(sample_signal) }
             array_dimension <- c(dm, length(all_electrodes))
 
             # length(array_dimension) is 2 for voltage
@@ -192,7 +192,7 @@ RAVESubjectRecordingBlockTimeFreqBaseRepository <- R6::R6Class(
           farray <- item$data
           sel <- dnames$Electrode == inst$number
 
-          if(force || is.na(farray[1, 1, sel])) {
+          if (force || is.na(farray[1, 1, sel])) {
             # Channel needs to be loaded
             signal <- inst$load_data_with_blocks(blocks = block,
                                                  type = data_type,
@@ -203,7 +203,7 @@ RAVESubjectRecordingBlockTimeFreqBaseRepository <- R6::R6Class(
         })
 
         # For better serialization
-        for(ii in seq_along(cached_arrays)) {
+        for (ii in seq_along(cached_arrays)) {
           cached_arrays[[ii]]$data <- ravepipeline::RAVEFileArray$new( cached_arrays[[ii]]$data )
         }
         cached_arrays
@@ -225,7 +225,7 @@ RAVESubjectRecordingBlockTimeFreqBaseRepository <- R6::R6Class(
       block_data <- structure(
         names = blocks,
         lapply(block_data, function(data_list) {
-          for(stype in names(data_list)) {
+          for (stype in names(data_list)) {
             item <- data_list[[stype]]
             item$data <- item$data$`@impl`
             item$data$.mode <- "readonly"

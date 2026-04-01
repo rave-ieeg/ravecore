@@ -78,13 +78,13 @@ RAVESubjectRecordingBlockRawVoltageRepository <- R6::R6Class(
                           lazy_load = FALSE, .class = NULL) {
 
       downsample <- as.integer(downsample)[[1]]
-      if(!is.na(downsample) && (isTRUE(downsample < 1) || !is.finite(downsample))) {
+      if (!is.na(downsample) && (isTRUE(downsample < 1) || !is.finite(downsample))) {
         ravepipeline::logger("`downsample` must be a positive integer; reset to NA", level = "warning")
       }
 
       .class <- c(.class, "prepare_subject_raw_voltage_with_blocks", "RAVESubjectRecordingBlockRawVoltageRepository")
 
-      if(!identical(reference_name, "noref")) {
+      if (!identical(reference_name, "noref")) {
         ravepipeline::logger("RAVESubjectRecordingBlockRawVoltageRepository: `reference_name` must be 'noref', coerce this setting", level = "warning")
         reference_name <- "noref"
       }
@@ -99,7 +99,7 @@ RAVESubjectRecordingBlockRawVoltageRepository <- R6::R6Class(
       private$.downsample <- downsample
 
       # Has to call this explicitly because downsampling is needed!
-      if( !lazy_load ) {
+      if ( !lazy_load ) {
         self$mount_data(force = FALSE)
       }
     },
@@ -124,11 +124,11 @@ RAVESubjectRecordingBlockRawVoltageRepository <- R6::R6Class(
       # self$mount_data(electrodes = 16, force = FALSE)
 
       workers <- 0
-      if( self$`@restored` ) { workers <- 1 }
+      if ( self$`@restored` ) { workers <- 1 }
 
       # raw-voltage
       data_type <- private$.data_type
-      if(!length(data_type)) { return(self) }
+      if (!length(data_type)) { return(self) }
 
       blocks <- self$blocks
       subject <- self$subject
@@ -137,14 +137,14 @@ RAVESubjectRecordingBlockRawVoltageRepository <- R6::R6Class(
       sample_rates <- self$sample_rates
       signal_types <- unique(self$electrode_signal_types)
       downsample <- as.integer(private$.downsample)
-      if(!isTRUE(downsample > 1)) {
+      if (!isTRUE(downsample > 1)) {
         downsample <- 1L
       }
 
       # determine electrodes to load
       electrodes <- parse_svec(electrodes)
       electrodes <- electrodes[electrodes %in% self$electrode_list]
-      if(!length(electrodes)) {
+      if (!length(electrodes)) {
         electrodes <- self$electrode_list
       }
 
@@ -164,7 +164,7 @@ RAVESubjectRecordingBlockRawVoltageRepository <- R6::R6Class(
 
       all_electrodes <- as.integer(subject$electrodes)
 
-      if(force || length(electrode_instances) > 4) {
+      if (force || length(electrode_instances) > 4) {
         callback <- function(inst) {
           sprintf("Loading Recording Blocks | Channel %s", inst$number)
         }
@@ -182,7 +182,7 @@ RAVESubjectRecordingBlockRawVoltageRepository <- R6::R6Class(
         lapply(blocks, function(block) {
           # block <- blocks[[1]]
           block_cache <- file.path(cache_path, block)
-          if(force && file_exists(block_cache)) {
+          if (force && file_exists(block_cache)) {
             unlink(block_cache, recursive = TRUE)
           }
           cached_arrays <- list()
@@ -200,7 +200,7 @@ RAVESubjectRecordingBlockRawVoltageRepository <- R6::R6Class(
               dm <- unname(sample_dim_info$dim)
               dm[[2]] <- length(all_electrodes)
 
-              if(isTRUE(downsample > 1)) {
+              if (isTRUE(downsample > 1)) {
                 dm[[1]] <- length(ravetools::decimate(seq_len(dm[[1]]), downsample))
               } else {
                 downsample <- 1L
@@ -272,12 +272,12 @@ RAVESubjectRecordingBlockRawVoltageRepository <- R6::R6Class(
             sel <- item$dimnames$Electrode == inst$number
             farray <- item$data$`@impl`
 
-            if(is.na(farray[1, sel])) {
+            if (is.na(farray[1, sel])) {
               # Channel needs to be loaded
               signal <- inst$load_data_with_blocks(blocks = block,
                                                    type = data_type,
                                                    simplify = TRUE)
-              if(isTRUE(downsample > 1)) {
+              if (isTRUE(downsample > 1)) {
                 signal <- ravetools::decimate(signal, downsample)
               }
               farray[, sel] <- signal
@@ -299,7 +299,7 @@ RAVESubjectRecordingBlockRawVoltageRepository <- R6::R6Class(
       )
 
       # Clear progress finish line
-      if(is.function(callback)) { cat("          \r") }
+      if (is.function(callback)) { cat("          \r") }
 
 
       block_data <- structure(
@@ -335,7 +335,7 @@ RAVESubjectRecordingBlockRawVoltageRepository <- R6::R6Class(
 
     #' @field reference_name name of reference table; always \code{'noref'}
     reference_name = function(v) {
-      if(identical(private$.reference_name, "noref")) {
+      if (identical(private$.reference_name, "noref")) {
         private$.reference_name <- "noref"
       }
       "noref"
@@ -374,7 +374,7 @@ RAVESubjectRecordingBlockRawVoltageRepository <- R6::R6Class(
       electrode_types <- self$subject$electrode_types[sel]
 
       downsample <- private$.downsample
-      if(!isTRUE(downsample > 1)) {
+      if (!isTRUE(downsample > 1)) {
         downsample <- 1
       }
 

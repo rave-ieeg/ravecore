@@ -2,7 +2,7 @@ validate_raw_nevnsx <- function(subject, blocks, electrodes, check_content = TRU
 
   # DIPSAUS DEBUG START
   # subject <- "test/YFM"
-  # blocks = c('EMU-0095_subj-YFM_task-BlockPodcast_run-02', "EMU-0099_subj-YFM_task-Check_timing_run-01")
+  # blocks = c("EMU-0095_subj-YFM_task-BlockPodcast_run-02", "EMU-0099_subj-YFM_task-Check_timing_run-01")
   # electrodes = 1:10
   # check_content = TRUE
 
@@ -19,7 +19,7 @@ validate_raw_nevnsx <- function(subject, blocks, electrodes, check_content = TRU
   }
 
 
-  if(missing(electrodes)){
+  if (missing(electrodes)) {
     electrodes <- NULL
   } else {
     electrodes <- parse_svec(electrodes)
@@ -35,9 +35,9 @@ validate_raw_nevnsx <- function(subject, blocks, electrodes, check_content = TRU
 
   })
 
-  data_paths <- switch (
+  data_paths <- switch(
     format_standard,
-    'bids' = {
+    "bids" = {
       lapply(blocks, function(block) {
         # Parse block
         with_validation({
@@ -53,7 +53,7 @@ validate_raw_nevnsx <- function(subject, blocks, electrodes, check_content = TRU
             )
           )
           sel <- block_names_from_bids_entities(query_results$parsed) %in% block
-          if(!any(sel)) {
+          if (!any(sel)) {
             validation_errors$add(sprintf("No data file for BIDS entity collection/RAVE block is found: `%s`", block))
             return()
           }
@@ -61,7 +61,7 @@ validate_raw_nevnsx <- function(subject, blocks, electrodes, check_content = TRU
 
           is_headerfile <- tolower(query_results$extension) %in% c("nev")
 
-          if(!any(is_headerfile)) {
+          if (!any(is_headerfile)) {
             validation_errors$add(sprintf("Files with BIDS entities `%s` found, but no NeuroEvent files (.nev) found.", block))
             return()
           }
@@ -87,9 +87,9 @@ validate_raw_nevnsx <- function(subject, blocks, electrodes, check_content = TRU
         with_validation({
 
           bpath <- file_path(raw_root, block)
-          files <- list.files(bpath, pattern = '\\.(nev)$', ignore.case = TRUE)
+          files <- list.files(bpath, pattern = "\\.(nev)$", ignore.case = TRUE)
 
-          if(!length(files)) {
+          if (!length(files)) {
             validation_errors$add(sprintf(
               "No NeuroEvent file (.nev) in block `%s`",
               block
@@ -103,10 +103,10 @@ validate_raw_nevnsx <- function(subject, blocks, electrodes, check_content = TRU
   )
   names(data_paths) <- blocks
 
-  temporary_path <- dir_create2(file_path(subject$cache_path, 'neuroevent'))
+  temporary_path <- dir_create2(file_path(subject$cache_path, "neuroevent"))
 
   progress <- ravepipeline::rave_progress(
-    title = 'Validating NEV/NSx files',
+    title = "Validating NEV/NSx files",
     max = length(blocks) + 1,
     shiny_auto_close = FALSE
   )
@@ -122,10 +122,10 @@ validate_raw_nevnsx <- function(subject, blocks, electrodes, check_content = TRU
       with_validation({
 
         paths <- data_paths[[block]]
-        if(length(paths) == 0) { return(FALSE) }
+        if (length(paths) == 0) { return(FALSE) }
         info <- list(paths = paths)
         valid <- TRUE
-        if( check_content && length(electrodes) > 0 ){
+        if ( check_content && length(electrodes) > 0 ) {
 
           channel_table <- lapply(paths, function(path) {
             digest <- ravepipeline::digest(file = path)
@@ -144,12 +144,12 @@ validate_raw_nevnsx <- function(subject, blocks, electrodes, check_content = TRU
 
           info$header <- channel_table
 
-          if( length(electrodes) > 0 ) {
+          if ( length(electrodes) > 0 ) {
             channel_exist <- electrodes %in% channel_table$original_channel
 
             info$channel_exist <- channel_exist
 
-            if(!all(channel_exist)) {
+            if (!all(channel_exist)) {
               validation_errors$add(sprintf(
                 "Channel %s are missing from block %s",
                 deparse_svec(electrodes[!channel_exist]), block
@@ -164,7 +164,7 @@ validate_raw_nevnsx <- function(subject, blocks, electrodes, check_content = TRU
 
             channels <- channel_table$original_channel[sel]
             dup_channels <- duplicated(channels)
-            if(any(dup_channels) && length(paths) > 1) {
+            if (any(dup_channels) && length(paths) > 1) {
               validation_errors$add(sprintf(
                 "Channel [%s] have duplicated entries in block `%s`. RAVE does not know which .nev/ns3/ns5 file to read the channel data",
                 deparse_svec(channels[dup_channels]), block
@@ -185,7 +185,7 @@ validate_raw_nevnsx <- function(subject, blocks, electrodes, check_content = TRU
 
   progress$inc("Collecting results...")
 
-  if(length(validation_errors)) {
+  if (length(validation_errors)) {
     return(list(
       passed = FALSE,
       errors = unlist(validation_errors$as_list())

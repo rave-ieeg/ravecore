@@ -8,7 +8,7 @@
 
 
 # check if rpyANTs is configured
-if( !isTRUE(rpyANTs::ants_available()) ) {
+if ( !isTRUE(rpyANTs::ants_available()) ) {
   rpyANTs::install_ants()
 }
 

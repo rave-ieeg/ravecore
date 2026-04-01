@@ -1,4 +1,4 @@
-package_installed <- function (pkgs, all = FALSE) {
+package_installed <- function(pkgs, all = FALSE) {
   re <- sapply(pkgs, function(p) {
     system.file("", package = p) != ""
   })
@@ -16,7 +16,7 @@ call_pkg_fun <- function(package, f_name, ...,
 
   stopifnot(length(package) == 1)
 
-  if(!package_installed(package)) {
+  if (!package_installed(package)) {
     .if_missing <- match.arg(.if_missing)
     switch(
       .if_missing,
@@ -34,8 +34,8 @@ call_pkg_fun <- function(package, f_name, ...,
   ns <- asNamespace(package)
   fun <- ns[[f_name]]
 
-  if( .call_pkg_function ) {
-    if(!is.function(fun)) {
+  if ( .call_pkg_function ) {
+    if (!is.function(fun)) {
       .if_missing <- match.arg(.if_missing)
       switch(
         .if_missing,

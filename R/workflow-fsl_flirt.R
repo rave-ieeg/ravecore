@@ -35,7 +35,7 @@ cmd_run_fsl_flirt <- function(
   # overwrite <- FALSE
 
   dof <- as.integer(dof)
-  if( !isTRUE(dof %in% c(6, 7, 9, 12)) ) {
+  if ( !isTRUE(dof %in% c(6, 7, 9, 12)) ) {
     stop("`cmd_run_flirt`: dof must be 6 (rigid body), 7 (global rescale), 9 (traditional), or 12 (affine)")
   }
   cost <- match.arg(cost)
@@ -66,13 +66,13 @@ cmd_run_fsl_flirt <- function(
       unset = default_fsl_path,
       type = "fsl"
     )
-    if(length(fsl) != 1 || is.na(fsl) || !isTRUE(dir.exists(fsl))) {
+    if (length(fsl) != 1 || is.na(fsl) || !isTRUE(dir.exists(fsl))) {
       fsl <- NULL
-    } else if(!identical(default_fsl_path, fsl)) {
+    } else if (!identical(default_fsl_path, fsl)) {
       ravepipeline::raveio_setopt("fsl_path", fsl)
     }
     fsl
-  }, error = function(e){ NULL })
+  }, error = function(e) { NULL })
 
   has_fsl <- !is.null(fsl_home)
 
@@ -82,8 +82,9 @@ cmd_run_fsl_flirt <- function(
   )
   log_file <- strftime(Sys.time(), "log-flirt-%y%m%d-%H%M%S.log")
 
-  template <- c(readLines(system.file('shell-templates/fsl-flirt-coregistration.sh',
-                                      package = "ravecore")), "")
+  template <- c(readLines(
+    system.file("shell-templates/fsl-flirt-coregistration.sh", package = "ravecore")
+  ), "")
   # template <- readLines('inst/shell-templates/fsl-flirt-coregistration.sh')
   cmd <- ravepipeline::glue(
     paste(template, collapse = "\n"),
@@ -114,10 +115,10 @@ cmd_run_fsl_flirt <- function(
     execute = execute,
     command = "bash"
   )
-  if( verbose ) {
+  if ( verbose ) {
     message(cmd)
   }
-  if(dry_run) {
+  if (dry_run) {
     return(invisible(re))
   }
 

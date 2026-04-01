@@ -29,15 +29,15 @@ generate_reference <- function(subject, electrodes) {
 
   # check if any electrodes fall out of declaration
   missing_e <- electrodes[!electrodes %in% subject$electrodes]
-  if(length(missing_e)) {
+  if (length(missing_e)) {
     stop("Electrodes ", deparse_svec(missing_e), " is missing or not defined. Please remove it from the reference")
   }
-  if(!length(electrodes)) {
+  if (!length(electrodes)) {
     stop("The reference does not contain any electrode channels")
   }
 
   has_wavelet <- TRUE
-  if(!all(subject$preprocess_settings$has_wavelet[subject$electrodes %in% electrodes])) {
+  if (!all(subject$preprocess_settings$has_wavelet[subject$electrodes %in% electrodes])) {
     has_wavelet <- FALSE
     # stop("Wavelet has not been applied to one or more electrodes. Please run the 'Wavelet' module first.")
   }
@@ -79,7 +79,7 @@ generate_reference <- function(subject, electrodes) {
       ref_signal <- ref_signal + (s[] / nchans)
     }
 
-    sarray_path <- file.path(ref_cache_path, block, 'voltage')
+    sarray_path <- file.path(ref_cache_path, block, "voltage")
     if (dir.exists(sarray_path)) {
       unlink(sarray_path, recursive = TRUE)
     }
@@ -115,7 +115,7 @@ generate_reference <- function(subject, electrodes) {
         subject_inst$reference_path,
         sprintf("ref_%s", electrode_text),
         block,
-        'wavelet'
+        "wavelet"
       )
       if (dir.exists(warray_path)) {
         unlink(warray_path, recursive = TRUE)
@@ -149,11 +149,11 @@ generate_reference <- function(subject, electrodes) {
   names(ref_signals) <- blocks
 
   target_file <- file.path(subject$reference_path, sprintf("ref_%s.h5", electrode_text))
-  if(file.exists(target_file)) {
+  if (file.exists(target_file)) {
     unlink(target_file)
   }
 
-  if(is.list(wavelet_params)) {
+  if (is.list(wavelet_params)) {
     chunk <- c(length(wavelet_params$frequencies), 1, 2L)
     chunk[[2]] <- 2^ceiling(log2(1024 / prod(chunk)))
   } else {
@@ -167,7 +167,7 @@ generate_reference <- function(subject, electrodes) {
     blocks = blocks
   )
 
-  for(block in blocks){
+  for (block in blocks) {
 
     item <- ref_signals[[block]]
 
@@ -178,8 +178,8 @@ generate_reference <- function(subject, electrodes) {
             chunk = 1024, level = 7, replace = TRUE)
 
     # wavelet
-    if(!is.null(item$wavelet)) {
-      coef <- t(item$wavelet[drop=FALSE])
+    if (!is.null(item$wavelet)) {
+      coef <- t(item$wavelet[drop = FALSE])
       coef_data <- c(Mod(coef), Arg(coef))
       dim(coef_data) <- c(dim(coef), 2L)
 

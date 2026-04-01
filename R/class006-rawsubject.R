@@ -24,17 +24,17 @@
 #'
 #' @export
 RAVEPreprocessSettings <- R6::R6Class(
-  classname = 'RAVEPreprocessSettings',
+  classname = "RAVEPreprocessSettings",
   class = TRUE,
   portable = TRUE,
   inherit = RAVESerializable,
   private = list(
-    has_key = function(keys){
-      .subset2(self$data, 'has')(keys)
+    has_key = function(keys) {
+      .subset2(self$data, "has")(keys)
     },
-    get_from = function(keys, default = NULL){
+    get_from = function(keys, default = NULL) {
       has_k <- private$has_key(keys)
-      if(any(has_k)){
+      if (any(has_k)) {
         self$data[[keys[has_k][[1]]]]
       } else {
         default
@@ -92,34 +92,34 @@ RAVEPreprocessSettings <- R6::R6Class(
     #' @description constructor
     #' @param subject character or \code{\link{RAVESubject}} instance
     #' @param read_only whether subject should be read-only (not yet implemented)
-    initialize = function(subject, read_only = TRUE){
+    initialize = function(subject, read_only = TRUE) {
 
       self$read_only <- isTRUE(read_only)
-      if(inherits(subject, "RAVESubject")) {
+      if (inherits(subject, "RAVESubject")) {
         self$subject <- subject
       } else {
         self$subject <- RAVESubject$new(restore_subject_impl(subject), strict = FALSE)
       }
-      self$path <- file.path(self$subject$preprocess_path, 'rave.yaml')
-      self$backup_path <- file.path(self$subject$rave_path, 'log.yaml')
+      self$path <- file.path(self$subject$preprocess_path, "rave.yaml")
+      self$backup_path <- file.path(self$subject$rave_path, "log.yaml")
       self$data <- fastmap2()
-      if( file.exists(self$backup_path) ){
+      if ( file.exists(self$backup_path) ) {
         load_yaml(self$backup_path, map = self$data)
         list_to_fastmap2(self$data$preprocess, self$data)
       }
-      if(file.exists(self$path)){
+      if (file.exists(self$path)) {
         load_yaml(self$path, map = self$data)
       }
       self$migrate()
     },
 
     #' @description whether configuration is valid or not
-    valid = function(){
+    valid = function() {
       (length(self$data) > 0)
     },
 
     #' @description whether raw data folder exists
-    has_raw = function(){
+    has_raw = function() {
       dir.exists(self$raw_path2)
     },
 
@@ -127,17 +127,17 @@ RAVEPreprocessSettings <- R6::R6Class(
     #' @param blocks character, combination of session task and run
     #' @param force whether to ignore checking. Only used when data
     #' structure is not native, for example, 'BIDS' format
-    set_blocks = function(blocks, force = FALSE){
+    set_blocks = function(blocks, force = FALSE) {
       # check level
       has_import <- self$data_imported
-      if(length(has_import) && any(has_import)){
-        stop('Cannot set block because some data has been imported.')
+      if (length(has_import) && any(has_import)) {
+        stop("Cannot set block because some data has been imported.")
       }
-      if(!force){
+      if (!force) {
         stopifnot2(all(blocks %in% self$all_blocks), msg = sprintf(
-          'Blocks found: %s, blocks requested: %s',
-          paste(self$all_blocks, collapse = ', '),
-          paste(blocks, collapse = ', ')
+          "Blocks found: %s, blocks requested: %s",
+          paste(self$all_blocks, collapse = ", "),
+          paste(blocks, collapse = ", ")
         ))
       }
       self$data$blocks <- blocks
@@ -152,7 +152,7 @@ RAVEPreprocessSettings <- R6::R6Class(
     #' paths are valid; default is true
     get_block_paths = function(block, force_native = FALSE, check = TRUE) {
       paths <- character(0L)
-      if(force_native) {
+      if (force_native) {
         format_standard <- "native"
       } else {
         format_standard <- self$raw_path2_type
@@ -160,7 +160,7 @@ RAVEPreprocessSettings <- R6::R6Class(
       switch(
         format_standard,
         "bids" = {
-          if(dir_exists(self$raw_path2)) {
+          if (dir_exists(self$raw_path2)) {
             bids_subject <- as_bids_subject(self$subject, strict = FALSE)
             query_results <- bidsr::query_bids(
               bids_subject,
@@ -184,10 +184,10 @@ RAVEPreprocessSettings <- R6::R6Class(
         }
       )
       paths <- unlist(paths)
-      if(check) {
+      if (check) {
         paths <- paths[file_exists(paths)]
       }
-      if(length(paths)) {
+      if (length(paths)) {
         paths <- path_abs(paths, must_work = FALSE)
       }
       paths
@@ -197,18 +197,18 @@ RAVEPreprocessSettings <- R6::R6Class(
     #' @param electrodes integer vectors
     #' @param type signal type of electrodes, see \code{\link{SIGNAL_TYPES}}
     #' @param add whether to add to current settings
-    set_electrodes = function(electrodes, type = SIGNAL_TYPES, add = FALSE){
+    set_electrodes = function(electrodes, type = SIGNAL_TYPES, add = FALSE) {
       elec <- self$electrodes
       imported <- self$data_imported[elec %in% electrodes]
-      if(length(imported) && any(imported)){
-        stop('Electrodes ', deparse_svec(elec[elec %in% electrodes]),
-             ' have/has been imported. Cannot set electrodes')
+      if (length(imported) && any(imported)) {
+        stop("Electrodes ", deparse_svec(elec[elec %in% electrodes]),
+             " have/has been imported. Cannot set electrodes")
       }
 
       type <- match.arg(type)
 
-      if(length(electrodes)){
-        for(e in electrodes){
+      if (length(electrodes)) {
+        for (e in electrodes) {
           self$data[[as.character(e)]] %?<-% list()
           self$data[[as.character(e)]]$sample_rate %?<-% NA
           # not locked, so we can reset
@@ -220,7 +220,7 @@ RAVEPreprocessSettings <- R6::R6Class(
         }
       }
 
-      if(add){
+      if (add) {
         electrodes <- sort(unique(c(self$data$electrodes, electrodes)))
       }
 
@@ -232,38 +232,38 @@ RAVEPreprocessSettings <- R6::R6Class(
     #' @param srate sample rate, must be positive number
     #' @param type electrode type to set sample rate. In 'rave', all electrodes
     #' with the same signal type must have the same sample rate.
-    set_sample_rates = function(srate, type = SIGNAL_TYPES){
-      stopifnot2(is_valid_ish(srate, max_len = 1, mode = 'numeric'),
-                 msg = 'sample rate must be positive')
+    set_sample_rates = function(srate, type = SIGNAL_TYPES) {
+      stopifnot2(is_valid_ish(srate, max_len = 1, mode = "numeric"),
+                 msg = "sample rate must be positive")
       type <- type[type %in% SIGNAL_TYPES]
 
       # LFP should be consistent in sample rates
-      if(any(type %in% c('LFP'))){
-        type <- unique(c(type, c('LFP')))
+      if (any(type %in% c("LFP"))) {
+        type <- unique(c(type, c("LFP")))
       }
       imported <- self$data_imported & self$electrode_types %in% type
-      if(length(imported) && any(imported)){
+      if (length(imported) && any(imported)) {
         # check whether sample rates are the same
         original_srates <- self$sample_rates[imported]
         original_srates <- unique(original_srates)
         original_srates <- original_srates[!is.na(original_srates)]
-        if(length(original_srates) & any(original_srates != srate)){
-          stop('Some/All electrodes with given types have been imported. Cannot change sample rate now.')
+        if (length(original_srates) & any(original_srates != srate)) {
+          stop("Some/All electrodes with given types have been imported. Cannot change sample rate now.")
         }
       }
 
       # To support previous format (RAVE 1.0 uses global settings for sample rate)
-      if(any(type %in% c('LFP'))){
+      if (any(type %in% c("LFP"))) {
         # support old format
         self$data$sample_rate <- srate
         self$data$srate <- srate
       }
       sel <- self$electrode_types %in% type
-      if(any(sel)){
+      if (any(sel)) {
         all_elec <- self$electrodes
-        sapply(all_elec[sel], function(e){
+        sapply(all_elec[sel], function(e) {
           x <- self$data[[as.character(e)]]
-          if(!is.list(x)){ stop('Please set electrodes first. Cannot find settings for electrode ', e) }
+          if (!is.list(x)) { stop("Please set electrodes first. Cannot find settings for electrode ", e) }
           self$data[[as.character(e)]]$sample_rate <- srate
         })
       }
@@ -272,10 +272,10 @@ RAVEPreprocessSettings <- R6::R6Class(
 
     #' @description convert old format to new formats
     #' @param force whether to force migrate and save settings
-    migrate = function(force = FALSE){
-      if(!self$old_version && !force){ return() }
-      if( self$version < 0 ){
-        if(length(self$data)){
+    migrate = function(force = FALSE) {
+      if (!self$old_version && !force) { return() }
+      if ( self$version < 0 ) {
+        if (length(self$data)) {
           # rave_debug("Migrating from an old format")
         }
       }
@@ -291,14 +291,14 @@ RAVEPreprocessSettings <- R6::R6Class(
       has_wavelet <- self$has_wavelet
       data_imported <- self$data_imported
       electrode_locked <- self$electrode_locked
-      for(ii in seq_along(electrodes)){
+      for (ii in seq_along(electrodes)) {
         x <- list(
           sample_rate = sample_rates[[ii]],
           notch_filtered = notch_filtered[[ii]],
           has_wavelet = has_wavelet[[ii]],
           data_imported = data_imported[[ii]],
           electrode_locked = electrode_locked[[ii]],
-          electrode_type = 'LFP'
+          electrode_type = "LFP"
         )
         self$data[[as.character(electrodes[[ii]])]] <- x
       }
@@ -309,15 +309,15 @@ RAVEPreprocessSettings <- R6::R6Class(
     #' @description get electrode information
     #' @param electrode integer
     #' @returns list of electrode type, number, etc.
-    electrode_info = function(electrode){
-      if(!electrode %in% self$electrodes){
+    electrode_info = function(electrode) {
+      if (!electrode %in% self$electrodes) {
         return()
       }
       self$data[[as.character(electrode)]]
     },
 
     #' @description save settings to hard disk
-    save = function(){
+    save = function() {
       dir_create2(dirname(self$path))
       dir_create2(dirname(self$backup_path))
       self$data$signature <- rand_string()
@@ -342,10 +342,10 @@ RAVEPreprocessSettings <- R6::R6Class(
     #' then a weight matrix;
     get_compose_weights = function(flat = TRUE) {
       elec <- sort(self$electrodes)
-      if(!length(elec)) { return( NULL ) }
+      if (!length(elec)) { return( NULL ) }
       mat <- drop_nulls(lapply(elec, function(e) {
         item <- self$data[[e]]
-        if( isTRUE(is.list(item) && isTRUE(item$composed) && is.list(item$composed_params)) ) {
+        if ( isTRUE(is.list(item) && isTRUE(item$composed) && is.list(item$composed_params)) ) {
           o <- order(item$composed_params$from)
           return(data.frame(
             Source = item$composed_params$from[o],
@@ -354,9 +354,9 @@ RAVEPreprocessSettings <- R6::R6Class(
           ))
         } else { return(NULL) }
       }))
-      if(!length(mat)) { return( NULL ) }
+      if (!length(mat)) { return( NULL ) }
       mat <- do.call("rbind", mat)
-      if(!flat) {
+      if (!flat) {
         mat <- sapply(split(mat, mat$Target), function(sub) {
           re <- rep(0.0, length(elec))
           re[elec %in% sub$Source] <- sub$Weight
@@ -370,40 +370,40 @@ RAVEPreprocessSettings <- R6::R6Class(
   active = list(
 
     #' @field version configure version of currently stored files
-    version = function(){
+    version = function() {
       v <- self$data$preprocess_version
-      if(is.null(v)){
+      if (is.null(v)) {
         v <- -1
       }
       v
     },
 
     #' @field old_version whether settings file is old format
-    old_version = function(){
+    old_version = function() {
       self$version < 0
     },
 
     #' @field blocks experiment blocks
-    blocks = function(){
+    blocks = function() {
       self$data$blocks
     },
 
     #' @field electrodes electrode numbers
-    electrodes = function(){
-      private$get_from(c('electrodes', 'channels'))
+    electrodes = function() {
+      private$get_from(c("electrodes", "channels"))
     },
 
     #' @field sample_rates voltage data sample rate
-    sample_rates = function(){
+    sample_rates = function() {
       # old format
-      if(self$old_version){
-        srate <- private$get_from(c('sample_rate', 'srate'), default = NA)
+      if (self$old_version) {
+        srate <- private$get_from(c("sample_rate", "srate"), default = NA)
         return(rep(srate, length(self$electrodes)))
       }
       all_elec <- self$electrodes
-      sapply(all_elec, function(e){
+      sapply(all_elec, function(e) {
         x <- self$data[[as.character(e)]]
-        if(length(x$sample_rate) == 1){
+        if (length(x$sample_rate) == 1) {
           return(x$sample_rate)
         } else {
           NA
@@ -412,61 +412,61 @@ RAVEPreprocessSettings <- R6::R6Class(
     },
 
     #' @field notch_filtered whether electrodes are notch filtered
-    notch_filtered = function(){
+    notch_filtered = function() {
       # NO_SUBJECT = 0
       # HAS_CACHE = 1
       # NOTCH_FILTERED = 2
       # WAVELETED = 3
       # REFERENCED = 4
       all_elec <- self$electrodes
-      if(self$old_version){
+      if (self$old_version) {
         # old format
-        if(isTRUE(self$data$checklevel >= 2)){
+        if (isTRUE(self$data$checklevel >= 2)) {
           return(rep(TRUE, length(all_elec)))
-        } else{
+        } else {
           return(rep(FALSE, length(all_elec)))
         }
       }
 
       # New format, all electrodes are recorded individually
-      vapply(all_elec, function(e){
+      vapply(all_elec, function(e) {
         x <- self$data[[as.character(e)]]
         isTRUE(x$notch_filtered)
       }, FUN.VALUE = FALSE)
     },
 
     #' @field has_wavelet whether each electrode has wavelet transforms
-    has_wavelet = function(){
+    has_wavelet = function() {
       # old format
       all_elec <- self$electrodes
-      if(self$old_version){
-        if(isTRUE(self$data$checklevel >= 3)){
+      if (self$old_version) {
+        if (isTRUE(self$data$checklevel >= 3)) {
           log <- self$data$wavelet_log
-          if(!length(log)){ return(NULL) }
+          if (!length(log)) { return(NULL) }
           return(all_elec %in% log[[length(log)]]$electrodes)
-        } else{
+        } else {
           return(rep(FALSE, length(all_elec)))
         }
       }
 
       # New format, all electrodes are recorded individually
-      vapply(all_elec, function(e){
+      vapply(all_elec, function(e) {
         x <- self$data[[as.character(e)]]
         isTRUE(x$has_wavelet)
       }, FUN.VALUE = FALSE)
     },
 
     #' @field data_imported whether electrodes are imported
-    data_imported = function(){
+    data_imported = function() {
       all_elec <- self$electrodes
-      if(self$old_version){
-        if(isTRUE(private$get_from('checklevel') >= 1)){
+      if (self$old_version) {
+        if (isTRUE(private$get_from("checklevel") >= 1)) {
           return(rep(TRUE, length(all_elec)))
         } else {
           return(rep(FALSE, length(all_elec)))
         }
       }
-      vapply(all_elec, function(e){
+      vapply(all_elec, function(e) {
         isTRUE(self$data[[as.character(e)]]$data_imported)
       }, FUN.VALUE = FALSE)
     },
@@ -476,20 +476,20 @@ RAVEPreprocessSettings <- R6::R6Class(
     #' @field data_locked whether electrode, blocks and sample rate are locked?
     #' usually when an electrode is imported into 'rave', that electrode is
     #' locked
-    data_locked = function(){
-      if(self$old_version){
-        return(isTRUE(isTRUE(private$get_from('checklevel') >= 2)))
+    data_locked = function() {
+      if (self$old_version) {
+        return(isTRUE(isTRUE(private$get_from("checklevel") >= 2)))
       }
       length(self$data_imported) && all(self$data_imported)
     },
 
     #' @field electrode_locked whether electrode is imported and locked
-    electrode_locked = function(){
+    electrode_locked = function() {
       all_elec <- self$electrodes
-      if(self$old_version){
+      if (self$old_version) {
         return(rep(self$data_locked, length(all_elec)))
       }
-      vapply(all_elec, function(e){
+      vapply(all_elec, function(e) {
         isTRUE(self$data[[as.character(e)]]$locked)
       }, FUN.VALUE = FALSE)
     },
@@ -498,7 +498,7 @@ RAVEPreprocessSettings <- R6::R6Class(
     #' physically contacts, but is generated from those physically ones
     electrode_composed = function() {
       elec <- self$electrodes
-      if(!length(elec)) { return(NULL) }
+      if (!length(elec)) { return(NULL) }
       sel <- vapply(elec, function(e) {
         item <- self$data[[e]]
         isTRUE(is.list(item) && isTRUE(item$composed) && is.list(item$composed_params))
@@ -507,10 +507,10 @@ RAVEPreprocessSettings <- R6::R6Class(
     },
 
     #' @field wavelet_params wavelet parameters
-    wavelet_params = function(){
-      if(self$old_version){
+    wavelet_params = function() {
+      if (self$old_version) {
         log <- self$data$wavelet_log
-        if(!length(log)){
+        if (!length(log)) {
           return(NULL)
         } else {
           log <- log[[length(log)]]
@@ -527,11 +527,11 @@ RAVEPreprocessSettings <- R6::R6Class(
     },
 
     #' @field notch_params Notch filter parameters
-    notch_params = function(){
-      if(self$old_version){
+    notch_params = function() {
+      if (self$old_version) {
         return(list(
-          frequencies = c(60,120,180),
-          half_bandwidths = c(1,2,2)
+          frequencies = c(60, 120, 180),
+          half_bandwidths = c(1, 2, 2)
         ))
       }
 
@@ -539,25 +539,25 @@ RAVEPreprocessSettings <- R6::R6Class(
     },
 
     #' @field electrode_types electrode signal types
-    electrode_types = function(){
+    electrode_types = function() {
       all_elec <- self$electrodes
       # RAVE 1.0 doesn't have electrode signal types, default to LFP
-      if(self$old_version){
-        return(rep('LFP', length(all_elec)))
+      if (self$old_version) {
+        return(rep("LFP", length(all_elec)))
       }
-      vapply(all_elec, function(e){
+      vapply(all_elec, function(e) {
         type <- self$data[[as.character(e)]]$electrode_type
-        if(length(type) != 1){
-          return('LFP')
+        if (length(type) != 1) {
+          return("LFP")
         }
         type
-      }, FUN.VALUE = 'LFP')
+      }, FUN.VALUE = "LFP")
     },
 
     #' @field @freeze_blocks whether to free block, internally used
-    `@freeze_blocks` = function(){
+    `@freeze_blocks` = function() {
       tmp <- self$data_imported
-      if(length(tmp) && any(tmp)){
+      if (length(tmp) && any(tmp)) {
         return(TRUE)
       } else {
         return(FALSE)
@@ -566,19 +566,19 @@ RAVEPreprocessSettings <- R6::R6Class(
 
     #' @field @freeze_lfp_ecog whether to freeze electrodes that record
     #' 'LFP' signals, internally used
-    `@freeze_lfp_ecog` = function(){
-      is_lfp <- (self$electrode_types %in% c('LFP'))
-      if(length(is_lfp) && any(self$data_imported[is_lfp])){
+    `@freeze_lfp_ecog` = function() {
+      is_lfp <- (self$electrode_types %in% c("LFP"))
+      if (length(is_lfp) && any(self$data_imported[is_lfp])) {
         return(TRUE)
-      } else{
+      } else {
         return(FALSE)
       }
     },
 
     #' @field @lfp_ecog_sample_rate 'LFP' sample rates, internally used
-    `@lfp_ecog_sample_rate` = function(){
-      is_lfp <- (self$electrode_types %in% c('LFP'))
-      if(length(is_lfp) && any(is_lfp)){
+    `@lfp_ecog_sample_rate` = function() {
+      is_lfp <- (self$electrode_types %in% c("LFP"))
+      if (length(is_lfp) && any(is_lfp)) {
         self$sample_rates[is_lfp][[1]]
       } else {
         NA
@@ -588,8 +588,8 @@ RAVEPreprocessSettings <- R6::R6Class(
 
     #' @field all_blocks characters, all possible blocks even not included in
     #' some projects
-    all_blocks = function(){
-      switch (
+    all_blocks = function() {
+      switch(
         self$raw_path2_type,
         "bids" = {
           bids_subject <- bidsr::bids_subject(
@@ -597,8 +597,8 @@ RAVEPreprocessSettings <- R6::R6Class(
             subject_code = self$subject$subject_code,
             strict = FALSE
           )
-          raw_path <- bidsr::resolve_bids_path(bids_subject, storage = 'raw')
-          if(!dir_exists(raw_path)) { return(character()) }
+          raw_path <- bidsr::resolve_bids_path(bids_subject, storage = "raw")
+          if (!dir_exists(raw_path)) { return(character()) }
           query <- bidsr::query_bids(bids_subject, list(
             storage = "raw",
             sidecars = FALSE,
@@ -621,16 +621,16 @@ RAVEPreprocessSettings <- R6::R6Class(
     #' @field raw_path2 raw data path, based on the format standard; for native,
     #' this is equivalent to \code{raw_path}; for 'BIDS', this is subject raw
     #' directory in \code{'BIDS'} project
-    raw_path2 = function(){
-      switch (
+    raw_path2 = function() {
+      switch(
         self$raw_path2_type,
-        "bids" = rave_path(self$subject$`@impl`, 'bids_raw'),
-        rave_path(self$subject$`@impl`, 'rave_raw')
+        "bids" = rave_path(self$subject$`@impl`, "bids_raw"),
+        rave_path(self$subject$`@impl`, "rave_raw")
       )
     },
 
     #' @field raw_path2_type raw data path type, 'native' or 'bids'
-    raw_path2_type = function(){
+    raw_path2_type = function() {
       self$subject$`@impl`@project@format_standard
     },
 
@@ -639,12 +639,12 @@ RAVEPreprocessSettings <- R6::R6Class(
     #' the legacy scripts. Please use \code{raw_path2} combined with
     #' \code{raw_path2_type} for supporting 'BIDS' format
     raw_path = function() {
-      rave_path(self$subject$`@impl`, 'rave_raw')
+      rave_path(self$subject$`@impl`, "rave_raw")
     },
 
     #' @field raw_path_type legacy type for \code{raw_path}, always returns
     #' \code{'native'}
-    raw_path_type = function() { 'native' }
+    raw_path_type = function() { "native" }
 
   )
 )

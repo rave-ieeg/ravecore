@@ -52,12 +52,12 @@
 export_table <- function(x, file, format = c("auto", "csv", "csv.zip", "tsv", "h5", "fst", "json", "rds", "yaml"), ...) {
 
   format <- match.arg(format)
-  if(format == "auto") {
+  if (format == "auto") {
     format <- path_ext(tolower(file))
-    if(!format %in% c("csv", "zip", "csv.zip", "tsv", "h5", "fst", "json", "rds", "yaml", "yml")) {
+    if (!format %in% c("csv", "zip", "csv.zip", "tsv", "h5", "fst", "json", "rds", "yaml", "yml")) {
       stop("ravecore::export_table: cannot infer `format` from file name: ", basename(file))
     }
-    if(format == "zip") {
+    if (format == "zip") {
       format <- "csv.zip"
     } else if (format == "yml") {
       format <- "yaml"
@@ -71,8 +71,8 @@ export_table <- function(x, file, format = c("auto", "csv", "csv.zip", "tsv", "h
     },
     "csv.zip" = {
       tf <- tempfile(
-        pattern = paste0('data_export_', format(Sys.time(), "%b_%d_%Y_%H_%M")),
-        fileext = '.csv'
+        pattern = paste0("data_export_", format(Sys.time(), "%b_%d_%Y_%H_%M")),
+        fileext = ".csv"
       )
       zf <- tempfile(fileext = ".csv.zip")
       on.exit({
@@ -80,7 +80,9 @@ export_table <- function(x, file, format = c("auto", "csv", "csv.zip", "tsv", "h
         unlink(zf)
       })
       data.table::fwrite(x = x, file = tf, ...)
-      utils::zip(zipfile = zf, files = tf, extras='-j')
+      utils::zip(zipfile = zf,
+                 files = tf,
+                 extras = "-j")
       file_move(zf, file)
     },
     "tsv" = {
@@ -92,23 +94,23 @@ export_table <- function(x, file, format = c("auto", "csv", "csv.zip", "tsv", "h
       ieegio::io_write_fst(x = x, con = file, compress = 99)
     },
     "h5" = {
-      h5file <- tempfile(fileext = '.h5')
+      h5file <- tempfile(fileext = ".h5")
       on.exit({
         unlink(h5file)
       })
       # recursive method for saving to h5 file
       save_list_to_h5 <- function(v, nm) {
-        if(is.list(v)) {
+        if (is.list(v)) {
           re <- mapply(save_list_to_h5, v,
-                       paste0(nm, '/', names(v)), USE.NAMES = TRUE, SIMPLIFY = FALSE)
+                       paste0(nm, "/", names(v)), USE.NAMES = TRUE, SIMPLIFY = FALSE)
           structure(list(do.call("c", re)), names = nm)
           return()
         } else {
-          ctype <- ifelse(is.numeric(v), 'numeric', 'character')
-          ieegio::io_write_h5(x=v, file=h5file, name=nm,
-                  level=ifelse(is.numeric(v), 4, 9),
-                  ctype=ctype,
-                  replace = TRUE, quiet = TRUE)
+          ctype <- ifelse(is.numeric(v), "numeric", "character")
+          ieegio::io_write_h5(x = v, file = h5file, name = nm,
+                              level = ifelse(is.numeric(v), 4, 9),
+                              ctype = ctype,
+                              replace = TRUE, quiet = TRUE)
           return(structure(list(ctype), names = nm))
         }
       }
@@ -181,12 +183,12 @@ export_table <- function(x, file, format = c("auto", "csv", "csv.zip", "tsv", "h
 #' @export
 import_table <- function(file, format = c("auto", "csv", "csv.zip", "tsv", "h5", "fst", "json", "rds", "yaml"), ...) {
   format <- match.arg(format)
-  if(format == "auto") {
+  if (format == "auto") {
     format <- path_ext(tolower(file))
-    if(!format %in% c("csv", "zip", "csv.zip", "tsv", "h5", "fst", "json", "rds", "yaml", "yml")) {
+    if (!format %in% c("csv", "zip", "csv.zip", "tsv", "h5", "fst", "json", "rds", "yaml", "yml")) {
       stop("ravecore::import_table: cannot infer `format` from file name: ", basename(file))
     }
-    if(format == "zip") {
+    if (format == "zip") {
       format <- "csv.zip"
     } else if (format == "yml") {
       format <- "yaml"
@@ -203,7 +205,7 @@ import_table <- function(file, format = c("auto", "csv", "csv.zip", "tsv", "h5",
       on.exit({ unlink(td, recursive = TRUE) })
       utils::unzip(zipfile = file, exdir = td, overwrite = TRUE)
       f <- list.files(td, pattern = "\\.csv$", ignore.case = TRUE)
-      if(length(f) != 1) {
+      if (length(f) != 1) {
         stop("ravecore::import_table: csv.zip file contains no csv or more than one csv files.")
       }
       data.table::fread(file = file.path(td, f), ...)
@@ -211,9 +213,9 @@ import_table <- function(file, format = c("auto", "csv", "csv.zip", "tsv", "h5",
     "tsv" = {
       args <- list(...)
       args$file <- file
-      if(!length(args$na)) { args$na <- "n/a" }
-      if(!length(args$sep)) { args$sep <- "\t" }
-      if(!length(args$header)) { args$header <- TRUE }
+      if (!length(args$na)) { args$na <- "n/a" }
+      if (!length(args$sep)) { args$sep <- "\t" }
+      if (!length(args$header)) { args$header <- TRUE }
       do.call(utils::read.table, args)
     },
     "fst" = {
@@ -223,18 +225,18 @@ import_table <- function(file, format = c("auto", "csv", "csv.zip", "tsv", "h5",
     "h5" = {
       nms <- ieegio::io_h5_names(file = file)
       column_attrs <- list()
-      if("__meta__" %in% nms) {
+      if ("__meta__" %in% nms) {
         tryCatch({
           meta <- load_h5(file = file, name = "__meta__", ram = TRUE, quiet = TRUE)
           meta <- jsonlite::unserializeJSON(meta)
-          if("columns" %in% names(meta)) {
+          if ("columns" %in% names(meta)) {
             column_attrs <- meta$columns
             nms <- meta$columns
           } else {
             nms <- nms[!nms %in% "__meta__"]
           }
 
-          if(is.list(meta$attributes)) {
+          if (is.list(meta$attributes)) {
             column_attrs <- meta$attributes
           }
         }, error = function(e) {
@@ -244,8 +246,8 @@ import_table <- function(file, format = c("auto", "csv", "csv.zip", "tsv", "h5",
       re <- structure(lapply(nms, function(nm) {
         re <- as.vector(load_h5(file = file, name = nm, ram = TRUE, quiet = TRUE))
         attri <- column_attrs[[ nm ]]
-        if(length(attri) && is.list(attri)) {
-          if("factor" %in% attri$class) {
+        if (length(attri) && is.list(attri)) {
+          if ("factor" %in% attri$class) {
             re <- factor(re, levels = attri$levels)
           }
           attributes(re) <- attri
@@ -265,10 +267,10 @@ import_table <- function(file, format = c("auto", "csv", "csv.zip", "tsv", "h5",
       stopifnot2(is.data.frame(dat), msg = "The object stored at JSON file does not contain a data.frame")
       attrs <- re$attributes
       cols <- re$columns
-      for(nm in cols) {
+      for (nm in cols) {
         attri <- attrs[[nm]]
-        if(length(attri) && is.list(attri)) {
-          if('factor' %in% attri$class) {
+        if (length(attri) && is.list(attri)) {
+          if ("factor" %in% attri$class) {
             dat[[nm]] <- factor(dat[[nm]], levels = attri$levels)
           }
           attributes(dat[[nm]]) <- attri
@@ -284,8 +286,8 @@ import_table <- function(file, format = c("auto", "csv", "csv.zip", "tsv", "h5",
       re <- structure(names = cols, lapply(cols, function(nm) {
         re <- unlist(dat[[nm]])
         attri <- attrs[[nm]]
-        if(length(attri) && is.list(attri)) {
-          if('factor' %in% attri$class) {
+        if (length(attri) && is.list(attri)) {
+          if ("factor" %in% attri$class) {
             re <- factor(re, levels = attri$levels)
           }
           attributes(re) <- attri

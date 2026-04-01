@@ -1,13 +1,13 @@
 ensure_threeBrain_template <- function(template_subject) {
   template_subject <- gsub("[\\./\\\\]", "", template_subject)
   template_subject <- trimws(template_subject)
-  if(is.na(template_subject) || !nzchar(template_subject)) {
+  if (is.na(template_subject) || !nzchar(template_subject)) {
     return(NULL)
   }
   template_imaging_path <- file.path(threeBrain::default_template_directory(), template_subject)
 
-  if(!dir.exists(template_imaging_path)) {
-    if(!template_subject %in% names(threeBrain::available_templates())) {
+  if (!dir.exists(template_imaging_path)) {
+    if (!template_subject %in% names(threeBrain::available_templates())) {
       return(NULL)
     }
     threeBrain::download_template_subject(subject_code = template_subject)
@@ -46,7 +46,7 @@ ensure_threeBrain_template <- function(template_subject) {
 #'
 #'   brain <- rave_brain("demo/DemoSubject")
 #'
-#'   if(interactive()) {
+#'   if (interactive()) {
 #'
 #'     brain$plot()
 #'
@@ -57,24 +57,24 @@ ensure_threeBrain_template <- function(template_subject) {
 #'
 #' @export
 rave_brain <- function(
-    subject, surfaces = 'pial', overlays = "aparc.a2009s+aseg", annotations = "label/aparc.a2009s",
-    ..., usetemplateifmissing = FALSE, include_electrodes = TRUE){
+    subject, surfaces = "pial", overlays = "aparc.a2009s+aseg", annotations = "label/aparc.a2009s",
+    ..., usetemplateifmissing = FALSE, include_electrodes = TRUE) {
 
   subject <- as_rave_subject(subject, strict = FALSE)
 
   fs_path <- subject$freesurfer_path
 
   electrode_table <- NULL
-  if(include_electrodes) {
+  if (include_electrodes) {
     electrode_table <- subject$meta_data(meta_type = "electrodes", strict = FALSE)
-    if(!is.data.frame(electrode_table) || !nrow(electrode_table)) {
+    if (!is.data.frame(electrode_table) || !nrow(electrode_table)) {
       electrode_table <- NULL
     }
   }
 
 
-  if(is.na(fs_path) || !isTRUE(dir_exists(fs_path))){
-    if( !usetemplateifmissing ){
+  if (is.na(fs_path) || !isTRUE(dir_exists(fs_path))) {
+    if ( !usetemplateifmissing ) {
       return(invisible())
     }
     brain <- threeBrain::merge_brain(
@@ -83,9 +83,9 @@ rave_brain <- function(
       template_annotation_types = annotations
     )
 
-    if(is.data.frame(electrode_table)) {
+    if (is.data.frame(electrode_table)) {
       # try to use MNI305 position
-      if(all(paste0("MNI305_", c("x", "y", "z")) %in% names(electrode_table))){
+      if (all(paste0("MNI305_", c("x", "y", "z")) %in% names(electrode_table))) {
         electrode_table$Coord_x <- electrode_table$MNI305_x
         electrode_table$Coord_y <- electrode_table$MNI305_y
         electrode_table$Coord_z <- electrode_table$MNI305_z
@@ -95,9 +95,9 @@ rave_brain <- function(
     }
 
   } else {
-    # if(recache){
-    #   if( clean_before_cache ){
-    #     fs <- list.files(file.path(fs_path, 'RAVE'), pattern = '\\.json$',
+    # if(recache) {
+    #   if ( clean_before_cache ) {
+    #     fs <- list.files(file.path(fs_path, "RAVE"), pattern = "\\.json$",
     #                     all.files = FALSE, recursive = FALSE, full.names = TRUE,
     #                     ignore.case = TRUE, include.dirs = FALSE, no.. = TRUE)
     #     lapply(fs, unlink)
@@ -114,20 +114,20 @@ rave_brain <- function(
     )
 
 
-    if(is.data.frame(electrode_table)) {
+    if (is.data.frame(electrode_table)) {
       brain$set_electrodes(electrodes = electrode_table)
     }
 
-    # if( compute_template ){
+    # if( compute_template ) {
     #   tf <- tempfile()
     #   new_table <- brain$calculate_template_coordinates(save_to = tf)
-    #   if( file.exists(tf) ){
+    #   if ( file.exists(tf) ) {
     #     brain$electrodes$raw_table_path <- NULL
     #     unlink(tf)
     #     # need to update meta
     #     save_meta2(
     #       data = new_table,
-    #       meta_type = 'electrodes',
+    #       meta_type = "electrodes",
     #       project_name = subject$project_name,
     #       subject_code = subject$subject_code
     #     )

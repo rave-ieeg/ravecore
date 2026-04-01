@@ -16,18 +16,18 @@ normalize_commandline_path <- function(
 
   type <- match.arg(type)
 
-  if(length(path) != 1 || is.na(path) || trimws(path) %in% c("", "/")) {
+  if (length(path) != 1 || is.na(path) || trimws(path) %in% c("", "/")) {
     return(unset)
   }
-  if(!file.exists(path)) {
+  if (!file.exists(path)) {
     return(unset)
   }
   path <- normalizePath(path, winslash = "\\")
-  if(cmd_dry_run()) {
+  if (cmd_dry_run()) {
     return(path)
   }
 
-  switch (
+  switch(
     type,
     `dcm2niix` = {
       res <- ""
@@ -35,14 +35,14 @@ normalize_commandline_path <- function(
         res <- system2(path, args = "--version",
                        wait = TRUE, stdout = TRUE, stderr = TRUE)
         res <- paste(res, collapse = "\n")
-        if(any(grepl("dcm2niix", res, ignore.case = TRUE))) {
+        if (any(grepl("dcm2niix", res, ignore.case = TRUE))) {
           return(path)
         }
       })
     },
     `freesurfer` = {
       recon_all <- file.path(path, "bin", "recon-all")
-      if(file.exists(recon_all)){
+      if (file.exists(recon_all)) {
         try({
           res <- system2(
             command = recon_all,
@@ -53,7 +53,7 @@ normalize_commandline_path <- function(
             wait = TRUE, stdout = TRUE, stderr = TRUE
           )
           res <- paste(res, collapse = "\n")
-          if(grepl("freesurfer", res, ignore.case = TRUE)) {
+          if (grepl("freesurfer", res, ignore.case = TRUE)) {
             return(path)
           }
         })
@@ -61,13 +61,13 @@ normalize_commandline_path <- function(
     },
     `fsl` = {
       flirt <- file.path(path, "bin", "flirt")
-      if(file.exists(flirt)){
+      if (file.exists(flirt)) {
         return(path)
       }
     },
     `afni` = {
       allineate <- file.path(path, "3dallineate")
-      if(file.exists(allineate)){
+      if (file.exists(allineate)) {
         return(path)
       }
     },
@@ -93,13 +93,13 @@ cmd_dcm2niix <- function(error_on_missing = TRUE, unset = NA) {
     type = "dcm2niix",
     unset = unset
   )
-  if( length(path) != 1 || is.na(path) || !isTRUE(file.exists(path)) ) {
+  if ( length(path) != 1 || is.na(path) || !isTRUE(file.exists(path)) ) {
     path <- c(
       file.path(rpymat::env_path(), "bin", "dcm2niix"),
       file.path(rpymat::env_path(), "Scripts", "dcm2niix.exe")
     )
     path <- path[file.exists(path)]
-    if(length(path)) {
+    if (length(path)) {
       path <- path[[1]]
       path_found <- TRUE
     }
@@ -108,10 +108,10 @@ cmd_dcm2niix <- function(error_on_missing = TRUE, unset = NA) {
     path_found <- TRUE
   }
 
-  if( path_found ) {
+  if ( path_found ) {
     path <- normalizePath(path, winslash = "/")
   } else {
-    if( error_on_missing ) {
+    if ( error_on_missing ) {
       stop("Cannot find binary command `dcm2niix`. ",
            "Please go to the following website to install it:\n\n",
            "  https://github.com/rordenlab/dcm2niix#install\n\n",
@@ -132,9 +132,9 @@ cmd_freesurfer_home <- function(error_on_missing = TRUE, unset = NA) {
   path <- ravepipeline::raveio_getopt("freesurfer_path", default = {
     Sys.getenv("FREESURFER_HOME", unset = NA)
   })
-  if(isTRUE(is.na(path))) {
+  if (isTRUE(is.na(path))) {
     path <- local({
-      if(file.exists("/Applications/freesurfer")) {
+      if (file.exists("/Applications/freesurfer")) {
         additional_fs <- c(
           "/Applications/freesurfer",
           list.dirs("/Applications/freesurfer", recursive = FALSE, full.names = TRUE)
@@ -147,18 +147,18 @@ cmd_freesurfer_home <- function(error_on_missing = TRUE, unset = NA) {
         "/usr/local/freesurfer"
       )
       fs <- fs[dir.exists(fs)]
-      if(length(fs)) { fs } else { "" }
+      if (length(fs)) { fs } else { "" }
     })
   }
   path <- sapply(path, normalize_commandline_path, type = "freesurfer", unset = NA)
   path <- path[!is.na(path)]
-  if(length(path)) {
+  if (length(path)) {
     path <- path[[1]]
   } else {
     path <- unset
   }
-  if( length(path) != 1 || is.na(path) || !isTRUE(dir.exists(path)) ) {
-    if( error_on_missing ) {
+  if ( length(path) != 1 || is.na(path) || !isTRUE(dir.exists(path)) ) {
+    if ( error_on_missing ) {
       stop("Cannot find FreeSurfer home directory. ",
            "Please go to the following website to install it:\n\n",
            "  https://surfer.nmr.mgh.harvard.edu/fswiki/DownloadAndInstall\n\n",
@@ -179,18 +179,18 @@ cmd_freesurfer_home <- function(error_on_missing = TRUE, unset = NA) {
 cmd_fsl_home <- function(error_on_missing = TRUE, unset = NA) {
 
   path <- normalize_commandline_path(
-    ravepipeline::raveio_getopt("fsl_path", default = Sys.getenv('FSLDIR')),
+    ravepipeline::raveio_getopt("fsl_path", default = Sys.getenv("FSLDIR")),
     type = "others",
     unset = local({
       fs <- c(
         "/usr/local/fsl"
       )
       fs <- fs[dir.exists(fs)]
-      if(length(fs)) { fs[[1]] } else { unset }
+      if (length(fs)) { fs[[1]] } else { unset }
     })
   )
-  if( length(path) != 1 || is.na(path) || !isTRUE(dir.exists(path)) ) {
-    if( error_on_missing ) {
+  if ( length(path) != 1 || is.na(path) || !isTRUE(dir.exists(path)) ) {
+    if ( error_on_missing ) {
       stop("Cannot find binary command `flirt`. ",
            "Please go to the following website to install it:\n\n",
            "  https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FslInstallation\n\n",
@@ -216,11 +216,11 @@ cmd_afni_home <- function(error_on_missing = TRUE, unset = NA) {
         "~/abin/"
       )
       fs <- fs[dir.exists(fs)]
-      if(length(fs)) { fs[[1]] } else { unset }
+      if (length(fs)) { fs[[1]] } else { unset }
     })
   )
-  if( length(path) != 1 || is.na(path) || !isTRUE(dir.exists(path)) ) {
-    if(error_on_missing) {
+  if ( length(path) != 1 || is.na(path) || !isTRUE(dir.exists(path)) ) {
+    if (error_on_missing) {
       stop("Cannot find AFNI command `3dallineate`. ",
            "Please go to the following website to install it:\n\n",
            "  https://afni.nimh.nih.gov/pub/dist/doc/htmldoc/background_install/install_instructs/index.html\n\n",
@@ -244,17 +244,17 @@ cmd_homebrew <- function(error_on_missing = TRUE, unset = NA) {
     type = "others",
     unset = unset
   )
-  if(length(path) != 1 || is.na(path) || !isTRUE(file.exists(path))) {
+  if (length(path) != 1 || is.na(path) || !isTRUE(file.exists(path))) {
 
-    if(identical(Sys.info()[['machine']], "arm64")) {
+    if (identical(Sys.info()[["machine"]], "arm64")) {
       path <- "/opt/homebrew/bin/brew"
     } else {
       path <- "/usr/local/bin/brew"
     }
 
   }
-  if( length(path) != 1 || is.na(path) || !isTRUE(file.exists(path)) ) {
-    if( error_on_missing ) {
+  if ( length(path) != 1 || is.na(path) || !isTRUE(file.exists(path)) ) {
+    if ( error_on_missing ) {
       stop("Cannot find binary command `brew`. ",
            "Please open terminal and run the following shell command:\n\n",
            '  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"\n\n',
@@ -271,7 +271,7 @@ cmd_homebrew <- function(error_on_missing = TRUE, unset = NA) {
 
 #' @rdname rave_cmd_tools
 #' @export
-cmd_dry_run <- function(){
+cmd_dry_run <- function() {
   isTRUE(ravepipeline::raveio_getopt("cmd_dry_run", default = FALSE))
 }
 
@@ -284,7 +284,7 @@ rscript_path <- function(...) {
                              full.names = TRUE, ignore.case = TRUE,
                              all.files = FALSE, recursive = FALSE,
                              include.dirs = FALSE)
-  if(length(rscript_path)) {
+  if (length(rscript_path)) {
     return(normalizePath(rscript_path[[1]], winslash = winslash))
   }
 
@@ -294,10 +294,10 @@ rscript_path <- function(...) {
     all.files = FALSE, recursive = TRUE,
     include.dirs = FALSE)
 
-  if(length(rscript_path)) {
+  if (length(rscript_path)) {
     # x64
     i386 <- grepl("i386", rscript_path)
-    if(any(!i386)) {
+    if (any(!i386)) {
       rscript_path <- rscript_path[!i386]
     }
     return(normalizePath(rscript_path[[1]], winslash = winslash))
@@ -305,10 +305,10 @@ rscript_path <- function(...) {
 
   # usually we won't reach to this step
   rscript_path <- Sys.which("Rscript")
-  if(rscript_path != "") { return(normalizePath(rscript_path, winslash = winslash)) }
+  if (rscript_path != "") { return(normalizePath(rscript_path, winslash = winslash)) }
 
   rscript_path <- Sys.which("Rscript.exe")
-  if(rscript_path != "") { return(normalizePath(rscript_path, winslash = winslash)) }
+  if (rscript_path != "") { return(normalizePath(rscript_path, winslash = winslash)) }
 
   return("Rscript")
 }

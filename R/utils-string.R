@@ -1,5 +1,5 @@
 
-deparse_svec <- function (
+deparse_svec <- function(
     nums,
     connect = "-",
     concatenate = TRUE,
@@ -13,15 +13,14 @@ deparse_svec <- function (
   }
   alag <- seq_len(max(1, max_lag))
   nums <- sort(unique(nums))
-  lg <- c(NA, nums)[seq_len(length(nums))]
+  lg <- c(NA, nums)[seq_along(nums)]
   ind <- nums - lg
   ind[1] <- 0
   ind2 <- c(ind[-1], -1)
   re <- apply(cbind(nums[!ind %in% alag], nums[!ind2 %in% alag]), 1, function(x) {
     if (x[1] == x[2]) {
       as.character(x[1])
-    }
-    else {
+    } else {
       paste(x, collapse = connect)
     }
   })
@@ -32,7 +31,7 @@ deparse_svec <- function (
 }
 
 
-parse_svec <- function (text, sep = ",", connect = "-:|", sort = FALSE, unique = TRUE) {
+parse_svec <- function(text, sep = ",", connect = "-:|", sort = FALSE, unique = TRUE) {
   connect <- unique(unlist(strsplit(connect, "")))
   connect[connect %in% c("|", ":", "~")] <- paste0("\\", connect[connect %in% c("|", ":", "~")])
   if ("-" %in% connect) {
@@ -70,8 +69,7 @@ parse_svec <- function (text, sep = ",", connect = "-:|", sort = FALSE, unique =
       if (length(ss) >= 2) {
         re <- c(re, (ss[1]:ss[2]))
       }
-    }
-    else {
+    } else {
       re <- c(re, as.numeric(ss))
     }
   }
@@ -85,17 +83,17 @@ parse_svec <- function (text, sep = ",", connect = "-:|", sort = FALSE, unique =
 }
 
 
-rand_string <- function(length = 50){
+rand_string <- function(length = 50) {
   pid <- as.integer(Sys.getpid())
   now <- as.numeric(Sys.time() - as.POSIXlt(Sys.Date()), units = "secs")
   now <- sprintf("%.24f", now)
   now <- strsplit(now, "\\.")[[1]]
   now2 <- strsplit(now[[2]], "")[[1]]
   now <- as.integer(c(
-    paste(now2[c(1,5,9,13,17,21) + 3], collapse = ""),
-    paste(now2[c(1,5,9,13,17,21) + 2], collapse = ""),
-    paste(now2[c(1,5,9,13,17,21) + 1], collapse = ""),
-    paste(now2[c(1,5,9,13,17,21)], collapse = ""),
+    paste(now2[c(1, 5, 9, 13, 17, 21) + 3], collapse = ""),
+    paste(now2[c(1, 5, 9, 13, 17, 21) + 2], collapse = ""),
+    paste(now2[c(1, 5, 9, 13, 17, 21) + 1], collapse = ""),
+    paste(now2[c(1, 5, 9, 13, 17, 21)], collapse = ""),
     now[[1]]
   ))
   now <- rev(as.integer(now))

@@ -11,17 +11,17 @@ prepare_subject_raw_voltage_with_epoch_legacy <- function(
   # ----- subject -----
   re$subject <- subject
 
-  if(missing(electrodes)){
+  if (missing(electrodes)) {
     electrodes <- subject$get_default(
       "electrodes", default_if_missing = subject$electrodes)
     message("No electrodes specified, loading all electrodes: ", deparse_svec(electrodes))
   }
-  if(length(electrodes) == 1 && is.character(electrodes)) {
+  if (length(electrodes) == 1 && is.character(electrodes)) {
     electrodes <- sort(parse_svec(electrodes))
   }
 
   # ----- epoch -----
-  if(missing(time_windows)){
+  if (missing(time_windows)) {
     time_windows <- subject$get_default("time_windows", default_if_missing = list(c(0, 2)))
     message("No time_windows specified, using default: ", deparse(time_windows))
     missing_time_windows <- TRUE
@@ -29,12 +29,12 @@ prepare_subject_raw_voltage_with_epoch_legacy <- function(
   time_windows <- validate_time_window(time_windows)
   re$time_windows <- time_windows
 
-  if(missing(epoch_name)){
+  if (missing(epoch_name)) {
     epoch_names <- subject$epoch_names
-    if(!length(epoch_names)){
+    if (!length(epoch_names)) {
       stop("No epoch file found in this subject. Please check meta folder.")
     }
-    epoch_name <- subject$get_default('epoch_name') %OF% epoch_names
+    epoch_name <- subject$get_default("epoch_name") %OF% epoch_names
     message("No epoch_name specified, using epoch `", epoch_name, "`.")
     epoch <- subject$get_epoch(
       epoch_name = epoch_name,
@@ -42,7 +42,7 @@ prepare_subject_raw_voltage_with_epoch_legacy <- function(
       as_table = FALSE
     )
   } else {
-    if(inherits(epoch_name, "RAVEEpoch")){
+    if (inherits(epoch_name, "RAVEEpoch")) {
       epoch <- epoch_name
       epoch_name <- epoch$name
     } else {
@@ -60,16 +60,16 @@ prepare_subject_raw_voltage_with_epoch_legacy <- function(
   re$epoch_table <- epoch_table
 
   # ----- stitch_events -----
-  if(length(stitch_events)) {
+  if (length(stitch_events)) {
     # check if the events are in epochs
     available_events <- epoch$available_events
-    if(length(stitch_events) == 1) {
+    if (length(stitch_events) == 1) {
       stitch_events <- c(stitch_events, stitch_events)
     } else {
       stitch_events <- stitch_events[c(1, 2)]
     }
     stitch_events[tolower(stitch_events) %in% c("trial onset")] <- ""
-    if(!all(stitch_events %in% available_events)) {
+    if (!all(stitch_events %in% available_events)) {
 
       warning(
         "Cannot find events to stitch: ",
@@ -100,13 +100,13 @@ prepare_subject_raw_voltage_with_epoch_legacy <- function(
 
   # ----- sample_rate -----
   sample_rate <- unique(subject$raw_sample_rates[sel])
-  if(length(sample_rate) > 1) {
+  if (length(sample_rate) > 1) {
     stop(sprintf("Found more than different sample rates from the requested electrode channels [%s]. Please choose electrodes with the same sample rate.", paste(sprintf("%.0fHz", sample_rate), collapse = ", ")))
   }
   re$sample_rate <- sample_rate
 
   # ----- electrode_instances -----
-  electrode_instances <- structure(lapply(seq_along(electrodes), function(ii){
+  electrode_instances <- structure(lapply(seq_along(electrodes), function(ii) {
     e <- electrodes[[ii]]
     signal_type <- electrode_signal_types[[ii]]
 
@@ -143,7 +143,7 @@ prepare_subject_raw_voltage_with_epoch_legacy <- function(
   )
   digest_string <- digest(digest_key)
   re$signature <- structure(digest_string, contents = names(digest_key))
-  if(!length(repository_id)) {
+  if (!length(repository_id)) {
     repository_id <- rand_string(4)
   }
   re$repository_id <- repository_id
@@ -178,7 +178,7 @@ prepare_subject_voltage_with_epoch_lagacy <- function(
   re <- list()
   subject <- as_rave_subject(subject)
 
-  if(!all(subject$notch_filtered)) {
+  if (!all(subject$notch_filtered)) {
     message("No Notch filter has been applied (though highly recommended), raw signals will be loaded.")
   }
 
@@ -188,18 +188,18 @@ prepare_subject_voltage_with_epoch_lagacy <- function(
   # ----- subject -----
   re$subject <- subject
 
-  if(missing(electrodes)){
+  if (missing(electrodes)) {
     electrodes <- subject$get_default(
       "electrodes", default_if_missing = subject$electrodes)
     message("No electrodes specified, loading all electrodes: ", deparse_svec(electrodes))
   }
-  if(length(electrodes) == 1 && is.character(electrodes)) {
+  if (length(electrodes) == 1 && is.character(electrodes)) {
     electrodes <- sort(parse_svec(electrodes))
   }
 
   # ----- reference -----
-  if(missing(reference_name) || !length(reference_name) || !all(reference_name %in% subject$reference_names)){
-    if(!length(subject$reference_names)){
+  if (missing(reference_name) || !length(reference_name) || !all(reference_name %in% subject$reference_names)) {
+    if (!length(subject$reference_names)) {
       warning("No reference file found in this subject. Please check meta folder! Preparing table with no reference.")
       safe_write_csv(
         data.frame(
@@ -212,11 +212,11 @@ prepare_subject_voltage_with_epoch_lagacy <- function(
       )
       reference_name <- "noref"
     } else {
-      reference_name <- subject$get_default('reference_name', default_if_missing = subject$reference_names[[1]])
-      if(!reference_name %in% subject$reference_names){
+      reference_name <- subject$get_default("reference_name", default_if_missing = subject$reference_names[[1]])
+      if (!reference_name %in% subject$reference_names) {
         reference_name <- subject$reference_names[[1]]
       }
-      if(reference_name != "noref") {
+      if (reference_name != "noref") {
         message("No reference_name specified, using reference `", reference_name, "`.")
       }
     }
@@ -226,11 +226,11 @@ prepare_subject_voltage_with_epoch_lagacy <- function(
   }
   reference_table <- subject$get_reference(reference_name)
 
-  if("Reference" %in% names(reference_table)){
+  if ("Reference" %in% names(reference_table)) {
     old_electrodes <- electrodes
-    electrodes <- as.integer(reference_table$Electrode[reference_table$Reference != ''])
+    electrodes <- as.integer(reference_table$Electrode[reference_table$Reference != ""])
     electrodes <- old_electrodes[old_electrodes %in% electrodes]
-    if(!setequal(electrodes, old_electrodes)){
+    if (!setequal(electrodes, old_electrodes)) {
       old_electrodes <- deparse_svec(old_electrodes[!old_electrodes %in% electrodes])
       message("The following electrodes are removed because they are either missing or marked as `excluded`: ", old_electrodes)
     }
@@ -239,7 +239,7 @@ prepare_subject_voltage_with_epoch_lagacy <- function(
   re$reference_name <- reference_name
 
   # ----- epoch -----
-  if(missing(time_windows)){
+  if (missing(time_windows)) {
     time_windows <- subject$get_default("time_windows", default_if_missing = list(c(0, 2)))
     message("No time_windows specified, using default: ", deparse(time_windows))
     missing_time_windows <- TRUE
@@ -247,12 +247,12 @@ prepare_subject_voltage_with_epoch_lagacy <- function(
   time_windows <- validate_time_window(time_windows)
   re$time_windows <- time_windows
 
-  if(missing(epoch_name)){
+  if (missing(epoch_name)) {
     epoch_names <- subject$epoch_names
-    if(!length(epoch_names)){
+    if (!length(epoch_names)) {
       stop("No epoch file found in this subject. Please check meta folder.")
     }
-    epoch_name <- subject$get_default('epoch_name') %OF% epoch_names
+    epoch_name <- subject$get_default("epoch_name") %OF% epoch_names
     message("No epoch_name specified, using epoch `", epoch_name, "`.")
     epoch <- subject$get_epoch(
       epoch_name = epoch_name,
@@ -260,7 +260,7 @@ prepare_subject_voltage_with_epoch_lagacy <- function(
       as_table = FALSE
     )
   } else {
-    if(inherits(epoch_name, "RAVEEpoch")){
+    if (inherits(epoch_name, "RAVEEpoch")) {
       epoch <- epoch_name
       epoch_name <- epoch$name
     } else {
@@ -291,22 +291,22 @@ prepare_subject_voltage_with_epoch_lagacy <- function(
 
   # ----- sample_rate -----
   sample_rate <- unique(subject$raw_sample_rates[sel])
-  if(length(sample_rate) > 1) {
+  if (length(sample_rate) > 1) {
     stop(sprintf("Found more than different sample rates from the requested electrode channels [%s]. Please choose electrodes with the same sample rate.", paste(sprintf("%.0fHz", sample_rate), collapse = ", ")))
   }
   re$sample_rate <- sample_rate
 
   # ----- stitch_events -----
-  if(length(stitch_events)) {
+  if (length(stitch_events)) {
     # check if the events are in epochs
     available_events <- epoch$available_events
-    if(length(stitch_events) == 1) {
+    if (length(stitch_events) == 1) {
       stitch_events <- c(stitch_events, stitch_events)
     } else {
       stitch_events <- stitch_events[c(1, 2)]
     }
     stitch_events[tolower(stitch_events) %in% c("trial onset")] <- ""
-    if(!all(stitch_events %in% available_events)) {
+    if (!all(stitch_events %in% available_events)) {
 
       warning(
         "Cannot find events to stitch: ",
@@ -333,7 +333,7 @@ prepare_subject_voltage_with_epoch_lagacy <- function(
     electrode_signal_types
   ))
   reference_instances <- structure(
-    lapply(seq_len(nrow(ref_mat)), function(ii){
+    lapply(seq_len(nrow(ref_mat)), function(ii) {
       y <- ref_mat[ii, ]
       new_reference(subject = subject, number = y[[1]], signal_type = y[[2]], quiet = quiet)
     }),
@@ -342,7 +342,7 @@ prepare_subject_voltage_with_epoch_lagacy <- function(
   re$reference_instances <- drop_nulls(reference_instances)
 
   # ----- electrode_instances -----
-  electrode_instances <- structure(lapply(seq_along(electrodes), function(ii){
+  electrode_instances <- structure(lapply(seq_along(electrodes), function(ii) {
     e <- electrodes[[ii]]
     signal_type <- electrode_signal_types[[ii]]
 
@@ -364,12 +364,12 @@ prepare_subject_voltage_with_epoch_lagacy <- function(
   # ----- load_data -----
   ref_mat <- unique(sprintf("%s_%s", re$reference_table[re$reference_table$Electrode %in% re$electrode_list, "Reference"], electrode_signal_types))
   ref_instances <- drop_nulls(re$reference_instances[ref_mat])
-  if(length(ref_instances) < 4) {
-    refs <- lapply(ref_instances, function(ref){
+  if (length(ref_instances) < 4) {
+    refs <- lapply(ref_instances, function(ref) {
       ref$load_data(type = "voltage")
     })
   } else {
-    refs <- lapply(ref_instances, function(ref){
+    refs <- lapply(ref_instances, function(ref) {
       ref$load_data(type = "voltage")
     })
   }
@@ -399,7 +399,7 @@ prepare_subject_voltage_with_epoch_lagacy <- function(
   )
   digest_string <- digest(digest_key)
   re$signature <- structure(digest_string, contents = names(digest_key))
-  if(!length(repository_id)) {
+  if (!length(repository_id)) {
     repository_id <- rand_string(4)
   }
   re$repository_id <- repository_id
@@ -422,7 +422,7 @@ test_that("RAVESubjectEpochRawVoltageRepository - parallel", {
   testthat::skip_if_not({
     dir.exists(as_rave_subject("demo/DemoSubject", strict = FALSE)$path)
   })
-  ravepipeline::raveio_setopt("max_worker", asNamespace('parallel')$detectCores())
+  ravepipeline::raveio_setopt("max_worker", asNamespace("parallel")$detectCores())
 
   repository_id <- rand_string(4)
   repo_old <- prepare_subject_raw_voltage_with_epoch_legacy(
@@ -499,7 +499,7 @@ test_that("RAVESubjectEpochVoltageRepository - parallel", {
   testthat::skip_if_not({
     dir.exists(as_rave_subject("demo/DemoSubject", strict = FALSE)$path)
   })
-  ravepipeline::raveio_setopt("max_worker", asNamespace('parallel')$detectCores())
+  ravepipeline::raveio_setopt("max_worker", asNamespace("parallel")$detectCores())
 
 
   repository_id <- rand_string(4)

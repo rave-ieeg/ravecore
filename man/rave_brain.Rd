@@ -55,7 +55,7 @@ if(has_rave_subject("demo/DemoSubject")) {
 
   brain <- rave_brain("demo/DemoSubject")
 
-  if(interactive()) {
+  if (interactive()) {
 
     brain$plot()
 

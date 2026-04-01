@@ -85,9 +85,9 @@ yael_preprocess <- function(
     use_antspynet = TRUE,
     verbose = TRUE, ...
 ) {
-  if(missing(subject)) {
+  if (missing(subject)) {
     subject <- list(...)$subject_code
-    if(!length(subject)) {
+    if (!length(subject)) {
       stop("yael_preprocess: `subject` is missing. Please provide a RAVE subject ID")
     }
     ravepipeline::logger(
@@ -112,12 +112,12 @@ yael_preprocess <- function(
     path_abs(file_path(path, ...), must_work = FALSE)
   }
 
-  for(template_name in normalize_template) {
+  for (template_name in normalize_template) {
     rpyANTs::ensure_template(template_name)
-    if(!length(atlases[[template_name]])) {
+    if (!length(atlases[[template_name]])) {
 
       atlas_folder <- mni_template_path(template_name, "atlases")
-      if(dir.exists(atlas_folder)) {
+      if (dir.exists(atlas_folder)) {
         atlases[[template_name]] <- path_abs(atlas_folder)
       }
     }
@@ -142,7 +142,7 @@ yael_preprocess <- function(
   project_name <- subject$project_name
   subject_code <- subject$subject_code
 
-  if(length(t1w_path) && !is.na(t1w_path) && nzchar(t1w_path)) {
+  if (length(t1w_path) && !is.na(t1w_path) && nzchar(t1w_path)) {
     ravepipeline::logger("Migrating T1w image: ", t1w_path, level = "trace")
     yael_process$set_input_image(path = t1w_path, type = "T1w", overwrite = TRUE)
   } else {
@@ -153,32 +153,32 @@ yael_preprocess <- function(
     )
   }
 
-  if(length(ct_path) && !is.na(ct_path) && nzchar(ct_path)) {
+  if (length(ct_path) && !is.na(ct_path) && nzchar(ct_path)) {
     ravepipeline::logger(level = "trace", "Migrating CT image: ", ct_path)
     yael_process$set_input_image(path = ct_path, type = "CT", overwrite = TRUE)
   }
 
-  if(length(t2w_path) && !is.na(t2w_path) && nzchar(t2w_path)) {
+  if (length(t2w_path) && !is.na(t2w_path) && nzchar(t2w_path)) {
     ravepipeline::logger(level = "trace", "Migrating T2w image: ", t2w_path)
     yael_process$set_input_image(path = t2w_path, type = "T2w", overwrite = TRUE)
   }
 
-  if(length(fgatir_path) && !is.na(fgatir_path) && nzchar(fgatir_path)) {
+  if (length(fgatir_path) && !is.na(fgatir_path) && nzchar(fgatir_path)) {
     ravepipeline::logger(level = "trace", "Migrating fGATIR image: ", fgatir_path)
     yael_process$set_input_image(path = fgatir_path, type = "fGATIR", overwrite = TRUE)
   }
 
-  if(length(preopct_path) && !is.na(preopct_path) && nzchar(preopct_path)) {
+  if (length(preopct_path) && !is.na(preopct_path) && nzchar(preopct_path)) {
     ravepipeline::logger(level = "trace", "Migrating preop-CT image: ", preopct_path)
     yael_process$set_input_image(path = preopct_path, type = "preopCT", overwrite = TRUE)
   }
 
-  if(length(flair_path) && !is.na(flair_path) && nzchar(flair_path)) {
+  if (length(flair_path) && !is.na(flair_path) && nzchar(flair_path)) {
     ravepipeline::logger(level = "trace", "Migrating FLAIR image: ", flair_path)
     yael_process$set_input_image(path = flair_path, type = "FLAIR", overwrite = TRUE)
   }
 
-  if(length(t1w_contrast_path) && !is.na(t1w_contrast_path) && nzchar(t1w_contrast_path)) {
+  if (length(t1w_contrast_path) && !is.na(t1w_contrast_path) && nzchar(t1w_contrast_path)) {
     ravepipeline::logger(level = "trace", "Migrating T1w with contrast image: ", t1w_contrast_path)
     yael_process$set_input_image(path = t1w_contrast_path, type = "T1wContrast", overwrite = TRUE)
   }
@@ -188,15 +188,15 @@ yael_preprocess <- function(
   image_types <- image_types[!tolower(image_types) %in% "t1w"]
   lapply(image_types, function(native_type) {
     impath <- yael_process$get_input_image(native_type)
-    if(!length(impath)) { return() }
+    if (!length(impath)) { return() }
     ravepipeline::logger(level = "info", "Co-registering [", native_type, "] image with [T1w] image.")
     suppressWarnings({
       pexists <- tryCatch({
         conf <- yael_process$get_native_mapping(image_type = native_type)
         length(conf$mappings) > 0
-      }, error = function(e){ FALSE })
+      }, error = function(e) { FALSE })
     })
-    if(!pexists || register_policy == "all") {
+    if (!pexists || register_policy == "all") {
       yael_process$register_to_T1w(image_type = native_type,
                                    reverse = register_reversed,
                                    verbose = verbose)
@@ -205,7 +205,7 @@ yael_preprocess <- function(
   })
 
   # Normalization
-  if( length(normalize_back) < 1 || is.na(normalize_back[[1]]) ) {
+  if ( length(normalize_back) < 1 || is.na(normalize_back[[1]]) ) {
     normalize_back <- NULL
   } else {
     normalize_back <- normalize_back[[1]]
@@ -217,16 +217,16 @@ yael_preprocess <- function(
       pexists <- tryCatch({
         conf <- yael_process$get_template_mapping(template_name = template_name, native_type = "T1w")
         length(conf) > 0
-      }, error = function(e){ FALSE })
+      }, error = function(e) { FALSE })
     })
-    if(!pexists || normalize_policy == "all") {
+    if (!pexists || normalize_policy == "all") {
       yael_process$map_to_template(template_name = template_name,
                                    native_type = "T1w",
                                    use_images = normalize_images,
                                    use_antspynet = use_antspynet,
                                    verbose = verbose)
     }
-    if( template_name %in% normalize_back ) {
+    if ( template_name %in% normalize_back ) {
       # Generate ANTs folder
       yael_process$construct_ants_folder_from_template(
         template_name = normalize_back,
@@ -237,15 +237,15 @@ yael_preprocess <- function(
 
   # Make sure the Norig and Torig transforms are set to conformed image
   t1_mgz <- file.path(yael_process$work_path, "ants", "T1.mgz")
-  if(!file.exists(t1_mgz)) {
+  if (!file.exists(t1_mgz)) {
     yael_process$construct_ants_folder_from_template(
       template_name = NULL,
       add_surfaces = FALSE
     )
   }
 
-  for(template_name in names(atlases)) {
-    if(template_name != "") {
+  for (template_name in names(atlases)) {
+    if (template_name != "") {
       tryCatch({
         yael_process$generate_atlas_from_template(
           template_name = template_name,
@@ -297,9 +297,9 @@ cmd_run_yael_preprocess <- function(
 
   use_antspynet <- isTRUE(use_antspynet)
 
-  if(missing(subject)) {
+  if (missing(subject)) {
     subject <- list(...)$subject_code
-    if(!length(subject)) {
+    if (!length(subject)) {
       stop("cmd_run_yael_preprocess: `subject` is missing. Please provide a RAVE subject ID")
     }
     ravepipeline::logger(
@@ -317,23 +317,23 @@ cmd_run_yael_preprocess <- function(
   project_name <- subject$project_name
   subject_code <- subject$subject_code
 
-  if(length(t1w_path)) {
+  if (length(t1w_path)) {
     t1w_path <- normalizePath(t1w_path, winslash = "/", mustWork = TRUE)
   } else {
-    if(!length(yael_process$get_input_image("T1w"))) {
+    if (!length(yael_process$get_input_image("T1w"))) {
       stop("`cmd_run_yael_preprocess`: No `T1w` MRI specified. Please specify a valid file")
     }
     t1w_path <- ""
   }
-  if(length(ct_path)) { ct_path <- normalizePath(ct_path, winslash = "/", mustWork = TRUE) } else { ct_path <- "" }
-  if(length(t2w_path)) { t2w_path <- normalizePath(t2w_path, winslash = "/", mustWork = TRUE) } else { t2w_path <- "" }
-  if(length(fgatir_path)) { fgatir_path <- normalizePath(fgatir_path, winslash = "/", mustWork = TRUE) } else { fgatir_path <- "" }
-  if(length(preopct_path)) { preopct_path <- normalizePath(preopct_path, winslash = "/", mustWork = TRUE) } else { preopct_path <- "" }
-  if(length(flair_path)) { flair_path <- normalizePath(flair_path, winslash = "/", mustWork = TRUE) } else { flair_path <- "" }
-  if(length(t1w_contrast_path)) { t1w_contrast_path <- normalizePath(t1w_contrast_path, winslash = "/", mustWork = TRUE) } else { t1w_contrast_path <- "" }
+  if (length(ct_path)) { ct_path <- normalizePath(ct_path, winslash = "/", mustWork = TRUE) } else { ct_path <- "" }
+  if (length(t2w_path)) { t2w_path <- normalizePath(t2w_path, winslash = "/", mustWork = TRUE) } else { t2w_path <- "" }
+  if (length(fgatir_path)) { fgatir_path <- normalizePath(fgatir_path, winslash = "/", mustWork = TRUE) } else { fgatir_path <- "" }
+  if (length(preopct_path)) { preopct_path <- normalizePath(preopct_path, winslash = "/", mustWork = TRUE) } else { preopct_path <- "" }
+  if (length(flair_path)) { flair_path <- normalizePath(flair_path, winslash = "/", mustWork = TRUE) } else { flair_path <- "" }
+  if (length(t1w_contrast_path)) { t1w_contrast_path <- normalizePath(t1w_contrast_path, winslash = "/", mustWork = TRUE) } else { t1w_contrast_path <- "" }
 
-  if(length(normalize_template)) {
-    if("mni_icbm152_nlin_asym_09b" %in% normalize_template) {
+  if (length(normalize_template)) {
+    if ("mni_icbm152_nlin_asym_09b" %in% normalize_template) {
       normalize_template <- unique(c("mni_icbm152_nlin_asym_09b", normalize_template))
     }
     lapply(normalize_template, rpyANTs::ensure_template)
@@ -352,13 +352,13 @@ cmd_run_yael_preprocess <- function(
   #     unset = default_fs_path,
   #     type = "freesurfer"
   #   )
-  #   if(length(freesurfer) != 1 || is.na(freesurfer) || !isTRUE(dir.exists(freesurfer))) {
+  #   if (length(freesurfer) != 1 || is.na(freesurfer) || !isTRUE(dir.exists(freesurfer))) {
   #     freesurfer <- NULL
   #   } else if(!identical(default_fs_path, freesurfer)) {
   #     raveio_setopt("freesurfer_path", freesurfer)
   #   }
   #   freesurfer
-  # }, error = function(e){ NULL })
+  # }, error = function(e) { NULL })
   #
   # has_freesurfer <- !is.null(freesurfer_home)
   # if(has_freesurfer) {
@@ -375,10 +375,10 @@ cmd_run_yael_preprocess <- function(
   # Always use a temporary working path since the target directory might contain spaces
   work_path_actual <- path_abs(subject$preprocess_settings$raw_path, must_work = FALSE)
 
-  template <- c(readLines(system.file('shell-templates/yael-preprocess.R', package = "ravecore")), "")
+  template <- c(readLines(system.file("shell-templates/yael-preprocess.R", package = "ravecore")), "")
   cmd <- ravepipeline::glue(paste(template, collapse = "\n"), .sep = "\n", .open = "{{", .close = "}}", .trim = FALSE)
 
-  if( run_recon_all ) {
+  if ( run_recon_all ) {
     script_name <- "cmd-yael-preprocess-full.R"
   } else {
     script_name <- "cmd-yael-preprocess-simple.R"
@@ -408,10 +408,10 @@ cmd_run_yael_preprocess <- function(
     execute = execute,
     command = rscript_path()
   )
-  if( verbose ) {
+  if ( verbose ) {
     message(cmd)
   }
-  if(dry_run) {
+  if (dry_run) {
     return(invisible(re))
   }
 

@@ -2,18 +2,18 @@
 
 # Make sure python is properly configured if ravemanager is installed
 # or do nothing
-if( get0("check_rpymat", inherits = TRUE, ifnotfound = TRUE) ) {
+if ( get0("check_rpymat", inherits = TRUE, ifnotfound = TRUE) ) {
   # This is non-CRAN package for RAVE users,
   # For normal CRAN users, this script will end up with errors unless
   # they explicitly configure python environments
-  if(system.file(package = "ravemanager") != "") {
+  if (system.file(package = "ravemanager") != "") {
     ravemanager <- asNamespace("ravemanager")
     ravemanager$configure_python(verbose = TRUE)
   }
-  if(system.file(package = "rpymat") != "") {
+  if (system.file(package = "rpymat") != "") {
     rpymat <- asNamespace("rpymat")
     existing_pkgs <- rpymat$list_pkgs()
-    if(!isTRUE("nipy" %in% existing_pkgs$package)) {
+    if (!isTRUE("nipy" %in% existing_pkgs$package)) {
       # try to configure nipy to RAVE isolated envrionment
       rpymat$add_packages("nipy", pip = TRUE)
     }
@@ -32,10 +32,10 @@ similarity <- "{{ similarity }}"
 optimizer <- "{{ optimizer }}"
 
 coreg_path <- file.path(work_path, "coregistration")
-if(!dir.exists(coreg_path)) { dir.create(coreg_path, showWarnings = FALSE, recursive = TRUE) }
+if (!dir.exists(coreg_path)) { dir.create(coreg_path, showWarnings = FALSE, recursive = TRUE) }
 
 deriv_path <- file.path(work_path, "derivative")
-if(!dir.exists(deriv_path)) { dir.create(deriv_path, showWarnings = FALSE, recursive = TRUE) }
+if (!dir.exists(deriv_path)) { dir.create(deriv_path, showWarnings = FALSE, recursive = TRUE) }
 
 ct_ext <- ifelse(grepl("\\.gz$", x = ct_path0, ignore.case = TRUE), ".nii.gz", ".nii")
 ct_path <- file.path(coreg_path, sprintf("CT_RAW%s", ct_ext))

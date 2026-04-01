@@ -67,7 +67,7 @@ compose_channel <- function(
 
   signal_type <- match.arg(signal_type)
 
-  if(length(label) != 1 || is.na(label)) {
+  if (length(label) != 1 || is.na(label)) {
     label <- "Composed"
   }
 
@@ -76,25 +76,25 @@ compose_channel <- function(
   preprocess_settings <- subject$preprocess_settings
   pdata <- preprocess_settings$data
   number <- as.integer(number)
-  if( length(number) != 1 || is.na(number) || number <= 0 || is.infinite(number)) {
+  if ( length(number) != 1 || is.na(number) || number <= 0 || is.infinite(number)) {
     stop("Invalid electrode channel number: ", number)
   }
 
   from <- as.integer(from)
   weights <- as.numeric(weights)
-  if(length(from) != length(weights)) {
+  if (length(from) != length(weights)) {
     stop("`from` must have the same length as `weights`")
   }
-  if(length(from) == 0) {
+  if (length(from) == 0) {
     stop("`compose_channel`: `from` must be non-empty.")
   }
-  if(any(is.na(from)) || !all(from %in% subject$electrodes)) {
+  if (any(is.na(from)) || !all(from %in% subject$electrodes)) {
     stop("Invalid `from` channels: ", paste(from, collapse = ", "))
   }
-  if(any(is.na(weights)) || sum(weights^2) < 1e-5) {
+  if (any(is.na(weights)) || sum(weights^2) < 1e-5) {
     stop("Invalid `weights`: must have at least one non-zero weight.")
   }
-  if(normalize) {
+  if (normalize) {
     # true_weights = weights / normalize_factor
     normalize_factor <- sqrt(sum(weights^2))
   } else {
@@ -105,36 +105,36 @@ compose_channel <- function(
   # make sure the from channels have the same sample rate
   sel <- subject$electrodes %in% from
   sample_rate <- unique(subject$raw_sample_rates[sel])
-  if(length(sample_rate) > 1) {
+  if (length(sample_rate) > 1) {
     stop("Cannot combine channels with different sampling frequencies: [", paste(sample_rate, collapse = ", "), "]")
   }
 
-  if(signal_type == "auto") {
+  if (signal_type == "auto") {
     signal_type <- subject$electrode_types[sel][[1]]
   }
 
   # check if this channel is composed
-  if(number %in% from) {
+  if (number %in% from) {
     stop("Cannot compose channel ", number, " from channels that contain this number: ", deparse_svec(from))
   }
   lapply(from, function(f) {
-    if(isTRUE(pdata[[f]]$composed) &&
+    if (isTRUE(pdata[[f]]$composed) &&
        number %in% pdata[[f]]$composed_params$from) {
       stop("Cannot compose channel ", number, " recursively. This channel has been used to compose another channel ", f, ". (Basically when you compose channel B from channel A, you cannot use B to compose channel A. This will cause recursive composition and is disallowed.)")
     }
   })
-  if( number %in% subject$electrodes ) {
-    if(!isTRUE(subject$preprocess_settings$data[[number]]$composed)) {
+  if ( number %in% subject$electrodes ) {
+    if (!isTRUE(subject$preprocess_settings$data[[number]]$composed)) {
       stop("Subject already has existing electrode channel: ", number, ". This channel seems not to be a composed channel, please change `number` to any positive integer other than ", deparse_svec(subject$electrodes))
     }
-    if(!force) {
+    if (!force) {
       stop("Subject already has existing composed channel: ", number,
            ". It's not recommended to overwrite existing composed channels as this might affect the data integrity (analyses based on these channels will be no-longer valid. If you know what you are doing (for example, you are at pre-processing stage), you can overwrite the channels by `force=TRUE` in the function call.")
     }
   }
 
   # Remove this channel temporarily
-  if("channels" %in% names(pdata)) {
+  if ("channels" %in% names(pdata)) {
     pdata$channels <- pdata$electrodes[!pdata$electrodes %in% number]
   }
   pdata$electrodes <- pdata$electrodes[!pdata$electrodes %in% number]
@@ -165,7 +165,7 @@ compose_channel <- function(
 
     dname <- sprintf("/raw/%s", block)
     s <- 0
-    for(ii in seq_along(from)) {
+    for (ii in seq_along(from)) {
       s <- s + load_h5(
         file = file.path(subject$preprocess_path, "voltage",
                          sprintf("electrode_%d.h5", from[[ii]])),
@@ -177,9 +177,9 @@ compose_channel <- function(
     ieegio::io_write_h5(x = s, file = fpath, name = dname, chunk = 1024, replace = TRUE, ctype = "numeric")
 
     # re-apply Notch filters
-    if( has_notch ) {
+    if ( has_notch ) {
       notch_params <- preprocess_settings$notch_params
-      if(length(notch_params$frequencies)) {
+      if (length(notch_params$frequencies)) {
         s <- ravetools::notch_filter(
           s = s, sample_rate = sample_rate,
           lb = notch_params$frequencies - notch_params$half_bandwidths,
@@ -192,10 +192,10 @@ compose_channel <- function(
       ieegio::io_write_h5(x = s, file = fpath2, name = sprintf("/raw/voltage/%s", block),
               chunk = 1024, replace = TRUE, ctype = "numeric")
     }
-    if( has_wavelet ) {
+    if ( has_wavelet ) {
 
       s <- 0
-      for(ii in seq_along(from)) {
+      for (ii in seq_along(from)) {
         power <- load_h5(
           file = file.path(subject$data_path, "power",
                            sprintf("%d.h5", from[[ii]])),
@@ -227,12 +227,12 @@ compose_channel <- function(
 
   progress$inc("Finalizing...")
 
-  if( has_notch ) {
+  if ( has_notch ) {
     ieegio::io_write_h5(x = "noref", file = fpath2, name = "reference",
             replace = TRUE, ctype = "character")
   }
 
-  if( has_wavelet ) {
+  if ( has_wavelet ) {
     ieegio::io_write_h5(x = "noref", file = fpower, name = "reference",
             replace = TRUE, ctype = "character")
     ieegio::io_write_h5(x = "noref", file = fphase, name = "reference",
@@ -243,7 +243,7 @@ compose_channel <- function(
   lapply(subject$reference_names, function(ref_name) {
     tryCatch({
       tbl <- subject$meta_data(meta_type = "references", meta_name = ref_name)
-      if(number %in% tbl$Electrode) {
+      if (number %in% tbl$Electrode) {
         sel <- tbl$Electrode == number
         tbl$Reference[sel] <- "noref"
         tbl$Type[sel] <- "noref"
@@ -262,10 +262,10 @@ compose_channel <- function(
     })
   })
   cref <- file.path(subject$cache_path, "cached_reference.csv")
-  if(file.exists(cref)) {
+  if (file.exists(cref)) {
     tryCatch({
       tbl <- safe_read_csv(cref)
-      if(number %in% tbl$Electrode) {
+      if (number %in% tbl$Electrode) {
         sel <- tbl$Electrode == number
         tbl$Reference[sel] <- "noref"
       } else {
@@ -283,28 +283,28 @@ compose_channel <- function(
 
   # electrodes.csv
   elec_path <- file.path(subject$meta_path, "electrodes.csv")
-  if(file.exists(elec_path)) {
+  if (file.exists(elec_path)) {
     electrode_table <- safe_read_csv(elec_path)
 
     nms <- names(electrode_table)
-    if(all(c("x", "electrode") %in% tolower(nms))) {
+    if (all(c("x", "electrode") %in% tolower(nms))) {
       idx1 <- which(tolower(nms) == "x")[[1]]
       idx2 <- which(tolower(nms) == "electrode")[[1]]
-      if(idx1 < idx2) {
+      if (idx1 < idx2) {
         nms <- nms[-idx1]
       }
       electrode_table <- electrode_table[, nms]
     }
 
-    if(!number %in% electrode_table$Electrode) {
-      row <- electrode_table[which(electrode_table$Electrode %in% from)[[1]],, drop = FALSE]
+    if (!number %in% electrode_table$Electrode) {
+      row <- electrode_table[which(electrode_table$Electrode %in% from)[[1]], , drop = FALSE]
       append <- TRUE
     } else {
       append <- which(electrode_table$Electrode == number)[[1]]
-      row <- electrode_table[append,, drop = FALSE]
+      row <- electrode_table[append, , drop = FALSE]
     }
-    for(nm in names(row)) {
-      if(is.numeric(row[[nm]])) {
+    for (nm in names(row)) {
+      if (is.numeric(row[[nm]])) {
         switch(
           nm,
           "Radius" = {},
@@ -335,7 +335,7 @@ compose_channel <- function(
             row[[nm]] <- FALSE
           },
           {
-            if(startsWith(nm, "FSLabel")) {
+            if (startsWith(nm, "FSLabel")) {
               row[[nm]] <- "Unknown"
             } else {
               row[[nm]] <- ""
@@ -345,7 +345,7 @@ compose_channel <- function(
       }
     }
 
-    if(isTRUE(append)) {
+    if (isTRUE(append)) {
       electrode_table <- rbind(electrode_table, row)
     } else {
       electrode_table[append, ] <- row
@@ -354,7 +354,7 @@ compose_channel <- function(
     elecs <- subject$electrodes
     stype <- subject$electrode_types
     labels <- rep("NoLabel", length(elecs))
-    if(!number %in% elecs) {
+    if (!number %in% elecs) {
       elecs <- c(elecs, elecs)
       stype <- c(stype, signal_type)
       labels <- c(labels, label)
@@ -385,7 +385,7 @@ compose_channel <- function(
       normalize_factor = normalize_factor
     )
   )
-  if("channels" %in% names(pdata)) {
+  if ("channels" %in% names(pdata)) {
     pdata$channels <- sort(unique(c(pdata$channels, number)))
   }
   pdata$electrodes <- sort(unique(c(pdata$electrodes, number)))

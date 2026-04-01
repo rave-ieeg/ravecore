@@ -79,7 +79,7 @@ glimpse_voltage_repository_with_blocks <- function(
     start_time = 0, duration = 5, channel_gap = 1000,
     highpass_freq = NA, lowpass_freq = NA) {
 
-  if(!package_installed("plotly")) {
+  if (!package_installed("plotly")) {
     stop("This function requires package `plotly`. Please instal this package first.")
   }
 
@@ -90,13 +90,13 @@ glimpse_voltage_repository_with_blocks <- function(
   # channel_gap <- 1000
   # start_time = 0; duration = 5
 
-  if(!length(highpass_freq)) { highpass_freq <- NA }
-  if(!length(lowpass_freq)) { lowpass_freq <- NA }
+  if (!length(highpass_freq)) { highpass_freq <- NA }
+  if (!length(lowpass_freq)) { lowpass_freq <- NA }
   filter_msg <- NULL
-  if(!is.na(highpass_freq)) {
+  if (!is.na(highpass_freq)) {
     filter_msg <- sprintf(" HighPass=%g", highpass_freq)
   }
-  if(!is.na(lowpass_freq)) {
+  if (!is.na(lowpass_freq)) {
     filter_msg <- c(filter_msg, sprintf(" LowPass=%g", lowpass_freq))
   }
   filter_msg <- paste(filter_msg, collapse = ",")
@@ -104,22 +104,22 @@ glimpse_voltage_repository_with_blocks <- function(
   initial_block <- initial_block %OF% repository$blocks
   channels <- parse_svec(channels)
   channels <- repository$electrode_list[repository$electrode_list %in% channels]
-  if(!length(channels)) {
+  if (!length(channels)) {
     channels <- repository$electrode_list
   }
 
-  if(is.na(channel_gap) || channel_gap < 0) { channel_gap <- 1000 }
+  if (is.na(channel_gap) || channel_gap < 0) { channel_gap <- 1000 }
 
   # Get epoch
-  if(inherits(epoch, "RAVEEpoch")) {
+  if (inherits(epoch, "RAVEEpoch")) {
     epoch_name <- epoch$name
-  } else if(is.character(epoch) && isTRUE(epoch %in% repository$subject$epoch_names)) {
+  } else if (is.character(epoch) && isTRUE(epoch %in% repository$subject$epoch_names)) {
     epoch_name <- epoch
     epoch <- repository$subject$get_epoch(epoch_name = epoch_name, as_table = FALSE)
   } else {
     epoch <- NULL
   }
-  if(is.null(epoch)) {
+  if (is.null(epoch)) {
     annotation_table_full <- NULL
   } else {
     # generate annotation table from epoch
@@ -127,7 +127,7 @@ glimpse_voltage_repository_with_blocks <- function(
     annotation_table_full <- data.table::rbindlist(lapply(seq_along(epoch_events), function(ii) {
       event_name <- epoch_events[[ii]]
       event_cname <- epoch$get_event_colname(event = event_name, missing = "warning")
-      if(event_name == "") { event_name <- "Onset" }
+      if (event_name == "") { event_name <- "Onset" }
       annotation_table <- data.frame(
         block = epoch$table$Block,
         time = epoch$table[[event_cname]],
@@ -187,9 +187,9 @@ glimpse_voltage_repository_with_blocks <- function(
 
     quality <- match.arg(quality)
 
-    if(length(start_time) != 1 || is.na(start_time)) { start_time <- stream_plot_container$start_time }
-    if(length(duration) != 1 || is.na(duration)) { start_time <- stream_plot_container$max_duration }
-    if(length(channel_gap) != 1 || is.na(channel_gap)) { channel_gap <- stream_plot_container$channel_gap }
+    if (length(start_time) != 1 || is.na(start_time)) { start_time <- stream_plot_container$start_time }
+    if (length(duration) != 1 || is.na(duration)) { start_time <- stream_plot_container$max_duration }
+    if (length(channel_gap) != 1 || is.na(channel_gap)) { channel_gap <- stream_plot_container$channel_gap }
 
     end_time <- start_time + duration
 
@@ -198,7 +198,7 @@ glimpse_voltage_repository_with_blocks <- function(
     current_data_range <- current_start_time + c(0, current_duration)
 
     stream_plot_container$channel_gap <- channel_gap
-    switch (
+    switch(
       quality,
       "high-quality" = { stream_plot_container$MAX_POINTS <- 2000000 },
       "performance" = { stream_plot_container$MAX_POINTS <- 100000 },
@@ -213,14 +213,14 @@ glimpse_voltage_repository_with_blocks <- function(
 
 
     # Update stream_plot_container
-    if( data_needs_update ) {
+    if ( data_needs_update ) {
       shiny::showNotification("Loading data...", id = "notification")
       local_data$current_block <- block
       recording_block <- block
       block_data <- signal_container[[recording_block]]
 
       # Set annotations
-      if(is.data.frame(annotation_table_full)) {
+      if (is.data.frame(annotation_table_full)) {
         stream_plot_container$annotations <- annotation_table_full[annotation_table_full$block == recording_block, ]
       }
 
@@ -228,21 +228,21 @@ glimpse_voltage_repository_with_blocks <- function(
 
       signal_types <- unique(electrode_table$SignalType)
 
-      if( init ) {
+      if ( init ) {
         load_start_time <- start_time
         load_duration <- duration
       } else {
         # preload duration
         total_sample_rates <- sum(electrode_table$SampleRate)
         total_timepoints <- duration * total_sample_rates
-        if(total_timepoints <= 1e6) {
+        if (total_timepoints <= 1e6) {
           # 40 MB from disk
           load_duration <- 1e7 / total_sample_rates
           load_start_time <- start_time - ((load_duration - duration) * 0.5)
-          if(load_start_time < 0) {
+          if (load_start_time < 0) {
             load_start_time <- 0
           }
-        } else if(total_timepoints <= 1e7){
+        } else if (total_timepoints <= 1e7) {
           # max 100 MB from disk
           load_start_time <- start_time
           load_duration <- duration + ceiling(duration * 0.75)
@@ -254,7 +254,7 @@ glimpse_voltage_repository_with_blocks <- function(
 
       # construct filters
       filters <- list()
-      if(!is.na(highpass_freq) || !is.na(lowpass_freq)) {
+      if (!is.na(highpass_freq) || !is.na(lowpass_freq)) {
         filters <- structure(
           names = signal_types,
           lapply(signal_types, function(signal_type) {
@@ -288,7 +288,7 @@ glimpse_voltage_repository_with_blocks <- function(
         dimnames(signal_data) <- NULL
 
         filter <- filters[[signal_type]]
-        if(length(filter)) {
+        if (length(filter)) {
           signal_data <- ravetools::filtfilt(b = filter$b, a = filter$a, x = signal_data)
         }
 
@@ -304,7 +304,7 @@ glimpse_voltage_repository_with_blocks <- function(
     }
 
 
-    if(!init) {
+    if (!init) {
       shiny::showNotification("Updating graphics...", id = "notification")
       stream_plot_container$update(proxy = stream_proxy,
                                    start_time = start_time,
@@ -389,7 +389,7 @@ glimpse_voltage_repository_with_blocks <- function(
     )
   }
 
-  module_server <- function(input, output, session, ...){
+  module_server <- function(input, output, session, ...) {
 
 
     # Local reactive values, used to store reactive event triggers
@@ -404,10 +404,10 @@ glimpse_voltage_repository_with_blocks <- function(
       shiny::observe({
         # try({
           duration <- input$duration
-          if(length(duration) == 1 && !is.na(duration) && isTRUE(duration > 0)) {
+          if (length(duration) == 1 && !is.na(duration) && isTRUE(duration > 0)) {
             shiny::updateNumericInput(
               session = session,
-              inputId = 'start_time',
+              inputId = "start_time",
               step = max(duration * 0.75, min(1, round(duration, 2)))
             )
           }
@@ -422,7 +422,7 @@ glimpse_voltage_repository_with_blocks <- function(
         # try({
           block <- input$block
           ravepipeline::logger("Block ", block, " is selected")
-          if(length(block) != 1 || !block %in% repository$block) { return() }
+          if (length(block) != 1 || !block %in% repository$block) { return() }
           block_info <- signal_container[[block]]
           preferred_names <- c("LFP", "Spike", "Auxiliary", names(block_info)[[1]])
           preferred_name <- preferred_names[preferred_names %in% names(block_info)][[1]]
@@ -430,7 +430,7 @@ glimpse_voltage_repository_with_blocks <- function(
           n_timepoints <- signal_info$dim[[1]]
           max_duration <- floor(n_timepoints / signal_info$sample_rate) - 1L
 
-          if(isTRUE(input$start_time < max_duration)) {
+          if (isTRUE(input$start_time < max_duration)) {
             start_time <- input$start_time
           } else {
             start_time <- 0
@@ -438,7 +438,7 @@ glimpse_voltage_repository_with_blocks <- function(
 
           shiny::updateNumericInput(
             session = session,
-            inputId = 'start_time',
+            inputId = "start_time",
             max = max_duration,
             value = start_time
           )
@@ -475,16 +475,16 @@ glimpse_voltage_repository_with_blocks <- function(
         relayout <- as.list(plotly::event_data("plotly_relayout"))
         start_time <- as.numeric(relayout[["xaxis.range[0]"]])
         end_time <- as.numeric(relayout[["xaxis.range[1]"]])
-        if(length(start_time) != 1 || is.na(start_time)) { return() }
+        if (length(start_time) != 1 || is.na(start_time)) { return() }
         # start_time <- floor(start_time)
         shiny::updateNumericInput(session = session,
-                                  inputId = 'start_time',
+                                  inputId = "start_time",
                                   value = start_time)
 
-        if(length(end_time) != 1 || is.na(end_time)) { return() }
+        if (length(end_time) != 1 || is.na(end_time)) { return() }
         duration <- end_time - start_time
         shiny::updateNumericInput(session = session,
-                                  inputId = 'duration',
+                                  inputId = "duration",
                                   value = duration)
       }),
       input$sync,
@@ -507,7 +507,7 @@ glimpse_voltage_repository_with_blocks <- function(
     })
   }
 
-  if(rstudio_main_session()) {
+  if (rstudio_main_session()) {
     # rstudioapi::viewer
     options <- list(launch.browser = rstudio_viewer())
   } else {
@@ -533,16 +533,16 @@ glimpse_voltage_filearray <- function(
     highpass_freq = NA, lowpass_freq = NA
 ) {
 
-  if(!package_installed("plotly")) {
+  if (!package_installed("plotly")) {
     stop("This function requires package `plotly`. Please instal this package first.")
   }
 
-  if(!inherits(filearray, "FileArray")) {
+  if (!inherits(filearray, "FileArray")) {
     stop("`filearray` must be a file array created from package `filearray`")
   }
   dnames <- dimnames(filearray)
 
-  if(!identical(c("Time", "Electrode"), names(dnames))) {
+  if (!identical(c("Time", "Electrode"), names(dnames))) {
     stop("Filearray must have `Time` x `Electrode` dimensions")
   }
 
@@ -554,13 +554,13 @@ glimpse_voltage_filearray <- function(
   # start_time = 0; duration = 5
   # sample_rate <- 30000
 
-  if(!length(highpass_freq)) { highpass_freq <- NA }
-  if(!length(lowpass_freq)) { lowpass_freq <- NA }
+  if (!length(highpass_freq)) { highpass_freq <- NA }
+  if (!length(lowpass_freq)) { lowpass_freq <- NA }
   filter_msg <- NULL
-  if(!is.na(highpass_freq)) {
+  if (!is.na(highpass_freq)) {
     filter_msg <- sprintf(" HighPass=%g", highpass_freq)
   }
-  if(!is.na(lowpass_freq)) {
+  if (!is.na(lowpass_freq)) {
     filter_msg <- c(filter_msg, sprintf(" LowPass=%g", lowpass_freq))
   }
   filter_msg <- paste(filter_msg, collapse = ",")
@@ -569,18 +569,18 @@ glimpse_voltage_filearray <- function(
   channels <- parse_svec(channels)
   all_channels <- dnames$Electrode
   channels <- all_channels[all_channels %in% channels]
-  if(!length(channels)) {
+  if (!length(channels)) {
     channels <- all_channels
   }
 
-  if(is.na(channel_gap) || channel_gap < 0) { channel_gap <- 1000 }
+  if (is.na(channel_gap) || channel_gap < 0) { channel_gap <- 1000 }
 
   # Get epoch
-  if(inherits(epoch, "RAVEEpoch")) {
+  if (inherits(epoch, "RAVEEpoch")) {
     epoch_name <- epoch$name
-  } else if(is.character(epoch) && !is.na(epoch) && nzchar(epoch)) {
+  } else if (is.character(epoch) && !is.na(epoch) && nzchar(epoch)) {
     epoch_table <- filearray$get_header(epoch, default = NULL)
-    if(is.data.frame(epoch_table) && nrow(epoch_table)) {
+    if (is.data.frame(epoch_table) && nrow(epoch_table)) {
       epoch <- tryCatch(
         {
           epoch <- RAVEEpoch$new("demo/DemoSubject", name = "_dummy_")
@@ -598,7 +598,7 @@ glimpse_voltage_filearray <- function(
       )
     }
   }
-  if(is.null(epoch)) {
+  if (is.null(epoch)) {
     annotation_table_full <- NULL
   } else {
     # generate annotation table from epoch
@@ -606,7 +606,7 @@ glimpse_voltage_filearray <- function(
     annotation_table_full <- data.table::rbindlist(lapply(seq_along(epoch_events), function(ii) {
       event_name <- epoch_events[[ii]]
       event_cname <- epoch$get_event_colname(event = event_name, missing = "warning")
-      if(event_name == "") { event_name <- "Onset" }
+      if (event_name == "") { event_name <- "Onset" }
       annotation_table <- data.frame(
         block = epoch$table$Block,
         time = epoch$table[[event_cname]],
@@ -653,9 +653,9 @@ glimpse_voltage_filearray <- function(
 
     quality <- match.arg(quality)
 
-    if(length(start_time) != 1 || is.na(start_time)) { start_time <- stream_plot_container$start_time }
-    if(length(duration) != 1 || is.na(duration)) { start_time <- stream_plot_container$max_duration }
-    if(length(channel_gap) != 1 || is.na(channel_gap)) { channel_gap <- stream_plot_container$channel_gap }
+    if (length(start_time) != 1 || is.na(start_time)) { start_time <- stream_plot_container$start_time }
+    if (length(duration) != 1 || is.na(duration)) { start_time <- stream_plot_container$max_duration }
+    if (length(channel_gap) != 1 || is.na(channel_gap)) { channel_gap <- stream_plot_container$channel_gap }
 
     end_time <- start_time + duration
 
@@ -667,7 +667,7 @@ glimpse_voltage_filearray <- function(
     stream_plot_container$annotations <- annotation_table_full
     stream_plot_container$title <- filter_msg
 
-    switch (
+    switch(
       quality,
       "high-quality" = { stream_plot_container$MAX_POINTS <- 2000000 },
       "performance" = { stream_plot_container$MAX_POINTS <- 100000 },
@@ -680,24 +680,24 @@ glimpse_voltage_filearray <- function(
       current_data_range[[2]] < end_time
 
     # Update stream_plot_container
-    if( data_needs_update ) {
+    if ( data_needs_update ) {
       shiny::showNotification("Loading data...", id = "notification")
 
-      if( init ) {
+      if ( init ) {
         load_start_time <- start_time
         load_duration <- duration
       } else {
         # preload duration
         total_sample_rates <- sum(stream_plot_container$sample_rates)
         total_timepoints <- duration * total_sample_rates
-        if(total_timepoints <= 1e6) {
+        if (total_timepoints <= 1e6) {
           # 40 MB from disk
           load_duration <- 1e7 / total_sample_rates
           load_start_time <- start_time - ((load_duration - duration) * 0.5)
-          if(load_start_time < 0) {
+          if (load_start_time < 0) {
             load_start_time <- 0
           }
-        } else if(total_timepoints <= 1e7){
+        } else if (total_timepoints <= 1e7) {
           # max 100 MB from disk
           load_start_time <- start_time
           load_duration <- duration + ceiling(duration * 0.75)
@@ -709,7 +709,7 @@ glimpse_voltage_filearray <- function(
 
       # construct filters
       filter <- NULL
-      if(!is.na(highpass_freq) || !is.na(lowpass_freq)) {
+      if (!is.na(highpass_freq) || !is.na(lowpass_freq)) {
         max_order <- floor(load_duration * sample_rate / 3) - 1
         filter <- ravetools::design_filter(
           sample_rate = sample_rate,
@@ -728,7 +728,7 @@ glimpse_voltage_filearray <- function(
         drop = FALSE, .env = environment()
       ))
 
-      if(length(filter)) {
+      if (length(filter)) {
         signal_data <- ravetools::filtfilt(b = filter$b, a = filter$a, x = signal_data)
       }
 
@@ -741,7 +741,7 @@ glimpse_voltage_filearray <- function(
     }
 
 
-    if(!init) {
+    if (!init) {
       shiny::showNotification("Updating graphics...", id = "notification")
       stream_plot_container$update(proxy = stream_proxy,
                                    start_time = start_time,
@@ -815,7 +815,7 @@ glimpse_voltage_filearray <- function(
     )
   }
 
-  module_server <- function(input, output, session, ...){
+  module_server <- function(input, output, session, ...) {
 
 
     # Local reactive values, used to store reactive event triggers
@@ -830,10 +830,10 @@ glimpse_voltage_filearray <- function(
       shiny::observe({
         # try({
         duration <- input$duration
-        if(length(duration) == 1 && !is.na(duration) && isTRUE(duration > 0)) {
+        if (length(duration) == 1 && !is.na(duration) && isTRUE(duration > 0)) {
           shiny::updateNumericInput(
             session = session,
-            inputId = 'start_time',
+            inputId = "start_time",
             step = max(duration * 0.75, min(1, round(duration, 2)))
           )
         }
@@ -867,16 +867,16 @@ glimpse_voltage_filearray <- function(
         relayout <- as.list(plotly::event_data("plotly_relayout"))
         start_time <- as.numeric(relayout[["xaxis.range[0]"]])
         end_time <- as.numeric(relayout[["xaxis.range[1]"]])
-        if(length(start_time) != 1 || is.na(start_time)) { return() }
+        if (length(start_time) != 1 || is.na(start_time)) { return() }
         # start_time <- floor(start_time)
         shiny::updateNumericInput(session = session,
-                                  inputId = 'start_time',
+                                  inputId = "start_time",
                                   value = start_time)
 
-        if(length(end_time) != 1 || is.na(end_time)) { return() }
+        if (length(end_time) != 1 || is.na(end_time)) { return() }
         duration <- end_time - start_time
         shiny::updateNumericInput(session = session,
-                                  inputId = 'duration',
+                                  inputId = "duration",
                                   value = duration)
       }),
       input$sync,
@@ -898,7 +898,7 @@ glimpse_voltage_filearray <- function(
     })
   }
 
-  if(rstudio_main_session()) {
+  if (rstudio_main_session()) {
     # rstudioapi::viewer
     options <- list(launch.browser = rstudio_viewer())
   } else {
@@ -920,13 +920,13 @@ print.glimpse_shinyapp <- function(x, port = NULL, use_browser = FALSE, ...) {
 
   args <- list(...)
   options <- as.list(x$options)
-  if(length(names(args))) {
+  if (length(names(args))) {
     options[names(args)] <- args
   }
 
   # we can use rs_exec
   running <- FALSE
-  if(length(x$.job_id)) {
+  if (length(x$.job_id)) {
     running <- tryCatch(
       {
         status <- ravepipeline::check_job(x$.job_id)
@@ -936,14 +936,14 @@ print.glimpse_shinyapp <- function(x, port = NULL, use_browser = FALSE, ...) {
         FALSE
       }
     )
-    if(!running) {
+    if (!running) {
       ravepipeline::remove_job(x$.job_id)
     }
   }
-  if(!running) {
+  if (!running) {
     # find an available port
-    if(is.null(port)) {
-      if(is.null(x$port)) {
+    if (is.null(port)) {
+      if (is.null(x$port)) {
         x$port <- tryCatch(
           {
             # use optional package httpuv
@@ -981,11 +981,11 @@ print.glimpse_shinyapp <- function(x, port = NULL, use_browser = FALSE, ...) {
 
   url <- sprintf("http://127.0.0.1:%s", x$port)
 
-  if(is.function(options$launch.browser) && !use_browser) {
-    if(!running) { Sys.sleep(2) }
+  if (is.function(options$launch.browser) && !use_browser) {
+    if (!running) { Sys.sleep(2) }
     options$launch.browser(url)
-  } else if(isTRUE(options$launch.browser) || use_browser) {
-    if(!running) { Sys.sleep(2) }
+  } else if (isTRUE(options$launch.browser) || use_browser) {
+    if (!running) { Sys.sleep(2) }
     utils::browseURL(url)
   }
 
@@ -996,7 +996,7 @@ print.glimpse_shinyapp <- function(x, port = NULL, use_browser = FALSE, ...) {
 
 #' @export
 close.glimpse_shinyapp <- function(con, ...) {
-  if(length(con$.job_id)) {
+  if (length(con$.job_id)) {
     ravepipeline::remove_job(con$.job_id)
     con$.job_id <- NULL
   }

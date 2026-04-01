@@ -1,7 +1,8 @@
 
 r6_reserved_fields <- c(
   ".__enclos_env__", "clone", "print", "initialize", "private",
-  "@unmarshal", "@marshal", "@unserialize_refhook", "@serialize_refhook")
+  "@unmarshal", "@marshal", "@unserialize_refhook", "@serialize_refhook"
+)
 
 HDF5_EAGERLOAD <- TRUE
 
@@ -39,7 +40,8 @@ IMPORT_FORMATS <- list(
 #' @export
 YAEL_IMAGE_TYPES <- c(
   "T1w", "T2w", "FLAIR", "preopCT", "T1wContrast", "fGATIR",
-  "postopT1w", "postopT2w", "postopFLAIR", "CT")
+  "postopT1w", "postopT2w", "postopFLAIR", "CT"
+)
 
 #' @rdname ravecore-constants
 #' @export

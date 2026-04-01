@@ -2,12 +2,12 @@ test_that("LFP_reference - single channel", {
 
   testthat::skip_on_cran()
   testthat::skip_if_not({
-    subject <- as_rave_subject('demo/DemoSubject', strict = FALSE)
+    subject <- as_rave_subject("demo/DemoSubject", strict = FALSE)
     file.exists(subject$path)
   })
 
-  self <- LFP_reference$new(subject = 'demo/DemoSubject', number = 14)
-  e14 <- LFP_electrode$new(subject = 'demo/DemoSubject', number = 14)
+  self <- LFP_reference$new(subject = "demo/DemoSubject", number = 14)
+  e14 <- LFP_electrode$new(subject = "demo/DemoSubject", number = 14)
   private <- self$.__enclos_env__$private
 
   testthat::expect_equal(self$h5_fname, "14.h5")
@@ -61,11 +61,11 @@ test_that("LFP_reference - multi-channel", {
 
   testthat::skip_on_cran()
   testthat::skip_if_not({
-    subject <- as_rave_subject('demo/DemoSubject', strict = FALSE)
+    subject <- as_rave_subject("demo/DemoSubject", strict = FALSE)
     file.exists(subject$path)
   })
 
-  self0 <- LFP_reference$new(subject = 'demo/DemoSubject', number = "ref_13-16,24")
+  self0 <- LFP_reference$new(subject = "demo/DemoSubject", number = "ref_13-16,24")
   self <- unserialize(
     serialize(self0, NULL, refhook = ravepipeline::rave_serialize_refhook),
     ravepipeline::rave_unserialize_refhook

@@ -1,30 +1,30 @@
-guess_raw_trace <- function(dat, electrodes = NULL, is_vector = TRUE){
+guess_raw_trace <- function(dat, electrodes = NULL, is_vector = TRUE) {
   nms <- names(dat)
-  for(nm in nms){
+  for (nm in nms) {
     x <- dat[[nm]]
-    if( inherits(x, "LazyH5") ) {
+    if ( inherits(x, "LazyH5") ) {
       type <- tryCatch({
         x$get_type(stay_open = FALSE)
-      }, error = function(e){ "unknown" })
-      if(!type %in% c("integer", "double")) { next }
-    } else if(!is.numeric(x) || mode(x) != "numeric"){ next }
+      }, error = function(e) { "unknown" })
+      if (!type %in% c("integer", "double")) { next }
+    } else if (!is.numeric(x) || mode(x) != "numeric") { next }
 
 
-    if(is_vector){
+    if (is_vector) {
       # should be vector
       dm <- dim(x)
-      if((is.null(dm) || length(dm) == 1) && length(x) > 1){
+      if ((is.null(dm) || length(dm) == 1) && length(x) > 1) {
         return(nm)
-      } else if (length(dm) %in% c(2) && min(dm) == 1){
+      } else if (length(dm) %in% c(2) && min(dm) == 1) {
         return(nm)
       }
     } else {
-      if(!is.matrix(x)){ next }
+      if (!is.matrix(x)) { next }
       dm <- dim(x)
       d1 <- min(dm)
 
       # d2 is the time points, d1 should be electrodes
-      if(d1 < max(electrodes, 1)){ next }
+      if (d1 < max(electrodes, 1)) { next }
       return(nm)
     }
   }
@@ -52,7 +52,7 @@ validate_raw_h5_mat_per_channel <- function(subject, blocks, electrodes, check_c
   }
 
 
-  if(missing(electrodes)){
+  if (missing(electrodes)) {
     electrodes <- NULL
   } else {
     electrodes <- parse_svec(electrodes)
@@ -68,9 +68,9 @@ validate_raw_h5_mat_per_channel <- function(subject, blocks, electrodes, check_c
 
   })
 
-  data_paths <- switch (
+  data_paths <- switch(
     format_standard,
-    'bids' = {
+    "bids" = {
       lapply(blocks, function(block) {
         # Parse block
         with_validation({
@@ -86,7 +86,7 @@ validate_raw_h5_mat_per_channel <- function(subject, blocks, electrodes, check_c
             )
           )
           sel <- block_names_from_bids_entities(query_results$parsed) %in% block
-          if(!any(sel)) {
+          if (!any(sel)) {
             validation_errors$add(sprintf("No data file for BIDS entity collection/RAVE block is found: `%s`", block))
             return()
           }
@@ -95,7 +95,7 @@ validate_raw_h5_mat_per_channel <- function(subject, blocks, electrodes, check_c
           is_datafile <- tolower(query_results$suffix) %in% c("matlab", "hdf5", "ieeg_matlab",
                                                               "ieeg_hdf5")
 
-          if(!any(is_datafile)) {
+          if (!any(is_datafile)) {
             validation_errors$add(sprintf("Files with BIDS entities `%s` found, but only one matlab (.mat) or HDF5 (.h5) file is allowed for each block.", block))
             return()
           }
@@ -104,21 +104,21 @@ validate_raw_h5_mat_per_channel <- function(subject, blocks, electrodes, check_c
 
           blockfiles <- lapply(query_results$parsed, function(parsed) {
             path <- bidsr::resolve_bids_path(bids_subject@project, format(parsed), storage = "raw")
-            if(dir_exists(path)) {
+            if (dir_exists(path)) {
               return(path)
             }
             return()
           })
           blockfiles <- unlist(blockfiles)
-          if(length(blockfiles) == 0) {
+          if (length(blockfiles) == 0) {
             stop("No folder ends with 'matlab' or 'hdf5' under block ", block)
           }
 
           bpath <- blockfiles[[1]]
 
-          files <- list.files(bpath, pattern = '[0-9]+\\.(mat|h5)$', ignore.case = TRUE)
+          files <- list.files(bpath, pattern = "[0-9]+\\.(mat|h5)$", ignore.case = TRUE)
 
-          if(!length(files)) {
+          if (!length(files)) {
             validation_errors$add(sprintf(
               "No Matlab/HDF5 file (.mat/.h5) under '%s'",
               bpath
@@ -142,9 +142,9 @@ validate_raw_h5_mat_per_channel <- function(subject, blocks, electrodes, check_c
         with_validation({
 
           bpath <- file_path(raw_root, block)
-          files <- list.files(bpath, pattern = '[0-9]+\\.(mat|h5)$', ignore.case = TRUE)
+          files <- list.files(bpath, pattern = "[0-9]+\\.(mat|h5)$", ignore.case = TRUE)
 
-          if(!length(files)) {
+          if (!length(files)) {
             validation_errors$add(sprintf(
               "No Matlab/HDF5 file (.mat/.h5) in block `%s`",
               block
@@ -159,7 +159,7 @@ validate_raw_h5_mat_per_channel <- function(subject, blocks, electrodes, check_c
   names(data_paths) <- blocks
 
   progress <- ravepipeline::rave_progress(
-    title = 'Validating channel files',
+    title = "Validating channel files",
     max = length(blocks) + 1,
     shiny_auto_close = FALSE
   )
@@ -175,7 +175,7 @@ validate_raw_h5_mat_per_channel <- function(subject, blocks, electrodes, check_c
       with_validation({
 
         paths <- data_paths[[block]]
-        if(length(paths) == 0) { return(FALSE) }
+        if (length(paths) == 0) { return(FALSE) }
 
         match <- regexec("(^|[^0-9])([0-9]+)\\.(h5|mat)$", paths, ignore.case = TRUE)
         path_info <- do.call("rbind", lapply(seq_along(paths), function(ii) {
@@ -190,10 +190,10 @@ validate_raw_h5_mat_per_channel <- function(subject, blocks, electrodes, check_c
           channels = as.integer(path_info[, 2])
         )
         valid <- TRUE
-        if( length(electrodes) > 0 ) {
+        if ( length(electrodes) > 0 ) {
 
           channel_exist <- electrodes %in% info$channels
-          if(!all(channel_exist)) {
+          if (!all(channel_exist)) {
             validation_errors$add(sprintf(
               "Channel %s are missing from block %s",
               deparse_svec(electrodes[!channel_exist]), block
@@ -207,7 +207,7 @@ validate_raw_h5_mat_per_channel <- function(subject, blocks, electrodes, check_c
           sel <- info$channels %in% electrodes
           matched_channels <- info$channels[sel]
           dups <- duplicated(matched_channels)
-          if(any(dups)) {
+          if (any(dups)) {
             validation_errors$add(sprintf(
               "Channel [%s] have multiple files in block `%s`. RAVE does not know which file to read from.",
               deparse_svec(matched_channels[dups]), block
@@ -217,19 +217,19 @@ validate_raw_h5_mat_per_channel <- function(subject, blocks, electrodes, check_c
             return(valid)
           }
 
-          if( check_content ) {
+          if ( check_content ) {
 
             get_time_points <- function(e) {
 
               path <- info$paths[info$channels == e]
-              if(endsWith(tolower(path), "mat")) {
+              if (endsWith(tolower(path), "mat")) {
                 mat <- ieegio::io_read_mat(path)
               } else {
                 mat <- read_mat2(path)
               }
 
               dname <- guess_raw_trace(mat, electrodes = length(electrodes), is_vector = TRUE)
-              if(!length(mat) || !length(dname)) {
+              if (!length(mat) || !length(dname)) {
                 validation_errors$add(sprintf(
                   "Cannot determine data name for channel `%s` from block `%s`",
                   e, block
@@ -248,14 +248,14 @@ validate_raw_h5_mat_per_channel <- function(subject, blocks, electrodes, check_c
             })
 
             unique_tpoints <- unique(unlist(time_points))
-            if(anyNA(unique_tpoints)) {
+            if (anyNA(unique_tpoints)) {
               valid <- FALSE
               attributes(valid) <- info
               return(valid)
             }
 
             # within 10 time points might be OK?
-            if(max(unique_tpoints) - min(unique_tpoints) > 10) {
+            if (max(unique_tpoints) - min(unique_tpoints) > 10) {
               validation_errors$add(sprintf(
                 "Channel data from block `%s` have inconsistent time points (min=%d, max=%d)",
                 block, min(unique_tpoints), max(unique_tpoints)
@@ -277,7 +277,7 @@ validate_raw_h5_mat_per_channel <- function(subject, blocks, electrodes, check_c
 
   progress$inc("Collecting results...")
 
-  if(length(validation_errors)) {
+  if (length(validation_errors)) {
     return(list(
       passed = FALSE,
       errors = unlist(validation_errors$as_list())

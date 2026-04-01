@@ -15,10 +15,10 @@ activate_ants <- function(verbose = TRUE) {
 
     # make sure rpymat version is at least 0.1.7.1
     rpymat_ver <- utils::packageVersion("rpymat")
-    if( utils::compareVersion(as.character(rpymat_ver), "0.1.7.1") >= 0 ) {
+    if ( utils::compareVersion(as.character(rpymat_ver), "0.1.7.1") >= 0 ) {
 
       # Check if rave-ants is configured
-      if(!file.exists(rpymat::env_path(env_name = "rave-ants"))) {
+      if (!file.exists(rpymat::env_path(env_name = "rave-ants"))) {
         rpymat::configure_conda(python_ver = "3.11", env_name = "rave-ants")
       }
       rpymat::ensure_rpymat(env_name = "rave-ants", verbose = verbose)
@@ -31,7 +31,7 @@ activate_ants <- function(verbose = TRUE) {
     message("Unable to configure dedicated conda environment for ANTs. Using the default environment.")
   })
 
-  if(using_antspynet) {
+  if (using_antspynet) {
     ants_module_to_check <- "antspynet"
   } else {
     ants_module_to_check <- "ants"
@@ -39,7 +39,7 @@ activate_ants <- function(verbose = TRUE) {
   }
 
   # check if rpyANTs is configured
-  if(!isTRUE(rpyANTs::ants_available(ants_module_to_check))) {
+  if (!isTRUE(rpyANTs::ants_available(ants_module_to_check))) {
     rpyANTs::install_ants(verbose = verbose)
   }
 }

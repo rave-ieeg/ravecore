@@ -1,4 +1,4 @@
-get_os <- function () {
+get_os <- function() {
   os <- R.version$os
   if (grepl("^darwin", os, ignore.case = TRUE)) {
     return("darwin")
@@ -27,9 +27,9 @@ get_os <- function () {
 #'
 rstudio_main_session <- function(
     os = c("darwin", "linux", "solaris", "windows", "emscripten")) {
-  if(!interactive()) { return(FALSE) }
-  if(!isTRUE(get_os() %in% os)) { return(FALSE) }
-  if(!identical(.Platform$GUI, "RStudio")) { return(FALSE) }
+  if (!interactive()) { return(FALSE) }
+  if (!isTRUE(get_os() %in% os)) { return(FALSE) }
+  if (!identical(.Platform$GUI, "RStudio")) { return(FALSE) }
   ravepipeline <- asNamespace("ravepipeline")
   ravepipeline$rs_avail(child_ok = FALSE, shiny_ok = TRUE)
 }
@@ -41,7 +41,7 @@ shiny_is_running <- function() {
 
 rstudio_viewer <- function(missing = TRUE) {
 
-  if( rstudio_main_session() ) {
+  if ( rstudio_main_session() ) {
     # This means rstudioapi has been installed
     return(asNamespace("rstudioapi")$viewer)
   }

@@ -1,15 +1,15 @@
 
 #' @rdname import-signals
 #' @export
-import_from_edf <- function(subject, blocks, electrodes, sample_rate, add = FALSE, data_type = 'LFP', skip_validation = FALSE, ...) {
+import_from_edf <- function(subject, blocks, electrodes, sample_rate, add = FALSE, data_type = "LFP", skip_validation = FALSE, ...) {
 
   # DIPSAUS DEBUG START
   # subject <- "demo@bids:ds005574/02"
-  # blocks = c('sub-02_task-podcast')
+  # blocks = c("sub-02_task-podcast")
   # electrodes = 1:10
   # skip_validation = TRUE
   # sample_rate <- 512
-  # list2env(list(add = FALSE, data_type = 'LFP'), .GlobalEnv)
+  # list2env(list(add = FALSE, data_type = "LFP"), .GlobalEnv)
 
   subject <- restore_subject_instance(subject, strict = FALSE)
   pretools <- subject$preprocess_settings
@@ -18,9 +18,9 @@ import_from_edf <- function(subject, blocks, electrodes, sample_rate, add = FALS
 
   # ---- Validation ---------------------------------------------
 
-  if(!add && isTRUE(pretools$`@freeze_lfp_ecog`)){
+  if (!add && isTRUE(pretools$`@freeze_lfp_ecog`)) {
     # LFP has been imported, just stop
-    stop(sprintf('Subject `%s` has been imported previously. Double-import channels to subject is prohibited in RAVE as it will break the data integrity. Please consider either removing the subject or changing to another project', subject$subject_id))
+    stop(sprintf("Subject `%s` has been imported previously. Double-import channels to subject is prohibited in RAVE as it will break the data integrity. Please consider either removing the subject or changing to another project", subject$subject_id))
   }
 
   validation <- validate_raw_edf(
@@ -30,9 +30,9 @@ import_from_edf <- function(subject, blocks, electrodes, sample_rate, add = FALS
     check_content = !skip_validation
   )
 
-  if(!validation$passed) {
+  if (!validation$passed) {
     error_messages <- validation$errors
-    if(!length(error_messages)) {
+    if (!length(error_messages)) {
       stop("RAVE encountered unknown error during the validation. Please report this issue to RAVE.")
     }
     stop(paste(
@@ -46,7 +46,7 @@ import_from_edf <- function(subject, blocks, electrodes, sample_rate, add = FALS
   # ---- Initialize subject and reload -------------------------------------------
   # Reload pretools with read_only FALSE
   pretools <- RAVEPreprocessSettings$new(subject = subject$subject_id, read_only = FALSE)
-  if(!add){
+  if (!add) {
     pretools$set_blocks(blocks = blocks)
   }
   pretools$set_electrodes(electrodes, type = data_type, add = add)
@@ -55,7 +55,7 @@ import_from_edf <- function(subject, blocks, electrodes, sample_rate, add = FALS
   pretools$save()
 
   progress <- ravepipeline::rave_progress(
-    title = sprintf('Importing %s', subject$subject_id),
+    title = sprintf("Importing %s", subject$subject_id),
     max = length(blocks) + 2,
     shiny_auto_close = FALSE
   )
@@ -66,7 +66,7 @@ import_from_edf <- function(subject, blocks, electrodes, sample_rate, add = FALS
 
   # ---- Extract data ------------------------------------------------------------
 
-  temporary_path <- dir_create2(file_path(subject$cache_path, 'edf'))
+  temporary_path <- dir_create2(file_path(subject$cache_path, "edf"))
   block_info <- validation$results
 
   block_unpacked <- structure(
@@ -87,13 +87,13 @@ import_from_edf <- function(subject, blocks, electrodes, sample_rate, add = FALS
 
   # ---- Import signal data ------------------------------------------------------
 
-  save_path <- file.path(subject$preprocess_path, 'voltage')
+  save_path <- file.path(subject$preprocess_path, "voltage")
   save_path <- dir_create2(save_path)
 
   progress$inc(detail = "Writing files...")
 
   ravepipeline::lapply_jobs(electrodes, function(e) {
-    cfile <- file.path(save_path, sprintf('electrode_%d.h5', e))
+    cfile <- file.path(save_path, sprintf("electrode_%d.h5", e))
 
     for (block in blocks) {
       block_data <- block_unpacked[[block]]
@@ -164,13 +164,13 @@ import_from_edf <- function(subject, blocks, electrodes, sample_rate, add = FALS
     sample_rate = sample_rate,
     block_unpacked = block_unpacked
   ), callback = function(e) {
-    sprintf('Writing data|Channel %s', e)
+    sprintf("Writing data|Channel %s", e)
   })
 
   progress$inc(detail = "Finalizing...")
 
   # Now set user conf
-  for(e in electrodes){
+  for (e in electrodes) {
     pretools$data[[e]]$data_imported <- TRUE
   }
   pretools$data$format <- which(unname(IMPORT_FORMATS) == "native_edf")
@@ -209,11 +209,11 @@ import_from_edf <- function(subject, blocks, electrodes, sample_rate, add = FALS
     # When electrodes are imported correctly
     electrode_table <- subject$get_electrode_table(simplify = FALSE, warn = FALSE)
 
-    if(all(subject$electrodes %in% electrode_table$Electrode)) {
+    if (all(subject$electrodes %in% electrode_table$Electrode)) {
 
       saved <- TRUE
 
-      if(!any(electrode_table$Electrode %in% subject$electrodes)) {
+      if (!any(electrode_table$Electrode %in% subject$electrodes)) {
         electrode_table <- electrode_table[electrode_table$Electrode %in% subject$electrodes, , drop = FALSE]
         electrode_table <- electrode_table[order(electrode_table$Electrode), ]
         save_meta2(
@@ -225,9 +225,9 @@ import_from_edf <- function(subject, blocks, electrodes, sample_rate, add = FALS
       }
 
       # Try to import
-      if( brain_model_exists ) {
+      if ( brain_model_exists ) {
         import_electrode_table(
-          path = file.path(subject$meta_path, 'electrodes.csv'),
+          path = file.path(subject$meta_path, "electrodes.csv"),
           subject = subject, use_fs = brain_model_exists)
       }
 
@@ -240,7 +240,7 @@ import_from_edf <- function(subject, blocks, electrodes, sample_rate, add = FALS
   })
 
 
-  if(!saved) {
+  if (!saved) {
     ravepipeline::logger("Cannot import from existing electrodes.csv, creating a new one", level = "info")
     tbl <- data.frame(
       Electrode = subject$electrodes,
@@ -264,7 +264,7 @@ import_from_edf <- function(subject, blocks, electrodes, sample_rate, add = FALS
   comments <- lapply(blocks, function(block) {
     block_data <- block_unpacked[[block]]
     annot <- block_data$get_annotations()
-    if(length(annot) && all(c("timestamp", "duration", "comments", "channel") %in% names(annot))) {
+    if (length(annot) && all(c("timestamp", "duration", "comments", "channel") %in% names(annot))) {
 
       annot <- data.frame(
         Block = block,
@@ -279,7 +279,7 @@ import_from_edf <- function(subject, blocks, electrodes, sample_rate, add = FALS
     return(NULL)
   })
   comments <- data.table::rbindlist(comments, use.names = TRUE)
-  if(nrow(comments)) {
+  if (nrow(comments)) {
     comments$Trial <- seq_len(nrow(comments))
     path <- file_path(pretools$subject$meta_path, "edf_annotations.csv")
     safe_write_csv(x = comments, file = path, row.names = FALSE)

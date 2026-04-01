@@ -4,7 +4,7 @@ test_that("collapse_power", {
     tempfile(), dimension = c(16, 100, 20, 5),
     partition_size = 1
   )
-  x[,,,1:4] <- rnorm(160000 / 5 * 4)
+  x[, , , 1:4] <- rnorm(160000 / 5 * 4)
   dnames <- list(
     Frequency = 1:16,
     Time = seq(0, 1, length.out = 100),
@@ -38,16 +38,16 @@ test_that("collapse_power", {
   )
   re <- collapse_power(x, analysis_index_cubes)
 
-  for(jj in seq_along(analysis_index_cubes)){
+  for (jj in seq_along(analysis_index_cubes)) {
     cube <- analysis_index_cubes[[jj]]
     cube_data <- x[cube$Frequency, cube$Time, cube$Trial, cube$Electrode, drop = FALSE]
     actual <- re[[jj]]
     nms <- names(actual)
     tmp <- cbind( grepl("freq", nms), grepl("time", nms), grepl("trial", nms), grepl("elec", nms) )
-    for(ii in seq_along(nms)){
+    for (ii in seq_along(nms)) {
       nm <- nms[[ii]]
-      sel <- tmp[ii,]
-      if(any(sel)){
+      sel <- tmp[ii, ]
+      if (any(sel)) {
         # print(nm)
         expected <- apply(cube_data, which(sel), mean)
         act <- actual[[nm]]
@@ -60,17 +60,17 @@ test_that("collapse_power", {
 
   re2 <- collapse_power(x[], analysis_index_cubes)
 
-  for(jj in seq_along(analysis_index_cubes)){
+  for (jj in seq_along(analysis_index_cubes)) {
     cube <- analysis_index_cubes[[jj]]
     cube_data <- x[cube$Frequency, cube$Time, cube$Trial, cube$Electrode, drop = FALSE]
     actual2 <- re2[[jj]]
     nms <- names(actual2)
     tmp <- cbind( grepl("freq", nms), grepl("time", nms), grepl("trial", nms), grepl("elec", nms) )
 
-    for(ii in seq_along(nms)){
+    for (ii in seq_along(nms)) {
       nm <- nms[[ii]]
-      sel <- tmp[ii,]
-      if(any(sel)){
+      sel <- tmp[ii, ]
+      if (any(sel)) {
         # print(nm)
         expected <- apply(cube_data, which(sel), mean)
         act2 <- actual2[[nm]]

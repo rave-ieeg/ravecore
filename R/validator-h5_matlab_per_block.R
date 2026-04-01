@@ -20,7 +20,7 @@ validate_raw_h5_mat_per_block <- function(subject, blocks, electrodes, check_con
   }
 
 
-  if(missing(electrodes)){
+  if (missing(electrodes)) {
     electrodes <- NULL
   } else {
     electrodes <- parse_svec(electrodes)
@@ -36,9 +36,9 @@ validate_raw_h5_mat_per_block <- function(subject, blocks, electrodes, check_con
 
   })
 
-  data_paths <- switch (
+  data_paths <- switch(
     format_standard,
-    'bids' = {
+    "bids" = {
       lapply(blocks, function(block) {
         # Parse block
         with_validation({
@@ -54,7 +54,7 @@ validate_raw_h5_mat_per_block <- function(subject, blocks, electrodes, check_con
             )
           )
           sel <- block_names_from_bids_entities(query_results$parsed) %in% block
-          if(!any(sel)) {
+          if (!any(sel)) {
             validation_errors$add(sprintf("No data file for BIDS entity collection/RAVE block is found: `%s`", block))
             return()
           }
@@ -62,7 +62,7 @@ validate_raw_h5_mat_per_block <- function(subject, blocks, electrodes, check_con
 
           is_datafile <- tolower(query_results$extension) %in% c("mat", "h5")
 
-          if(!any(is_datafile)) {
+          if (!any(is_datafile)) {
             validation_errors$add(sprintf("Files with BIDS entities `%s` found, but only one matlab (.mat) or HDF5 (.h5) file is allowed for each block.", block))
             return()
           }
@@ -88,9 +88,9 @@ validate_raw_h5_mat_per_block <- function(subject, blocks, electrodes, check_con
         with_validation({
 
           bpath <- file_path(raw_root, block)
-          files <- list.files(bpath, pattern = '\\.(mat|h5)$', ignore.case = TRUE)
+          files <- list.files(bpath, pattern = "\\.(mat|h5)$", ignore.case = TRUE)
 
-          if(length(files) != 1) {
+          if (length(files) != 1) {
             stop(sprintf("Block `%s` must only contain one matlab (.mat) or HDF5 (.h5) file.", block))
           }
           return(file_path(bpath, files))
@@ -101,7 +101,7 @@ validate_raw_h5_mat_per_block <- function(subject, blocks, electrodes, check_con
   names(data_paths) <- blocks
 
   progress <- ravepipeline::rave_progress(
-    title = 'Validating channel files',
+    title = "Validating channel files",
     max = length(blocks) + 1,
     shiny_auto_close = FALSE
   )
@@ -117,21 +117,21 @@ validate_raw_h5_mat_per_block <- function(subject, blocks, electrodes, check_con
         progress$inc(block)
 
 
-        # data_paths = list('008' = '~/rave_data/raw_dir/DemoSubject/008/DemoSubjectDatafile008_ch13.mat')
+        # data_paths = list("008" = "~/rave_data/raw_dir/DemoSubject/008/DemoSubjectDatafile008_ch13.mat")
 
         path <- data_paths[[block]]
-        if(length(path) == 0) { return(FALSE) }
+        if (length(path) == 0) { return(FALSE) }
 
         path_data <- read_mat2(path, ram = FALSE)
 
         possible_names <- guess_raw_trace(path_data, electrodes = electrodes, is_vector = FALSE)
 
-        if(length(possible_names) > 1) {
+        if (length(possible_names) > 1) {
           stop("Block %s has more than one dataset in the file. RAVE does not know which matrix contains the signal traces: %s",
                block, paste(sQuote(possible_names), collapse = ", "))
         }
 
-        if(length(possible_names) == 0 ) {
+        if (length(possible_names) == 0 ) {
           stop(sprintf("Block %s has no matrix that qualifies as signal trace matrix. Please make sure this file contains one matrix with the correct channel size (along the shorted margin of the matrix)", block))
         }
 
@@ -148,9 +148,9 @@ validate_raw_h5_mat_per_block <- function(subject, blocks, electrodes, check_con
           time_points = max(dm)
         )
 
-        if(length(electrodes) > 0) {
+        if (length(electrodes) > 0) {
           mis_e <- electrodes[!electrodes %in% info$channels]
-          if(length(mis_e)) {
+          if (length(mis_e)) {
             stop("Found data matrix with shape %s from block %s. However, this matrix is too small that it does not contain channel %s",
                  paste(dm, collapse = "x"), block, deparse_svec(mis_e))
           }
@@ -163,7 +163,7 @@ validate_raw_h5_mat_per_block <- function(subject, blocks, electrodes, check_con
 
   progress$inc("Collecting results...")
 
-  if(length(validation_errors)) {
+  if (length(validation_errors)) {
     return(list(
       passed = FALSE,
       errors = unlist(validation_errors$as_list())

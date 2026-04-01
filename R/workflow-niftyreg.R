@@ -51,7 +51,7 @@ niftyreg_coreg <- function(
   results <- ravetools::register_volume(source = ct_path, target = mri_path, method = reg_type, interpolation = interp, verbose = verbose, ...)
 
   # Get coregistration path
-  if(length(coreg_path) != 1) {
+  if (length(coreg_path) != 1) {
     coreg_path <- dirname(ct_path)
   }
   backup_file(coreg_path, remove = TRUE, quiet = TRUE)
@@ -71,7 +71,7 @@ niftyreg_coreg <- function(
 
   # save forward transform
   forward_transform <- rniftyreg$forward(results)
-  if( rniftyreg$isAffine(forward_transform, strict = FALSE) ) {
+  if ( rniftyreg$isAffine(forward_transform, strict = FALSE) ) {
 
     # forward_transform is a 4x4 matrix RAS CT to RAS scanner
     affine_ct_ras_to_mri_ras <- solve(forward_transform)
@@ -86,7 +86,7 @@ niftyreg_coreg <- function(
       x = affine_ct_ijk_to_mri_ras, sep = "\t", row.names = FALSE,
       col.names = FALSE, file = file.path(coreg_path, "CT_IJK_to_MR_RAS.txt"))
 
-  } else if(isTRUE(rniftyreg$isImage(forward_transform))) {
+  } else if (isTRUE(rniftyreg$isImage(forward_transform))) {
 
     # non-linear
     rnifti$writeNifti(image = forward_transform,
@@ -170,10 +170,10 @@ cmd_run_niftyreg_coreg <- function(
     execute = execute,
     command = rscript_path()
   )
-  if( verbose ) {
+  if ( verbose ) {
     message(cmd)
   }
-  if(dry_run) {
+  if (dry_run) {
     return(invisible(re))
   }
 

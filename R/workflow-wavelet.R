@@ -104,16 +104,16 @@ run_wavelet <- function(
 
   blocks <- subject$preprocess_settings$blocks
   srates <- subject$preprocess_settings$sample_rates
-  srates <- sapply(electrodes, function(e){
+  srates <- sapply(electrodes, function(e) {
     re <- srates[subject$electrodes == e]
-    if(!length(re)) {
+    if (!length(re)) {
       stop("Electrode ", e, " does not have sample rate. The data might not be imported correctly and some configurations are missing.")
     }
     re[[1]]
   })
   compress_rates <- srates / target_sample_rate
   pre_decimate <- as.integer(pre_downsample)
-  if(is.na(pre_decimate) || pre_decimate < 1) {
+  if (is.na(pre_decimate) || pre_decimate < 1) {
     pre_decimate <- 1
   }
 
@@ -142,7 +142,7 @@ run_wavelet <- function(
 
   on.exit({
     options("ravetools.tempdir" = ravetools_tdir_opt)
-    if(identical(ravetools_tdir_env, "")) {
+    if (identical(ravetools_tdir_env, "")) {
       Sys.unsetenv("RAVETOOLS_TEMPDIR")
     } else {
       Sys.setenv("RAVETOOLS_TEMPDIR" = ravetools_tdir_env)
@@ -152,9 +152,9 @@ run_wavelet <- function(
 
   # prepare kernels
   overall_progress$inc("Generating wavelet kernels")
-  sample_file <- file.path(subject$preprocess_path, 'voltage',
-                           sprintf('electrode_%d.h5', electrodes[[1]]))
-  if(!file.exists(sample_file) || !ieegio::io_h5_valid(sample_file)){
+  sample_file <- file.path(subject$preprocess_path, "voltage",
+                           sprintf("electrode_%d.h5", electrodes[[1]]))
+  if (!file.exists(sample_file) || !ieegio::io_h5_valid(sample_file)) {
     stop("Electrode file is missing (preprocess, electrode ", electrodes[[1]], ")")
   }
   sample_names <- gsub("^/", "", ieegio::io_h5_names(sample_file))
@@ -166,19 +166,19 @@ run_wavelet <- function(
   generate_kernel <- ravetools[[sprintf("wavelet_kernels2_%s", kernels_precision)]]
 
   lapply(unique(srates), function(srate) {
-    lapply(blocks, function(block){
+    lapply(blocks, function(block) {
       sample_name <- sprintf("notch/%s", block)
-      if(!sample_name %in% sample_names) {
+      if (!sample_name %in% sample_names) {
         stop(sprintf("I can find the imported signal file for Electrode %s, but cannot find any notch-filtered signal for block %s. The data file might be corrupted.", electrodes[[1]], block))
       }
       ptr <- load_h5(sample_file, name = sample_name, ram = FALSE, read_only = TRUE)
       data_length <- length(ptr)
 
-      if(data_length <= 0) {
+      if (data_length <= 0) {
         stop(sprintf("Electrode %s has zero-length signal (/notch/%s). The data file might be corrupted.", electrodes[[1]], block))
       }
 
-      if(pre_downsample > 1) {
+      if (pre_downsample > 1) {
         sample_data <- ravetools::decimate(ptr[], pre_downsample, ftype = "fir")
         data_length <- length(sample_data)
       }
@@ -193,19 +193,19 @@ run_wavelet <- function(
   overall_progress$inc("Removing previously generated wavelet coefficients")
   preproc <- RAVEPreprocessSettings$new(subject = subject$subject_id, read_only = TRUE)
 
-  for(e in electrodes) {
+  for (e in electrodes) {
     preproc$data[[as.character(e)]]$has_wavelet <- FALSE
   }
   preproc$save()
 
   data_root <- subject$data_path
-  lapply(electrodes, function(e){
-    unlink(file.path(data_root, 'power', sprintf('%d.h5', e)))
-    unlink(file.path(data_root, 'phase', sprintf('%d.h5', e)))
-    unlink(file.path(data_root, 'voltage', sprintf('%d.h5', e)))
-    for(block in blocks){
-      unlink(file.path(data_root, 'cache', 'power', 'raw', block, sprintf('%d.fst', e)))
-      unlink(file.path(data_root, 'cache', 'phase', 'raw', block, sprintf('%d.fst', e)))
+  lapply(electrodes, function(e) {
+    unlink(file.path(data_root, "power", sprintf("%d.h5", e)))
+    unlink(file.path(data_root, "phase", sprintf("%d.h5", e)))
+    unlink(file.path(data_root, "voltage", sprintf("%d.h5", e)))
+    for (block in blocks) {
+      unlink(file.path(data_root, "cache", "power", "raw", block, sprintf("%d.fst", e)))
+      unlink(file.path(data_root, "cache", "phase", "raw", block, sprintf("%d.fst", e)))
     }
   })
 
@@ -215,26 +215,26 @@ run_wavelet <- function(
   overall_progress$inc("Applying wavelet (a.k.a. the long step)")
   preprocess_dir <- subject$preprocess_path
   ravepipeline::lapply_jobs(
-    seq_along(electrodes), function(ii){
+    seq_along(electrodes), function(ii) {
 
       e <- electrodes[[ii]]
       srate <- srates[[ii]]
       compress_rate <- compress_rates[[ii]]
 
-      if(pre_decimate > 1) {
+      if (pre_decimate > 1) {
         compress_rate <- compress_rates[[ii]] / pre_decimate
         srate <- srate / pre_decimate
       }
 
-      for(block in blocks){
+      for (block in blocks) {
 
         sorig <- ieegio::io_read_h5(
-          file = file.path(preprocess_dir, 'voltage', sprintf('electrode_%d.h5', e)),
-          name = sprintf('/notch/%s', block),
+          file = file.path(preprocess_dir, "voltage", sprintf("electrode_%d.h5", e)),
+          name = sprintf("/notch/%s", block),
           ram = TRUE
         )
 
-        if(pre_decimate > 1) {
+        if (pre_decimate > 1) {
           s <- ravetools::decimate(sorig, pre_decimate,
                                    ftype = "fir")
         } else {
@@ -254,9 +254,9 @@ run_wavelet <- function(
         # Subset coefficients to save space
         ind <- floor(seq(1, data_length, by = compress_rate))
 
-        if(kernels_precision == "float"){
+        if (kernels_precision == "float") {
           # Load all at once and subset is faster, but one signal is around 1-2GB, so...
-          coef <- t(re[ind,,drop = FALSE])
+          coef <- t(re[ind, , drop = FALSE])
 
           phase <- Arg(coef)
           power <- Mod(coef)^2
@@ -275,21 +275,21 @@ run_wavelet <- function(
         }
 
         # Save power, phase, voltage
-        fname <- sprintf('%d.h5', e)
+        fname <- sprintf("%d.h5", e)
         wavelet_h5chunk <- c(length(freqs), 128)
 
         # power
         ieegio::io_write_h5(
           x = power,
           file = file.path(data_root, "power", fname),
-          name = sprintf('/raw/power/%s', block),
+          name = sprintf("/raw/power/%s", block),
           chunk = wavelet_h5chunk,
           replace = TRUE, quiet = TRUE
         )
         # save_h5(
-        #   x = 'noref',
+        #   x = "noref",
         #   file = file.path(data_root, "power", fname),
-        #   name = '/reference',
+        #   name = "/reference",
         #   chunk = 1,
         #   replace = TRUE, size = 1000
         # )
@@ -298,7 +298,7 @@ run_wavelet <- function(
         ieegio::io_write_h5(
           x = phase,
           file = file.path(data_root, "phase", fname),
-          name = sprintf('/raw/phase/%s', block),
+          name = sprintf("/raw/phase/%s", block),
           chunk = wavelet_h5chunk,
           replace = TRUE, quiet = TRUE
         )
@@ -307,13 +307,13 @@ run_wavelet <- function(
         ieegio::io_write_h5(
           x = sorig,
           file = file.path(data_root, "voltage", fname),
-          name = sprintf('/raw/voltage/%s', block),
+          name = sprintf("/raw/voltage/%s", block),
           chunk = 1024,
           replace = TRUE, quiet = TRUE
         )
       }
     },
-    callback = function(ii){
+    callback = function(ii) {
       sprintf("Applying wavelet|Electrode - %s", electrodes[[ii]])
     },
     .globals = list(
@@ -337,7 +337,7 @@ run_wavelet <- function(
 
   overall_progress$inc("Saving configurations and update log files")
 
-  for(e in electrodes) {
+  for (e in electrodes) {
     preproc$data[[as.character(e)]]$notch_filtered <- TRUE
     preproc$data[[as.character(e)]]$has_wavelet <- TRUE
   }
@@ -400,7 +400,7 @@ run_wavelet <- function(
 
   # also remove the meta/time_points.csv
   tpfile <- file.path(subject$meta_path, "time_points.csv")
-  if(file.exists(tpfile)) {
+  if (file.exists(tpfile)) {
     unlink(tpfile)
   }
 
@@ -412,7 +412,7 @@ run_wavelet <- function(
     tryCatch({
       refs <- unique(subject$get_reference(refname, simplify = TRUE))
       refs <- refs[startsWith(refs, "ref_")]
-      if(length(refs)) {
+      if (length(refs)) {
         refs <- refs[vapply(refs, function(ref) {
           isTRUE(length(parse_svec(gsub("^ref_", "", ref))) > 1)
         }, FALSE)]
@@ -422,7 +422,7 @@ run_wavelet <- function(
   }))
   refs <- unique(refs)
 
-  if(length(refs)) {
+  if (length(refs)) {
     progress <- ravepipeline::rave_progress(title = "Re-generate reference",
                                             max = length(refs),
                                             shiny_auto_close = TRUE)

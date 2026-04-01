@@ -1,13 +1,13 @@
 #' @rdname import-signals
 #' @export
-import_from_brainvis <- function(subject, blocks, electrodes, sample_rate, add = FALSE, data_type = 'LFP', ...) {
+import_from_brainvis <- function(subject, blocks, electrodes, sample_rate, add = FALSE, data_type = "LFP", ...) {
 
   # DIPSAUS DEBUG START
   # subject <- "demo/sub-01"
   # blocks <- "ses-01"
   # electrodes <- 1:10
   # sample_rate <- 1000
-  # list2env(list(conversion = NA, add = FALSE, data_type = 'LFP'), .GlobalEnv)
+  # list2env(list(conversion = NA, add = FALSE, data_type = "LFP"), .GlobalEnv)
   # skip_validation <- FALSE
 
   subject <- restore_subject_instance(subject, strict = FALSE)
@@ -17,9 +17,9 @@ import_from_brainvis <- function(subject, blocks, electrodes, sample_rate, add =
 
   # ---- Validation ---------------------------------------------
 
-  if(!add && isTRUE(pretools$`@freeze_lfp_ecog`)){
+  if (!add && isTRUE(pretools$`@freeze_lfp_ecog`)) {
     # LFP has been imported, just stop
-    stop(sprintf('Subject `%s` has been imported previously. Double-import channels to subject is prohibited in RAVE as it will break the data integrity. Please consider either removing the subject or changing to another project', subject$subject_id))
+    stop(sprintf("Subject `%s` has been imported previously. Double-import channels to subject is prohibited in RAVE as it will break the data integrity. Please consider either removing the subject or changing to another project", subject$subject_id))
   }
 
   validation <- validate_raw_brainvision(
@@ -29,9 +29,9 @@ import_from_brainvis <- function(subject, blocks, electrodes, sample_rate, add =
     check_content = TRUE
   )
 
-  if(!validation$passed) {
+  if (!validation$passed) {
     error_messages <- validation$errors
-    if(!length(error_messages)) {
+    if (!length(error_messages)) {
       stop("RAVE encountered unknown error during the validation. Please report this issue to RAVE.")
     }
     stop(paste(
@@ -45,7 +45,7 @@ import_from_brainvis <- function(subject, blocks, electrodes, sample_rate, add =
   # ---- Initialize subject and reload -------------------------------------------
   # Reload pretools with read_only FALSE
   pretools <- RAVEPreprocessSettings$new(subject = subject$subject_id, read_only = FALSE)
-  if(!add){
+  if (!add) {
     pretools$set_blocks(blocks = blocks)
   }
   pretools$set_electrodes(electrodes, type = data_type, add = add)
@@ -54,7 +54,7 @@ import_from_brainvis <- function(subject, blocks, electrodes, sample_rate, add =
   pretools$save()
 
   progress <- ravepipeline::rave_progress(
-    title = sprintf('Importing %s', subject$subject_id),
+    title = sprintf("Importing %s", subject$subject_id),
     max = length(blocks) + 2,
     shiny_auto_close = FALSE
   )
@@ -65,7 +65,7 @@ import_from_brainvis <- function(subject, blocks, electrodes, sample_rate, add =
 
   # ---- Extract data ------------------------------------------------------------
 
-  temporary_path <- dir_create2(file_path(subject$cache_path, 'brainvision'))
+  temporary_path <- dir_create2(file_path(subject$cache_path, "brainvision"))
   block_info <- validation$results
 
   block_unpacked <- structure(
@@ -85,13 +85,13 @@ import_from_brainvis <- function(subject, blocks, electrodes, sample_rate, add =
 
   # ---- Import signal data ------------------------------------------------------
 
-  save_path <- file.path(subject$preprocess_path, 'voltage')
+  save_path <- file.path(subject$preprocess_path, "voltage")
   save_path <- dir_create2(save_path)
 
   progress$inc(detail = "Writing files...")
 
   ravepipeline::lapply_jobs(electrodes, function(e) {
-    cfile <- file.path(save_path, sprintf('electrode_%d.h5', e))
+    cfile <- file.path(save_path, sprintf("electrode_%d.h5", e))
 
     for (block in blocks) {
       block_data <- block_unpacked[[block]]
@@ -163,13 +163,13 @@ import_from_brainvis <- function(subject, blocks, electrodes, sample_rate, add =
     sample_rate = sample_rate,
     block_unpacked = block_unpacked
   ), callback = function(e) {
-    sprintf('Writing data|Channel %s', e)
+    sprintf("Writing data|Channel %s", e)
   })
 
   progress$inc(detail = "Finalizing...")
 
   # Now set user conf
-  for(e in electrodes){
+  for (e in electrodes) {
     pretools$data[[e]]$data_imported <- TRUE
   }
   pretools$data$format <- which(unname(IMPORT_FORMATS) == "native_brainvis")
@@ -208,11 +208,11 @@ import_from_brainvis <- function(subject, blocks, electrodes, sample_rate, add =
     # When electrodes are imported correctly
     electrode_table <- subject$get_electrode_table(simplify = FALSE, warn = FALSE)
 
-    if(all(subject$electrodes %in% electrode_table$Electrode)) {
+    if (all(subject$electrodes %in% electrode_table$Electrode)) {
 
       saved <- TRUE
 
-      if(!any(electrode_table$Electrode %in% subject$electrodes)) {
+      if (!any(electrode_table$Electrode %in% subject$electrodes)) {
         electrode_table <- electrode_table[electrode_table$Electrode %in% subject$electrodes, , drop = FALSE]
         electrode_table <- electrode_table[order(electrode_table$Electrode), ]
         save_meta2(
@@ -224,9 +224,9 @@ import_from_brainvis <- function(subject, blocks, electrodes, sample_rate, add =
       }
 
       # Try to import
-      if( brain_model_exists ) {
+      if ( brain_model_exists ) {
         import_electrode_table(
-          path = file.path(subject$meta_path, 'electrodes.csv'),
+          path = file.path(subject$meta_path, "electrodes.csv"),
           subject = subject, use_fs = brain_model_exists)
       }
 
@@ -239,7 +239,7 @@ import_from_brainvis <- function(subject, blocks, electrodes, sample_rate, add =
   })
 
 
-  if(!saved) {
+  if (!saved) {
     ravepipeline::logger("Cannot import from existing electrodes.csv, creating a new one", level = "info")
     tbl <- data.frame(
       Electrode = subject$electrodes,

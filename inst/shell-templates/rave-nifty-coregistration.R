@@ -19,7 +19,7 @@ verbose <- TRUE
 coreg_path <- file.path(work_path, "coregistration")
 
 deriv_path <- file.path(work_path, "derivative")
-if(!dir.exists(deriv_path)) {
+if (!dir.exists(deriv_path)) {
   dir.create(deriv_path, showWarnings = FALSE, recursive = TRUE)
 }
 
@@ -32,7 +32,7 @@ outputs <- list(
     comment = "re-sampled CT; the resolution is the same as reference MRI"
   )
 )
-if(identical(reg_type, "nonlinear")) {
+if (identical(reg_type, "nonlinear")) {
   outputs$forward_control_points <- list(
     type = "nifti",
     path = "./coregistration/forward_control_points.nii.gz",
@@ -153,7 +153,7 @@ file.copy(
   copy.date = TRUE
 )
 
-if(identical(reg_type, "nonlinear")) {
+if (identical(reg_type, "nonlinear")) {
 
   file.copy(
     from = file.path(coreg_path, "forward_control_points.nii.gz"),
