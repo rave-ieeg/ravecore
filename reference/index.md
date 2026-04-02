@@ -1,0 +1,265 @@
+# Package index
+
+## All functions
+
+- [`Auxiliary_electrode`](http://rave.wiki/ravecore/reference/Auxiliary_electrode.md)
+  : Class definition for auxiliary channels
+
+- [`LFP_electrode`](http://rave.wiki/ravecore/reference/LFP_electrode.md)
+  : Definitions of electrode with local field potential signal type
+
+- [`LFP_reference`](http://rave.wiki/ravecore/reference/LFP_reference.md)
+  : Definitions of reference with local field potential signal type
+
+- [`RAVEAbstarctElectrode`](http://rave.wiki/ravecore/reference/RAVEAbstarctElectrode.md)
+  : Abstract definition of electrode class in 'RAVE'
+
+- [`RAVEEpoch`](http://rave.wiki/ravecore/reference/RAVEEpoch.md) :
+  Definition for epoch class
+
+- [`RAVEPreprocessSettings`](http://rave.wiki/ravecore/reference/RAVEPreprocessSettings.md)
+  : Defines preprocess configurations
+
+- [`RAVEProject`](http://rave.wiki/ravecore/reference/RAVEProject.md) :
+  Definition for 'RAVE' project class
+
+- [`RAVESubject`](http://rave.wiki/ravecore/reference/RAVESubject.md) :
+  Defines 'RAVE' subject class
+
+- [`RAVESubjectBaseRepository`](http://rave.wiki/ravecore/reference/RAVESubjectBaseRepository.md)
+  : 'RAVE' class for base repository
+
+- [`RAVESubjectEpochPhaseRepository`](http://rave.wiki/ravecore/reference/RAVESubjectEpochPhaseRepository.md)
+  : 'RAVE' class for epoch repository - time-frequency phase
+
+- [`RAVESubjectEpochPowerRepository`](http://rave.wiki/ravecore/reference/RAVESubjectEpochPowerRepository.md)
+  : 'RAVE' class for epoch repository - time-frequency power
+
+- [`RAVESubjectEpochRawVoltageRepository`](http://rave.wiki/ravecore/reference/RAVESubjectEpochRawVoltageRepository.md)
+  : 'RAVE' class for epoch repository - raw voltage
+
+- [`RAVESubjectEpochRepository`](http://rave.wiki/ravecore/reference/RAVESubjectEpochRepository.md)
+  : 'RAVE' class for epoch repository
+
+- [`RAVESubjectEpochTimeFreqBaseRepository`](http://rave.wiki/ravecore/reference/RAVESubjectEpochTimeFreqBaseRepository.md)
+  : 'RAVE' class for epoch repository - time-frequency (internal)
+
+- [`RAVESubjectEpochTimeFreqCoefRepository`](http://rave.wiki/ravecore/reference/RAVESubjectEpochTimeFreqCoefRepository.md)
+  : 'RAVE' class for epoch repository - time-frequency
+
+- [`RAVESubjectEpochVoltageRepository`](http://rave.wiki/ravecore/reference/RAVESubjectEpochVoltageRepository.md)
+  : 'RAVE' class for epoch repository - voltage
+
+- [`RAVESubjectRecordingBlockPhaseRepository`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockPhaseRepository.md)
+  : 'RAVE' class for loading time-frequency phase components
+
+- [`RAVESubjectRecordingBlockPowerRepository`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockPowerRepository.md)
+  : 'RAVE' class for loading time-frequency power components
+
+- [`RAVESubjectRecordingBlockRawVoltageRepository`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockRawVoltageRepository.md)
+  : 'RAVE' class for blocks of voltage repository
+
+- [`RAVESubjectRecordingBlockRepository`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockRepository.md)
+  : 'RAVE' class for loading entire recording block repository
+
+- [`RAVESubjectRecordingBlockTimeFreqBaseRepository`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockTimeFreqBaseRepository.md)
+  : 'RAVE' class for loading entire block of time-frequency coefficients
+
+- [`RAVESubjectRecordingBlockTimeFreqCoefRepository`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockTimeFreqCoefRepository.md)
+  : 'RAVE' class for loading time-frequency coefficients
+
+- [`RAVESubjectRecordingBlockVoltageRepository`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockVoltageRepository.md)
+  : 'RAVE' class for blocks of voltage repository
+
+- [`Spike_electrode`](http://rave.wiki/ravecore/reference/Spike_electrode.md)
+  : Class definition for micro-wire spike channels
+
+- [`YAELProcess`](http://rave.wiki/ravecore/reference/YAELProcess.md) :
+  Class definition of 'YAEL' image pipeline
+
+- [`archive_subject()`](http://rave.wiki/ravecore/reference/archive_subject.md)
+  : Archive and share a subject
+
+- [`as_rave_project()`](http://rave.wiki/ravecore/reference/as_rave_project.md)
+  :
+
+  Convert character to `RAVEProject` instance
+
+- [`as_yael_process()`](http://rave.wiki/ravecore/reference/as_yael_process.md)
+  : Create a 'YAEL' imaging processing instance
+
+- [`backup_file()`](http://rave.wiki/ravecore/reference/backup_file.md)
+  : Back up and rename the file or directory
+
+- [`cache_root()`](http://rave.wiki/ravecore/reference/cache_path.md)
+  [`clear_cached_files()`](http://rave.wiki/ravecore/reference/cache_path.md)
+  : Manipulate cached data on the file systems
+
+- [`cmd_execute()`](http://rave.wiki/ravecore/reference/cmd-external.md)
+  [`cmd_run_r()`](http://rave.wiki/ravecore/reference/cmd-external.md) :
+  External shell commands for 'RAVE'
+
+- [`cmd_run_3dAllineate()`](http://rave.wiki/ravecore/reference/cmd_run_3dAllineate.md)
+  : Align images using 'AFNI'
+
+- [`ants_coreg()`](http://rave.wiki/ravecore/reference/cmd_run_ants_coreg.md)
+  [`cmd_run_ants_coreg()`](http://rave.wiki/ravecore/reference/cmd_run_ants_coreg.md)
+  : Register a computerized tomography (CT) image to MRI via 'ANTs'
+
+- [`cmd_run_dcm2niix()`](http://rave.wiki/ravecore/reference/cmd_run_dcm2niix.md)
+  :
+
+  Convert DICOM to NIfTI via `'dcm2niix'`
+
+- [`cmd_run_freesurfer_recon_all()`](http://rave.wiki/ravecore/reference/cmd_run_freesurfer_recon_all.md)
+  [`cmd_run_freesurfer_recon_all_clinical()`](http://rave.wiki/ravecore/reference/cmd_run_freesurfer_recon_all.md)
+  : Workflow: 'FreeSurfer' surface reconstruction
+
+- [`cmd_run_fsl_flirt()`](http://rave.wiki/ravecore/reference/cmd_run_fsl_flirt.md)
+  : Run 'FSL' linear registration
+
+- [`yael_preprocess()`](http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess.md)
+  [`cmd_run_yael_preprocess()`](http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess.md)
+  : Run a built-in 'YAEL' imaging processing workflow
+
+- [`collapse2()`](http://rave.wiki/ravecore/reference/collapse2.md) :
+  Collapse high-dimensional tensor array
+
+- [`collapse_power()`](http://rave.wiki/ravecore/reference/collapse_power.md)
+  : Collapse power array with given analysis cubes
+
+- [`compose_channel()`](http://rave.wiki/ravecore/reference/compose_channel.md)
+  : Compose a phantom channel from existing electrodes
+
+- [`convert_electrode_table_to_bids()`](http://rave.wiki/ravecore/reference/convert_electrode_table_to_bids.md)
+  : Convert electrode table
+
+- [`export_table()`](http://rave.wiki/ravecore/reference/export_table.md)
+  [`import_table()`](http://rave.wiki/ravecore/reference/export_table.md)
+  : Export data frame to different common formats
+
+- [`generate_atlases_from_template()`](http://rave.wiki/ravecore/reference/generate_atlases_from_template.md)
+  : Create brain atlases from template
+
+- [`generate_reference()`](http://rave.wiki/ravecore/reference/generate_reference.md)
+  : Generate common average reference signal for 'RAVE' subjects
+
+- [`get_available_morph_to_template()`](http://rave.wiki/ravecore/reference/get_available_morph_to_template.md)
+  : Get names of available non-linear transforms to the templates
+
+- [`get_projects()`](http://rave.wiki/ravecore/reference/get_projects.md)
+  : Get all possible projects in 'RAVE' default directory
+
+- [`glimpse_voltage_repository_with_blocks()`](http://rave.wiki/ravecore/reference/glimpse-repository.md)
+  [`glimpse_voltage_filearray()`](http://rave.wiki/ravecore/reference/glimpse-repository.md)
+  : Visualizes repositories with interactive plots
+
+- [`import_from_brainvis()`](http://rave.wiki/ravecore/reference/import-signals.md)
+  [`import_from_edf()`](http://rave.wiki/ravecore/reference/import-signals.md)
+  [`import_from_h5_mat_per_block()`](http://rave.wiki/ravecore/reference/import-signals.md)
+  [`import_from_h5_mat_per_channel()`](http://rave.wiki/ravecore/reference/import-signals.md)
+  [`import_from_nevnsx()`](http://rave.wiki/ravecore/reference/import-signals.md)
+  : Import signal data into 'RAVE'
+
+- [`install_openneuro()`](http://rave.wiki/ravecore/reference/install_openneuro.md)
+  : Install data-sets from OpenNeuro
+
+- [`install_subject()`](http://rave.wiki/ravecore/reference/install_subject.md)
+  : Install a subject from the internet, a zip file or a directory
+
+- [`save_meta2()`](http://rave.wiki/ravecore/reference/meta-data.md)
+  [`load_meta2()`](http://rave.wiki/ravecore/reference/meta-data.md) :
+  Load or save meta data to 'RAVE' subject
+
+- [`new_electrode()`](http://rave.wiki/ravecore/reference/new_electrode.md)
+  [`new_reference()`](http://rave.wiki/ravecore/reference/new_electrode.md)
+  : Create new electrode channel instance or a reference signal instance
+
+- [`new_rave_subject()`](http://rave.wiki/ravecore/reference/new_rave_subject.md)
+  [`as_rave_subject()`](http://rave.wiki/ravecore/reference/new_rave_subject.md)
+  [`has_rave_subject()`](http://rave.wiki/ravecore/reference/new_rave_subject.md)
+  :
+
+  Get `RAVESubject` instance from character
+
+- [`niftyreg_coreg()`](http://rave.wiki/ravecore/reference/niftyreg_coreg.md)
+  [`cmd_run_niftyreg_coreg()`](http://rave.wiki/ravecore/reference/niftyreg_coreg.md)
+  :
+
+  Register a computerized tomography (CT) image to MRI via `'NiftyReg'`
+
+- [`plot_volume_slices()`](http://rave.wiki/ravecore/reference/plot_volume_slices.md)
+  : Plot volume slices into scalable vector graphics SVG images
+
+- [`power_baseline()`](http://rave.wiki/ravecore/reference/power_baseline.md)
+  : Calculate power baseline
+
+- [`prepare_subject_bare()`](http://rave.wiki/ravecore/reference/prepare_subject_bare.md)
+  [`prepare_subject_bare0()`](http://rave.wiki/ravecore/reference/prepare_subject_bare.md)
+  : 'RAVE' repository: basic
+
+- [`prepare_subject_with_blocks()`](http://rave.wiki/ravecore/reference/prepare_subject_with_blocks.md)
+  [`prepare_subject_raw_voltage_with_blocks()`](http://rave.wiki/ravecore/reference/prepare_subject_with_blocks.md)
+  [`prepare_subject_voltage_with_blocks()`](http://rave.wiki/ravecore/reference/prepare_subject_with_blocks.md)
+  [`prepare_subject_time_frequency_coefficients_with_blocks()`](http://rave.wiki/ravecore/reference/prepare_subject_with_blocks.md)
+  [`prepare_subject_phase_with_blocks()`](http://rave.wiki/ravecore/reference/prepare_subject_with_blocks.md)
+  [`prepare_subject_power_with_blocks()`](http://rave.wiki/ravecore/reference/prepare_subject_with_blocks.md)
+  : 'RAVE' repository: with entire recording blocks
+
+- [`prepare_subject_with_epochs()`](http://rave.wiki/ravecore/reference/prepare_subject_with_epochs.md)
+  [`prepare_subject_raw_voltage_with_epochs()`](http://rave.wiki/ravecore/reference/prepare_subject_with_epochs.md)
+  [`prepare_subject_voltage_with_epochs()`](http://rave.wiki/ravecore/reference/prepare_subject_with_epochs.md)
+  [`prepare_subject_time_frequency_coefficients_with_epochs()`](http://rave.wiki/ravecore/reference/prepare_subject_with_epochs.md)
+  [`prepare_subject_power_with_epochs()`](http://rave.wiki/ravecore/reference/prepare_subject_with_epochs.md)
+  [`prepare_subject_power()`](http://rave.wiki/ravecore/reference/prepare_subject_with_epochs.md)
+  [`prepare_subject_phase_with_epochs()`](http://rave.wiki/ravecore/reference/prepare_subject_with_epochs.md)
+  : 'RAVE' repository: with epochs
+
+- [`py_nipy_coreg()`](http://rave.wiki/ravecore/reference/py_nipy_coreg.md)
+  [`cmd_run_nipy_coreg()`](http://rave.wiki/ravecore/reference/py_nipy_coreg.md)
+  :
+
+  Register a computerized tomography (CT) image to MRI via `'nipy'`
+
+- [`rave_brain()`](http://rave.wiki/ravecore/reference/rave_brain.md) :
+  Load 'FreeSurfer' brain from 'RAVE'
+
+- [`normalize_commandline_path()`](http://rave.wiki/ravecore/reference/rave_cmd_tools.md)
+  [`cmd_dcm2niix()`](http://rave.wiki/ravecore/reference/rave_cmd_tools.md)
+  [`cmd_freesurfer_home()`](http://rave.wiki/ravecore/reference/rave_cmd_tools.md)
+  [`cmd_fsl_home()`](http://rave.wiki/ravecore/reference/rave_cmd_tools.md)
+  [`cmd_afni_home()`](http://rave.wiki/ravecore/reference/rave_cmd_tools.md)
+  [`cmd_homebrew()`](http://rave.wiki/ravecore/reference/rave_cmd_tools.md)
+  [`cmd_dry_run()`](http://rave.wiki/ravecore/reference/rave_cmd_tools.md)
+  [`rscript_path()`](http://rave.wiki/ravecore/reference/rave_cmd_tools.md)
+  : Find external command-line tools
+
+- [`rave_legacy_subject_format_conversion()`](http://rave.wiki/ravecore/reference/rave_legacy_subject_format_conversion.md)
+  : Legacy support for 'RAVE' 1.0 format
+
+- [`rave_path()`](http://rave.wiki/ravecore/reference/rave_path.md) :
+  Find file paths based on storage
+
+- [`LOCATION_TYPES`](http://rave.wiki/ravecore/reference/ravecore-constants.md)
+  [`SIGNAL_TYPES`](http://rave.wiki/ravecore/reference/ravecore-constants.md)
+  [`IMPORT_FORMATS`](http://rave.wiki/ravecore/reference/ravecore-constants.md)
+  [`YAEL_IMAGE_TYPES`](http://rave.wiki/ravecore/reference/ravecore-constants.md)
+  [`MNI305_to_MNI152`](http://rave.wiki/ravecore/reference/ravecore-constants.md)
+  : 'RAVE' constants
+
+- [`run_wavelet()`](http://rave.wiki/ravecore/reference/run_wavelet.md)
+  : Apply Morlet-Wavelet to subject
+
+- [`snapshot_subject()`](http://rave.wiki/ravecore/reference/snapshot_project.md)
+  [`snapshot_project()`](http://rave.wiki/ravecore/reference/snapshot_project.md)
+  : Create overview report for given project or subject
+
+- [`transform_point_to_template()`](http://rave.wiki/ravecore/reference/transform_point_to_template.md)
+  [`transform_thinfilm_to_mni152()`](http://rave.wiki/ravecore/reference/transform_point_to_template.md)
+  : Calculate template 'MNI' coordinates for points on native brain
+
+- [`validate_subject`](http://rave.wiki/ravecore/reference/validate_subject.md)
+  : Validate subject data integrity
+
+- [`validate_time_window()`](http://rave.wiki/ravecore/reference/validate_time_window.md)
+  : Validate time windows to be used

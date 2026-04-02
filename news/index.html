@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ravecore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9010</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,10 +33,55 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.1" id="ravecore-011">ravecore 0.1.1<a class="anchor" aria-label="anchor" href="#ravecore-011"></a></h2>
+<div class="section level4">
+<h4 id="new-features-0-1-1">New Features<a class="anchor" aria-label="anchor" href="#new-features-0-1-1"></a></h4>
+<ul><li>Added <code><a href="../reference/generate_atlases_from_template.html">generate_atlases_from_template()</a></code> to generate brain atlases from a template; supports exporting STL meshes in LPS coordinates (<code>#d2b0f60</code>, <code>#c42dbb9</code>).</li>
+<li>Added <code>use_antspynet</code> option in the YAEL preprocessing pipeline (<code>#7795023</code>).</li>
+<li>Added snapshot report for projects and subjects (<code>#f91eb3b</code>).</li>
+<li>Added <code><a href="../reference/install_openneuro.html">install_openneuro()</a></code> helper to install OpenNeuro subjects (<code>#1cdffc2</code>).</li>
+<li>Added quick mode for faster subject preparation (<code>#70388b4</code>).</li>
+<li>Added spike diagnostic plots and graphic options for the spike visualizer (<code>#b53887d</code>, <code>#f1cc332</code>).</li>
+<li>Added debug message output for spike sorter workflows (<code>#fc25b2f</code>).</li>
+<li>Added utility functions for <code>SpikeInterface</code> integration (<code>#71db36d</code>).</li>
+<li>Spike analyzer now uses band-passed signal for improved accuracy (<code>#bb021d4</code>).</li>
+<li>Parallel workers are used to save spike data (<code>#b4c1b46</code>).</li>
+<li>Python environment is auto-installed when missing (<code>#5985f46</code>).</li>
+<li>Spike sorters are now cached to avoid redundant computation (<code>#2068ce0</code>).</li>
+<li>Baseline firing rate computation now supports sub-1 rates (<code>#292f2fe</code>, <code>#48f3760</code>).</li>
+<li>Spike histogram bins now cover the entire epoch range (<code>#d49f9db</code>, <code>#a9e94ea</code>).</li>
+<li>Spike train is filtered to ensure times are within the requested bin range (<code>#ca2c1e4</code>).</li>
+<li>Repository object format has been updated and improved (<code>#ea2513a</code>).</li>
+</ul></div>
+<div class="section level4">
+<h4 id="bug-fixes-0-1-1">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-1"></a></h4>
+<ul><li>Fixed HDF5 links not being closed promptly, which could cause resource leaks (<code>#a5e95fe</code>).</li>
+<li>Fixed <code>LFP_reference</code> serialization error and added additional validation checks (<code>#93ad452</code>, <code>#f39f51a</code>).</li>
+<li>Fixed error message displayed when <code>rpymat</code> is not configured (<code>#ff5a6b2</code>).</li>
+<li>Fixed <code>ensure_py_package()</code> to install <code>spikeinterface</code> via pip correctly (<code>#1bcd358</code>).</li>
+<li>Fixed ordering issue when the electrode table is empty (<code>#37904c3</code>).</li>
+<li>Fixed syntax errors (<code>#fb14366</code>).</li>
+<li>Handle missing electrodes gracefully (<code>#3f6e381</code>).</li>
+<li>
+<code>threeBrain</code> template is now ensured without throwing an error (<code>#f91eb3b</code>).</li>
+<li>Invalid projects now display without broken links (<code>#048c91e</code>).</li>
+<li>Spike iteration now processes per channel instead of manually computing iteration chunks (<code>#1580465</code>).</li>
+<li>Only spike data (not raw signals) is stored during sorter runs (<code>#2aa1cff</code>).</li>
+<li>Reference path is now correctly prioritized (<code>#39c75bb</code>).</li>
+</ul></div>
+<div class="section level4">
+<h4 id="other-changes-0-1-1">Other Changes<a class="anchor" aria-label="anchor" href="#other-changes-0-1-1"></a></h4>
+<ul><li>Lint and code style improvements (<code>#afae460</code>).</li>
+<li>Minor documentation fixes (<code>#990fc40</code>).</li>
+<li>CRAN submission comment fixes (<code>#004b775</code>, <code>#8804222</code>).</li>
+</ul><hr></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0" id="ravecore-010">ravecore 0.1.0<a class="anchor" aria-label="anchor" href="#ravecore-010"></a></h2><p class="text-muted">CRAN release: 2025-09-23</p>
 <ul><li>Initial CRAN submission.</li>
 </ul></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
@@ -44,7 +89,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

@@ -1,0 +1,159 @@
+# Plot volume slices into scalable vector graphics SVG images
+
+Display slices, or interleave with image overlays. Require installing
+package `htmltools`.
+
+## Usage
+
+``` r
+plot_volume_slices(
+  x,
+  overlay = NULL,
+  depths = seq(-100, 100, by = 18),
+  which = c("coronal", "axial", "sagittal"),
+  nc = NA,
+  col = c("black", "white"),
+  overlay_col = col,
+  overlay_alpha = NA,
+  interleave = is.na(overlay_alpha),
+  interleave_period = 4,
+  interleave_transition = c("ease-in-out", "linear"),
+  pixel_width = 0.5,
+  underlay_range = NULL,
+  overlay_range = NULL,
+  ...
+)
+```
+
+## Arguments
+
+- x:
+
+  underlay, objects that can be converted to
+  [`as_ieegio_volume`](http://dipterix.org/ieegio/reference/as_ieegio_volume.md);
+  for example, 'NIfTI' or 'FreeSurfer' volume file path, array, loaded
+  volume instances
+
+- overlay:
+
+  same type as `x`, but optional; served as overlay
+
+- depths:
+
+  depth position in millimeters, along the normal to the `which` plane
+
+- which:
+
+  which plane to visualize; can be `"coronal"`, `"axial"`, `"sagittal"`
+
+- nc:
+
+  number of columns; default is to be determined by total number of
+  images
+
+- col, overlay_col:
+
+  underlay and overlay color keys, must have at least two colors to
+  construct color palettes
+
+- overlay_alpha:
+
+  overlay transparency
+
+- interleave:
+
+  whether to interleave overlay; default is true when `overlay_alpha` is
+  unspecified
+
+- interleave_period:
+
+  interleave animation duration per period, only used when overlay is
+  specified; default is 4 seconds
+
+- interleave_transition:
+
+  interleave animation transition, only used when overlay is specified;
+  choices are `'ease-in-out'` (default) and `'linear'`
+
+- pixel_width:
+
+  pixel width resolution; default is 0.5 millimeters
+
+- underlay_range, overlay_range:
+
+  numeric vectors of two, value ranges of underlay and overlay
+
+- ...:
+
+  passed to internal method
+
+## Value
+
+A `'SVG'` tag object that can be embedded in shiny applications or
+plotted directly.
+
+## Examples
+
+``` r
+
+
+# toy-example:
+
+shape <- c(10, 10, 10)
+vox2ras <- matrix(
+  c(10, 17.32, 0, -136,
+    -17.32, 10, 20, -63,
+    0, -20, 0, 100,
+    0, 0, 0, 1),
+  nrow = 4, byrow = TRUE
+)
+
+# continuous
+x <- abs(array(sin(seq_len(100) / 10), shape))
+
+underlay <- ieegio::as_ieegio_volume(x, vox2ras = vox2ras)
+overlay <- ieegio::as_ieegio_volume(x > 0.2, vox2ras = vox2ras)
+
+if(interactive()) {
+
+  plot_volume_slices(
+    underlay, overlay = overlay,
+    depths = seq(0, 150, length.out = 4), pixel_width = 5,
+    overlay_col = c("#00000000", "#FF000044", "#FF0000FF")
+  )
+
+}
+
+# Require `install_subject("yael_demo_001")`
+if(has_rave_subject("YAEL/yael_demo_001")) {
+
+subject <- ravecore::as_rave_subject("YAEL/yael_demo_001",
+                                     strict = FALSE)
+
+
+t1 <- file.path(subject$imaging_path, "coregistration",
+                "MRI_reference.nii.gz")
+
+ct <- file.path(subject$imaging_path, "coregistration",
+                "CT_RAW.nii.gz")
+transform <- read.table(
+  file.path(subject$imaging_path, "coregistration",
+            "CT_IJK_to_MR_RAS.txt")
+)
+
+ct_image_original <- ieegio::read_volume(ct)
+ct_image_aligned <- ieegio::as_ieegio_volume(
+  ct_image_original[], vox2ras = as.matrix(transform)
+)
+
+if(interactive()) {
+  plot_volume_slices(
+    t1, overlay = ct_image_aligned,
+    overlay_col = c("#00000000", "#FF000044", "#FF0000FF"),
+    nc = 6
+  )
+}
+
+}
+
+```

@@ -1,0 +1,260 @@
+# 'RAVE' repository: with entire recording blocks
+
+Loads recording blocks - continuous recording chunks, typically a run of
+minutes.
+
+## Usage
+
+``` r
+prepare_subject_with_blocks(
+  subject,
+  electrodes = NULL,
+  blocks = NULL,
+  reference_name = NULL,
+  ...,
+  quiet = FALSE,
+  repository_id = NULL,
+  strict = TRUE
+)
+
+prepare_subject_raw_voltage_with_blocks(
+  subject,
+  electrodes = NULL,
+  blocks = NULL,
+  reference_name = "noref",
+  downsample = NA,
+  ...,
+  quiet = FALSE,
+  repository_id = NULL,
+  strict = TRUE
+)
+
+prepare_subject_voltage_with_blocks(
+  subject,
+  electrodes = NULL,
+  blocks = NULL,
+  reference_name = NULL,
+  downsample = NA,
+  ...,
+  quiet = FALSE,
+  repository_id = NULL,
+  strict = TRUE
+)
+
+prepare_subject_time_frequency_coefficients_with_blocks(
+  subject,
+  electrodes = NULL,
+  blocks = NULL,
+  reference_name = NULL,
+  ...,
+  quiet = FALSE,
+  repository_id = NULL,
+  strict = TRUE
+)
+
+prepare_subject_phase_with_blocks(
+  subject,
+  electrodes = NULL,
+  blocks = NULL,
+  reference_name = NULL,
+  ...,
+  quiet = FALSE,
+  repository_id = NULL,
+  strict = TRUE
+)
+
+prepare_subject_power_with_blocks(
+  subject,
+  electrodes = NULL,
+  blocks = NULL,
+  reference_name = NULL,
+  ...,
+  quiet = FALSE,
+  repository_id = NULL,
+  strict = TRUE
+)
+```
+
+## Arguments
+
+- subject:
+
+  'RAVE' subject
+
+- electrodes:
+
+  string or integers indicating electrodes to load
+
+- blocks:
+
+  names of the recording blocks to load, can be queried via
+  `subject$blocks`
+
+- reference_name:
+
+  name of the reference table
+
+- ...:
+
+  passed to
+  [`RAVESubjectBaseRepository`](http://rave.wiki/ravecore/reference/RAVESubjectBaseRepository.md)
+  constructor
+
+- quiet:
+
+  see field `quiet`
+
+- repository_id:
+
+  see field `repository_id`
+
+- strict:
+
+  whether to check existence of subject before loading data; default is
+  true
+
+- downsample:
+
+  positive integer or `NA`, indicating whether the signals should be
+  down-sampled during loading, for voltage traces only; default is `NA`,
+  meaning no down-sampling
+
+## Value
+
+A
+[`RAVESubjectRecordingBlockRepository`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockRepository.md)
+instance
+
+## Details
+
+`prepare_subject_with_blocks` does not actually load any signal data.
+Its existence is simply for backward compatibility. It instantiates a
+super-class of the rest of methods. Therefore, please refer to the rest
+of the methods for loading specific data types.
+
+If you do not need to analyze super high-frequency signals, it is
+recommended to set a proper `downsample` value to down-sample the
+signals while loading voltage traces. This helps optimizing the data
+storage and speed up computation (significantly). For example, suppose
+you have 200 channels sampled at 30,000 Hz, a 30-minute recording will
+cost around 80+ gigabyte memory only to store, let along the storage
+needed to compute analyses and time needed to perform those analyses.
+Down-sampling the channels helps a lot. If you are mostly interested in
+signals below 100 Hz, then down-sampling voltage traces to 400 Hz will
+preserve the frequency components needed, and it takes 1.2 gigabytes to
+hold the same recording in memory.
+
+Due to the large-data nature of blocks of signals, the repository will
+prepare cache files for all the channels, allowing users to load the
+cached data later without needing to reload
+
+## Examples
+
+``` r
+if( has_rave_subject("demo/DemoSubject") ) {
+
+
+# ---- An use-case example ------------------------------------------------
+# Install subject via install_subject("DemoSubject")
+subject <- as_rave_subject("demo/DemoSubject")
+
+# list all blocks
+subject$blocks
+
+repository <- prepare_subject_voltage_with_blocks(
+  subject,
+  electrodes = 13:16,
+  blocks = "008",
+  reference = "default"
+)
+
+print(repository)
+
+repository$blocks
+
+# get data
+container <- repository$get_container()
+
+# block data
+container$`008`
+lfp_list <- container$`008`$LFP
+channel_sample_rate <- lfp_list$sample_rate
+
+# Even we only load channels 14-16, all the channels are here for
+# in case we want to use the cache for future purposes
+lfp_list$dimnames$Electrode
+
+# Plot all loaded channels
+channel_sel <- lfp_list$dimnames$Electrode %in% c(14, 15, 16)
+channel_signals <- lfp_list$data[, channel_sel,
+                                 drop = FALSE,
+                                 dimnames = FALSE]
+
+ravetools::plot_signals(t(channel_signals),
+                        sample_rate = channel_sample_rate,
+                        channel_names = 14:16)
+
+# Load channel 14 and plot pwelch
+channel_sel <- lfp_list$dimnames$Electrode == 14
+
+channel_signals <- lfp_list$data[, channel_sel,
+                                 drop = TRUE,
+                                 dimnames = FALSE]
+
+ravetools::diagnose_channel(channel_signals,
+                            srate = channel_sample_rate,
+                            name = "Channel 14",
+                            nclass = 30)
+
+# ---- Use cache ---------------------------------------------------
+
+subject <- as_rave_subject("demo/DemoSubject")
+
+# Lazy-load block 008
+repository <- prepare_subject_voltage_with_blocks(
+  subject,
+  electrodes = 13:16,
+  blocks = "008",
+  reference = "default",
+  lazy_load = TRUE  # <-- trick
+)
+
+# Immediately load data with force=FALSE to use cache if exists
+repository$mount_data(force = FALSE)
+
+# ---- More examples ---------------------------------------------
+
+
+subject <- as_rave_subject("demo/DemoSubject")
+repository <- prepare_subject_power_with_blocks(
+  subject,
+  electrodes = 14,
+  blocks = "008",
+  reference_name = "default"
+)
+
+block_008 <- repository$power$`008`$LFP
+
+channel_sel <- block_008$dimnames$Electrode == 14
+
+# Drop electrode margin
+power <- block_008$data[, , channel_sel,
+                        drop = TRUE, dimnames = FALSE]
+
+# global baseline
+power_baselined_t <- 10 * log10(t(power))
+power_baselined_t <- power_baselined_t - rowMeans(power_baselined_t)
+
+ravetools::plot_signals(
+  power_baselined_t,
+  sample_rate = block_008$sample_rate,
+  channel_names = block_008$dimnames$Frequency,
+  space = 1,
+  start_time = 20,
+  duration = 30, ylab = "Frequency",
+  main = "Channel 14 - Power with Global Baseline (20-50 sec)"
+)
+
+
+}
+```

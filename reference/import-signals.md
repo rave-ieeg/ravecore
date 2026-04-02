@@ -1,0 +1,156 @@
+# Import signal data into 'RAVE'
+
+Import signal data from different file formats; supports `'EDF'`,
+`'BrainVision'`, `'BlackRock'`, `'HDF5'`, and `'Matlab'` formats under
+either native or 'BIDS' standard. It is recommended to use 'RAVE' user
+interfaces to import data.
+
+## Usage
+
+``` r
+import_from_brainvis(
+  subject,
+  blocks,
+  electrodes,
+  sample_rate,
+  add = FALSE,
+  data_type = "LFP",
+  ...
+)
+
+import_from_edf(
+  subject,
+  blocks,
+  electrodes,
+  sample_rate,
+  add = FALSE,
+  data_type = "LFP",
+  skip_validation = FALSE,
+  ...
+)
+
+import_from_h5_mat_per_block(
+  subject,
+  blocks,
+  electrodes,
+  sample_rate,
+  add = FALSE,
+  data_type = "LFP",
+  skip_validation = FALSE,
+  ...
+)
+
+import_from_h5_mat_per_channel(
+  subject,
+  blocks,
+  electrodes,
+  sample_rate,
+  add = FALSE,
+  data_type = "LFP",
+  skip_validation = FALSE,
+  ...
+)
+
+import_from_nevnsx(
+  subject,
+  blocks,
+  electrodes,
+  sample_rate,
+  add = FALSE,
+  data_type = "LFP",
+  skip_validation = FALSE,
+  ...
+)
+```
+
+## Arguments
+
+- subject:
+
+  a 'RAVE' subject or subject ID, consists of a project name, a forward
+  slash, followed by a subject code; for example, `'demo/DemoSubject'`
+  refers to a 'RAVE' native subject `'DemoSubject'` under the project
+  `'demo'`; while `'demo@bids:ds001/01'` refers to subject `'sub-01'`
+  from the 'BIDS' data set `'ds001'`, under its 'RAVE' project `'demo'`
+  under the derivative folder.
+
+- blocks:
+
+  recording block; see Section 'Recording Blocks' for details
+
+- electrodes:
+
+  electrode (channels) to import, must be a vector of integers (channel
+  numbers) or a character that can be interpreted as integers; for
+  example, integer vector `1:10` stands for the first 10 channels, while
+  `'1,3-10,15'` refers to channels 1, 3 to 10, then 15. Notice some
+  formats might not have definition of the channel numbers, see Section
+  'Channel Numbers' for details
+
+- sample_rate:
+
+  sampling frequency of the channel, must be positive. 'RAVE' only
+  accepts unified consistent sample rate across all channels with the
+  same type. For example, if one 'LFP' channel is 2000 Hz, then all
+  'LFP' channels must be 2000 Hz. Channels with different sample rates
+  will be either
+  [`decimate`](https://dipterix.org/ravetools/reference/decimate.html)
+  (if possible, with a 'FIR' filter) or
+  [`resample`](https://rdrr.io/pkg/gsignal/man/resample.html)
+  (fractional ratio) during import. Different channel types (such as
+  'Spike', 'Auxiliary', ...) can have different sample rates
+
+- add:
+
+  whether the operation is to add new channels; default is false to
+  protect data integrity
+
+- data_type:
+
+  channel signal data type, can be `'LFP'`, `'Spike'`, or `'Auxiliary'`
+
+- ...:
+
+  passed to or reserved for other methods
+
+- skip_validation:
+
+  whether to skip data validation, default is false (recommended)
+
+## Recording Blocks
+
+The term "recording block" is defined as a continuous block of signals
+recorded during the experiment, typically during one run of the
+experiment, depending on the setups and format standards:
+
+In the context of native standard, the raw 'RAVE' data is typically
+stored in the `'~/rave_data/raw_dir'` directory (`'~'` stands for your
+home directory, or documents directory under Windows). Each subject is
+stored under a folder named after the subject code. For example, subject
+`'DemoSubject'` has a raw folder path
+`'~/rave_data/raw_dir/DemoSubject'`. The block folders are stored under
+this subject folder (such as `'008'`, `'010'`, ...). Each block folder
+contains a 5-min recording from an experiment.
+
+In the context of 'BIDS' standard, there is no official definition of a
+'block', instead, 'BIDS' has an explicit definition of sessions, tasks,
+and runs. We typically consider that a combination of a session, a task,
+and a run consists of a recording block. For example,
+`'ses-01_task-01_run-01'` or `'ses-01_run-01'`, depending on the
+existence of the 'BIDS' entities.
+
+## Channel Numbers
+
+(Electrode) channel numbers refer to vectors of integers, or characters
+that can be interpreted as integers. For integers, this is
+straightforward: `c(1:10, 21:30)` refers to channel 1 to 20, then 21 to
+30. For characters, this is converted to integer internally via an
+unexported function `ravecore:::parse_svec`.
+
+The channel numbers must be an integer. In some data formats (such as
+'EDF') or some standards ('BIDS'), the channel number is not officially
+explicitly defined: they use the channel labels as the identifiers. To
+deal with this situation, 'RAVE' treats the channel order as their
+numbers. In some cases, this is less ideal because the channel labels
+might implicitly encode the channel numbers. 'RAVE' will ignore such
+information for consistent behavior.
