@@ -98,7 +98,7 @@ import_from_h5_mat_per_channel <- function(
       if (endsWith(tolower(path), "mat")) {
         mat <- ieegio::io_read_mat(path, verbose = FALSE)
       } else {
-        mat <- ravecore$read_mat2(path, verbose = FALSE)
+        mat <- ravecore$read_mat2(path)
       }
       name <- ravecore$guess_raw_trace(mat, length(electrodes),
                                        is_vector = TRUE)
