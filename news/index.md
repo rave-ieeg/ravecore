@@ -2,6 +2,8 @@
 
 ## ravecore 0.1.1
 
+CRAN release: 2026-04-02
+
 #### New Features
 
 - Added
