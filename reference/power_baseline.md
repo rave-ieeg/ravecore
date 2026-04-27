@@ -8,7 +8,8 @@ Calculate power baseline
 power_baseline(
   x,
   baseline_windows,
-  method = c("percentage", "sqrt_percentage", "decibel", "zscore", "sqrt_zscore"),
+  method = c("percentage", "sqrt_percentage", "decibel", "zscore", "sqrt_zscore",
+    "db_zscore"),
   units = c("Trial", "Frequency", "Electrode"),
   ...
 )
@@ -17,7 +18,8 @@ power_baseline(
 power_baseline(
   x,
   baseline_windows,
-  method = c("percentage", "sqrt_percentage", "decibel", "zscore", "sqrt_zscore"),
+  method = c("percentage", "sqrt_percentage", "decibel", "zscore", "sqrt_zscore",
+    "db_zscore"),
   units = c("Frequency", "Trial", "Electrode"),
   electrodes,
   ...
@@ -27,7 +29,8 @@ power_baseline(
 power_baseline(
   x,
   baseline_windows,
-  method = c("percentage", "sqrt_percentage", "decibel", "zscore", "sqrt_zscore"),
+  method = c("percentage", "sqrt_percentage", "decibel", "zscore", "sqrt_zscore",
+    "db_zscore"),
   units = c("Frequency", "Trial", "Electrode"),
   filebase = NULL,
   ...
@@ -37,7 +40,8 @@ power_baseline(
 power_baseline(
   x,
   baseline_windows,
-  method = c("percentage", "sqrt_percentage", "decibel", "zscore", "sqrt_zscore"),
+  method = c("percentage", "sqrt_percentage", "decibel", "zscore", "sqrt_zscore",
+    "db_zscore"),
   units = c("Trial", "Frequency", "Electrode"),
   ...
 )
