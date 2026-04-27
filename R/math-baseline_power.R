@@ -80,7 +80,7 @@
 #' @export
 power_baseline <- function(
     x, baseline_windows,
-    method = c("percentage", "sqrt_percentage", "decibel", "zscore", "sqrt_zscore"),
+    method = c("percentage", "sqrt_percentage", "decibel", "zscore", "sqrt_zscore", "db_zscore"),
     units = c("Trial", "Frequency", "Electrode"), ...
 ) {
   UseMethod("power_baseline")
@@ -90,7 +90,7 @@ power_baseline <- function(
 #' @export
 power_baseline.rave_prepare_power <- function(
     x, baseline_windows,
-    method = c("percentage", "sqrt_percentage", "decibel", "zscore", "sqrt_zscore"),
+    method = c("percentage", "sqrt_percentage", "decibel", "zscore", "sqrt_zscore", "db_zscore"),
     units = c("Frequency", "Trial", "Electrode"),
     electrodes, ...
 ) {
@@ -285,7 +285,7 @@ power_baseline.rave_prepare_power <- function(
 #' @export
 power_baseline.FileArray <- function(
     x, baseline_windows,
-    method = c("percentage", "sqrt_percentage", "decibel", "zscore", "sqrt_zscore"),
+    method = c("percentage", "sqrt_percentage", "decibel", "zscore", "sqrt_zscore", "db_zscore"),
     units = c("Frequency", "Trial", "Electrode"),
     filebase = NULL, ...
 ) {
@@ -406,7 +406,7 @@ power_baseline.FileArray <- function(
 #' @export
 power_baseline.array <- function(
     x, baseline_windows,
-    method = c("percentage", "sqrt_percentage", "decibel", "zscore", "sqrt_zscore"),
+    method = c("percentage", "sqrt_percentage", "decibel", "zscore", "sqrt_zscore", "db_zscore"),
     units = c("Trial", "Frequency", "Electrode"), ...
 ) {
   method <- match.arg(method)
