@@ -130,7 +130,7 @@ test_that("namespace call signatures match function formals", {
   re_assign <- '(\\w+)\\s*(<-|=|<<-)\\s*asNamespace\\(\\s*["\']([^"\']+)["\']\\s*\\)'
   # var$func(  OR  var$Class$method(
   # Capture: (var), (func_or_Class), optional ($method), and note column of "("
-  re_call <- '\\b(\\w+)\\$(\\w+)(?:\\$(\\w+))?\\s*\\('
+  re_call <- "\\b(\\w+)\\$(\\w+)(?:\\$(\\w+))?\\s*\\("
   # asNamespace("pkg")$func(
   re_inline <- 'asNamespace\\(\\s*["\']([^"\']+)["\']\\s*\\)\\$(\\w+)\\s*\\('
 
@@ -172,7 +172,7 @@ test_that("namespace call signatures match function formals", {
           match_text <- substr(ln, pos, pos + mlen - 1L)
 
           parts <- regmatches(match_text,
-                              regexec('(\\w+)\\$(\\w+)(?:\\$(\\w+))?\\s*\\(', match_text))[[1L]]
+                              regexec("(\\w+)\\$(\\w+)(?:\\$(\\w+))?\\s*\\(", match_text))[[1L]]
           var_name <- parts[[2L]]
           name2 <- parts[[3L]]
           name3 <- if (nzchar(parts[[4L]])) parts[[4L]] else ""
