@@ -258,6 +258,9 @@
   [`transform_thinfilm_to_mni152()`](http://rave.wiki/ravecore/reference/transform_point_to_template.md)
   : Calculate template 'MNI' coordinates for points on native brain
 
+- [`validate_condition_groupings()`](http://rave.wiki/ravecore/reference/validate_condition_groupings.md)
+  : Validate and normalize a list of user-supplied condition groupings.
+
 - [`validate_subject`](http://rave.wiki/ravecore/reference/validate_subject.md)
   : Validate subject data integrity
 
