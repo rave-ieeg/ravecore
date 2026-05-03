@@ -107,6 +107,10 @@ validate_condition_groupings <- function(condition_groupings, epoch = NULL) {
       stop("`epoch` does not have a `Trial` column.")
     }
     use_epoch <- TRUE
+    # Make sure the epoch table is sorted
+    if (is.unsorted(epoch_table$Trial)) {
+      epoch_table <- epoch_table[order(epoch_table$Trial), ]
+    }
     epoch_condition <- as.character(epoch_table$Condition)
     epoch_trial <- as.integer(epoch_table$Trial)
     available_conditions <- unique(epoch_condition)
