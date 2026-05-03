@@ -362,6 +362,7 @@ The objects of this class are cloneable with this method.
 ## Examples
 
 ``` r
+
 if( has_rave_subject("demo/DemoSubject") ) {
 
 # To run this example, please download demo subject (~700 MB) from

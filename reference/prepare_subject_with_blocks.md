@@ -151,6 +151,7 @@ cached data later without needing to reload
 ## Examples
 
 ``` r
+
 if( has_rave_subject("demo/DemoSubject") ) {
 
 

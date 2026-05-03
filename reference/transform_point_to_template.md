@@ -106,6 +106,7 @@ A table of electrode 'MNI' coordinates.
 ## Examples
 
 ``` r
+
 if (has_rave_subject("demo/DemoSubject")) {
 
   transform_point_to_template(

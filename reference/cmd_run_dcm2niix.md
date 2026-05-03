@@ -62,6 +62,7 @@ will be created under the subject image input folder
 ## Examples
 
 ``` r
+
 if (FALSE) { # \dontrun{
 
 cmd_run_dcm2niix(

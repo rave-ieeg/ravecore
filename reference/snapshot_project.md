@@ -49,6 +49,7 @@ report in 'HTML'.
 ## Examples
 
 ``` r
+
 if (FALSE) { # \dontrun{
 
 # Run in parallel

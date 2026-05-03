@@ -29,6 +29,7 @@ A list of table in data frame and a list of meta information
 ## Examples
 
 ``` r
+
 # Run `install_subject("DemoSubject")` first!
 if( has_rave_subject("demo/DemoSubject") ) {
 

@@ -149,6 +149,7 @@ folder. It will take a while to run the workflow.
 ## Examples
 
 ``` r
+
 if (FALSE) { # \dontrun{
 
 # For T1 normalization only; add ct_path to include coregistration

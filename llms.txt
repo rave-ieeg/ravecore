@@ -39,6 +39,7 @@ For advanced developers, you can install the development version of
 `ravecore` with:
 
 ``` r
+
 # install.packages("pak")
 pak::pak("rave-ieeg/ravecore")
 ```

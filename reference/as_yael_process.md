@@ -28,6 +28,7 @@ A processing instance, see
 ## Examples
 
 ``` r
+
 process <- as_yael_process("YAEL/test_subject")
 
 if (FALSE) { # \dontrun{

@@ -77,6 +77,7 @@ Nothing
 ## Examples
 
 ``` r
+
 if(interactive() && has_rave_subject("demo/DemoSubject")) {
 
   # the actual example code:

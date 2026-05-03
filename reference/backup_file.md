@@ -29,6 +29,7 @@ backup_file(path, remove = FALSE, quiet = FALSE)
 ## Examples
 
 ``` r
+
 path <- tempfile()
 file.create(path)
 #> [1] TRUE

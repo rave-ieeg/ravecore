@@ -41,6 +41,7 @@ this function, please make sure that all 'RAVE' instances are shutdown.
 ## Examples
 
 ``` r
+
 cache_root()
 #> [1] "~/rave_data/cache_dir/"
 ```

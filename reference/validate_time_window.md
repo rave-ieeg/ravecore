@@ -23,6 +23,7 @@ A list of time intervals (ordered, length of 2)
 
 ``` r
 
+
 # Simple time window
 validate_time_window(c(-1, 2))
 #> [[1]]

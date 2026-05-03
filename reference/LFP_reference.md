@@ -374,6 +374,7 @@ The objects of this class are cloneable with this method.
 ## Examples
 
 ``` r
+
 # Download subject demo/DemoSubject
 if( has_rave_subject("demo/DemoSubject") ) {
 

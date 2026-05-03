@@ -117,6 +117,7 @@ electrodes (e.g. in some mini-electrodes), remove `'Electrode'` from the
 ## Examples
 
 ``` r
+
 if( has_rave_subject("demo/DemoSubject") ) {
 
 # The following code need to download additional demo data

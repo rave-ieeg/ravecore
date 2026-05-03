@@ -109,6 +109,7 @@ folder, with transformed files aligned to 'DICOM' stored.
 ## Examples
 
 ``` r
+
 # Please check out https://rave.wiki to configure Python for RAVE
 # or run ravemanager::configure_python()
 if (FALSE) { # \dontrun{

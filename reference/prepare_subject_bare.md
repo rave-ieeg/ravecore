@@ -67,6 +67,7 @@ instance
 ## Examples
 
 ``` r
+
 if ( has_rave_subject("demo/DemoSubject") ) {
 
 

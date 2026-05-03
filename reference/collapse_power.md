@@ -83,6 +83,7 @@ a list of collapsed (mean) results
 
 ``` r
 
+
 # Generate a 4-mode tensor array
 x <- filearray::filearray_create(
   tempfile(), dimension = c(16, 100, 20, 5),

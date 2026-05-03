@@ -95,6 +95,7 @@ of the followings:
 ## Examples
 
 ``` r
+
 # Download subject demo/DemoSubject
 if( has_rave_subject("demo/DemoSubject") ) {
 

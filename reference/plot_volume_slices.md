@@ -97,6 +97,7 @@ plotted directly.
 ``` r
 
 
+
 # toy-example:
 
 shape <- c(10, 10, 10)

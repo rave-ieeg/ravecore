@@ -47,6 +47,7 @@ instance
 ## Examples
 
 ``` r
+
 subject <- new_rave_subject(project_name = "demo@bids:ds04001",
                             subject_code = "DemoSubject",
                             strict = FALSE)

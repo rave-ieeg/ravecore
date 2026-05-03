@@ -41,6 +41,7 @@ The data folder name on the local disk.
 ## Examples
 
 ``` r
+
 if (FALSE) { # \dontrun{
 
 # Download Hermes D, Miller KJ, Wandell BA, Winawer J (2015) dataset

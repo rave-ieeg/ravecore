@@ -281,6 +281,7 @@ The objects of this class are cloneable with this method.
 ## Examples
 
 ``` r
+
 # Please download DemoSubject ~700MB from
 # https://github.com/beauchamplab/rave/releases/tag/v0.1.9-beta
 

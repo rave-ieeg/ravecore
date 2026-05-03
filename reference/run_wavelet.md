@@ -75,6 +75,7 @@ bi-polar reference can be carried over to the complex coefficients).
 ## Examples
 
 ``` r
+
 # Check https://rave.wiki for additional pipeline installation
 
 if (FALSE) { # \dontrun{

@@ -52,6 +52,7 @@ The corresponding metadata
 
 ``` r
 
+
 if(has_rave_subject("demo/DemoSubject")) {
   subject <- as_rave_subject("demo/DemoSubject", strict = FALSE)
 

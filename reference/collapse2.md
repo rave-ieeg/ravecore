@@ -51,6 +51,7 @@ A collapsed array (or a vector or matrix), depending on `keep`
 ## Examples
 
 ``` r
+
 x <- array(1:16, rep(2, 4))
 
 collapse2(x, c(3, 2))
