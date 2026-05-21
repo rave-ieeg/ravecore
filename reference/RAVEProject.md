@@ -4,14 +4,6 @@ See
 [`as_rave_project`](http://rave.wiki/ravecore/reference/as_rave_project.md)
 for creating 'RAVE' project class
 
-## Value
-
-character vector
-
-true or false whether subject is in the project
-
-A data table of pipeline time-stamps and directories
-
 ## Super class
 
 [`ravepipeline::RAVESerializable`](http://dipterix.org/ravepipeline/reference/RAVESerializable.md)
@@ -51,7 +43,7 @@ A data table of pipeline time-stamps and directories
 
 - [`RAVEProject$format()`](#method-RAVEProject-format)
 
-- [`RAVEProject$new()`](#method-RAVEProject-new)
+- [`RAVEProject$new()`](#method-RAVEProject-initialize)
 
 - [`RAVEProject$subjects()`](#method-RAVEProject-subjects)
 
@@ -69,7 +61,7 @@ Inherited methods
 
 ------------------------------------------------------------------------
 
-### Method `@marshal()`
+### `RAVEProject$@marshal()`
 
 Internal method
 
@@ -85,7 +77,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method `@unmarshal()`
+### `RAVEProject$@unmarshal()`
 
 Internal method
 
@@ -101,7 +93,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method [`print()`](https://rdrr.io/r/base/print.html)
+### `RAVEProject$print()`
 
 override print method
 
@@ -117,7 +109,7 @@ override print method
 
 ------------------------------------------------------------------------
 
-### Method [`format()`](https://rdrr.io/r/base/format.html)
+### `RAVEProject$format()`
 
 override format method
 
@@ -133,7 +125,7 @@ override format method
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `RAVEProject$new()`
 
 constructor
 
@@ -158,7 +150,7 @@ constructor
 
 ------------------------------------------------------------------------
 
-### Method `subjects()`
+### `RAVEProject$subjects()`
 
 get all imported subjects within project
 
@@ -166,9 +158,13 @@ get all imported subjects within project
 
     RAVEProject$subjects()
 
+#### Returns
+
+character vector
+
 ------------------------------------------------------------------------
 
-### Method `has_subject()`
+### `RAVEProject$has_subject()`
 
 whether a specific subject exists in this project
 
@@ -182,9 +178,13 @@ whether a specific subject exists in this project
 
   character, subject name
 
+#### Returns
+
+true or false whether subject is in the project
+
 ------------------------------------------------------------------------
 
-### Method `group_path()`
+### `RAVEProject$group_path()`
 
 get group data path for 'RAVE' module
 
@@ -205,7 +205,7 @@ get group data path for 'RAVE' module
 
 ------------------------------------------------------------------------
 
-### Method `subject_pipelines()`
+### `RAVEProject$subject_pipelines()`
 
 list saved pipelines
 
@@ -237,9 +237,13 @@ list saved pipelines
   whether to list all pipelines; default is false; pipelines with the
   same label but older time-stamps will be hidden
 
+#### Returns
+
+A data table of pipeline time-stamps and directories
+
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `RAVEProject$clone()`
 
 The objects of this class are cloneable with this method.
 

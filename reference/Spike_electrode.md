@@ -2,19 +2,11 @@
 
 Class definition for micro-wire spike channels
 
-Class definition for micro-wire spike channels
-
-## Value
-
-If `simplify` is enabled, and only one block is loaded, then the result
-will be a vector (`type="voltage"`) or a matrix (others), otherwise the
-result will be a named list where the names are the blocks.
-
 ## Super classes
 
 [`ravepipeline::RAVESerializable`](http://dipterix.org/ravepipeline/reference/RAVESerializable.md)
 -\>
-[`ravecore::RAVEAbstarctElectrode`](http://rave.wiki/ravecore/reference/RAVEAbstarctElectrode.md)
+[`RAVEAbstarctElectrode`](http://rave.wiki/ravecore/reference/RAVEAbstarctElectrode.md)
 -\> `Spike_electrode`
 
 ## Active bindings
@@ -57,7 +49,7 @@ result will be a named list where the names are the blocks.
 
 - [`Spike_electrode$set_reference()`](#method-Spike_electrode-set_reference)
 
-- [`Spike_electrode$new()`](#method-Spike_electrode-new)
+- [`Spike_electrode$new()`](#method-Spike_electrode-initialize)
 
 - [`Spike_electrode$.load_noref_voltage()`](#method-Spike_electrode-.load_noref_voltage)
 
@@ -80,13 +72,13 @@ result will be a named list where the names are the blocks.
 Inherited methods
 
 - [`ravepipeline::RAVESerializable$@compare()`](http://dipterix.org/ravepipeline/reference/RAVESerializable.html#method-@compare)
-- [`ravecore::RAVEAbstarctElectrode$load_blocks()`](http://rave.wiki/ravecore/reference/RAVEAbstarctElectrode.html#method-load_blocks)
-- [`ravecore::RAVEAbstarctElectrode$load_data()`](http://rave.wiki/ravecore/reference/RAVEAbstarctElectrode.html#method-load_data)
-- [`ravecore::RAVEAbstarctElectrode$set_epoch()`](http://rave.wiki/ravecore/reference/RAVEAbstarctElectrode.html#method-set_epoch)
+- [`RAVEAbstarctElectrode$load_blocks()`](http://rave.wiki/ravecore/reference/RAVEAbstarctElectrode.html#method-load_blocks)
+- [`RAVEAbstarctElectrode$load_data()`](http://rave.wiki/ravecore/reference/RAVEAbstarctElectrode.html#method-load_data)
+- [`RAVEAbstarctElectrode$set_epoch()`](http://rave.wiki/ravecore/reference/RAVEAbstarctElectrode.html#method-set_epoch)
 
 ------------------------------------------------------------------------
 
-### Method `@marshal()`
+### `Spike_electrode$@marshal()`
 
 Internal method
 
@@ -102,7 +94,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method `@unmarshal()`
+### `Spike_electrode$@unmarshal()`
 
 Internal method
 
@@ -118,7 +110,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method [`print()`](https://rdrr.io/r/base/print.html)
+### `Spike_electrode$print()`
 
 print electrode summary
 
@@ -128,7 +120,7 @@ print electrode summary
 
 ------------------------------------------------------------------------
 
-### Method `set_reference()`
+### `Spike_electrode$set_reference()`
 
 set reference for current electrode
 
@@ -144,7 +136,7 @@ set reference for current electrode
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `Spike_electrode$new()`
 
 constructor
 
@@ -161,7 +153,7 @@ constructor
 
 ------------------------------------------------------------------------
 
-### Method `.load_noref_voltage()`
+### `Spike_electrode$.load_noref_voltage()`
 
 load non-referenced voltage (internally used)
 
@@ -181,7 +173,7 @@ load non-referenced voltage (internally used)
 
 ------------------------------------------------------------------------
 
-### Method `.load_raw_voltage()`
+### `Spike_electrode$.load_raw_voltage()`
 
 load raw voltage (no process)
 
@@ -197,7 +189,7 @@ load raw voltage (no process)
 
 ------------------------------------------------------------------------
 
-### Method `load_data_with_epochs()`
+### `Spike_electrode$load_data_with_epochs()`
 
 method to load electrode data
 
@@ -219,7 +211,7 @@ method to load electrode data
 
 ------------------------------------------------------------------------
 
-### Method `load_dimnames_with_epochs()`
+### `Spike_electrode$load_dimnames_with_epochs()`
 
 get expected dimension names
 
@@ -235,7 +227,7 @@ get expected dimension names
 
 ------------------------------------------------------------------------
 
-### Method `load_data_with_blocks()`
+### `Spike_electrode$load_data_with_blocks()`
 
 load electrode block-wise data (with no reference), useful when epoch is
 absent
@@ -267,9 +259,15 @@ absent
 
   whether to simplify the result
 
+#### Returns
+
+If `simplify` is enabled, and only one block is loaded, then the result
+will be a vector (`type="voltage"`) or a matrix (others), otherwise the
+result will be a named list where the names are the blocks.
+
 ------------------------------------------------------------------------
 
-### Method `load_dim_with_blocks()`
+### `Spike_electrode$load_dim_with_blocks()`
 
 get expected dimension information for block-based loader
 
@@ -288,7 +286,7 @@ get expected dimension information for block-based loader
 
 ------------------------------------------------------------------------
 
-### Method `clear_cache()`
+### `Spike_electrode$clear_cache()`
 
 method to clear cache on hard drive
 
@@ -304,7 +302,7 @@ method to clear cache on hard drive
 
 ------------------------------------------------------------------------
 
-### Method `clear_memory()`
+### `Spike_electrode$clear_memory()`
 
 method to clear memory
 
@@ -320,7 +318,7 @@ method to clear memory
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `Spike_electrode$clone()`
 
 The objects of this class are cloneable with this method.
 

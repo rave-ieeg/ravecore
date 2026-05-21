@@ -35,6 +35,9 @@ Useful links:
 
 Authors:
 
+- Zhengjia Wang <dipterix.wang@gmail.com>
+  ([ORCID](https://orcid.org/0000-0001-5629-1116))
+
 - Xiang Zhang <xiang.zhang@pennmedicine.upenn.edu>
 
 - John Magnotti <john.magnotti@pennmedicine.upenn.edu>

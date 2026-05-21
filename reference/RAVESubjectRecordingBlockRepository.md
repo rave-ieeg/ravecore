@@ -6,12 +6,6 @@ this repository requires specifying block information. please use
 [`prepare_subject_with_blocks`](http://rave.wiki/ravecore/reference/prepare_subject_with_blocks.md)
 to instantiate this repository.
 
-## Value
-
-The root directory where the files are stored.
-
-A named map, typically with data arrays, shape/dimension information
-
 ## See also
 
 [`prepare_subject_with_blocks`](http://rave.wiki/ravecore/reference/prepare_subject_with_blocks.md)
@@ -19,8 +13,7 @@ A named map, typically with data arrays, shape/dimension information
 ## Super classes
 
 [`ravepipeline::RAVESerializable`](http://dipterix.org/ravepipeline/reference/RAVESerializable.md)
--\> `ravecore::RAVESubjectRepository` -\>
-`RAVESubjectRecordingBlockRepository`
+-\> `RAVESubjectRepository` -\> `RAVESubjectRecordingBlockRepository`
 
 ## Active bindings
 
@@ -54,7 +47,7 @@ A named map, typically with data arrays, shape/dimension information
 
 - [`RAVESubjectRecordingBlockRepository$@unmarshal()`](#method-RAVESubjectRecordingBlockRepository-@unmarshal)
 
-- [`RAVESubjectRecordingBlockRepository$new()`](#method-RAVESubjectRecordingBlockRepository-new)
+- [`RAVESubjectRecordingBlockRepository$new()`](#method-RAVESubjectRecordingBlockRepository-initialize)
 
 - [`RAVESubjectRecordingBlockRepository$export_matlab()`](#method-RAVESubjectRecordingBlockRepository-export_matlab)
 
@@ -65,12 +58,12 @@ A named map, typically with data arrays, shape/dimension information
 Inherited methods
 
 - [`ravepipeline::RAVESerializable$@compare()`](http://dipterix.org/ravepipeline/reference/RAVESerializable.html#method-@compare)
-- [`ravecore::RAVESubjectRepository$@get_container()`](http://rave.wiki/ravecore/reference/RAVESubjectRepository.html#method-@get_container)
-- [`ravecore::RAVESubjectRepository$print()`](http://rave.wiki/ravecore/reference/RAVESubjectRepository.html#method-print)
+- `RAVESubjectRepository$@get_container()`
+- `RAVESubjectRepository$print()`
 
 ------------------------------------------------------------------------
 
-### Method `@marshal()`
+### `RAVESubjectRecordingBlockRepository$@marshal()`
 
 Internal method
 
@@ -86,7 +79,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method `@unmarshal()`
+### `RAVESubjectRecordingBlockRepository$@unmarshal()`
 
 Internal method
 
@@ -102,7 +95,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `RAVESubjectRecordingBlockRepository$new()`
 
 constructor
 
@@ -168,7 +161,7 @@ constructor
 
 ------------------------------------------------------------------------
 
-### Method `export_matlab()`
+### `RAVESubjectRecordingBlockRepository$export_matlab()`
 
 Export the repository to 'Matlab' for future analysis
 
@@ -186,9 +179,13 @@ Export the repository to 'Matlab' for future analysis
 
   print progresses
 
+#### Returns
+
+The root directory where the files are stored.
+
 ------------------------------------------------------------------------
 
-### Method `get_container()`
+### `RAVESubjectRecordingBlockRepository$get_container()`
 
 get container where loaded data are stored
 
@@ -202,9 +199,13 @@ get container where loaded data are stored
 
   passed to `mount_data`
 
+#### Returns
+
+A named map, typically with data arrays, shape/dimension information
+
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `RAVESubjectRecordingBlockRepository$clone()`
 
 The objects of this class are cloneable with this method.
 

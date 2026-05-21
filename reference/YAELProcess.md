@@ -5,36 +5,6 @@ normalization from native brain to common templates, and map template
 atlas or regions of interest back to native brain. See examples at
 [`as_yael_process`](http://rave.wiki/ravecore/reference/as_yael_process.md)
 
-## Value
-
-whether the image has been set (or replaced)
-
-Absolute path if the image
-
-'RAVE' subject instance
-
-Nothing
-
-A list of moving and fixing images, with rigid transformations from
-different formats.
-
-See method `get_template_mapping`
-
-A list of input, output images, with forward and inverse transform files
-(usually two `'Affine'` with one displacement field)
-
-transformed image in `'ANTs'` format
-
-transformed image in `'ANTs'` format
-
-Paths to the atlas (volume) files
-
-A matrix of 3 columns, each row is a transformed points ( invalid rows
-will be filled with `NA`)
-
-A matrix of 3 columns, each row is a transformed points ( invalid rows
-will be filled with `NA`)
-
 ## Super class
 
 [`ravepipeline::RAVESerializable`](http://dipterix.org/ravepipeline/reference/RAVESerializable.md)
@@ -62,7 +32,7 @@ will be filled with `NA`)
 
 - [`YAELProcess$@unmarshal()`](#method-YAELProcess-@unmarshal)
 
-- [`YAELProcess$new()`](#method-YAELProcess-new)
+- [`YAELProcess$new()`](#method-YAELProcess-initialize)
 
 - [`YAELProcess$set_input_image()`](#method-YAELProcess-set_input_image)
 
@@ -100,7 +70,7 @@ Inherited methods
 
 ------------------------------------------------------------------------
 
-### Method `@marshal()`
+### `YAELProcess$@marshal()`
 
 Internal method
 
@@ -116,7 +86,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method `@unmarshal()`
+### `YAELProcess$@unmarshal()`
 
 Internal method
 
@@ -132,7 +102,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `YAELProcess$new()`
 
 Constructor to instantiate the class
 
@@ -167,7 +137,7 @@ Constructor to instantiate the class
 
 ------------------------------------------------------------------------
 
-### Method `set_input_image()`
+### `YAELProcess$set_input_image()`
 
 Set the raw input for different image types
 
@@ -201,9 +171,13 @@ Set the raw input for different image types
   be reported; choices are `'warning'` (default), `'error'` (throw error
   and abort), or `'ignore'`.
 
+#### Returns
+
+whether the image has been set (or replaced)
+
 ------------------------------------------------------------------------
 
-### Method `get_input_image()`
+### `YAELProcess$get_input_image()`
 
 Get image path
 
@@ -217,9 +191,13 @@ Get image path
 
   type of the image
 
+#### Returns
+
+Absolute path if the image
+
 ------------------------------------------------------------------------
 
-### Method `get_subject()`
+### `YAELProcess$get_subject()`
 
 Get 'RAVE' subject instance
 
@@ -238,9 +216,13 @@ Get 'RAVE' subject instance
   passed to
   [`as_rave_subject`](http://rave.wiki/ravecore/reference/new_rave_subject.md)
 
+#### Returns
+
+'RAVE' subject instance
+
 ------------------------------------------------------------------------
 
-### Method `register_to_T1w()`
+### `YAELProcess$register_to_T1w()`
 
 Register other images to `'T1'` weighted `'MRI'`
 
@@ -265,9 +247,13 @@ Register other images to `'T1'` weighted `'MRI'`
 
   whether to print out the process; default is true
 
+#### Returns
+
+Nothing
+
 ------------------------------------------------------------------------
 
-### Method `get_native_mapping()`
+### `YAELProcess$get_native_mapping()`
 
 Get the mapping configurations used by `register_to_T1w`
 
@@ -285,9 +271,14 @@ Get the mapping configurations used by `register_to_T1w`
 
   whether to use relative path (to the `work_path` field)
 
+#### Returns
+
+A list of moving and fixing images, with rigid transformations from
+different formats.
+
 ------------------------------------------------------------------------
 
-### Method `map_to_template()`
+### `YAELProcess$map_to_template()`
 
 Normalize native brain to `'MNI152'` template
 
@@ -335,9 +326,13 @@ Normalize native brain to `'MNI152'` template
 
   additional tuning parameters passed to internal 'Python' code.
 
+#### Returns
+
+See method `get_template_mapping`
+
 ------------------------------------------------------------------------
 
-### Method `get_template_mapping()`
+### `YAELProcess$get_template_mapping()`
 
 Get configurations used for normalization
 
@@ -364,9 +359,14 @@ Get configurations used for normalization
   whether the paths should be relative or absolute; default is false
   (absolute paths)
 
+#### Returns
+
+A list of input, output images, with forward and inverse transform files
+(usually two `'Affine'` with one displacement field)
+
 ------------------------------------------------------------------------
 
-### Method `transform_image_from_template()`
+### `YAELProcess$transform_image_from_template()`
 
 Apply transform from images (usually an atlas or 'ROI') on template to
 native space
@@ -408,9 +408,13 @@ native space
 
   whether the print out the progress
 
+#### Returns
+
+transformed image in `'ANTs'` format
+
 ------------------------------------------------------------------------
 
-### Method `transform_image_to_template()`
+### `YAELProcess$transform_image_to_template()`
 
 Apply transform to images (usually an atlas or 'ROI') from native space
 to template
@@ -451,9 +455,13 @@ to template
 
   whether the print out the progress
 
+#### Returns
+
+transformed image in `'ANTs'` format
+
 ------------------------------------------------------------------------
 
-### Method `generate_atlas_from_template()`
+### `YAELProcess$generate_atlas_from_template()`
 
 Generate atlas maps from template and morph to native brain
 
@@ -496,9 +504,13 @@ Generate atlas maps from template and morph to native brain
   passed to
   [`volume_to_surf`](https://dipterix.org/threeBrain/reference/volume_to_surf.html)
 
+#### Returns
+
+Paths to the atlas (volume) files
+
 ------------------------------------------------------------------------
 
-### Method `transform_points_to_template()`
+### `YAELProcess$transform_points_to_template()`
 
 Transform points from native images to template
 
@@ -530,9 +542,14 @@ Transform points from native images to template
 
   whether the print out the progress
 
+#### Returns
+
+A matrix of 3 columns, each row is a transformed points ( invalid rows
+will be filled with `NA`)
+
 ------------------------------------------------------------------------
 
-### Method `transform_points_from_template()`
+### `YAELProcess$transform_points_from_template()`
 
 Transform points from template images to native
 
@@ -565,9 +582,14 @@ Transform points from template images to native
 
   whether the print out the progress
 
+#### Returns
+
+A matrix of 3 columns, each row is a transformed points ( invalid rows
+will be filled with `NA`)
+
 ------------------------------------------------------------------------
 
-### Method `construct_ants_folder_from_template()`
+### `YAELProcess$construct_ants_folder_from_template()`
 
 Create a reconstruction folder (as an alternative option) that is
 generated from template brain to facilitate the three-dimensional
@@ -597,7 +619,7 @@ this method (or the program will fail)
 
 ------------------------------------------------------------------------
 
-### Method `get_brain()`
+### `YAELProcess$get_brain()`
 
 Get three-dimensional brain model
 
@@ -639,7 +661,7 @@ Get three-dimensional brain model
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `YAELProcess$clone()`
 
 The objects of this class are cloneable with this method.
 

@@ -13,8 +13,8 @@ to instantiate this repository.
 ## Super classes
 
 [`ravepipeline::RAVESerializable`](http://dipterix.org/ravepipeline/reference/RAVESerializable.md)
--\> `ravecore::RAVESubjectRepository` -\>
-[`ravecore::RAVESubjectRecordingBlockRepository`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockRepository.md)
+-\> `RAVESubjectRepository` -\>
+[`RAVESubjectRecordingBlockRepository`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockRepository.md)
 -\> `RAVESubjectRecordingBlockRawVoltageRepository`
 
 ## Active bindings
@@ -53,7 +53,7 @@ to instantiate this repository.
 
 - [`RAVESubjectRecordingBlockRawVoltageRepository$@unmarshal()`](#method-RAVESubjectRecordingBlockRawVoltageRepository-@unmarshal)
 
-- [`RAVESubjectRecordingBlockRawVoltageRepository$new()`](#method-RAVESubjectRecordingBlockRawVoltageRepository-new)
+- [`RAVESubjectRecordingBlockRawVoltageRepository$new()`](#method-RAVESubjectRecordingBlockRawVoltageRepository-initialize)
 
 - [`RAVESubjectRecordingBlockRawVoltageRepository$mount_data()`](#method-RAVESubjectRecordingBlockRawVoltageRepository-mount_data)
 
@@ -62,14 +62,14 @@ to instantiate this repository.
 Inherited methods
 
 - [`ravepipeline::RAVESerializable$@compare()`](http://dipterix.org/ravepipeline/reference/RAVESerializable.html#method-@compare)
-- [`ravecore::RAVESubjectRepository$@get_container()`](http://rave.wiki/ravecore/reference/RAVESubjectRepository.html#method-@get_container)
-- [`ravecore::RAVESubjectRepository$print()`](http://rave.wiki/ravecore/reference/RAVESubjectRepository.html#method-print)
-- [`ravecore::RAVESubjectRecordingBlockRepository$export_matlab()`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockRepository.html#method-export_matlab)
-- [`ravecore::RAVESubjectRecordingBlockRepository$get_container()`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockRepository.html#method-get_container)
+- `RAVESubjectRepository$@get_container()`
+- `RAVESubjectRepository$print()`
+- [`RAVESubjectRecordingBlockRepository$export_matlab()`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockRepository.html#method-export_matlab)
+- [`RAVESubjectRecordingBlockRepository$get_container()`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockRepository.html#method-get_container)
 
 ------------------------------------------------------------------------
 
-### Method `@marshal()`
+### `RAVESubjectRecordingBlockRawVoltageRepository$@marshal()`
 
 Internal method
 
@@ -85,7 +85,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method `@unmarshal()`
+### `RAVESubjectRecordingBlockRawVoltageRepository$@unmarshal()`
 
 Internal method
 
@@ -101,7 +101,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `RAVESubjectRecordingBlockRawVoltageRepository$new()`
 
 constructor
 
@@ -175,7 +175,7 @@ constructor
 
 ------------------------------------------------------------------------
 
-### Method `mount_data()`
+### `RAVESubjectRecordingBlockRawVoltageRepository$mount_data()`
 
 function to mount data
 
@@ -203,7 +203,7 @@ function to mount data
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `RAVESubjectRecordingBlockRawVoltageRepository$clone()`
 
 The objects of this class are cloneable with this method.
 

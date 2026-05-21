@@ -2,8 +2,6 @@
 
 'RAVE' class for loading entire block of time-frequency coefficients
 
-'RAVE' class for loading entire block of time-frequency coefficients
-
 ## See also
 
 [`prepare_subject_with_blocks`](http://rave.wiki/ravecore/reference/prepare_subject_with_blocks.md)
@@ -11,8 +9,8 @@
 ## Super classes
 
 [`ravepipeline::RAVESerializable`](http://dipterix.org/ravepipeline/reference/RAVESerializable.md)
--\> `ravecore::RAVESubjectRepository` -\>
-[`ravecore::RAVESubjectRecordingBlockRepository`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockRepository.md)
+-\> `RAVESubjectRepository` -\>
+[`RAVESubjectRecordingBlockRepository`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockRepository.md)
 -\> `RAVESubjectRecordingBlockTimeFreqBaseRepository`
 
 ## Active bindings
@@ -35,7 +33,7 @@
 
 - [`RAVESubjectRecordingBlockTimeFreqBaseRepository$@unmarshal()`](#method-RAVESubjectRecordingBlockTimeFreqBaseRepository-@unmarshal)
 
-- [`RAVESubjectRecordingBlockTimeFreqBaseRepository$new()`](#method-RAVESubjectRecordingBlockTimeFreqBaseRepository-new)
+- [`RAVESubjectRecordingBlockTimeFreqBaseRepository$new()`](#method-RAVESubjectRecordingBlockTimeFreqBaseRepository-initialize)
 
 - [`RAVESubjectRecordingBlockTimeFreqBaseRepository$mount_data()`](#method-RAVESubjectRecordingBlockTimeFreqBaseRepository-mount_data)
 
@@ -44,14 +42,14 @@
 Inherited methods
 
 - [`ravepipeline::RAVESerializable$@compare()`](http://dipterix.org/ravepipeline/reference/RAVESerializable.html#method-@compare)
-- [`ravecore::RAVESubjectRepository$@get_container()`](http://rave.wiki/ravecore/reference/RAVESubjectRepository.html#method-@get_container)
-- [`ravecore::RAVESubjectRepository$print()`](http://rave.wiki/ravecore/reference/RAVESubjectRepository.html#method-print)
-- [`ravecore::RAVESubjectRecordingBlockRepository$export_matlab()`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockRepository.html#method-export_matlab)
-- [`ravecore::RAVESubjectRecordingBlockRepository$get_container()`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockRepository.html#method-get_container)
+- `RAVESubjectRepository$@get_container()`
+- `RAVESubjectRepository$print()`
+- [`RAVESubjectRecordingBlockRepository$export_matlab()`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockRepository.html#method-export_matlab)
+- [`RAVESubjectRecordingBlockRepository$get_container()`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockRepository.html#method-get_container)
 
 ------------------------------------------------------------------------
 
-### Method `@marshal()`
+### `RAVESubjectRecordingBlockTimeFreqBaseRepository$@marshal()`
 
 Internal method
 
@@ -67,7 +65,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method `@unmarshal()`
+### `RAVESubjectRecordingBlockTimeFreqBaseRepository$@unmarshal()`
 
 Internal method
 
@@ -83,7 +81,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `RAVESubjectRecordingBlockTimeFreqBaseRepository$new()`
 
 constructor
 
@@ -149,7 +147,7 @@ constructor
 
 ------------------------------------------------------------------------
 
-### Method `mount_data()`
+### `RAVESubjectRecordingBlockTimeFreqBaseRepository$mount_data()`
 
 function to mount data
 
@@ -177,7 +175,7 @@ function to mount data
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `RAVESubjectRecordingBlockTimeFreqBaseRepository$clone()`
 
 The objects of this class are cloneable with this method.
 

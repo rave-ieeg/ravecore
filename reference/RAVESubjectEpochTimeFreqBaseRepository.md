@@ -7,8 +7,8 @@ time-frequency coefficients.
 ## Super classes
 
 [`ravepipeline::RAVESerializable`](http://dipterix.org/ravepipeline/reference/RAVESerializable.md)
--\> `ravecore::RAVESubjectRepository` -\>
-[`ravecore::RAVESubjectEpochRepository`](http://rave.wiki/ravecore/reference/RAVESubjectEpochRepository.md)
+-\> `RAVESubjectRepository` -\>
+[`RAVESubjectEpochRepository`](http://rave.wiki/ravecore/reference/RAVESubjectEpochRepository.md)
 -\> `RAVESubjectEpochTimeFreqBaseRepository`
 
 ## Active bindings
@@ -45,7 +45,7 @@ time-frequency coefficients.
 
 - [`RAVESubjectEpochTimeFreqBaseRepository$@unmarshal()`](#method-RAVESubjectEpochTimeFreqBaseRepository-@unmarshal)
 
-- [`RAVESubjectEpochTimeFreqBaseRepository$new()`](#method-RAVESubjectEpochTimeFreqBaseRepository-new)
+- [`RAVESubjectEpochTimeFreqBaseRepository$new()`](#method-RAVESubjectEpochTimeFreqBaseRepository-initialize)
 
 - [`RAVESubjectEpochTimeFreqBaseRepository$mount_data()`](#method-RAVESubjectEpochTimeFreqBaseRepository-mount_data)
 
@@ -54,15 +54,15 @@ time-frequency coefficients.
 Inherited methods
 
 - [`ravepipeline::RAVESerializable$@compare()`](http://dipterix.org/ravepipeline/reference/RAVESerializable.html#method-@compare)
-- [`ravecore::RAVESubjectRepository$@get_container()`](http://rave.wiki/ravecore/reference/RAVESubjectRepository.html#method-@get_container)
-- [`ravecore::RAVESubjectRepository$print()`](http://rave.wiki/ravecore/reference/RAVESubjectRepository.html#method-print)
-- [`ravecore::RAVESubjectEpochRepository$export_matlab()`](http://rave.wiki/ravecore/reference/RAVESubjectEpochRepository.html#method-export_matlab)
-- [`ravecore::RAVESubjectEpochRepository$get_container()`](http://rave.wiki/ravecore/reference/RAVESubjectEpochRepository.html#method-get_container)
-- [`ravecore::RAVESubjectEpochRepository$set_epoch()`](http://rave.wiki/ravecore/reference/RAVESubjectEpochRepository.html#method-set_epoch)
+- `RAVESubjectRepository$@get_container()`
+- `RAVESubjectRepository$print()`
+- [`RAVESubjectEpochRepository$export_matlab()`](http://rave.wiki/ravecore/reference/RAVESubjectEpochRepository.html#method-export_matlab)
+- [`RAVESubjectEpochRepository$get_container()`](http://rave.wiki/ravecore/reference/RAVESubjectEpochRepository.html#method-get_container)
+- [`RAVESubjectEpochRepository$set_epoch()`](http://rave.wiki/ravecore/reference/RAVESubjectEpochRepository.html#method-set_epoch)
 
 ------------------------------------------------------------------------
 
-### Method `@marshal()`
+### `RAVESubjectEpochTimeFreqBaseRepository$@marshal()`
 
 Internal method
 
@@ -78,7 +78,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method `@unmarshal()`
+### `RAVESubjectEpochTimeFreqBaseRepository$@unmarshal()`
 
 Internal method
 
@@ -94,7 +94,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `RAVESubjectEpochTimeFreqBaseRepository$new()`
 
 constructor
 
@@ -179,7 +179,7 @@ constructor
 
 ------------------------------------------------------------------------
 
-### Method `mount_data()`
+### `RAVESubjectEpochTimeFreqBaseRepository$mount_data()`
 
 function to mount processed and referenced spectrogram
 
@@ -208,7 +208,7 @@ function to mount processed and referenced spectrogram
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `RAVESubjectEpochTimeFreqBaseRepository$clone()`
 
 The objects of this class are cloneable with this method.
 

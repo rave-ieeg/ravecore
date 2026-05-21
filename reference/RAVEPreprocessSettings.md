@@ -2,15 +2,6 @@
 
 `R6` class definition
 
-## Value
-
-list of electrode type, number, etc.
-
-`NULL` when no channel is composed. When `flat` is `TRUE`, a data frame
-of weights with the columns composing electrode channel numbers,
-composed channel number, and corresponding weights; if `flat` is
-`FALSE`, then a weight matrix;
-
 ## Super class
 
 [`ravepipeline::RAVESerializable`](http://dipterix.org/ravepipeline/reference/RAVESerializable.md)
@@ -149,7 +140,7 @@ composed channel number, and corresponding weights; if `flat` is
 
 - [`RAVEPreprocessSettings$@unmarshal()`](#method-RAVEPreprocessSettings-@unmarshal)
 
-- [`RAVEPreprocessSettings$new()`](#method-RAVEPreprocessSettings-new)
+- [`RAVEPreprocessSettings$new()`](#method-RAVEPreprocessSettings-initialize)
 
 - [`RAVEPreprocessSettings$valid()`](#method-RAVEPreprocessSettings-valid)
 
@@ -179,7 +170,7 @@ Inherited methods
 
 ------------------------------------------------------------------------
 
-### Method `@marshal()`
+### `RAVEPreprocessSettings$@marshal()`
 
 Internal method
 
@@ -195,7 +186,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method `@unmarshal()`
+### `RAVEPreprocessSettings$@unmarshal()`
 
 Internal method
 
@@ -211,7 +202,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `RAVEPreprocessSettings$new()`
 
 constructor
 
@@ -233,7 +224,7 @@ constructor
 
 ------------------------------------------------------------------------
 
-### Method `valid()`
+### `RAVEPreprocessSettings$valid()`
 
 whether configuration is valid or not
 
@@ -243,7 +234,7 @@ whether configuration is valid or not
 
 ------------------------------------------------------------------------
 
-### Method `has_raw()`
+### `RAVEPreprocessSettings$has_raw()`
 
 whether raw data folder exists
 
@@ -253,7 +244,7 @@ whether raw data folder exists
 
 ------------------------------------------------------------------------
 
-### Method `set_blocks()`
+### `RAVEPreprocessSettings$set_blocks()`
 
 set blocks
 
@@ -274,7 +265,7 @@ set blocks
 
 ------------------------------------------------------------------------
 
-### Method `get_block_paths()`
+### `RAVEPreprocessSettings$get_block_paths()`
 
 get block-related files
 
@@ -304,7 +295,7 @@ get block-related files
 
 ------------------------------------------------------------------------
 
-### Method `set_electrodes()`
+### `RAVEPreprocessSettings$set_electrodes()`
 
 set electrodes
 
@@ -333,7 +324,7 @@ set electrodes
 
 ------------------------------------------------------------------------
 
-### Method `set_sample_rates()`
+### `RAVEPreprocessSettings$set_sample_rates()`
 
 set sample frequency
 
@@ -354,7 +345,7 @@ set sample frequency
 
 ------------------------------------------------------------------------
 
-### Method `migrate()`
+### `RAVEPreprocessSettings$migrate()`
 
 convert old format to new formats
 
@@ -370,7 +361,7 @@ convert old format to new formats
 
 ------------------------------------------------------------------------
 
-### Method `electrode_info()`
+### `RAVEPreprocessSettings$electrode_info()`
 
 get electrode information
 
@@ -384,9 +375,13 @@ get electrode information
 
   integer
 
+#### Returns
+
+list of electrode type, number, etc.
+
 ------------------------------------------------------------------------
 
-### Method [`save()`](https://rdrr.io/r/base/save.html)
+### `RAVEPreprocessSettings$save()`
 
 save settings to hard disk
 
@@ -396,7 +391,7 @@ save settings to hard disk
 
 ------------------------------------------------------------------------
 
-### Method `get_compose_weights()`
+### `RAVEPreprocessSettings$get_compose_weights()`
 
 get weights of each composed channels
 
@@ -410,9 +405,16 @@ get weights of each composed channels
 
   whether to flatten the data frame; default is true
 
+#### Returns
+
+`NULL` when no channel is composed. When `flat` is `TRUE`, a data frame
+of weights with the columns composing electrode channel numbers,
+composed channel number, and corresponding weights; if `flat` is
+`FALSE`, then a weight matrix;
+
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `RAVEPreprocessSettings$clone()`
 
 The objects of this class are cloneable with this method.
 

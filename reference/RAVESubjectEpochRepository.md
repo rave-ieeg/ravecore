@@ -6,12 +6,6 @@ this repository requires epoch information. please use
 [`prepare_subject_with_epochs`](http://rave.wiki/ravecore/reference/prepare_subject_with_epochs.md)
 to instantiate this repository.
 
-## Value
-
-The root directory where the files are stored.
-
-A named map, typically with data arrays, shape/dimension information
-
 ## See also
 
 [`prepare_subject_with_epochs`](http://rave.wiki/ravecore/reference/prepare_subject_with_epochs.md)
@@ -19,7 +13,7 @@ A named map, typically with data arrays, shape/dimension information
 ## Super classes
 
 [`ravepipeline::RAVESerializable`](http://dipterix.org/ravepipeline/reference/RAVESerializable.md)
--\> `ravecore::RAVESubjectRepository` -\> `RAVESubjectEpochRepository`
+-\> `RAVESubjectRepository` -\> `RAVESubjectEpochRepository`
 
 ## Active bindings
 
@@ -95,7 +89,7 @@ A named map, typically with data arrays, shape/dimension information
 
 - [`RAVESubjectEpochRepository$@unmarshal()`](#method-RAVESubjectEpochRepository-@unmarshal)
 
-- [`RAVESubjectEpochRepository$new()`](#method-RAVESubjectEpochRepository-new)
+- [`RAVESubjectEpochRepository$new()`](#method-RAVESubjectEpochRepository-initialize)
 
 - [`RAVESubjectEpochRepository$export_matlab()`](#method-RAVESubjectEpochRepository-export_matlab)
 
@@ -110,12 +104,12 @@ A named map, typically with data arrays, shape/dimension information
 Inherited methods
 
 - [`ravepipeline::RAVESerializable$@compare()`](http://dipterix.org/ravepipeline/reference/RAVESerializable.html#method-@compare)
-- [`ravecore::RAVESubjectRepository$@get_container()`](http://rave.wiki/ravecore/reference/RAVESubjectRepository.html#method-@get_container)
-- [`ravecore::RAVESubjectRepository$print()`](http://rave.wiki/ravecore/reference/RAVESubjectRepository.html#method-print)
+- `RAVESubjectRepository$@get_container()`
+- `RAVESubjectRepository$print()`
 
 ------------------------------------------------------------------------
 
-### Method `@marshal()`
+### `RAVESubjectEpochRepository$@marshal()`
 
 Internal method
 
@@ -131,7 +125,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method `@unmarshal()`
+### `RAVESubjectEpochRepository$@unmarshal()`
 
 Internal method
 
@@ -147,7 +141,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `RAVESubjectEpochRepository$new()`
 
 constructor
 
@@ -226,7 +220,7 @@ constructor
 
 ------------------------------------------------------------------------
 
-### Method `export_matlab()`
+### `RAVESubjectEpochRepository$export_matlab()`
 
 Export the repository to 'Matlab' for future analysis
 
@@ -244,9 +238,13 @@ Export the repository to 'Matlab' for future analysis
 
   print progresses
 
+#### Returns
+
+The root directory where the files are stored.
+
 ------------------------------------------------------------------------
 
-### Method `set_epoch()`
+### `RAVESubjectEpochRepository$set_epoch()`
 
 change trial epoch profiles
 
@@ -266,7 +264,7 @@ change trial epoch profiles
 
 ------------------------------------------------------------------------
 
-### Method `mount_data()`
+### `RAVESubjectEpochRepository$mount_data()`
 
 function to mount data, not doing anything in this class, but may be
 used by child classes
@@ -291,7 +289,7 @@ used by child classes
 
 ------------------------------------------------------------------------
 
-### Method `get_container()`
+### `RAVESubjectEpochRepository$get_container()`
 
 get container where loaded data are stored
 
@@ -305,9 +303,13 @@ get container where loaded data are stored
 
   passed to `mount_data`
 
+#### Returns
+
+A named map, typically with data arrays, shape/dimension information
+
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `RAVESubjectEpochRepository$clone()`
 
 The objects of this class are cloneable with this method.
 

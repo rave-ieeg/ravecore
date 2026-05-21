@@ -9,10 +9,10 @@ Loads time-frequency coefficients (complex numbers)
 ## Super classes
 
 [`ravepipeline::RAVESerializable`](http://dipterix.org/ravepipeline/reference/RAVESerializable.md)
--\> `ravecore::RAVESubjectRepository` -\>
-[`ravecore::RAVESubjectRecordingBlockRepository`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockRepository.md)
+-\> `RAVESubjectRepository` -\>
+[`RAVESubjectRecordingBlockRepository`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockRepository.md)
 -\>
-[`ravecore::RAVESubjectRecordingBlockTimeFreqBaseRepository`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockTimeFreqBaseRepository.md)
+[`RAVESubjectRecordingBlockTimeFreqBaseRepository`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockTimeFreqBaseRepository.md)
 -\> `RAVESubjectRecordingBlockTimeFreqCoefRepository`
 
 ## Active bindings
@@ -29,22 +29,22 @@ Loads time-frequency coefficients (complex numbers)
 
 - [`RAVESubjectRecordingBlockTimeFreqCoefRepository$@unmarshal()`](#method-RAVESubjectRecordingBlockTimeFreqCoefRepository-@unmarshal)
 
-- [`RAVESubjectRecordingBlockTimeFreqCoefRepository$new()`](#method-RAVESubjectRecordingBlockTimeFreqCoefRepository-new)
+- [`RAVESubjectRecordingBlockTimeFreqCoefRepository$new()`](#method-RAVESubjectRecordingBlockTimeFreqCoefRepository-initialize)
 
 - [`RAVESubjectRecordingBlockTimeFreqCoefRepository$clone()`](#method-RAVESubjectRecordingBlockTimeFreqCoefRepository-clone)
 
 Inherited methods
 
 - [`ravepipeline::RAVESerializable$@compare()`](http://dipterix.org/ravepipeline/reference/RAVESerializable.html#method-@compare)
-- [`ravecore::RAVESubjectRepository$@get_container()`](http://rave.wiki/ravecore/reference/RAVESubjectRepository.html#method-@get_container)
-- [`ravecore::RAVESubjectRepository$print()`](http://rave.wiki/ravecore/reference/RAVESubjectRepository.html#method-print)
-- [`ravecore::RAVESubjectRecordingBlockRepository$export_matlab()`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockRepository.html#method-export_matlab)
-- [`ravecore::RAVESubjectRecordingBlockRepository$get_container()`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockRepository.html#method-get_container)
-- [`ravecore::RAVESubjectRecordingBlockTimeFreqBaseRepository$mount_data()`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockTimeFreqBaseRepository.html#method-mount_data)
+- `RAVESubjectRepository$@get_container()`
+- `RAVESubjectRepository$print()`
+- [`RAVESubjectRecordingBlockRepository$export_matlab()`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockRepository.html#method-export_matlab)
+- [`RAVESubjectRecordingBlockRepository$get_container()`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockRepository.html#method-get_container)
+- [`RAVESubjectRecordingBlockTimeFreqBaseRepository$mount_data()`](http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockTimeFreqBaseRepository.html#method-mount_data)
 
 ------------------------------------------------------------------------
 
-### Method `@marshal()`
+### `RAVESubjectRecordingBlockTimeFreqCoefRepository$@marshal()`
 
 Internal method
 
@@ -60,7 +60,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method `@unmarshal()`
+### `RAVESubjectRecordingBlockTimeFreqCoefRepository$@unmarshal()`
 
 Internal method
 
@@ -76,7 +76,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `RAVESubjectRecordingBlockTimeFreqCoefRepository$new()`
 
 constructor
 
@@ -142,7 +142,7 @@ constructor
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `RAVESubjectRecordingBlockTimeFreqCoefRepository$clone()`
 
 The objects of this class are cloneable with this method.
 

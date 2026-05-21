@@ -9,8 +9,8 @@ to create an instance.
 ## Super classes
 
 [`ravepipeline::RAVESerializable`](http://dipterix.org/ravepipeline/reference/RAVESerializable.md)
--\> `ravecore::RAVESubjectRepository` -\>
-[`ravecore::RAVESubjectEpochRepository`](http://rave.wiki/ravecore/reference/RAVESubjectEpochRepository.md)
+-\> `RAVESubjectRepository` -\>
+[`RAVESubjectEpochRepository`](http://rave.wiki/ravecore/reference/RAVESubjectEpochRepository.md)
 -\> `RAVESubjectEpochVoltageRepository`
 
 ## Active bindings
@@ -31,7 +31,7 @@ to create an instance.
 
 - [`RAVESubjectEpochVoltageRepository$@unmarshal()`](#method-RAVESubjectEpochVoltageRepository-@unmarshal)
 
-- [`RAVESubjectEpochVoltageRepository$new()`](#method-RAVESubjectEpochVoltageRepository-new)
+- [`RAVESubjectEpochVoltageRepository$new()`](#method-RAVESubjectEpochVoltageRepository-initialize)
 
 - [`RAVESubjectEpochVoltageRepository$mount_data()`](#method-RAVESubjectEpochVoltageRepository-mount_data)
 
@@ -40,15 +40,15 @@ to create an instance.
 Inherited methods
 
 - [`ravepipeline::RAVESerializable$@compare()`](http://dipterix.org/ravepipeline/reference/RAVESerializable.html#method-@compare)
-- [`ravecore::RAVESubjectRepository$@get_container()`](http://rave.wiki/ravecore/reference/RAVESubjectRepository.html#method-@get_container)
-- [`ravecore::RAVESubjectRepository$print()`](http://rave.wiki/ravecore/reference/RAVESubjectRepository.html#method-print)
-- [`ravecore::RAVESubjectEpochRepository$export_matlab()`](http://rave.wiki/ravecore/reference/RAVESubjectEpochRepository.html#method-export_matlab)
-- [`ravecore::RAVESubjectEpochRepository$get_container()`](http://rave.wiki/ravecore/reference/RAVESubjectEpochRepository.html#method-get_container)
-- [`ravecore::RAVESubjectEpochRepository$set_epoch()`](http://rave.wiki/ravecore/reference/RAVESubjectEpochRepository.html#method-set_epoch)
+- `RAVESubjectRepository$@get_container()`
+- `RAVESubjectRepository$print()`
+- [`RAVESubjectEpochRepository$export_matlab()`](http://rave.wiki/ravecore/reference/RAVESubjectEpochRepository.html#method-export_matlab)
+- [`RAVESubjectEpochRepository$get_container()`](http://rave.wiki/ravecore/reference/RAVESubjectEpochRepository.html#method-get_container)
+- [`RAVESubjectEpochRepository$set_epoch()`](http://rave.wiki/ravecore/reference/RAVESubjectEpochRepository.html#method-set_epoch)
 
 ------------------------------------------------------------------------
 
-### Method `@marshal()`
+### `RAVESubjectEpochVoltageRepository$@marshal()`
 
 Internal method
 
@@ -64,7 +64,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method `@unmarshal()`
+### `RAVESubjectEpochVoltageRepository$@unmarshal()`
 
 Internal method
 
@@ -80,7 +80,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `RAVESubjectEpochVoltageRepository$new()`
 
 constructor
 
@@ -159,7 +159,7 @@ constructor
 
 ------------------------------------------------------------------------
 
-### Method `mount_data()`
+### `RAVESubjectEpochVoltageRepository$mount_data()`
 
 function to mount referenced voltage signals
 
@@ -188,7 +188,7 @@ function to mount referenced voltage signals
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `RAVESubjectEpochVoltageRepository$clone()`
 
 The objects of this class are cloneable with this method.
 

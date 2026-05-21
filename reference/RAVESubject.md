@@ -2,45 +2,6 @@
 
 `R6` class definition
 
-## Value
-
-data frame
-
-integer vector of valid electrodes
-
-The same as `value`
-
-A named list of key-value pairs, or if one key is specified and
-`simplify=TRUE`, then only the value will be returned.
-
-A data frame with four columns: `'namespace'` for the group name of the
-entry (entries within the same namespace usually share same module),
-`'timestamp'` for when the entry was registered. `'entry_name'` is the
-name of the entry. If `include_history` is true, then multiple entries
-with the same `'entry_name'` might appear since the obsolete entries are
-included. `'entry_value'` is the value of the corresponding entry.
-
-If `as_table` is `FALSE`, then returns as
-[`RAVEEpoch`](http://rave.wiki/ravecore/reference/RAVEEpoch.md)
-instance; otherwise returns epoch table; will raise errors when file is
-missing or the epoch is invalid.
-
-If `simplify` is true, returns a vector of reference electrode names,
-otherwise returns the whole table; will raise errors when file is
-missing or the reference is invalid.
-
-If `simplify` is true, returns a vector of electrodes that are valid (or
-won't be excluded) under given reference; otherwise returns a table. If
-`subset` is true, then the table will be subset and only rows with
-electrodes to be loaded will be kept.
-
-If `simplify` is true, returns a vector of frequencies; otherwise
-returns a table.
-
-A table of pipeline registry
-
-A `PipelineTools` instance
-
 ## See also
 
 [`load_meta2`](http://rave.wiki/ravecore/reference/meta-data.md)
@@ -178,7 +139,7 @@ A `PipelineTools` instance
 
 - [`RAVESubject$print()`](#method-RAVESubject-print)
 
-- [`RAVESubject$new()`](#method-RAVESubject-new)
+- [`RAVESubject$new()`](#method-RAVESubject-initialize)
 
 - [`RAVESubject$meta_data()`](#method-RAVESubject-meta_data)
 
@@ -212,7 +173,7 @@ Inherited methods
 
 ------------------------------------------------------------------------
 
-### Method `@marshal()`
+### `RAVESubject$@marshal()`
 
 Internal method
 
@@ -228,7 +189,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method `@unmarshal()`
+### `RAVESubject$@unmarshal()`
 
 Internal method
 
@@ -244,7 +205,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method [`print()`](https://rdrr.io/r/base/print.html)
+### `RAVESubject$print()`
 
 override print method
 
@@ -260,7 +221,7 @@ override print method
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `RAVESubject$new()`
 
 constructor
 
@@ -294,7 +255,7 @@ constructor
 
 ------------------------------------------------------------------------
 
-### Method `meta_data()`
+### `RAVESubject$meta_data()`
 
 get subject meta data located in `"meta/"` folder
 
@@ -323,9 +284,13 @@ get subject meta data located in `"meta/"` folder
   whether to raise errors if the files are missing; default is true;
   alternative is to return `NULL` on missing
 
+#### Returns
+
+data frame
+
 ------------------------------------------------------------------------
 
-### Method `valid_electrodes()`
+### `RAVESubject$valid_electrodes()`
 
 get valid electrode numbers
 
@@ -346,9 +311,13 @@ get valid electrode numbers
   whether to reload reference table before obtaining data, default is
   false
 
+#### Returns
+
+integer vector of valid electrodes
+
 ------------------------------------------------------------------------
 
-### Method `initialize_paths()`
+### `RAVESubject$initialize_paths()`
 
 create subject's directories on hard disk
 
@@ -364,7 +333,7 @@ create subject's directories on hard disk
 
 ------------------------------------------------------------------------
 
-### Method `set_default()`
+### `RAVESubject$set_default()`
 
 set default key-value pair for the subject, used by 'RAVE' modules
 
@@ -386,9 +355,13 @@ set default key-value pair for the subject, used by 'RAVE' modules
 
   file name of the note (without post-fix)
 
+#### Returns
+
+The same as `value`
+
 ------------------------------------------------------------------------
 
-### Method `get_default()`
+### `RAVESubject$get_default()`
 
 get default key-value pairs for the subject, used by 'RAVE' modules
 
@@ -420,9 +393,14 @@ get default key-value pairs for the subject, used by 'RAVE' modules
 
   file name of the note (without post-fix)
 
+#### Returns
+
+A named list of key-value pairs, or if one key is specified and
+`simplify=TRUE`, then only the value will be returned.
+
 ------------------------------------------------------------------------
 
-### Method `get_note_summary()`
+### `RAVESubject$get_note_summary()`
 
 get summary table of all the key-value pairs used by 'RAVE' modules for
 the subject
@@ -442,9 +420,18 @@ the subject
 
   whether to include history entries; default is false
 
+#### Returns
+
+A data frame with four columns: `'namespace'` for the group name of the
+entry (entries within the same namespace usually share same module),
+`'timestamp'` for when the entry was registered. `'entry_name'` is the
+name of the entry. If `include_history` is true, then multiple entries
+with the same `'entry_name'` might appear since the obsolete entries are
+included. `'entry_value'` is the value of the corresponding entry.
+
 ------------------------------------------------------------------------
 
-### Method `get_epoch()`
+### `RAVESubject$get_epoch()`
 
 check and get subject's epoch information
 
@@ -472,9 +459,16 @@ check and get subject's epoch information
 
   the start of the trial relative to epoch time; default is 0
 
+#### Returns
+
+If `as_table` is `FALSE`, then returns as
+[`RAVEEpoch`](http://rave.wiki/ravecore/reference/RAVEEpoch.md)
+instance; otherwise returns epoch table; will raise errors when file is
+missing or the epoch is invalid.
+
 ------------------------------------------------------------------------
 
-### Method `get_reference()`
+### `RAVESubject$get_reference()`
 
 check and get subject's reference information
 
@@ -492,9 +486,15 @@ check and get subject's reference information
 
   whether to only return the reference column
 
+#### Returns
+
+If `simplify` is true, returns a vector of reference electrode names,
+otherwise returns the whole table; will raise errors when file is
+missing or the reference is invalid.
+
 ------------------------------------------------------------------------
 
-### Method `get_electrode_table()`
+### `RAVESubject$get_electrode_table()`
 
 check and get subject's electrode table with electrodes that are
 load-able
@@ -532,9 +532,16 @@ load-able
 
   whether to warn about missing electrodes; default is true
 
+#### Returns
+
+If `simplify` is true, returns a vector of electrodes that are valid (or
+won't be excluded) under given reference; otherwise returns a table. If
+`subset` is true, then the table will be subset and only rows with
+electrodes to be loaded will be kept.
+
 ------------------------------------------------------------------------
 
-### Method `get_frequency()`
+### `RAVESubject$get_frequency()`
 
 check and get subject's frequency table, time-frequency decomposition is
 needed.
@@ -549,9 +556,14 @@ needed.
 
   whether to simplify as vector
 
+#### Returns
+
+If `simplify` is true, returns a vector of frequencies; otherwise
+returns a table.
+
 ------------------------------------------------------------------------
 
-### Method `list_pipelines()`
+### `RAVESubject$list_pipelines()`
 
 list saved pipelines
 
@@ -583,9 +595,13 @@ list saved pipelines
   whether to list all pipelines; default is false; pipelines with the
   same label but older time-stamps will be hidden
 
+#### Returns
+
+A table of pipeline registry
+
 ------------------------------------------------------------------------
 
-### Method `load_pipeline()`
+### `RAVESubject$load_pipeline()`
 
 load saved pipeline
 
@@ -599,9 +615,13 @@ load saved pipeline
 
   pipeline directory name
 
+#### Returns
+
+A `PipelineTools` instance
+
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `RAVESubject$clone()`
 
 The objects of this class are cloneable with this method.
 

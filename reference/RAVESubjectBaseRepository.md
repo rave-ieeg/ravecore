@@ -5,10 +5,6 @@ please use
 [`prepare_subject_bare0`](http://rave.wiki/ravecore/reference/prepare_subject_bare.md)
 to create base repository.
 
-## Value
-
-The root directory where the files are stored.
-
 ## See also
 
 [`prepare_subject_bare0`](http://rave.wiki/ravecore/reference/prepare_subject_bare.md)
@@ -112,19 +108,19 @@ The root directory where the files are stored.
 
 ### Public methods
 
-- [`RAVESubjectBaseRepository$@get_container()`](#method-RAVESubjectRepository-@get_container)
+- [`RAVESubjectRepository$@get_container()`](#method-RAVESubjectRepository-@get_container)
 
-- [`RAVESubjectBaseRepository$@marshal()`](#method-RAVESubjectRepository-@marshal)
+- [`RAVESubjectRepository$@marshal()`](#method-RAVESubjectRepository-@marshal)
 
-- [`RAVESubjectBaseRepository$@unmarshal()`](#method-RAVESubjectRepository-@unmarshal)
+- [`RAVESubjectRepository$@unmarshal()`](#method-RAVESubjectRepository-@unmarshal)
 
-- [`RAVESubjectBaseRepository$print()`](#method-RAVESubjectRepository-print)
+- [`RAVESubjectRepository$print()`](#method-RAVESubjectRepository-print)
 
-- [`RAVESubjectBaseRepository$new()`](#method-RAVESubjectRepository-new)
+- [`RAVESubjectRepository$new()`](#method-RAVESubjectRepository-initialize)
 
-- [`RAVESubjectBaseRepository$export_matlab()`](#method-RAVESubjectRepository-export_matlab)
+- [`RAVESubjectRepository$export_matlab()`](#method-RAVESubjectRepository-export_matlab)
 
-- [`RAVESubjectBaseRepository$clone()`](#method-RAVESubjectRepository-clone)
+- [`RAVESubjectRepository$clone()`](#method-RAVESubjectRepository-clone)
 
 Inherited methods
 
@@ -132,23 +128,23 @@ Inherited methods
 
 ------------------------------------------------------------------------
 
-### Method `@get_container()`
+### `RAVESubjectRepository$@get_container()`
 
 Internal method, do not use it directly
 
 #### Usage
 
-    RAVESubjectBaseRepository$@get_container()
+    RAVESubjectRepository$@get_container()
 
 ------------------------------------------------------------------------
 
-### Method `@marshal()`
+### `RAVESubjectRepository$@marshal()`
 
 Internal method
 
 #### Usage
 
-    RAVESubjectBaseRepository$@marshal(...)
+    RAVESubjectRepository$@marshal(...)
 
 #### Arguments
 
@@ -158,13 +154,13 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method `@unmarshal()`
+### `RAVESubjectRepository$@unmarshal()`
 
 Internal method
 
 #### Usage
 
-    RAVESubjectBaseRepository$@unmarshal(object, ...)
+    RAVESubjectRepository$@unmarshal(object, ...)
 
 #### Arguments
 
@@ -174,23 +170,23 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method [`print()`](https://rdrr.io/r/base/print.html)
+### `RAVESubjectRepository$print()`
 
 User-friendly print method
 
 #### Usage
 
-    RAVESubjectBaseRepository$print()
+    RAVESubjectRepository$print()
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `RAVESubjectRepository$new()`
 
 constructor
 
 #### Usage
 
-    RAVESubjectBaseRepository$new(
+    RAVESubjectRepository$new(
       subject,
       electrodes = NULL,
       reference_name = NULL,
@@ -243,13 +239,13 @@ constructor
 
 ------------------------------------------------------------------------
 
-### Method `export_matlab()`
+### `RAVESubjectRepository$export_matlab()`
 
 Export the repository to 'Matlab' for future analysis
 
 #### Usage
 
-    RAVESubjectBaseRepository$export_matlab(..., verbose = TRUE)
+    RAVESubjectRepository$export_matlab(..., verbose = TRUE)
 
 #### Arguments
 
@@ -261,15 +257,19 @@ Export the repository to 'Matlab' for future analysis
 
   print progresses
 
+#### Returns
+
+The root directory where the files are stored.
+
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `RAVESubjectRepository$clone()`
 
 The objects of this class are cloneable with this method.
 
 #### Usage
 
-    RAVESubjectBaseRepository$clone(deep = FALSE)
+    RAVESubjectRepository$clone(deep = FALSE)
 
 #### Arguments
 

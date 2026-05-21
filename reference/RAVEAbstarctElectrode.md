@@ -3,12 +3,6 @@
 This class is not intended for direct use. Please create new child
 classes and implement some key methods.
 
-## Value
-
-If `simplify` is enabled, and only one block is loaded, then the result
-will be a vector (`type="voltage"`) or a matrix (others), otherwise the
-result will be a named list where the names are the blocks.
-
 ## Super class
 
 [`ravepipeline::RAVESerializable`](http://dipterix.org/ravepipeline/reference/RAVESerializable.md)
@@ -104,7 +98,7 @@ result will be a named list where the names are the blocks.
 
 ### Public methods
 
-- [`RAVEAbstarctElectrode$new()`](#method-RAVEAbstarctElectrode-new)
+- [`RAVEAbstarctElectrode$new()`](#method-RAVEAbstarctElectrode-initialize)
 
 - [`RAVEAbstarctElectrode$set_reference()`](#method-RAVEAbstarctElectrode-set_reference)
 
@@ -136,7 +130,7 @@ Inherited methods
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `RAVEAbstarctElectrode$new()`
 
 constructor
 
@@ -162,7 +156,7 @@ constructor
 
 ------------------------------------------------------------------------
 
-### Method `set_reference()`
+### `RAVEAbstarctElectrode$set_reference()`
 
 set reference for instance
 
@@ -178,7 +172,7 @@ set reference for instance
 
 ------------------------------------------------------------------------
 
-### Method `set_epoch()`
+### `RAVEAbstarctElectrode$set_epoch()`
 
 set epoch instance for the electrode
 
@@ -205,7 +199,7 @@ set epoch instance for the electrode
 
 ------------------------------------------------------------------------
 
-### Method `clear_cache()`
+### `RAVEAbstarctElectrode$clear_cache()`
 
 method to clear cache on hard drive
 
@@ -221,7 +215,7 @@ method to clear cache on hard drive
 
 ------------------------------------------------------------------------
 
-### Method `clear_memory()`
+### `RAVEAbstarctElectrode$clear_memory()`
 
 method to clear memory
 
@@ -237,7 +231,7 @@ method to clear memory
 
 ------------------------------------------------------------------------
 
-### Method `load_data_with_epochs()`
+### `RAVEAbstarctElectrode$load_data_with_epochs()`
 
 method to load electrode data
 
@@ -255,7 +249,7 @@ method to load electrode data
 
 ------------------------------------------------------------------------
 
-### Method `load_data()`
+### `RAVEAbstarctElectrode$load_data()`
 
 alias of `load_data_with_epochs` for legacy code
 
@@ -271,7 +265,7 @@ alias of `load_data_with_epochs` for legacy code
 
 ------------------------------------------------------------------------
 
-### Method `load_dimnames_with_epochs()`
+### `RAVEAbstarctElectrode$load_dimnames_with_epochs()`
 
 get expected dimension names
 
@@ -287,7 +281,7 @@ get expected dimension names
 
 ------------------------------------------------------------------------
 
-### Method `load_data_with_blocks()`
+### `RAVEAbstarctElectrode$load_data_with_blocks()`
 
 load electrode block-wise data (with reference), useful when epoch is
 absent
@@ -311,9 +305,15 @@ absent
 
   whether to simplify the result
 
+#### Returns
+
+If `simplify` is enabled, and only one block is loaded, then the result
+will be a vector (`type="voltage"`) or a matrix (others), otherwise the
+result will be a named list where the names are the blocks.
+
 ------------------------------------------------------------------------
 
-### Method `load_blocks()`
+### `RAVEAbstarctElectrode$load_blocks()`
 
 alias of `load_data_with_blocks` for legacy code
 
@@ -329,7 +329,7 @@ alias of `load_data_with_blocks` for legacy code
 
 ------------------------------------------------------------------------
 
-### Method `load_dim_with_blocks()`
+### `RAVEAbstarctElectrode$load_dim_with_blocks()`
 
 get expected dimension information for block-based loader
 
@@ -345,7 +345,7 @@ get expected dimension information for block-based loader
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `RAVEAbstarctElectrode$clone()`
 
 The objects of this class are cloneable with this method.
 

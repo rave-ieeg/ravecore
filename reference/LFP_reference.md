@@ -5,21 +5,11 @@ Please use a safer
 function to create instances. This documentation is to describe the
 member methods of the electrode class `LFP_reference`
 
-## Value
-
-if the reference number if `NULL` or `'noref'`, then returns 0,
-otherwise returns a
-[`FileArray-class`](https://dipterix.org/filearray/reference/FileArray-class.html)
-
-If `simplify` is enabled, and only one block is loaded, then the result
-will be a vector (`type="voltage"`) or a matrix (others), otherwise the
-result will be a named list where the names are the blocks.
-
 ## Super classes
 
 [`ravepipeline::RAVESerializable`](http://dipterix.org/ravepipeline/reference/RAVESerializable.md)
 -\>
-[`ravecore::RAVEAbstarctElectrode`](http://rave.wiki/ravecore/reference/RAVEAbstarctElectrode.md)
+[`RAVEAbstarctElectrode`](http://rave.wiki/ravecore/reference/RAVEAbstarctElectrode.md)
 -\> `LFP_reference`
 
 ## Active bindings
@@ -74,7 +64,7 @@ result will be a named list where the names are the blocks.
 
 - [`LFP_reference$set_reference()`](#method-LFP_reference-set_reference)
 
-- [`LFP_reference$new()`](#method-LFP_reference-new)
+- [`LFP_reference$new()`](#method-LFP_reference-initialize)
 
 - [`LFP_reference$.load_noref_wavelet()`](#method-LFP_reference-.load_noref_wavelet)
 
@@ -99,14 +89,14 @@ result will be a named list where the names are the blocks.
 Inherited methods
 
 - [`ravepipeline::RAVESerializable$@compare()`](http://dipterix.org/ravepipeline/reference/RAVESerializable.html#method-@compare)
-- [`ravecore::RAVEAbstarctElectrode$load_blocks()`](http://rave.wiki/ravecore/reference/RAVEAbstarctElectrode.html#method-load_blocks)
-- [`ravecore::RAVEAbstarctElectrode$load_data()`](http://rave.wiki/ravecore/reference/RAVEAbstarctElectrode.html#method-load_data)
-- [`ravecore::RAVEAbstarctElectrode$load_dimnames_with_epochs()`](http://rave.wiki/ravecore/reference/RAVEAbstarctElectrode.html#method-load_dimnames_with_epochs)
-- [`ravecore::RAVEAbstarctElectrode$set_epoch()`](http://rave.wiki/ravecore/reference/RAVEAbstarctElectrode.html#method-set_epoch)
+- [`RAVEAbstarctElectrode$load_blocks()`](http://rave.wiki/ravecore/reference/RAVEAbstarctElectrode.html#method-load_blocks)
+- [`RAVEAbstarctElectrode$load_data()`](http://rave.wiki/ravecore/reference/RAVEAbstarctElectrode.html#method-load_data)
+- [`RAVEAbstarctElectrode$load_dimnames_with_epochs()`](http://rave.wiki/ravecore/reference/RAVEAbstarctElectrode.html#method-load_dimnames_with_epochs)
+- [`RAVEAbstarctElectrode$set_epoch()`](http://rave.wiki/ravecore/reference/RAVEAbstarctElectrode.html#method-set_epoch)
 
 ------------------------------------------------------------------------
 
-### Method `@marshal()`
+### `LFP_reference$@marshal()`
 
 Internal method
 
@@ -122,7 +112,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method `@unmarshal()`
+### `LFP_reference$@unmarshal()`
 
 Internal method
 
@@ -138,7 +128,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method [`print()`](https://rdrr.io/r/base/print.html)
+### `LFP_reference$print()`
 
 print reference summary
 
@@ -148,7 +138,7 @@ print reference summary
 
 ------------------------------------------------------------------------
 
-### Method `set_reference()`
+### `LFP_reference$set_reference()`
 
 set reference for current electrode
 
@@ -164,7 +154,7 @@ set reference for current electrode
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `LFP_reference$new()`
 
 constructor
 
@@ -181,7 +171,7 @@ constructor
 
 ------------------------------------------------------------------------
 
-### Method `.load_noref_wavelet()`
+### `LFP_reference$.load_noref_wavelet()`
 
 load non-referenced wavelet coefficients (internally used)
 
@@ -195,9 +185,15 @@ load non-referenced wavelet coefficients (internally used)
 
   whether to reload cache
 
+#### Returns
+
+if the reference number if `NULL` or `'noref'`, then returns 0,
+otherwise returns a
+[`FileArray-class`](https://dipterix.org/filearray/reference/FileArray-class.html)
+
 ------------------------------------------------------------------------
 
-### Method `.load_noref_voltage()`
+### `LFP_reference$.load_noref_voltage()`
 
 load non-referenced voltage (internally used)
 
@@ -217,7 +213,7 @@ load non-referenced voltage (internally used)
 
 ------------------------------------------------------------------------
 
-### Method `.load_wavelet()`
+### `LFP_reference$.load_wavelet()`
 
 load referenced wavelet coefficients (internally used)
 
@@ -240,7 +236,7 @@ load referenced wavelet coefficients (internally used)
 
 ------------------------------------------------------------------------
 
-### Method `.load_voltage()`
+### `LFP_reference$.load_voltage()`
 
 load referenced voltage (internally used)
 
@@ -256,7 +252,7 @@ load referenced voltage (internally used)
 
 ------------------------------------------------------------------------
 
-### Method `load_data_with_epochs()`
+### `LFP_reference$load_data_with_epochs()`
 
 method to load electrode data
 
@@ -275,7 +271,7 @@ method to load electrode data
 
 ------------------------------------------------------------------------
 
-### Method `load_data_with_blocks()`
+### `LFP_reference$load_data_with_blocks()`
 
 load electrode block-wise data (with reference), useful when epoch is
 absent
@@ -304,9 +300,15 @@ absent
 
   whether to simplify the result
 
+#### Returns
+
+If `simplify` is enabled, and only one block is loaded, then the result
+will be a vector (`type="voltage"`) or a matrix (others), otherwise the
+result will be a named list where the names are the blocks.
+
 ------------------------------------------------------------------------
 
-### Method `load_dim_with_blocks()`
+### `LFP_reference$load_dim_with_blocks()`
 
 get expected dimension information for block-based loader
 
@@ -325,7 +327,7 @@ get expected dimension information for block-based loader
 
 ------------------------------------------------------------------------
 
-### Method `clear_cache()`
+### `LFP_reference$clear_cache()`
 
 method to clear cache on hard drive
 
@@ -341,7 +343,7 @@ method to clear cache on hard drive
 
 ------------------------------------------------------------------------
 
-### Method `clear_memory()`
+### `LFP_reference$clear_memory()`
 
 method to clear memory
 
@@ -357,7 +359,7 @@ method to clear memory
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `LFP_reference$clone()`
 
 The objects of this class are cloneable with this method.
 

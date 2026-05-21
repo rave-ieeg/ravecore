@@ -9,10 +9,10 @@ to create an instance.
 ## Super classes
 
 [`ravepipeline::RAVESerializable`](http://dipterix.org/ravepipeline/reference/RAVESerializable.md)
--\> `ravecore::RAVESubjectRepository` -\>
-[`ravecore::RAVESubjectEpochRepository`](http://rave.wiki/ravecore/reference/RAVESubjectEpochRepository.md)
+-\> `RAVESubjectRepository` -\>
+[`RAVESubjectEpochRepository`](http://rave.wiki/ravecore/reference/RAVESubjectEpochRepository.md)
 -\>
-[`ravecore::RAVESubjectEpochTimeFreqBaseRepository`](http://rave.wiki/ravecore/reference/RAVESubjectEpochTimeFreqBaseRepository.md)
+[`RAVESubjectEpochTimeFreqBaseRepository`](http://rave.wiki/ravecore/reference/RAVESubjectEpochTimeFreqBaseRepository.md)
 -\> `RAVESubjectEpochPowerRepository`
 
 ## Active bindings
@@ -30,23 +30,23 @@ to create an instance.
 
 - [`RAVESubjectEpochPowerRepository$@unmarshal()`](#method-RAVESubjectEpochPowerRepository-@unmarshal)
 
-- [`RAVESubjectEpochPowerRepository$new()`](#method-RAVESubjectEpochPowerRepository-new)
+- [`RAVESubjectEpochPowerRepository$new()`](#method-RAVESubjectEpochPowerRepository-initialize)
 
 - [`RAVESubjectEpochPowerRepository$clone()`](#method-RAVESubjectEpochPowerRepository-clone)
 
 Inherited methods
 
 - [`ravepipeline::RAVESerializable$@compare()`](http://dipterix.org/ravepipeline/reference/RAVESerializable.html#method-@compare)
-- [`ravecore::RAVESubjectRepository$@get_container()`](http://rave.wiki/ravecore/reference/RAVESubjectRepository.html#method-@get_container)
-- [`ravecore::RAVESubjectRepository$print()`](http://rave.wiki/ravecore/reference/RAVESubjectRepository.html#method-print)
-- [`ravecore::RAVESubjectEpochRepository$export_matlab()`](http://rave.wiki/ravecore/reference/RAVESubjectEpochRepository.html#method-export_matlab)
-- [`ravecore::RAVESubjectEpochRepository$get_container()`](http://rave.wiki/ravecore/reference/RAVESubjectEpochRepository.html#method-get_container)
-- [`ravecore::RAVESubjectEpochRepository$set_epoch()`](http://rave.wiki/ravecore/reference/RAVESubjectEpochRepository.html#method-set_epoch)
-- [`ravecore::RAVESubjectEpochTimeFreqBaseRepository$mount_data()`](http://rave.wiki/ravecore/reference/RAVESubjectEpochTimeFreqBaseRepository.html#method-mount_data)
+- `RAVESubjectRepository$@get_container()`
+- `RAVESubjectRepository$print()`
+- [`RAVESubjectEpochRepository$export_matlab()`](http://rave.wiki/ravecore/reference/RAVESubjectEpochRepository.html#method-export_matlab)
+- [`RAVESubjectEpochRepository$get_container()`](http://rave.wiki/ravecore/reference/RAVESubjectEpochRepository.html#method-get_container)
+- [`RAVESubjectEpochRepository$set_epoch()`](http://rave.wiki/ravecore/reference/RAVESubjectEpochRepository.html#method-set_epoch)
+- [`RAVESubjectEpochTimeFreqBaseRepository$mount_data()`](http://rave.wiki/ravecore/reference/RAVESubjectEpochTimeFreqBaseRepository.html#method-mount_data)
 
 ------------------------------------------------------------------------
 
-### Method `@marshal()`
+### `RAVESubjectEpochPowerRepository$@marshal()`
 
 Internal method
 
@@ -62,7 +62,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method `@unmarshal()`
+### `RAVESubjectEpochPowerRepository$@unmarshal()`
 
 Internal method
 
@@ -78,7 +78,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `RAVESubjectEpochPowerRepository$new()`
 
 constructor
 
@@ -157,7 +157,7 @@ constructor
 
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `RAVESubjectEpochPowerRepository$clone()`
 
 The objects of this class are cloneable with this method.
 

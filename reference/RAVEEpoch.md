@@ -5,23 +5,6 @@ block/session string; `Time` trial onset within that block; `Trial`
 trial number; `Condition` trial condition. Other optional columns are
 `Event_xxx` (starts with "Event").
 
-## Value
-
-`self$table`
-
-If `event` is one of `"trial onset"`, `"default"`, `""`, or `NULL`, then
-the result will be `"Time"` column; if the event is found, then return
-will be the corresponding event column. When the event is not found and
-`missing` is `"error"`, error will be raised; default is to return
-`"Time"` column, as it's trial onset and is mandatory.
-
-If `condition_type` is one of `"default"`, `""`, or `NULL`, then the
-result will be `"Condition"` column; if the condition type is found,
-then return will be the corresponding condition type column. When the
-condition type is not found and `missing` is `"error"`, error will be
-raised; default is to return `"Condition"` column, as it's the default
-and is mandatory.
-
 ## Super class
 
 [`ravepipeline::RAVESerializable`](http://dipterix.org/ravepipeline/reference/RAVESerializable.md)
@@ -79,7 +62,7 @@ and is mandatory.
 
 - [`RAVEEpoch$@unmarshal()`](#method-RAVEEpoch-@unmarshal)
 
-- [`RAVEEpoch$new()`](#method-RAVEEpoch-new)
+- [`RAVEEpoch$new()`](#method-RAVEEpoch-initialize)
 
 - [`RAVEEpoch$trial_at()`](#method-RAVEEpoch-trial_at)
 
@@ -99,7 +82,7 @@ Inherited methods
 
 ------------------------------------------------------------------------
 
-### Method `@marshal()`
+### `RAVEEpoch$@marshal()`
 
 Internal method
 
@@ -115,7 +98,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method `@unmarshal()`
+### `RAVEEpoch$@unmarshal()`
 
 Internal method
 
@@ -131,7 +114,7 @@ Internal method
 
 ------------------------------------------------------------------------
 
-### Method `new()`
+### `RAVEEpoch$new()`
 
 constructor
 
@@ -151,7 +134,7 @@ constructor
 
 ------------------------------------------------------------------------
 
-### Method `trial_at()`
+### `RAVEEpoch$trial_at()`
 
 get `ith` trial
 
@@ -171,7 +154,7 @@ get `ith` trial
 
 ------------------------------------------------------------------------
 
-### Method `update_table()`
+### `RAVEEpoch$update_table()`
 
 manually update table field
 
@@ -179,9 +162,13 @@ manually update table field
 
     RAVEEpoch$update_table()
 
+#### Returns
+
+`self$table`
+
 ------------------------------------------------------------------------
 
-### Method `set_trial()`
+### `RAVEEpoch$set_trial()`
 
 set one trial
 
@@ -213,7 +200,7 @@ set one trial
 
 ------------------------------------------------------------------------
 
-### Method `get_event_colname()`
+### `RAVEEpoch$get_event_colname()`
 
 Get epoch column name that represents the desired event
 
@@ -236,9 +223,17 @@ Get epoch column name that represents the desired event
 
   what to do if event is missing; default is to warn
 
+#### Returns
+
+If `event` is one of `"trial onset"`, `"default"`, `""`, or `NULL`, then
+the result will be `"Time"` column; if the event is found, then return
+will be the corresponding event column. When the event is not found and
+`missing` is `"error"`, error will be raised; default is to return
+`"Time"` column, as it's trial onset and is mandatory.
+
 ------------------------------------------------------------------------
 
-### Method `get_condition_colname()`
+### `RAVEEpoch$get_condition_colname()`
 
 Get condition column name that represents the desired condition type
 
@@ -262,9 +257,18 @@ Get condition column name that represents the desired condition type
   what to do if condition type is missing; default is to warn if the
   condition column is not found.
 
+#### Returns
+
+If `condition_type` is one of `"default"`, `""`, or `NULL`, then the
+result will be `"Condition"` column; if the condition type is found,
+then return will be the corresponding condition type column. When the
+condition type is not found and `missing` is `"error"`, error will be
+raised; default is to return `"Condition"` column, as it's the default
+and is mandatory.
+
 ------------------------------------------------------------------------
 
-### Method `clone()`
+### `RAVEEpoch$clone()`
 
 The objects of this class are cloneable with this method.
 
