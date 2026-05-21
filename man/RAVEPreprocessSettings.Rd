@@ -3,15 +3,6 @@
 \name{RAVEPreprocessSettings}
 \alias{RAVEPreprocessSettings}
 \title{Defines preprocess configurations}
-\value{
-list of electrode type, number, etc.
-
-\code{NULL} when no channel is composed.
-When \code{flat} is \code{TRUE}, a data frame of weights with
-the columns composing electrode channel numbers, composed channel
-number, and corresponding weights; if \code{flat} is \code{FALSE},
-then a weight matrix;
-}
 \description{
 \code{R6} class definition
 }
@@ -41,350 +32,379 @@ conf$data_locked   # Whether block, sample rates should be locked
 \code{\link[ravepipeline:RAVESerializable]{ravepipeline::RAVESerializable}} -> \code{RAVEPreprocessSettings}
 }
 \section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{current_version}}{current configuration setting version}
+  \if{html}{\out{<div class="r6-fields">}}
+  \describe{
+    \item{\code{current_version}}{current configuration setting version}
 
-\item{\code{path}}{settings file path}
+    \item{\code{path}}{settings file path}
 
-\item{\code{backup_path}}{alternative back up path for redundancy checks}
+    \item{\code{backup_path}}{alternative back up path for redundancy checks}
 
-\item{\code{data}}{list of raw configurations, internally used only}
+    \item{\code{data}}{list of raw configurations, internally used only}
 
-\item{\code{subject}}{\code{\link{RAVESubject}} instance}
+    \item{\code{subject}}{\code{\link{RAVESubject}} instance}
 
-\item{\code{read_only}}{whether the configuration should be read-only,
+    \item{\code{read_only}}{whether the configuration should be read-only,
 not yet implemented}
-}
-\if{html}{\out{</div>}}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Active bindings}{
-\if{html}{\out{<div class="r6-active-bindings">}}
-\describe{
-\item{\code{version}}{configure version of currently stored files}
+  \if{html}{\out{<div class="r6-active-bindings">}}
+  \describe{
+    \item{\code{version}}{configure version of currently stored files}
 
-\item{\code{old_version}}{whether settings file is old format}
+    \item{\code{old_version}}{whether settings file is old format}
 
-\item{\code{blocks}}{experiment blocks}
+    \item{\code{blocks}}{experiment blocks}
 
-\item{\code{electrodes}}{electrode numbers}
+    \item{\code{electrodes}}{electrode numbers}
 
-\item{\code{sample_rates}}{voltage data sample rate}
+    \item{\code{sample_rates}}{voltage data sample rate}
 
-\item{\code{notch_filtered}}{whether electrodes are notch filtered}
+    \item{\code{notch_filtered}}{whether electrodes are notch filtered}
 
-\item{\code{has_wavelet}}{whether each electrode has wavelet transforms}
+    \item{\code{has_wavelet}}{whether each electrode has wavelet transforms}
 
-\item{\code{data_imported}}{whether electrodes are imported}
+    \item{\code{data_imported}}{whether electrodes are imported}
 
-\item{\code{data_locked}}{whether electrode, blocks and sample rate are locked?
+    \item{\code{data_locked}}{whether electrode, blocks and sample rate are locked?
 usually when an electrode is imported into 'rave', that electrode is
 locked}
 
-\item{\code{electrode_locked}}{whether electrode is imported and locked}
+    \item{\code{electrode_locked}}{whether electrode is imported and locked}
 
-\item{\code{electrode_composed}}{composed electrode channels, not actual
+    \item{\code{electrode_composed}}{composed electrode channels, not actual
 physically contacts, but is generated from those physically ones}
 
-\item{\code{wavelet_params}}{wavelet parameters}
+    \item{\code{wavelet_params}}{wavelet parameters}
 
-\item{\code{notch_params}}{Notch filter parameters}
+    \item{\code{notch_params}}{Notch filter parameters}
 
-\item{\code{electrode_types}}{electrode signal types}
+    \item{\code{electrode_types}}{electrode signal types}
 
-\item{\code{@freeze_blocks}}{whether to free block, internally used}
+    \item{\code{@freeze_blocks}}{whether to free block, internally used}
 
-\item{\code{@freeze_lfp_ecog}}{whether to freeze electrodes that record
+    \item{\code{@freeze_lfp_ecog}}{whether to freeze electrodes that record
 'LFP' signals, internally used}
 
-\item{\code{@lfp_ecog_sample_rate}}{'LFP' sample rates, internally used}
+    \item{\code{@lfp_ecog_sample_rate}}{'LFP' sample rates, internally used}
 
-\item{\code{all_blocks}}{characters, all possible blocks even not included in
+    \item{\code{all_blocks}}{characters, all possible blocks even not included in
 some projects}
 
-\item{\code{raw_path2}}{raw data path, based on the format standard; for native,
+    \item{\code{raw_path2}}{raw data path, based on the format standard; for native,
 this is equivalent to \code{raw_path}; for 'BIDS', this is subject raw
 directory in \code{'BIDS'} project}
 
-\item{\code{raw_path2_type}}{raw data path type, 'native' or 'bids'}
+    \item{\code{raw_path2_type}}{raw data path type, 'native' or 'bids'}
 
-\item{\code{raw_path}}{legacy raw data path for 'RAVE', regardless of
+    \item{\code{raw_path}}{legacy raw data path for 'RAVE', regardless of
 \code{raw_path2_type}. This field exists for compatibility support
 the legacy scripts. Please use \code{raw_path2} combined with
 \code{raw_path2_type} for supporting 'BIDS' format}
 
-\item{\code{raw_path_type}}{legacy type for \code{raw_path}, always returns
+    \item{\code{raw_path_type}}{legacy type for \code{raw_path}, always returns
 \code{'native'}}
-}
-\if{html}{\out{</div>}}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-RAVEPreprocessSettings-@marshal}{\code{RAVEPreprocessSettings$@marshal()}}
-\item \href{#method-RAVEPreprocessSettings-@unmarshal}{\code{RAVEPreprocessSettings$@unmarshal()}}
-\item \href{#method-RAVEPreprocessSettings-new}{\code{RAVEPreprocessSettings$new()}}
-\item \href{#method-RAVEPreprocessSettings-valid}{\code{RAVEPreprocessSettings$valid()}}
-\item \href{#method-RAVEPreprocessSettings-has_raw}{\code{RAVEPreprocessSettings$has_raw()}}
-\item \href{#method-RAVEPreprocessSettings-set_blocks}{\code{RAVEPreprocessSettings$set_blocks()}}
-\item \href{#method-RAVEPreprocessSettings-get_block_paths}{\code{RAVEPreprocessSettings$get_block_paths()}}
-\item \href{#method-RAVEPreprocessSettings-set_electrodes}{\code{RAVEPreprocessSettings$set_electrodes()}}
-\item \href{#method-RAVEPreprocessSettings-set_sample_rates}{\code{RAVEPreprocessSettings$set_sample_rates()}}
-\item \href{#method-RAVEPreprocessSettings-migrate}{\code{RAVEPreprocessSettings$migrate()}}
-\item \href{#method-RAVEPreprocessSettings-electrode_info}{\code{RAVEPreprocessSettings$electrode_info()}}
-\item \href{#method-RAVEPreprocessSettings-save}{\code{RAVEPreprocessSettings$save()}}
-\item \href{#method-RAVEPreprocessSettings-get_compose_weights}{\code{RAVEPreprocessSettings$get_compose_weights()}}
-\item \href{#method-RAVEPreprocessSettings-clone}{\code{RAVEPreprocessSettings$clone()}}
+  \itemize{
+    \item \href{#method-RAVEPreprocessSettings-@marshal}{\code{RAVEPreprocessSettings$@marshal()}}
+    \item \href{#method-RAVEPreprocessSettings-@unmarshal}{\code{RAVEPreprocessSettings$@unmarshal()}}
+    \item \href{#method-RAVEPreprocessSettings-initialize}{\code{RAVEPreprocessSettings$new()}}
+    \item \href{#method-RAVEPreprocessSettings-valid}{\code{RAVEPreprocessSettings$valid()}}
+    \item \href{#method-RAVEPreprocessSettings-has_raw}{\code{RAVEPreprocessSettings$has_raw()}}
+    \item \href{#method-RAVEPreprocessSettings-set_blocks}{\code{RAVEPreprocessSettings$set_blocks()}}
+    \item \href{#method-RAVEPreprocessSettings-get_block_paths}{\code{RAVEPreprocessSettings$get_block_paths()}}
+    \item \href{#method-RAVEPreprocessSettings-set_electrodes}{\code{RAVEPreprocessSettings$set_electrodes()}}
+    \item \href{#method-RAVEPreprocessSettings-set_sample_rates}{\code{RAVEPreprocessSettings$set_sample_rates()}}
+    \item \href{#method-RAVEPreprocessSettings-migrate}{\code{RAVEPreprocessSettings$migrate()}}
+    \item \href{#method-RAVEPreprocessSettings-electrode_info}{\code{RAVEPreprocessSettings$electrode_info()}}
+    \item \href{#method-RAVEPreprocessSettings-save}{\code{RAVEPreprocessSettings$save()}}
+    \item \href{#method-RAVEPreprocessSettings-get_compose_weights}{\code{RAVEPreprocessSettings$get_compose_weights()}}
+    \item \href{#method-RAVEPreprocessSettings-clone}{\code{RAVEPreprocessSettings$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="ravepipeline" data-topic="RAVESerializable" data-id="@compare"><a href='../../ravepipeline/html/RAVESerializable.html#method-RAVESerializable-@compare'><code>ravepipeline::RAVESerializable$@compare()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="ravepipeline" data-topic="RAVESerializable" data-id="@compare"><a href='../../ravepipeline/html/RAVESerializable.html#method-RAVESerializable-@compare'><code>ravepipeline::RAVESerializable$@compare()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVEPreprocessSettings-@marshal"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVEPreprocessSettings-@marshal}{}}}
-\subsection{Method \code{@marshal()}}{
-Internal method
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVEPreprocessSettings$@marshal(...)}\if{html}{\out{</div>}}
+\subsection{\code{RAVEPreprocessSettings$@marshal()}}{
+  Internal method
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVEPreprocessSettings$@marshal(...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{...}}{internal arguments}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{internal arguments}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVEPreprocessSettings-@unmarshal"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVEPreprocessSettings-@unmarshal}{}}}
-\subsection{Method \code{@unmarshal()}}{
-Internal method
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVEPreprocessSettings$@unmarshal(object, ...)}\if{html}{\out{</div>}}
+\subsection{\code{RAVEPreprocessSettings$@unmarshal()}}{
+  Internal method
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVEPreprocessSettings$@unmarshal(object, ...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{object, ...}}{internal arguments}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{object, ...}}{internal arguments}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-RAVEPreprocessSettings-new"></a>}}
-\if{latex}{\out{\hypertarget{method-RAVEPreprocessSettings-new}{}}}
-\subsection{Method \code{new()}}{
-constructor
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVEPreprocessSettings$new(subject, read_only = TRUE)}\if{html}{\out{</div>}}
+\if{html}{\out{<a id="method-RAVEPreprocessSettings-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-RAVEPreprocessSettings-initialize}{}}}
+\subsection{\code{RAVEPreprocessSettings$new()}}{
+  constructor
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVEPreprocessSettings$new(subject, read_only = TRUE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{subject}}{character or \code{\link{RAVESubject}} instance}
+      \item{\code{read_only}}{whether subject should be read-only (not yet implemented)}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{subject}}{character or \code{\link{RAVESubject}} instance}
-
-\item{\code{read_only}}{whether subject should be read-only (not yet implemented)}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVEPreprocessSettings-valid"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVEPreprocessSettings-valid}{}}}
-\subsection{Method \code{valid()}}{
-whether configuration is valid or not
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVEPreprocessSettings$valid()}\if{html}{\out{</div>}}
+\subsection{\code{RAVEPreprocessSettings$valid()}}{
+  whether configuration is valid or not
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVEPreprocessSettings$valid()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVEPreprocessSettings-has_raw"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVEPreprocessSettings-has_raw}{}}}
-\subsection{Method \code{has_raw()}}{
-whether raw data folder exists
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVEPreprocessSettings$has_raw()}\if{html}{\out{</div>}}
+\subsection{\code{RAVEPreprocessSettings$has_raw()}}{
+  whether raw data folder exists
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVEPreprocessSettings$has_raw()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVEPreprocessSettings-set_blocks"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVEPreprocessSettings-set_blocks}{}}}
-\subsection{Method \code{set_blocks()}}{
-set blocks
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVEPreprocessSettings$set_blocks(blocks, force = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{blocks}}{character, combination of session task and run}
-
-\item{\code{force}}{whether to ignore checking. Only used when data
+\subsection{\code{RAVEPreprocessSettings$set_blocks()}}{
+  set blocks
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVEPreprocessSettings$set_blocks(blocks, force = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{blocks}}{character, combination of session task and run}
+      \item{\code{force}}{whether to ignore checking. Only used when data
 structure is not native, for example, 'BIDS' format}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVEPreprocessSettings-get_block_paths"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVEPreprocessSettings-get_block_paths}{}}}
-\subsection{Method \code{get_block_paths()}}{
-get block-related files
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVEPreprocessSettings$get_block_paths(
+\subsection{\code{RAVEPreprocessSettings$get_block_paths()}}{
+  get block-related files
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVEPreprocessSettings$get_block_paths(
   block,
   force_native = FALSE,
   check = TRUE
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{block}}{block names (for all available blocks, see \code{all_blocks})}
-
-\item{\code{force_native}}{whether to ignore the format standard, such as 'BIDS'
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{block}}{block names (for all available blocks, see \code{all_blocks})}
+      \item{\code{force_native}}{whether to ignore the format standard, such as 'BIDS'
 and force return the native paths; default is false}
-
-\item{\code{check}}{whether to check the file paths to make sure the returned
+      \item{\code{check}}{whether to check the file paths to make sure the returned
 paths are valid; default is true}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVEPreprocessSettings-set_electrodes"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVEPreprocessSettings-set_electrodes}{}}}
-\subsection{Method \code{set_electrodes()}}{
-set electrodes
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVEPreprocessSettings$set_electrodes(
+\subsection{\code{RAVEPreprocessSettings$set_electrodes()}}{
+  set electrodes
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVEPreprocessSettings$set_electrodes(
   electrodes,
   type = SIGNAL_TYPES,
   add = FALSE
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{electrodes}}{integer vectors}
+      \item{\code{type}}{signal type of electrodes, see \code{\link{SIGNAL_TYPES}}}
+      \item{\code{add}}{whether to add to current settings}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{electrodes}}{integer vectors}
-
-\item{\code{type}}{signal type of electrodes, see \code{\link{SIGNAL_TYPES}}}
-
-\item{\code{add}}{whether to add to current settings}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVEPreprocessSettings-set_sample_rates"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVEPreprocessSettings-set_sample_rates}{}}}
-\subsection{Method \code{set_sample_rates()}}{
-set sample frequency
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVEPreprocessSettings$set_sample_rates(srate, type = SIGNAL_TYPES)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{srate}}{sample rate, must be positive number}
-
-\item{\code{type}}{electrode type to set sample rate. In 'rave', all electrodes
+\subsection{\code{RAVEPreprocessSettings$set_sample_rates()}}{
+  set sample frequency
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVEPreprocessSettings$set_sample_rates(srate, type = SIGNAL_TYPES)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{srate}}{sample rate, must be positive number}
+      \item{\code{type}}{electrode type to set sample rate. In 'rave', all electrodes
 with the same signal type must have the same sample rate.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVEPreprocessSettings-migrate"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVEPreprocessSettings-migrate}{}}}
-\subsection{Method \code{migrate()}}{
-convert old format to new formats
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVEPreprocessSettings$migrate(force = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{RAVEPreprocessSettings$migrate()}}{
+  convert old format to new formats
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVEPreprocessSettings$migrate(force = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{force}}{whether to force migrate and save settings}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{force}}{whether to force migrate and save settings}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVEPreprocessSettings-electrode_info"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVEPreprocessSettings-electrode_info}{}}}
-\subsection{Method \code{electrode_info()}}{
-get electrode information
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVEPreprocessSettings$electrode_info(electrode)}\if{html}{\out{</div>}}
+\subsection{\code{RAVEPreprocessSettings$electrode_info()}}{
+  get electrode information
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVEPreprocessSettings$electrode_info(electrode)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{electrode}}{integer}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    list of electrode type, number, etc.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{electrode}}{integer}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVEPreprocessSettings-save"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVEPreprocessSettings-save}{}}}
-\subsection{Method \code{save()}}{
-save settings to hard disk
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVEPreprocessSettings$save()}\if{html}{\out{</div>}}
+\subsection{\code{RAVEPreprocessSettings$save()}}{
+  save settings to hard disk
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVEPreprocessSettings$save()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVEPreprocessSettings-get_compose_weights"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVEPreprocessSettings-get_compose_weights}{}}}
-\subsection{Method \code{get_compose_weights()}}{
-get weights of each composed channels
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVEPreprocessSettings$get_compose_weights(flat = TRUE)}\if{html}{\out{</div>}}
+\subsection{\code{RAVEPreprocessSettings$get_compose_weights()}}{
+  get weights of each composed channels
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVEPreprocessSettings$get_compose_weights(flat = TRUE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{flat}}{whether to flatten the data frame; default is true}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    \code{NULL} when no channel is composed.
+When \code{flat} is \code{TRUE}, a data frame of weights with
+the columns composing electrode channel numbers, composed channel
+number, and corresponding weights; if \code{flat} is \code{FALSE},
+then a weight matrix;
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{flat}}{whether to flatten the data frame; default is true}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVEPreprocessSettings-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVEPreprocessSettings-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVEPreprocessSettings$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{RAVEPreprocessSettings$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVEPreprocessSettings$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

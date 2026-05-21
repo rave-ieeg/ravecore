@@ -3,9 +3,6 @@
 \name{RAVESubjectBaseRepository}
 \alias{RAVESubjectBaseRepository}
 \title{'RAVE' class for base repository}
-\value{
-The root directory where the files are stored.
-}
 \description{
 The class is for creating child classes, to instantiate the class,
 please use \code{\link{prepare_subject_bare0}} to create base repository.
@@ -17,147 +14,154 @@ please use \code{\link{prepare_subject_bare0}} to create base repository.
 \code{\link[ravepipeline:RAVESerializable]{ravepipeline::RAVESerializable}} -> \code{RAVESubjectRepository}
 }
 \section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{@restored}}{internal flag indicating whether the repository
+  \if{html}{\out{<div class="r6-fields">}}
+  \describe{
+    \item{\code{@restored}}{internal flag indicating whether the repository
 is restored from serialization. Repositories restored from serialization
 will behave differently (slightly) for performance considerations}
 
-\item{\code{repository_id}}{repository identifier, typically generated with
+    \item{\code{repository_id}}{repository identifier, typically generated with
 random string}
 
-\item{\code{quiet}}{whether to suppress update warning messages, when
+    \item{\code{quiet}}{whether to suppress update warning messages, when
 requested electrodes are not fully processed or excluded}
-}
-\if{html}{\out{</div>}}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Active bindings}{
-\if{html}{\out{<div class="r6-active-bindings">}}
-\describe{
-\item{\code{auto_exclude}}{whether to automatically discard channels that are
+  \if{html}{\out{<div class="r6-active-bindings">}}
+  \describe{
+    \item{\code{auto_exclude}}{whether to automatically discard channels that are
 marked as "excluded" (such as bad channels or channels that should
 not be analyzed); default is often true}
 
-\item{\code{meta_info}}{list of meta information}
+    \item{\code{meta_info}}{list of meta information}
 
-\item{\code{needs_update}}{write-only attribute when subject needs to be
+    \item{\code{needs_update}}{write-only attribute when subject needs to be
 reloaded from the disk and reference table needs to be updated, use
 \code{repo$needs_update <- TRUE}}
 
-\item{\code{project}}{project instance, see \code{\link{RAVEProject}}}
+    \item{\code{project}}{project instance, see \code{\link{RAVEProject}}}
 
-\item{\code{subject}}{subject instance, see \code{\link{RAVESubject}}}
+    \item{\code{subject}}{subject instance, see \code{\link{RAVESubject}}}
 
-\item{\code{electrode_list}}{integer vector of electrodes included}
+    \item{\code{electrode_list}}{integer vector of electrodes included}
 
-\item{\code{electrode_table}}{the entire electrode table}
+    \item{\code{electrode_table}}{the entire electrode table}
 
-\item{\code{electrode_signal_types}}{more accurate name should be "channel"
+    \item{\code{electrode_signal_types}}{more accurate name should be "channel"
 signal types: currently returns \code{'LFP'}, \code{'Auxiliary'}, or
 \code{'Spike'}, for each channel}
 
-\item{\code{electrode_instances}}{electrode channel instance helpers for
+    \item{\code{electrode_instances}}{electrode channel instance helpers for
 loading electrode data}
 
-\item{\code{reference_name}}{name of reference table}
+    \item{\code{reference_name}}{name of reference table}
 
-\item{\code{reference_table}}{reference table}
+    \item{\code{reference_table}}{reference table}
 
-\item{\code{references_list}}{a vector of reference channel names, used together
+    \item{\code{references_list}}{a vector of reference channel names, used together
 with \code{reference_instances}}
 
-\item{\code{reference_instances}}{instances of reference channels, for
+    \item{\code{reference_instances}}{instances of reference channels, for
 referencing on the fly, used for \code{electrode_instances}}
 
-\item{\code{digest_key}}{a list of repository data used to generate
+    \item{\code{digest_key}}{a list of repository data used to generate
 repository signature}
 
-\item{\code{signature}}{signature of the repository, two repositories might
+    \item{\code{signature}}{signature of the repository, two repositories might
 share the same signature if their contents are the same (even with
 different identifiers); generated from \code{digest_key}}
-}
-\if{html}{\out{</div>}}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-RAVESubjectRepository-@get_container}{\code{RAVESubjectBaseRepository$@get_container()}}
-\item \href{#method-RAVESubjectRepository-@marshal}{\code{RAVESubjectBaseRepository$@marshal()}}
-\item \href{#method-RAVESubjectRepository-@unmarshal}{\code{RAVESubjectBaseRepository$@unmarshal()}}
-\item \href{#method-RAVESubjectRepository-print}{\code{RAVESubjectBaseRepository$print()}}
-\item \href{#method-RAVESubjectRepository-new}{\code{RAVESubjectBaseRepository$new()}}
-\item \href{#method-RAVESubjectRepository-export_matlab}{\code{RAVESubjectBaseRepository$export_matlab()}}
-\item \href{#method-RAVESubjectRepository-clone}{\code{RAVESubjectBaseRepository$clone()}}
+  \itemize{
+    \item \href{#method-RAVESubjectRepository-@get_container}{\code{RAVESubjectRepository$@get_container()}}
+    \item \href{#method-RAVESubjectRepository-@marshal}{\code{RAVESubjectRepository$@marshal()}}
+    \item \href{#method-RAVESubjectRepository-@unmarshal}{\code{RAVESubjectRepository$@unmarshal()}}
+    \item \href{#method-RAVESubjectRepository-print}{\code{RAVESubjectRepository$print()}}
+    \item \href{#method-RAVESubjectRepository-initialize}{\code{RAVESubjectRepository$new()}}
+    \item \href{#method-RAVESubjectRepository-export_matlab}{\code{RAVESubjectRepository$export_matlab()}}
+    \item \href{#method-RAVESubjectRepository-clone}{\code{RAVESubjectRepository$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="ravepipeline" data-topic="RAVESerializable" data-id="@compare"><a href='../../ravepipeline/html/RAVESerializable.html#method-RAVESerializable-@compare'><code>ravepipeline::RAVESerializable$@compare()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="ravepipeline" data-topic="RAVESerializable" data-id="@compare"><a href='../../ravepipeline/html/RAVESerializable.html#method-RAVESerializable-@compare'><code>ravepipeline::RAVESerializable$@compare()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVESubjectRepository-@get_container"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVESubjectRepository-@get_container}{}}}
-\subsection{Method \code{@get_container()}}{
-Internal method, do not use it directly
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectBaseRepository$@get_container()}\if{html}{\out{</div>}}
+\subsection{\code{RAVESubjectRepository$@get_container()}}{
+  Internal method, do not use it directly
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVESubjectRepository$@get_container()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVESubjectRepository-@marshal"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVESubjectRepository-@marshal}{}}}
-\subsection{Method \code{@marshal()}}{
-Internal method
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectBaseRepository$@marshal(...)}\if{html}{\out{</div>}}
+\subsection{\code{RAVESubjectRepository$@marshal()}}{
+  Internal method
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVESubjectRepository$@marshal(...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{...}}{internal arguments}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{internal arguments}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVESubjectRepository-@unmarshal"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVESubjectRepository-@unmarshal}{}}}
-\subsection{Method \code{@unmarshal()}}{
-Internal method
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectBaseRepository$@unmarshal(object, ...)}\if{html}{\out{</div>}}
+\subsection{\code{RAVESubjectRepository$@unmarshal()}}{
+  Internal method
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVESubjectRepository$@unmarshal(object, ...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{object, ...}}{internal arguments}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{object, ...}}{internal arguments}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVESubjectRepository-print"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVESubjectRepository-print}{}}}
-\subsection{Method \code{print()}}{
-User-friendly print method
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectBaseRepository$print()}\if{html}{\out{</div>}}
+\subsection{\code{RAVESubjectRepository$print()}}{
+  User-friendly print method
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVESubjectRepository$print()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-RAVESubjectRepository-new"></a>}}
-\if{latex}{\out{\hypertarget{method-RAVESubjectRepository-new}{}}}
-\subsection{Method \code{new()}}{
-constructor
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectBaseRepository$new(
+\if{html}{\out{<a id="method-RAVESubjectRepository-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-RAVESubjectRepository-initialize}{}}}
+\subsection{\code{RAVESubjectRepository$new()}}{
+  constructor
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVESubjectRepository$new(
   subject,
   electrodes = NULL,
   reference_name = NULL,
@@ -167,68 +171,67 @@ constructor
   repository_id = NULL,
   strict = TRUE,
   .class = NULL
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{subject}}{'RAVE' subject}
-
-\item{\code{electrodes}}{string or integers indicating electrodes to load}
-
-\item{\code{reference_name}}{name of the reference table}
-
-\item{\code{...}}{reserved, currently ignored}
-
-\item{\code{auto_exclude}}{whether to automatically discard bad channels}
-
-\item{\code{quiet}}{see field \code{quiet}}
-
-\item{\code{repository_id}}{see field \code{repository_id}}
-
-\item{\code{strict}}{whether the mode should be strict; default is true and
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{subject}}{'RAVE' subject}
+      \item{\code{electrodes}}{string or integers indicating electrodes to load}
+      \item{\code{reference_name}}{name of the reference table}
+      \item{\code{...}}{reserved, currently ignored}
+      \item{\code{auto_exclude}}{whether to automatically discard bad channels}
+      \item{\code{quiet}}{see field \code{quiet}}
+      \item{\code{repository_id}}{see field \code{repository_id}}
+      \item{\code{strict}}{whether the mode should be strict; default is true and
 errors out when subject is missing}
+      \item{\code{.class}}{internally used, do not set, even if you know what this is}
+    }
+    \if{html}{\out{</div>}}
+  }
+}
 
-\item{\code{.class}}{internally used, do not set, even if you know what this is}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVESubjectRepository-export_matlab"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVESubjectRepository-export_matlab}{}}}
-\subsection{Method \code{export_matlab()}}{
-Export the repository to 'Matlab' for future analysis
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectBaseRepository$export_matlab(..., verbose = TRUE)}\if{html}{\out{</div>}}
+\subsection{\code{RAVESubjectRepository$export_matlab()}}{
+  Export the repository to 'Matlab' for future analysis
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVESubjectRepository$export_matlab(..., verbose = TRUE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{...}}{reserved for child classes}
+      \item{\code{verbose}}{print progresses}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    The root directory where the files are stored.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{reserved for child classes}
-
-\item{\code{verbose}}{print progresses}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVESubjectRepository-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVESubjectRepository-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectBaseRepository$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{RAVESubjectRepository$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVESubjectRepository$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

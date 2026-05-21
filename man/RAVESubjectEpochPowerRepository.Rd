@@ -11,79 +11,82 @@ Use \code{\link{prepare_subject_power_with_epochs}} to create an
 instance.
 }
 \section{Super classes}{
-\code{\link[ravepipeline:RAVESerializable]{ravepipeline::RAVESerializable}} -> \code{ravecore::RAVESubjectRepository} -> \code{\link[ravecore:RAVESubjectEpochRepository]{ravecore::RAVESubjectEpochRepository}} -> \code{\link[ravecore:RAVESubjectEpochTimeFreqBaseRepository]{ravecore::RAVESubjectEpochTimeFreqBaseRepository}} -> \code{RAVESubjectEpochPowerRepository}
+\code{\link[ravepipeline:RAVESerializable]{ravepipeline::RAVESerializable}} -> \code{RAVESubjectRepository} -> \code{\link[ravecore:RAVESubjectEpochRepository]{RAVESubjectEpochRepository}} -> \code{\link[ravecore:RAVESubjectEpochTimeFreqBaseRepository]{RAVESubjectEpochTimeFreqBaseRepository}} -> \code{RAVESubjectEpochPowerRepository}
 }
 \section{Active bindings}{
-\if{html}{\out{<div class="r6-active-bindings">}}
-\describe{
-\item{\code{power}}{a named map of time-frequency power spectrogram,
+  \if{html}{\out{<div class="r6-active-bindings">}}
+  \describe{
+    \item{\code{power}}{a named map of time-frequency power spectrogram,
 mounted by \code{mount_data}}
-}
-\if{html}{\out{</div>}}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-RAVESubjectEpochPowerRepository-@marshal}{\code{RAVESubjectEpochPowerRepository$@marshal()}}
-\item \href{#method-RAVESubjectEpochPowerRepository-@unmarshal}{\code{RAVESubjectEpochPowerRepository$@unmarshal()}}
-\item \href{#method-RAVESubjectEpochPowerRepository-new}{\code{RAVESubjectEpochPowerRepository$new()}}
-\item \href{#method-RAVESubjectEpochPowerRepository-clone}{\code{RAVESubjectEpochPowerRepository$clone()}}
+  \itemize{
+    \item \href{#method-RAVESubjectEpochPowerRepository-@marshal}{\code{RAVESubjectEpochPowerRepository$@marshal()}}
+    \item \href{#method-RAVESubjectEpochPowerRepository-@unmarshal}{\code{RAVESubjectEpochPowerRepository$@unmarshal()}}
+    \item \href{#method-RAVESubjectEpochPowerRepository-initialize}{\code{RAVESubjectEpochPowerRepository$new()}}
+    \item \href{#method-RAVESubjectEpochPowerRepository-clone}{\code{RAVESubjectEpochPowerRepository$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details><summary>Inherited methods</summary>
+\if{html}{\out{<details><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="ravepipeline" data-topic="RAVESerializable" data-id="@compare"><a href='../../ravepipeline/html/RAVESerializable.html#method-RAVESerializable-@compare'><code>ravepipeline::RAVESerializable$@compare()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectRepository" data-id="@get_container"><a href='../../ravecore/html/RAVESubjectRepository.html#method-RAVESubjectRepository-@get_container'><code>ravecore::RAVESubjectRepository$@get_container()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectRepository" data-id="print"><a href='../../ravecore/html/RAVESubjectRepository.html#method-RAVESubjectRepository-print'><code>ravecore::RAVESubjectRepository$print()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectEpochRepository" data-id="export_matlab"><a href='../../ravecore/html/RAVESubjectEpochRepository.html#method-RAVESubjectEpochRepository-export_matlab'><code>ravecore::RAVESubjectEpochRepository$export_matlab()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectEpochRepository" data-id="get_container"><a href='../../ravecore/html/RAVESubjectEpochRepository.html#method-RAVESubjectEpochRepository-get_container'><code>ravecore::RAVESubjectEpochRepository$get_container()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectEpochRepository" data-id="set_epoch"><a href='../../ravecore/html/RAVESubjectEpochRepository.html#method-RAVESubjectEpochRepository-set_epoch'><code>ravecore::RAVESubjectEpochRepository$set_epoch()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectEpochTimeFreqBaseRepository" data-id="mount_data"><a href='../../ravecore/html/RAVESubjectEpochTimeFreqBaseRepository.html#method-RAVESubjectEpochTimeFreqBaseRepository-mount_data'><code>ravecore::RAVESubjectEpochTimeFreqBaseRepository$mount_data()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="ravepipeline" data-topic="RAVESerializable" data-id="@compare"><a href='../../ravepipeline/html/RAVESerializable.html#method-RAVESerializable-@compare'><code>ravepipeline::RAVESerializable$@compare()</code></a></span></li>
+  <li><code>RAVESubjectRepository$@get_container()</code></li>
+  <li><code>RAVESubjectRepository$print()</code></li>
+  <li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectEpochRepository" data-id="export_matlab"><a href='../../ravecore/html/RAVESubjectEpochRepository.html#method-RAVESubjectEpochRepository-export_matlab'><code>RAVESubjectEpochRepository$export_matlab()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectEpochRepository" data-id="get_container"><a href='../../ravecore/html/RAVESubjectEpochRepository.html#method-RAVESubjectEpochRepository-get_container'><code>RAVESubjectEpochRepository$get_container()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectEpochRepository" data-id="set_epoch"><a href='../../ravecore/html/RAVESubjectEpochRepository.html#method-RAVESubjectEpochRepository-set_epoch'><code>RAVESubjectEpochRepository$set_epoch()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectEpochTimeFreqBaseRepository" data-id="mount_data"><a href='../../ravecore/html/RAVESubjectEpochTimeFreqBaseRepository.html#method-RAVESubjectEpochTimeFreqBaseRepository-mount_data'><code>RAVESubjectEpochTimeFreqBaseRepository$mount_data()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVESubjectEpochPowerRepository-@marshal"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVESubjectEpochPowerRepository-@marshal}{}}}
-\subsection{Method \code{@marshal()}}{
-Internal method
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectEpochPowerRepository$@marshal(...)}\if{html}{\out{</div>}}
+\subsection{\code{RAVESubjectEpochPowerRepository$@marshal()}}{
+  Internal method
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVESubjectEpochPowerRepository$@marshal(...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{...}}{internal arguments}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{internal arguments}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVESubjectEpochPowerRepository-@unmarshal"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVESubjectEpochPowerRepository-@unmarshal}{}}}
-\subsection{Method \code{@unmarshal()}}{
-Internal method
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectEpochPowerRepository$@unmarshal(object, ...)}\if{html}{\out{</div>}}
+\subsection{\code{RAVESubjectEpochPowerRepository$@unmarshal()}}{
+  Internal method
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVESubjectEpochPowerRepository$@unmarshal(object, ...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{object, ...}}{internal arguments}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{object, ...}}{internal arguments}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-RAVESubjectEpochPowerRepository-new"></a>}}
-\if{latex}{\out{\hypertarget{method-RAVESubjectEpochPowerRepository-new}{}}}
-\subsection{Method \code{new()}}{
-constructor
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectEpochPowerRepository$new(
+\if{html}{\out{<a id="method-RAVESubjectEpochPowerRepository-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-RAVESubjectEpochPowerRepository-initialize}{}}}
+\subsection{\code{RAVESubjectEpochPowerRepository$new()}}{
+  constructor
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVESubjectEpochPowerRepository$new(
   subject,
   electrodes = NULL,
   reference_name = NULL,
@@ -96,59 +99,51 @@ constructor
   strict = TRUE,
   lazy_load = FALSE,
   .class = NULL
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{subject}}{'RAVE' subject}
-
-\item{\code{electrodes}}{string or integers indicating electrodes to load}
-
-\item{\code{reference_name}}{name of the reference table}
-
-\item{\code{epoch_name}}{name of the epoch trial table}
-
-\item{\code{time_windows}}{numeric vector with even lengths, the time start
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{subject}}{'RAVE' subject}
+      \item{\code{electrodes}}{string or integers indicating electrodes to load}
+      \item{\code{reference_name}}{name of the reference table}
+      \item{\code{epoch_name}}{name of the epoch trial table}
+      \item{\code{time_windows}}{numeric vector with even lengths, the time start
 and end of the trials, for example, \code{c(-1, 2)} means load
 1 second before the trial onset and 2 seconds after trial onset}
-
-\item{\code{stitch_events}}{events where the \code{time_windows} is based;
+      \item{\code{stitch_events}}{events where the \code{time_windows} is based;
 default is trial onset (\code{NULL})}
-
-\item{\code{...}}{passed to \code{\link{RAVESubjectEpochTimeFreqBaseRepository}} constructor}
-
-\item{\code{quiet}}{see field \code{quiet}}
-
-\item{\code{repository_id}}{see field \code{repository_id}}
-
-\item{\code{strict}}{whether the mode should be strict; default is true and
+      \item{\code{...}}{passed to \code{\link{RAVESubjectEpochTimeFreqBaseRepository}} constructor}
+      \item{\code{quiet}}{see field \code{quiet}}
+      \item{\code{repository_id}}{see field \code{repository_id}}
+      \item{\code{strict}}{whether the mode should be strict; default is true and
 errors out when subject is missing}
-
-\item{\code{lazy_load}}{whether to delay \code{mount_data};
+      \item{\code{lazy_load}}{whether to delay \code{mount_data};
 default is false}
+      \item{\code{.class}}{internally used, do not set, even if you know what this is}
+    }
+    \if{html}{\out{</div>}}
+  }
+}
 
-\item{\code{.class}}{internally used, do not set, even if you know what this is}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVESubjectEpochPowerRepository-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVESubjectEpochPowerRepository-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectEpochPowerRepository$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{RAVESubjectEpochPowerRepository$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVESubjectEpochPowerRepository$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

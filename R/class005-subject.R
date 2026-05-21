@@ -703,7 +703,8 @@ RAVESubject <- R6::R6Class(
                 directory = "character"
               ), na.strings = "n/a"
             )
-            stopifnot(all(c("project", "subject", "pipeline_name", "timestamp", "label", "directory") %in% names(registry)))
+            stopifnot(all(c("project", "subject", "pipeline_name", "timestamp",
+                            "label", "directory") %in% names(registry)))
             if (nrow(registry)) {
               if (!length(registry$policy)) {
                 registry$policy <- "default"
@@ -724,26 +725,22 @@ RAVESubject <- R6::R6Class(
       }
 
       if (!is.data.frame(registry) || nrow(registry) == 0) {
-        pipeline_paths <- file.path(self$pipeline_path, pipeline_name)
+
         prefix <- sprintf("^%s-", pipeline_name)
-        re <- list.files(
-          pipeline_paths,
-          pattern = prefix,
-          include.dirs = TRUE,
-          all.files = FALSE,
-          ignore.case = TRUE,
-          no.. = TRUE,
-          recursive = FALSE,
-          full.names = FALSE
-        )
-        if ( check && length(re) ) {
-          re <- re[dir.exists(file.path(pipeline_paths, re))]
-        }
-        re <- lapply(re, function(name) {
+
+        filter_pipeline <- function(pipeline_paths, name) {
           tryCatch({
+            if (!dir.exists(file.path(pipeline_paths, name))) {
+              return(NULL)
+            }
             item <- strsplit(gsub(prefix, "", name, ignore.case = TRUE), "-", fixed = TRUE)[[1]]
             idx <- length(item)
-            timestamp <- as.POSIXct(strptime(paste(item[idx], collapse = "-"), "%Y%m%dT%H%M%S"))
+            timestamp_str <- paste(item[idx], collapse = "-")
+            if (nchar(timestamp_str) == 15) {
+              timestamp <- as.POSIXct(strptime(timestamp_str, "%Y%m%dT%H%M%S"))
+            } else {
+              timestamp <- as.POSIXct(strptime(timestamp_str, "%y%m%dT%H%M%S"))
+            }
             label <- paste(item[-idx], collapse = "-")
             # check fork policy
             path_fork_info <- file.path(pipeline_paths, name, "_fork_info")
@@ -766,17 +763,63 @@ RAVESubject <- R6::R6Class(
               version = info$version
             )
           }, error = function(...) { NULL })
+        }
+
+        # Canonical path
+        pipeline_paths <- file.path(self$pipeline_path, pipeline_name)
+
+        re <- list.files(
+          pipeline_paths, pattern = prefix, include.dirs = TRUE,
+          all.files = FALSE, ignore.case = TRUE, no.. = TRUE,
+          recursive = FALSE, full.names = FALSE
+        )
+        re <- lapply(re, function(name) {
+          filter_pipeline(pipeline_paths, name)
         })
 
         registry <- data.table::rbindlist(re)
+
+        # Backward compatible
+        pipeline_paths_old <- file.path(self$rave_path, "pipeline", pipeline_name)
+
+        re <- list.files(
+          pipeline_paths_old, pattern = prefix, include.dirs = TRUE,
+          all.files = FALSE, ignore.case = TRUE, no.. = TRUE,
+          recursive = FALSE, full.names = FALSE
+        )
+        re <- lapply(re, function(name) {
+          filter_pipeline(pipeline_paths_old, name)
+        })
+        registry_old <- data.table::rbindlist(re)
+
+        if (length(registry_old)) {
+          registry <- rbind(registry, registry_old)
+        }
+
       }
 
       if (!all && is.data.frame(registry) && nrow(registry) > 0) {
         # remove duplicated labels
-        registry <- registry[order(registry$label, registry$timestamp, decreasing = TRUE, na.last = TRUE), ]
-        registry <- data.table::rbindlist(lapply(split(registry, registry$label), function(sub) {
-          sub[1, ]
-        }), use.names = FALSE)
+        registry <- registry[order(registry$label,
+                                   registry$timestamp,
+                                   decreasing = TRUE,
+                                   na.last = TRUE), ]
+        split_list <- split(registry, registry$label)
+        registry <- data.table::rbindlist(
+          lapply(split_list, function(sub) {
+            sub[1, ]
+          }), use.names = FALSE)
+      } else {
+        registry <- data.table::data.table(
+          project = character(0L),
+          subject = character(0L),
+          pipeline_name = character(0L),
+          timestamp = as.POSIXct(numeric()),
+          label = character(0L),
+          directory = character(0L),
+          policy = character(0L),
+          version = character(0L)
+        )
       }
 
       registry
@@ -790,6 +833,10 @@ RAVESubject <- R6::R6Class(
       # directory <- "power_explorer-NA-20240822T184419"
       pipeline_name <- strsplit(directory, "-", fixed = TRUE)[[1]][[1]]
       pipeline_path <- file.path(self$pipeline_path, pipeline_name, directory)
+      if (!file.exists(pipeline_path)) {
+        # old path
+        pipeline_path <- file.path(self$rave_path, "pipeline", directory)
+      }
       if (!file.exists(pipeline_path)) {
         stop("Unable to find pipeline [", directory, "] from subject ", self$subject_id)
       }

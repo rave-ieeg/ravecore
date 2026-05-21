@@ -3,24 +3,6 @@
 \name{RAVEEpoch}
 \alias{RAVEEpoch}
 \title{Definition for epoch class}
-\value{
-\code{self$table}
-
-If \code{event} is one of \code{"trial onset"},
-\code{"default"}, \code{""}, or \code{NULL}, then the result will be
-\code{"Time"} column; if the event is found, then return will be the
-corresponding event column. When the event is not found and
-\code{missing} is \code{"error"}, error will be raised; default is
-to return \code{"Time"} column, as it's trial onset and is mandatory.
-
-If \code{condition_type} is one of
-\code{"default"}, \code{""}, or \code{NULL}, then the result will be
-\code{"Condition"} column; if the condition type is found, then return
-will be the corresponding condition type column. When the condition type
-is not found and \code{missing} is \code{"error"}, error will be raised;
-default is to return \code{"Condition"} column, as it's the default
-and is mandatory.
-}
 \description{
 Trial epoch, contains the following information: \code{Block}
 experiment block/session string; \code{Time} trial onset within that block;
@@ -63,230 +45,258 @@ head(epoch$table)
 \code{\link[ravepipeline:RAVESerializable]{ravepipeline::RAVESerializable}} -> \code{RAVEEpoch}
 }
 \section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{name}}{epoch name, character}
+  \if{html}{\out{<div class="r6-fields">}}
+  \describe{
+    \item{\code{name}}{epoch name, character}
 
-\item{\code{subject}}{\code{RAVESubject} instance}
+    \item{\code{subject}}{\code{RAVESubject} instance}
 
-\item{\code{data}}{a list of trial information, internally used}
+    \item{\code{data}}{a list of trial information, internally used}
 
-\item{\code{table}}{trial epoch table}
+    \item{\code{table}}{trial epoch table}
 
-\item{\code{.columns}}{epoch column names, internally used}
-}
-\if{html}{\out{</div>}}
+    \item{\code{.columns}}{epoch column names, internally used}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Active bindings}{
-\if{html}{\out{<div class="r6-active-bindings">}}
-\describe{
-\item{\code{columns}}{columns of trial table}
+  \if{html}{\out{<div class="r6-active-bindings">}}
+  \describe{
+    \item{\code{columns}}{columns of trial table}
 
-\item{\code{n_trials}}{total number of trials}
+    \item{\code{n_trials}}{total number of trials}
 
-\item{\code{trials}}{trial numbers}
+    \item{\code{trials}}{trial numbers}
 
-\item{\code{available_events}}{available events other than trial onset}
+    \item{\code{available_events}}{available events other than trial onset}
 
-\item{\code{available_condition_type}}{available condition type other than
+    \item{\code{available_condition_type}}{available condition type other than
 the default}
-}
-\if{html}{\out{</div>}}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-RAVEEpoch-@marshal}{\code{RAVEEpoch$@marshal()}}
-\item \href{#method-RAVEEpoch-@unmarshal}{\code{RAVEEpoch$@unmarshal()}}
-\item \href{#method-RAVEEpoch-new}{\code{RAVEEpoch$new()}}
-\item \href{#method-RAVEEpoch-trial_at}{\code{RAVEEpoch$trial_at()}}
-\item \href{#method-RAVEEpoch-update_table}{\code{RAVEEpoch$update_table()}}
-\item \href{#method-RAVEEpoch-set_trial}{\code{RAVEEpoch$set_trial()}}
-\item \href{#method-RAVEEpoch-get_event_colname}{\code{RAVEEpoch$get_event_colname()}}
-\item \href{#method-RAVEEpoch-get_condition_colname}{\code{RAVEEpoch$get_condition_colname()}}
-\item \href{#method-RAVEEpoch-clone}{\code{RAVEEpoch$clone()}}
+  \itemize{
+    \item \href{#method-RAVEEpoch-@marshal}{\code{RAVEEpoch$@marshal()}}
+    \item \href{#method-RAVEEpoch-@unmarshal}{\code{RAVEEpoch$@unmarshal()}}
+    \item \href{#method-RAVEEpoch-initialize}{\code{RAVEEpoch$new()}}
+    \item \href{#method-RAVEEpoch-trial_at}{\code{RAVEEpoch$trial_at()}}
+    \item \href{#method-RAVEEpoch-update_table}{\code{RAVEEpoch$update_table()}}
+    \item \href{#method-RAVEEpoch-set_trial}{\code{RAVEEpoch$set_trial()}}
+    \item \href{#method-RAVEEpoch-get_event_colname}{\code{RAVEEpoch$get_event_colname()}}
+    \item \href{#method-RAVEEpoch-get_condition_colname}{\code{RAVEEpoch$get_condition_colname()}}
+    \item \href{#method-RAVEEpoch-clone}{\code{RAVEEpoch$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="ravepipeline" data-topic="RAVESerializable" data-id="@compare"><a href='../../ravepipeline/html/RAVESerializable.html#method-RAVESerializable-@compare'><code>ravepipeline::RAVESerializable$@compare()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="ravepipeline" data-topic="RAVESerializable" data-id="@compare"><a href='../../ravepipeline/html/RAVESerializable.html#method-RAVESerializable-@compare'><code>ravepipeline::RAVESerializable$@compare()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVEEpoch-@marshal"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVEEpoch-@marshal}{}}}
-\subsection{Method \code{@marshal()}}{
-Internal method
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVEEpoch$@marshal(...)}\if{html}{\out{</div>}}
+\subsection{\code{RAVEEpoch$@marshal()}}{
+  Internal method
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVEEpoch$@marshal(...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{...}}{internal arguments}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{internal arguments}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVEEpoch-@unmarshal"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVEEpoch-@unmarshal}{}}}
-\subsection{Method \code{@unmarshal()}}{
-Internal method
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVEEpoch$@unmarshal(object, ...)}\if{html}{\out{</div>}}
+\subsection{\code{RAVEEpoch$@unmarshal()}}{
+  Internal method
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVEEpoch$@unmarshal(object, ...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{object, ...}}{internal arguments}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{object, ...}}{internal arguments}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-RAVEEpoch-new"></a>}}
-\if{latex}{\out{\hypertarget{method-RAVEEpoch-new}{}}}
-\subsection{Method \code{new()}}{
-constructor
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVEEpoch$new(subject, name)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{subject}}{\code{RAVESubject} instance or character}
-
-\item{\code{name}}{character, make sure \code{"epoch_<name>.csv"} is in meta
+\if{html}{\out{<a id="method-RAVEEpoch-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-RAVEEpoch-initialize}{}}}
+\subsection{\code{RAVEEpoch$new()}}{
+  constructor
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVEEpoch$new(subject, name)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{subject}}{\code{RAVESubject} instance or character}
+      \item{\code{name}}{character, make sure \code{"epoch_<name>.csv"} is in meta
 folder}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVEEpoch-trial_at"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVEEpoch-trial_at}{}}}
-\subsection{Method \code{trial_at()}}{
-get \code{ith} trial
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVEEpoch$trial_at(i, df = TRUE)}\if{html}{\out{</div>}}
+\subsection{\code{RAVEEpoch$trial_at()}}{
+  get \code{ith} trial
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVEEpoch$trial_at(i, df = TRUE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{i}}{trial number}
+      \item{\code{df}}{whether to return as data frame or a list}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{i}}{trial number}
-
-\item{\code{df}}{whether to return as data frame or a list}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVEEpoch-update_table"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVEEpoch-update_table}{}}}
-\subsection{Method \code{update_table()}}{
-manually update table field
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVEEpoch$update_table()}\if{html}{\out{</div>}}
+\subsection{\code{RAVEEpoch$update_table()}}{
+  manually update table field
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVEEpoch$update_table()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    \code{self$table}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVEEpoch-set_trial"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVEEpoch-set_trial}{}}}
-\subsection{Method \code{set_trial()}}{
-set one trial
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVEEpoch$set_trial(Block, Time, Trial, Condition, ...)}\if{html}{\out{</div>}}
+\subsection{\code{RAVEEpoch$set_trial()}}{
+  set one trial
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVEEpoch$set_trial(Block, Time, Trial, Condition, ...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{Block}}{block string}
+      \item{\code{Time}}{time in second}
+      \item{\code{Trial}}{positive integer, trial number}
+      \item{\code{Condition}}{character, trial condition}
+      \item{\code{...}}{other key-value pairs corresponding to other optional columns}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{Block}}{block string}
-
-\item{\code{Time}}{time in second}
-
-\item{\code{Trial}}{positive integer, trial number}
-
-\item{\code{Condition}}{character, trial condition}
-
-\item{\code{...}}{other key-value pairs corresponding to other optional columns}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVEEpoch-get_event_colname"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVEEpoch-get_event_colname}{}}}
-\subsection{Method \code{get_event_colname()}}{
-Get epoch column name that represents the desired event
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVEEpoch$get_event_colname(
+\subsection{\code{RAVEEpoch$get_event_colname()}}{
+  Get epoch column name that represents the desired event
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVEEpoch$get_event_colname(
   event = "",
   missing = c("warning", "error", "none")
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{event}}{a character string of the event, see
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{event}}{a character string of the event, see
 \code{$available_events} for all available events; set to
 \code{"trial onset"}, \code{"default"}, or blank to use the default}
+      \item{\code{missing}}{what to do if event is missing; default is to warn}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    If \code{event} is one of \code{"trial onset"},
+\code{"default"}, \code{""}, or \code{NULL}, then the result will be
+\code{"Time"} column; if the event is found, then return will be the
+corresponding event column. When the event is not found and
+\code{missing} is \code{"error"}, error will be raised; default is
+to return \code{"Time"} column, as it's trial onset and is mandatory.
+  }
+}
 
-\item{\code{missing}}{what to do if event is missing; default is to warn}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVEEpoch-get_condition_colname"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVEEpoch-get_condition_colname}{}}}
-\subsection{Method \code{get_condition_colname()}}{
-Get condition column name that represents the desired
+\subsection{\code{RAVEEpoch$get_condition_colname()}}{
+  Get condition column name that represents the desired
 condition type
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVEEpoch$get_condition_colname(
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVEEpoch$get_condition_colname(
   condition_type = "default",
   missing = c("error", "warning", "none")
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{condition_type}}{a character string of the condition type, see
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{condition_type}}{a character string of the condition type, see
 \code{$available_condition_type} for all available condition types;
 set to \code{"default"} or blank to use the default}
-
-\item{\code{missing}}{what to do if condition type is missing; default is to
+      \item{\code{missing}}{what to do if condition type is missing; default is to
 warn if the condition column is not found.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    If \code{condition_type} is one of
+\code{"default"}, \code{""}, or \code{NULL}, then the result will be
+\code{"Condition"} column; if the condition type is found, then return
+will be the corresponding condition type column. When the condition type
+is not found and \code{missing} is \code{"error"}, error will be raised;
+default is to return \code{"Condition"} column, as it's the default
+and is mandatory.
+  }
 }
-\if{html}{\out{</div>}}
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVEEpoch-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVEEpoch-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVEEpoch$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{RAVEEpoch$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVEEpoch$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

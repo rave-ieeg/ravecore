@@ -22,6 +22,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Zhengjia Wang \email{dipterix.wang@gmail.com} (\href{https://orcid.org/0000-0001-5629-1116}{ORCID})
   \item Xiang Zhang \email{xiang.zhang@pennmedicine.upenn.edu}
   \item John Magnotti \email{john.magnotti@pennmedicine.upenn.edu}
   \item Michael Beauchamp \email{michael.beauchamp@pennmedicine.upenn.edu}

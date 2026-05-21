@@ -3,15 +3,6 @@
 \name{LFP_electrode}
 \alias{LFP_electrode}
 \title{Definitions of electrode with local field potential signal type}
-\value{
-if the reference number if \code{NULL} or \code{'noref'}, then
-returns 0, otherwise returns a \code{\link[filearray]{FileArray-class}}
-
-If \code{simplify} is enabled, and only one block is loaded,
-then the result will be a vector (\code{type="voltage"}) or a matrix
-(others), otherwise the result will be a named list where the names
-are the blocks.
-}
 \description{
 Please use a safer \code{\link{new_electrode}} function to
 create instances. This documentation is to describe the member methods
@@ -58,249 +49,270 @@ ref$clear_cache()
 
 }
 \section{Super classes}{
-\code{\link[ravepipeline:RAVESerializable]{ravepipeline::RAVESerializable}} -> \code{\link[ravecore:RAVEAbstarctElectrode]{ravecore::RAVEAbstarctElectrode}} -> \code{LFP_electrode}
+\code{\link[ravepipeline:RAVESerializable]{ravepipeline::RAVESerializable}} -> \code{\link[ravecore:RAVEAbstarctElectrode]{RAVEAbstarctElectrode}} -> \code{LFP_electrode}
 }
 \section{Active bindings}{
-\if{html}{\out{<div class="r6-active-bindings">}}
-\describe{
-\item{\code{h5_fname}}{'HDF5' file name}
+  \if{html}{\out{<div class="r6-active-bindings">}}
+  \describe{
+    \item{\code{h5_fname}}{'HDF5' file name}
 
-\item{\code{valid}}{whether current electrode is valid: subject exists and
+    \item{\code{valid}}{whether current electrode is valid: subject exists and
 contains current electrode or reference; subject electrode type matches
 with current electrode type}
 
-\item{\code{raw_sample_rate}}{voltage sample rate}
+    \item{\code{raw_sample_rate}}{voltage sample rate}
 
-\item{\code{power_sample_rate}}{power/phase sample rate}
+    \item{\code{power_sample_rate}}{power/phase sample rate}
 
-\item{\code{preprocess_info}}{preprocess information}
+    \item{\code{preprocess_info}}{preprocess information}
 
-\item{\code{power_file}}{path to power 'HDF5' file}
+    \item{\code{power_file}}{path to power 'HDF5' file}
 
-\item{\code{phase_file}}{path to phase 'HDF5' file}
+    \item{\code{phase_file}}{path to phase 'HDF5' file}
 
-\item{\code{voltage_file}}{path to voltage 'HDF5' file}
-}
-\if{html}{\out{</div>}}
+    \item{\code{voltage_file}}{path to voltage 'HDF5' file}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-LFP_electrode-@marshal}{\code{LFP_electrode$@marshal()}}
-\item \href{#method-LFP_electrode-@unmarshal}{\code{LFP_electrode$@unmarshal()}}
-\item \href{#method-LFP_electrode-print}{\code{LFP_electrode$print()}}
-\item \href{#method-LFP_electrode-set_reference}{\code{LFP_electrode$set_reference()}}
-\item \href{#method-LFP_electrode-new}{\code{LFP_electrode$new()}}
-\item \href{#method-LFP_electrode-.load_noref_wavelet}{\code{LFP_electrode$.load_noref_wavelet()}}
-\item \href{#method-LFP_electrode-.load_noref_voltage}{\code{LFP_electrode$.load_noref_voltage()}}
-\item \href{#method-LFP_electrode-.load_wavelet}{\code{LFP_electrode$.load_wavelet()}}
-\item \href{#method-LFP_electrode-.load_voltage}{\code{LFP_electrode$.load_voltage()}}
-\item \href{#method-LFP_electrode-.load_raw_voltage}{\code{LFP_electrode$.load_raw_voltage()}}
-\item \href{#method-LFP_electrode-load_data_with_epochs}{\code{LFP_electrode$load_data_with_epochs()}}
-\item \href{#method-LFP_electrode-load_dimnames_with_epochs}{\code{LFP_electrode$load_dimnames_with_epochs()}}
-\item \href{#method-LFP_electrode-load_data_with_blocks}{\code{LFP_electrode$load_data_with_blocks()}}
-\item \href{#method-LFP_electrode-load_dim_with_blocks}{\code{LFP_electrode$load_dim_with_blocks()}}
-\item \href{#method-LFP_electrode-clear_cache}{\code{LFP_electrode$clear_cache()}}
-\item \href{#method-LFP_electrode-clear_memory}{\code{LFP_electrode$clear_memory()}}
-\item \href{#method-LFP_electrode-clone}{\code{LFP_electrode$clone()}}
+  \itemize{
+    \item \href{#method-LFP_electrode-@marshal}{\code{LFP_electrode$@marshal()}}
+    \item \href{#method-LFP_electrode-@unmarshal}{\code{LFP_electrode$@unmarshal()}}
+    \item \href{#method-LFP_electrode-print}{\code{LFP_electrode$print()}}
+    \item \href{#method-LFP_electrode-set_reference}{\code{LFP_electrode$set_reference()}}
+    \item \href{#method-LFP_electrode-initialize}{\code{LFP_electrode$new()}}
+    \item \href{#method-LFP_electrode-.load_noref_wavelet}{\code{LFP_electrode$.load_noref_wavelet()}}
+    \item \href{#method-LFP_electrode-.load_noref_voltage}{\code{LFP_electrode$.load_noref_voltage()}}
+    \item \href{#method-LFP_electrode-.load_wavelet}{\code{LFP_electrode$.load_wavelet()}}
+    \item \href{#method-LFP_electrode-.load_voltage}{\code{LFP_electrode$.load_voltage()}}
+    \item \href{#method-LFP_electrode-.load_raw_voltage}{\code{LFP_electrode$.load_raw_voltage()}}
+    \item \href{#method-LFP_electrode-load_data_with_epochs}{\code{LFP_electrode$load_data_with_epochs()}}
+    \item \href{#method-LFP_electrode-load_dimnames_with_epochs}{\code{LFP_electrode$load_dimnames_with_epochs()}}
+    \item \href{#method-LFP_electrode-load_data_with_blocks}{\code{LFP_electrode$load_data_with_blocks()}}
+    \item \href{#method-LFP_electrode-load_dim_with_blocks}{\code{LFP_electrode$load_dim_with_blocks()}}
+    \item \href{#method-LFP_electrode-clear_cache}{\code{LFP_electrode$clear_cache()}}
+    \item \href{#method-LFP_electrode-clear_memory}{\code{LFP_electrode$clear_memory()}}
+    \item \href{#method-LFP_electrode-clone}{\code{LFP_electrode$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details open><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="ravepipeline" data-topic="RAVESerializable" data-id="@compare"><a href='../../ravepipeline/html/RAVESerializable.html#method-RAVESerializable-@compare'><code>ravepipeline::RAVESerializable$@compare()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVEAbstarctElectrode" data-id="load_blocks"><a href='../../ravecore/html/RAVEAbstarctElectrode.html#method-RAVEAbstarctElectrode-load_blocks'><code>ravecore::RAVEAbstarctElectrode$load_blocks()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVEAbstarctElectrode" data-id="load_data"><a href='../../ravecore/html/RAVEAbstarctElectrode.html#method-RAVEAbstarctElectrode-load_data'><code>ravecore::RAVEAbstarctElectrode$load_data()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVEAbstarctElectrode" data-id="set_epoch"><a href='../../ravecore/html/RAVEAbstarctElectrode.html#method-RAVEAbstarctElectrode-set_epoch'><code>ravecore::RAVEAbstarctElectrode$set_epoch()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="ravepipeline" data-topic="RAVESerializable" data-id="@compare"><a href='../../ravepipeline/html/RAVESerializable.html#method-RAVESerializable-@compare'><code>ravepipeline::RAVESerializable$@compare()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVEAbstarctElectrode" data-id="load_blocks"><a href='../../ravecore/html/RAVEAbstarctElectrode.html#method-RAVEAbstarctElectrode-load_blocks'><code>RAVEAbstarctElectrode$load_blocks()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVEAbstarctElectrode" data-id="load_data"><a href='../../ravecore/html/RAVEAbstarctElectrode.html#method-RAVEAbstarctElectrode-load_data'><code>RAVEAbstarctElectrode$load_data()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVEAbstarctElectrode" data-id="set_epoch"><a href='../../ravecore/html/RAVEAbstarctElectrode.html#method-RAVEAbstarctElectrode-set_epoch'><code>RAVEAbstarctElectrode$set_epoch()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LFP_electrode-@marshal"></a>}}
 \if{latex}{\out{\hypertarget{method-LFP_electrode-@marshal}{}}}
-\subsection{Method \code{@marshal()}}{
-Internal method
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LFP_electrode$@marshal(...)}\if{html}{\out{</div>}}
+\subsection{\code{LFP_electrode$@marshal()}}{
+  Internal method
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LFP_electrode$@marshal(...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{...}}{internal arguments}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{internal arguments}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LFP_electrode-@unmarshal"></a>}}
 \if{latex}{\out{\hypertarget{method-LFP_electrode-@unmarshal}{}}}
-\subsection{Method \code{@unmarshal()}}{
-Internal method
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LFP_electrode$@unmarshal(object)}\if{html}{\out{</div>}}
+\subsection{\code{LFP_electrode$@unmarshal()}}{
+  Internal method
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LFP_electrode$@unmarshal(object)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{object, ...}}{internal arguments}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{object, ...}}{internal arguments}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LFP_electrode-print"></a>}}
 \if{latex}{\out{\hypertarget{method-LFP_electrode-print}{}}}
-\subsection{Method \code{print()}}{
-print electrode summary
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LFP_electrode$print()}\if{html}{\out{</div>}}
+\subsection{\code{LFP_electrode$print()}}{
+  print electrode summary
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LFP_electrode$print()}
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LFP_electrode-set_reference"></a>}}
 \if{latex}{\out{\hypertarget{method-LFP_electrode-set_reference}{}}}
-\subsection{Method \code{set_reference()}}{
-set reference for current electrode
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LFP_electrode$set_reference(reference)}\if{html}{\out{</div>}}
+\subsection{\code{LFP_electrode$set_reference()}}{
+  set reference for current electrode
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LFP_electrode$set_reference(reference)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{reference}}{either \code{NULL} or \code{LFP_electrode} instance}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{reference}}{either \code{NULL} or \code{LFP_electrode} instance}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-LFP_electrode-new"></a>}}
-\if{latex}{\out{\hypertarget{method-LFP_electrode-new}{}}}
-\subsection{Method \code{new()}}{
-constructor
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LFP_electrode$new(subject, number, quiet = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<a id="method-LFP_electrode-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-LFP_electrode-initialize}{}}}
+\subsection{\code{LFP_electrode$new()}}{
+  constructor
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LFP_electrode$new(subject, number, quiet = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{subject, number, quiet}}{see constructor in
+\code{\link{RAVEAbstarctElectrode}}}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{subject, number, quiet}}{see constructor in
-\code{\link{RAVEAbstarctElectrode}}}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LFP_electrode-.load_noref_wavelet"></a>}}
 \if{latex}{\out{\hypertarget{method-LFP_electrode-.load_noref_wavelet}{}}}
-\subsection{Method \code{.load_noref_wavelet()}}{
-load non-referenced wavelet coefficients (internally used)
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LFP_electrode$.load_noref_wavelet(reload = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{LFP_electrode$.load_noref_wavelet()}}{
+  load non-referenced wavelet coefficients (internally used)
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LFP_electrode$.load_noref_wavelet(reload = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{reload}}{whether to reload cache}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    if the reference number if \code{NULL} or \code{'noref'}, then
+returns 0, otherwise returns a \code{\link[filearray]{FileArray-class}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{reload}}{whether to reload cache}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LFP_electrode-.load_noref_voltage"></a>}}
 \if{latex}{\out{\hypertarget{method-LFP_electrode-.load_noref_voltage}{}}}
-\subsection{Method \code{.load_noref_voltage()}}{
-load non-referenced voltage (internally used)
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LFP_electrode$.load_noref_voltage(reload = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{LFP_electrode$.load_noref_voltage()}}{
+  load non-referenced voltage (internally used)
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LFP_electrode$.load_noref_voltage(reload = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{reload}}{whether to reload cache}
+      \item{\code{srate}}{voltage signal sample rate}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{reload}}{whether to reload cache}
-
-\item{\code{srate}}{voltage signal sample rate}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LFP_electrode-.load_wavelet"></a>}}
 \if{latex}{\out{\hypertarget{method-LFP_electrode-.load_wavelet}{}}}
-\subsection{Method \code{.load_wavelet()}}{
-load referenced wavelet coefficients (internally used)
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LFP_electrode$.load_wavelet(
+\subsection{\code{LFP_electrode$.load_wavelet()}}{
+  load referenced wavelet coefficients (internally used)
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LFP_electrode$.load_wavelet(
   type = c("power", "phase", "wavelet-coefficient"),
   reload = FALSE
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{type of data to load}
+      \item{\code{reload}}{whether to reload cache}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{type}}{type of data to load}
-
-\item{\code{reload}}{whether to reload cache}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LFP_electrode-.load_voltage"></a>}}
 \if{latex}{\out{\hypertarget{method-LFP_electrode-.load_voltage}{}}}
-\subsection{Method \code{.load_voltage()}}{
-load referenced voltage (internally used)
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LFP_electrode$.load_voltage(reload = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{LFP_electrode$.load_voltage()}}{
+  load referenced voltage (internally used)
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LFP_electrode$.load_voltage(reload = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{reload}}{whether to reload cache}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{reload}}{whether to reload cache}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LFP_electrode-.load_raw_voltage"></a>}}
 \if{latex}{\out{\hypertarget{method-LFP_electrode-.load_raw_voltage}{}}}
-\subsection{Method \code{.load_raw_voltage()}}{
-load raw voltage (no process)
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LFP_electrode$.load_raw_voltage(reload = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{LFP_electrode$.load_raw_voltage()}}{
+  load raw voltage (no process)
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LFP_electrode$.load_raw_voltage(reload = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{reload}}{whether to reload cache}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{reload}}{whether to reload cache}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LFP_electrode-load_data_with_epochs"></a>}}
 \if{latex}{\out{\hypertarget{method-LFP_electrode-load_data_with_epochs}{}}}
-\subsection{Method \code{load_data_with_epochs()}}{
-method to load electrode data
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LFP_electrode$load_data_with_epochs(
+\subsection{\code{LFP_electrode$load_data_with_epochs()}}{
+  method to load electrode data
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LFP_electrode$load_data_with_epochs(
   type = c("power", "phase", "voltage", "wavelet-coefficient", "raw-voltage")
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{type}}{data type such as \code{"power"}, \code{"phase"},
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{data type such as \code{"power"}, \code{"phase"},
 \code{"voltage"}, \code{"wavelet-coefficient"}, and
 \code{"raw-voltage"}. For \code{"power"}, \code{"phase"},
 and \code{"wavelet-coefficient"}, 'Wavelet' transforms are required.
@@ -308,129 +320,146 @@ For \code{"voltage"}, 'Notch' filters must be applied. All these
 types except for \code{"raw-voltage"} will be referenced.
 For \code{"raw-voltage"}, no reference will be performed since the data
 will be the "raw" signal (no processing).}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
-\if{html}{\out{</div>}}
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LFP_electrode-load_dimnames_with_epochs"></a>}}
 \if{latex}{\out{\hypertarget{method-LFP_electrode-load_dimnames_with_epochs}{}}}
-\subsection{Method \code{load_dimnames_with_epochs()}}{
-get expected dimension names
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LFP_electrode$load_dimnames_with_epochs(
+\subsection{\code{LFP_electrode$load_dimnames_with_epochs()}}{
+  get expected dimension names
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LFP_electrode$load_dimnames_with_epochs(
   type = c("power", "phase", "voltage", "wavelet-coefficient", "raw-voltage")
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{see \code{load_data_with_epochs}}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{type}}{see \code{load_data_with_epochs}}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LFP_electrode-load_data_with_blocks"></a>}}
 \if{latex}{\out{\hypertarget{method-LFP_electrode-load_data_with_blocks}{}}}
-\subsection{Method \code{load_data_with_blocks()}}{
-load electrode block-wise data (with no reference),
+\subsection{\code{LFP_electrode$load_data_with_blocks()}}{
+  load electrode block-wise data (with no reference),
 useful when epoch is absent
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LFP_electrode$load_data_with_blocks(
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LFP_electrode$load_data_with_blocks(
   blocks,
   type = c("power", "phase", "voltage", "wavelet-coefficient", "raw-voltage"),
   simplify = TRUE
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{blocks}}{session blocks}
-
-\item{\code{type}}{data type such as \code{"power"}, \code{"phase"},
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{blocks}}{session blocks}
+      \item{\code{type}}{data type such as \code{"power"}, \code{"phase"},
 \code{"voltage"}, \code{"raw-voltage"} (with no filters applied, as-is
 from imported), \code{"wavelet-coefficient"}. Note that if type
 is \code{"raw-voltage"}, then the data only needs to be imported;
 for \code{"voltage"} data, 'Notch' filters must be applied; for
 all other types, 'Wavelet' transforms are required.}
+      \item{\code{simplify}}{whether to simplify the result}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    If \code{simplify} is enabled, and only one block is loaded,
+then the result will be a vector (\code{type="voltage"}) or a matrix
+(others), otherwise the result will be a named list where the names
+are the blocks.
+  }
+}
 
-\item{\code{simplify}}{whether to simplify the result}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LFP_electrode-load_dim_with_blocks"></a>}}
 \if{latex}{\out{\hypertarget{method-LFP_electrode-load_dim_with_blocks}{}}}
-\subsection{Method \code{load_dim_with_blocks()}}{
-get expected dimension information for block-based loader
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LFP_electrode$load_dim_with_blocks(
+\subsection{\code{LFP_electrode$load_dim_with_blocks()}}{
+  get expected dimension information for block-based loader
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LFP_electrode$load_dim_with_blocks(
   blocks,
   type = c("power", "phase", "voltage", "wavelet-coefficient", "raw-voltage")
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{blocks, type}}{see \code{load_data_with_blocks}}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{blocks, type}}{see \code{load_data_with_blocks}}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LFP_electrode-clear_cache"></a>}}
 \if{latex}{\out{\hypertarget{method-LFP_electrode-clear_cache}{}}}
-\subsection{Method \code{clear_cache()}}{
-method to clear cache on hard drive
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LFP_electrode$clear_cache(...)}\if{html}{\out{</div>}}
+\subsection{\code{LFP_electrode$clear_cache()}}{
+  method to clear cache on hard drive
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LFP_electrode$clear_cache(...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{...}}{ignored}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{ignored}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LFP_electrode-clear_memory"></a>}}
 \if{latex}{\out{\hypertarget{method-LFP_electrode-clear_memory}{}}}
-\subsection{Method \code{clear_memory()}}{
-method to clear memory
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LFP_electrode$clear_memory(...)}\if{html}{\out{</div>}}
+\subsection{\code{LFP_electrode$clear_memory()}}{
+  method to clear memory
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LFP_electrode$clear_memory(...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{...}}{ignored}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{ignored}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-LFP_electrode-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-LFP_electrode-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LFP_electrode$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{LFP_electrode$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{LFP_electrode$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

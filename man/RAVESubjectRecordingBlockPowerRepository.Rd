@@ -10,77 +10,80 @@ Loads time-frequency power
 \code{\link{prepare_subject_power_with_blocks}}
 }
 \section{Super classes}{
-\code{\link[ravepipeline:RAVESerializable]{ravepipeline::RAVESerializable}} -> \code{ravecore::RAVESubjectRepository} -> \code{\link[ravecore:RAVESubjectRecordingBlockRepository]{ravecore::RAVESubjectRecordingBlockRepository}} -> \code{\link[ravecore:RAVESubjectRecordingBlockTimeFreqBaseRepository]{ravecore::RAVESubjectRecordingBlockTimeFreqBaseRepository}} -> \code{RAVESubjectRecordingBlockPowerRepository}
+\code{\link[ravepipeline:RAVESerializable]{ravepipeline::RAVESerializable}} -> \code{RAVESubjectRepository} -> \code{\link[ravecore:RAVESubjectRecordingBlockRepository]{RAVESubjectRecordingBlockRepository}} -> \code{\link[ravecore:RAVESubjectRecordingBlockTimeFreqBaseRepository]{RAVESubjectRecordingBlockTimeFreqBaseRepository}} -> \code{RAVESubjectRecordingBlockPowerRepository}
 }
 \section{Active bindings}{
-\if{html}{\out{<div class="r6-active-bindings">}}
-\describe{
-\item{\code{power}}{data container, alias of \code{get_container}}
-}
-\if{html}{\out{</div>}}
+  \if{html}{\out{<div class="r6-active-bindings">}}
+  \describe{
+    \item{\code{power}}{data container, alias of \code{get_container}}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-RAVESubjectRecordingBlockPowerRepository-@marshal}{\code{RAVESubjectRecordingBlockPowerRepository$@marshal()}}
-\item \href{#method-RAVESubjectRecordingBlockPowerRepository-@unmarshal}{\code{RAVESubjectRecordingBlockPowerRepository$@unmarshal()}}
-\item \href{#method-RAVESubjectRecordingBlockPowerRepository-new}{\code{RAVESubjectRecordingBlockPowerRepository$new()}}
-\item \href{#method-RAVESubjectRecordingBlockPowerRepository-clone}{\code{RAVESubjectRecordingBlockPowerRepository$clone()}}
+  \itemize{
+    \item \href{#method-RAVESubjectRecordingBlockPowerRepository-@marshal}{\code{RAVESubjectRecordingBlockPowerRepository$@marshal()}}
+    \item \href{#method-RAVESubjectRecordingBlockPowerRepository-@unmarshal}{\code{RAVESubjectRecordingBlockPowerRepository$@unmarshal()}}
+    \item \href{#method-RAVESubjectRecordingBlockPowerRepository-initialize}{\code{RAVESubjectRecordingBlockPowerRepository$new()}}
+    \item \href{#method-RAVESubjectRecordingBlockPowerRepository-clone}{\code{RAVESubjectRecordingBlockPowerRepository$clone()}}
+  }
 }
-}
-\if{html}{\out{
-<details><summary>Inherited methods</summary>
+\if{html}{\out{<details><summary>Inherited methods</summary>
 <ul>
-<li><span class="pkg-link" data-pkg="ravepipeline" data-topic="RAVESerializable" data-id="@compare"><a href='../../ravepipeline/html/RAVESerializable.html#method-RAVESerializable-@compare'><code>ravepipeline::RAVESerializable$@compare()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectRepository" data-id="@get_container"><a href='../../ravecore/html/RAVESubjectRepository.html#method-RAVESubjectRepository-@get_container'><code>ravecore::RAVESubjectRepository$@get_container()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectRepository" data-id="print"><a href='../../ravecore/html/RAVESubjectRepository.html#method-RAVESubjectRepository-print'><code>ravecore::RAVESubjectRepository$print()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectRecordingBlockRepository" data-id="export_matlab"><a href='../../ravecore/html/RAVESubjectRecordingBlockRepository.html#method-RAVESubjectRecordingBlockRepository-export_matlab'><code>ravecore::RAVESubjectRecordingBlockRepository$export_matlab()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectRecordingBlockRepository" data-id="get_container"><a href='../../ravecore/html/RAVESubjectRecordingBlockRepository.html#method-RAVESubjectRecordingBlockRepository-get_container'><code>ravecore::RAVESubjectRecordingBlockRepository$get_container()</code></a></span></li>
-<li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectRecordingBlockTimeFreqBaseRepository" data-id="mount_data"><a href='../../ravecore/html/RAVESubjectRecordingBlockTimeFreqBaseRepository.html#method-RAVESubjectRecordingBlockTimeFreqBaseRepository-mount_data'><code>ravecore::RAVESubjectRecordingBlockTimeFreqBaseRepository$mount_data()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="ravepipeline" data-topic="RAVESerializable" data-id="@compare"><a href='../../ravepipeline/html/RAVESerializable.html#method-RAVESerializable-@compare'><code>ravepipeline::RAVESerializable$@compare()</code></a></span></li>
+  <li><code>RAVESubjectRepository$@get_container()</code></li>
+  <li><code>RAVESubjectRepository$print()</code></li>
+  <li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectRecordingBlockRepository" data-id="export_matlab"><a href='../../ravecore/html/RAVESubjectRecordingBlockRepository.html#method-RAVESubjectRecordingBlockRepository-export_matlab'><code>RAVESubjectRecordingBlockRepository$export_matlab()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectRecordingBlockRepository" data-id="get_container"><a href='../../ravecore/html/RAVESubjectRecordingBlockRepository.html#method-RAVESubjectRecordingBlockRepository-get_container'><code>RAVESubjectRecordingBlockRepository$get_container()</code></a></span></li>
+  <li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectRecordingBlockTimeFreqBaseRepository" data-id="mount_data"><a href='../../ravecore/html/RAVESubjectRecordingBlockTimeFreqBaseRepository.html#method-RAVESubjectRecordingBlockTimeFreqBaseRepository-mount_data'><code>RAVESubjectRecordingBlockTimeFreqBaseRepository$mount_data()</code></a></span></li>
 </ul>
-</details>
-}}
+</details>}}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVESubjectRecordingBlockPowerRepository-@marshal"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVESubjectRecordingBlockPowerRepository-@marshal}{}}}
-\subsection{Method \code{@marshal()}}{
-Internal method
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectRecordingBlockPowerRepository$@marshal(...)}\if{html}{\out{</div>}}
+\subsection{\code{RAVESubjectRecordingBlockPowerRepository$@marshal()}}{
+  Internal method
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVESubjectRecordingBlockPowerRepository$@marshal(...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{...}}{internal arguments}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{internal arguments}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVESubjectRecordingBlockPowerRepository-@unmarshal"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVESubjectRecordingBlockPowerRepository-@unmarshal}{}}}
-\subsection{Method \code{@unmarshal()}}{
-Internal method
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectRecordingBlockPowerRepository$@unmarshal(object, ...)}\if{html}{\out{</div>}}
+\subsection{\code{RAVESubjectRecordingBlockPowerRepository$@unmarshal()}}{
+  Internal method
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVESubjectRecordingBlockPowerRepository$@unmarshal(object, ...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{object, ...}}{internal arguments}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{object, ...}}{internal arguments}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-RAVESubjectRecordingBlockPowerRepository-new"></a>}}
-\if{latex}{\out{\hypertarget{method-RAVESubjectRecordingBlockPowerRepository-new}{}}}
-\subsection{Method \code{new()}}{
-constructor
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectRecordingBlockPowerRepository$new(
+\if{html}{\out{<a id="method-RAVESubjectRecordingBlockPowerRepository-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-RAVESubjectRecordingBlockPowerRepository-initialize}{}}}
+\subsection{\code{RAVESubjectRecordingBlockPowerRepository$new()}}{
+  constructor
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVESubjectRecordingBlockPowerRepository$new(
   subject,
   electrodes = NULL,
   reference_name = NULL,
@@ -91,51 +94,45 @@ constructor
   strict = TRUE,
   lazy_load = FALSE,
   .class = NULL
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{subject}}{'RAVE' subject}
-
-\item{\code{electrodes}}{string or integers indicating electrodes to load}
-
-\item{\code{reference_name}}{name of the reference table}
-
-\item{\code{blocks}}{name of the recording blocks to load}
-
-\item{\code{...}}{passed to \code{\link{RAVESubjectBaseRepository}} constructor}
-
-\item{\code{quiet}}{see field \code{quiet}}
-
-\item{\code{repository_id}}{see field \code{repository_id}}
-
-\item{\code{strict}}{whether the mode should be strict; default is true and
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{subject}}{'RAVE' subject}
+      \item{\code{electrodes}}{string or integers indicating electrodes to load}
+      \item{\code{reference_name}}{name of the reference table}
+      \item{\code{blocks}}{name of the recording blocks to load}
+      \item{\code{...}}{passed to \code{\link{RAVESubjectBaseRepository}} constructor}
+      \item{\code{quiet}}{see field \code{quiet}}
+      \item{\code{repository_id}}{see field \code{repository_id}}
+      \item{\code{strict}}{whether the mode should be strict; default is true and
 errors out when subject is missing}
+      \item{\code{lazy_load}}{whether to delay (lazy) the evaluation \code{mount_data}}
+      \item{\code{.class}}{internally used, do not set, even if you know what this is}
+    }
+    \if{html}{\out{</div>}}
+  }
+}
 
-\item{\code{lazy_load}}{whether to delay (lazy) the evaluation \code{mount_data}}
-
-\item{\code{.class}}{internally used, do not set, even if you know what this is}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-RAVESubjectRecordingBlockPowerRepository-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVESubjectRecordingBlockPowerRepository-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{RAVESubjectRecordingBlockPowerRepository$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{RAVESubjectRecordingBlockPowerRepository$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVESubjectRecordingBlockPowerRepository$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }
