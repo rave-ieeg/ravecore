@@ -835,7 +835,7 @@ RAVESubject <- R6::R6Class(
       pipeline_path <- file.path(self$pipeline_path, pipeline_name, directory)
       if (!file.exists(pipeline_path)) {
         # old path
-        pipeline_path <- file.path(self$rave_path, "pipeline", directory)
+        pipeline_path <- file.path(self$rave_path, "pipeline", pipeline_name, directory)
       }
       if (!file.exists(pipeline_path)) {
         stop("Unable to find pipeline [", directory, "] from subject ", self$subject_id)
