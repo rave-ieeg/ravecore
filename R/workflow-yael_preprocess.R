@@ -33,6 +33,9 @@
 #' @param normalize_back length of one (select from \code{normalize_template}),
 #' which template is to be used to generate native brain mask and transform
 #' matrices
+#' @param normalize_affine optional path for initial affine transform: this
+#' allows to manually set the affine transform and perform non-linear
+#' normalization only; for advanced users only.
 #' @param atlases a named list: the names must be template names from
 #' \code{normalize_template} and the values must be directories of atlases of
 #' the corresponding templates (see 'Examples').
@@ -80,6 +83,7 @@ yael_preprocess <- function(
     normalize_policy = c("auto", "all"),
     normalize_images = c("T1w", "T2w", "T1wContrast", "fGATIR", "preopCT"),
     normalize_back = ifelse(length(normalize_template) >= 1, normalize_template[[1]], NA),
+    normalize_affine = NULL,
     atlases = list(),
     add_surfaces = FALSE,
     use_antspynet = TRUE,
@@ -99,6 +103,12 @@ yael_preprocess <- function(
 
   register_policy <- match.arg(register_policy)
   normalize_policy <- match.arg(normalize_policy)
+
+  if (!is.null(normalize_affine)) {
+    affine_transform <- normalizePath(normalize_affine, winslash = "/", mustWork = TRUE)
+  } else {
+    affine_transform <- NULL
+  }
 
   normalize_template <- match.arg(normalize_template, rpyants_builtin_templates(), several.ok = TRUE)
   # generate atlases
@@ -224,6 +234,7 @@ yael_preprocess <- function(
                                    native_type = "T1w",
                                    use_images = normalize_images,
                                    use_antspynet = use_antspynet,
+                                   affine_transform = affine_transform,
                                    verbose = verbose)
     }
     if ( template_name %in% normalize_back ) {
@@ -276,6 +287,7 @@ cmd_run_yael_preprocess <- function(
     register_reversed = FALSE,
     normalize_template = "mni_icbm152_nlin_asym_09b",
     normalize_images = c("T1w", "T2w", "T1wContrast", "fGATIR", "preopCT"),
+    normalize_affine = NULL,
     run_recon_all = TRUE,
     dry_run = FALSE,
     use_antspynet = TRUE,
@@ -331,6 +343,12 @@ cmd_run_yael_preprocess <- function(
   if (length(preopct_path)) { preopct_path <- normalizePath(preopct_path, winslash = "/", mustWork = TRUE) } else { preopct_path <- "" }
   if (length(flair_path)) { flair_path <- normalizePath(flair_path, winslash = "/", mustWork = TRUE) } else { flair_path <- "" }
   if (length(t1w_contrast_path)) { t1w_contrast_path <- normalizePath(t1w_contrast_path, winslash = "/", mustWork = TRUE) } else { t1w_contrast_path <- "" }
+
+  if (length(normalize_affine)) {
+    normalize_affine <- normalizePath(normalize_affine, winslash = "/", mustWork = TRUE)
+  } else {
+    normalize_affine <- NULL
+  }
 
   if (length(normalize_template)) {
     if ("mni_icbm152_nlin_asym_09b" %in% normalize_template) {

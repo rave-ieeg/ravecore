@@ -158,9 +158,9 @@ spike_sort_py <- function(repository, sorter_name = "mountainsort5", verbose = T
 
   # orig/           # BinaryFolderRecording or ZarrRecording
   # mountainsort5/
-  #   •	sorting_np/               # NumpyFolderSorting (cached spike trains)
-  #   •	analyzer/                 # SortingAnalyzer folder (extensions cache)
-  #   •	reports/                  # export_report / export_to_phy, etc.
+  #   - sorting_np/               # NumpyFolderSorting (cached spike trains)
+  #   -	analyzer/                 # SortingAnalyzer folder (extensions cache)
+  #   -	reports/                  # export_report / export_to_phy, etc.
   #
 
   ravecorepy <- load_ravecorepy()

@@ -20,9 +20,13 @@ t1w_contrast_path <- "{{ t1w_contrast_path }}"
 register_reversed <- {{ register_reversed }}
 normalize_template <- {{ normalize_template_str }}
 normalize_images <- {{ normalize_images_str }}
+normalize_affine <- "{{ paste(normalize_affine, collapse = '') }}"
 run_recon_all <- {{ run_recon_all }}
 use_antspynet <- {{ use_antspynet }}
 
+if (!nzchar(normalize_affine) || !file.exists(normalize_affine)) {
+  normalize_affine <- NULL
+}
 
 subject <- ravecore::RAVESubject$new(project_name = project_name,
                                      subject_code = subject_code,
@@ -58,6 +62,7 @@ if ( !run_recon_all ) {
     register_reversed = register_reversed,
     normalize_template = normalize_template,
     normalize_images = normalize_images,
+    normalize_affine = normalize_affine,
     use_antspynet = use_antspynet,
     add_surfaces = TRUE
   )
@@ -104,6 +109,7 @@ if ( !run_recon_all ) {
     register_reversed = register_reversed,
     normalize_template = normalize_template,
     normalize_images = normalize_images,
+    normalize_affine = normalize_affine,
     use_antspynet = use_antspynet,
     add_surfaces = FALSE
   )

@@ -258,3 +258,52 @@ cmd_run_freesurfer_recon_all_clinical <- function(
   # cmd_run_freesurfer_recon_all_clinical(subject = "devel/TMP", mri_path = "~/Dropbox (PennNeurosurgery)/RAVE/Samples/raw/TMP/IMG/T1.nii.gz", verbose = TRUE)
 }
 
+
+run_freesurfer <- function(command, subject, fsdir = "fs", create_subdir = TRUE,
+                           workdir = "", enable_conda = FALSE, env_list = list(), ...) {
+  fshome <- cmd_freesurfer_home(error_on_missing = TRUE)
+
+  env_list <- as.list(env_list)
+  env_list[["FREESURFER_HOME"]] <- fshome
+
+  subject <- as_rave_subject(subject)
+  dir_create2(subject$imaging_path)
+
+  imaging_path <- subject$imaging_path
+  if (!grepl("^[a-zA-Z0-9\\./\\\\_-]+$", imaging_path) || TRUE) {
+    symlink_root <- file_path(
+      tools::R_user_dir("ravecore", which = "cache"),
+      "FreeSurfer",
+      subject$subject_code
+    )
+    if (file_exists(symlink_root)) {
+      unlink(symlink_root, recursive = TRUE)
+    }
+    dir_create2(dirname(symlink_root))
+    file.symlink(to = symlink_root, from = subject$imaging_path)
+    imaging_path <- symlink_root
+  }
+
+  imaging_path <- path_abs(imaging_path, must_work = TRUE)
+
+  fs_root <- file_path(imaging_path, fsdir)
+  workdir_abs <- file_path(fs_root, workdir)
+  if (create_subdir) {
+    dir_create2(fs_root)
+    dir_create2(workdir_abs)
+  }
+
+  # Set subject path, subdir is the subject code for freesurfer
+  env_list[["SUBJECTS_DIR"]] <- imaging_path
+
+  cmd <- sprintf('source "$FREESURFER_HOME/SetUpFreeSurfer.sh"\n\n%s', command)
+  rpymat::run_command(
+    command = cmd,
+    use_glue = FALSE,
+    enable_conda = enable_conda,
+    env_list = env_list,
+    workdir = workdir_abs,
+    ...
+  )
+}
+
