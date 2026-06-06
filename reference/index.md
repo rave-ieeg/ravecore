@@ -266,3 +266,6 @@
 
 - [`validate_time_window()`](http://rave.wiki/ravecore/reference/validate_time_window.md)
   : Validate time windows to be used
+
+- [`yael_macaque()`](http://rave.wiki/ravecore/reference/yael_macaque.md)
+  : Run YAEL-based FreeSurfer reconstruction for macaque brains

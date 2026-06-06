@@ -15,7 +15,7 @@ normalization."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ravecore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,6 +66,7 @@ normalization.</p>
 <span>  normalize_policy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"auto"</span>, <span class="st">"all"</span><span class="op">)</span>,</span>
 <span>  normalize_images <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"T1w"</span>, <span class="st">"T2w"</span>, <span class="st">"T1wContrast"</span>, <span class="st">"fGATIR"</span>, <span class="st">"preopCT"</span><span class="op">)</span>,</span>
 <span>  normalize_back <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">normalize_template</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">1</span>, <span class="va">normalize_template</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="cn">NA</span><span class="op">)</span>,</span>
+<span>  normalize_affine <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  atlases <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  add_surfaces <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  use_antspynet <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -85,6 +86,7 @@ normalization.</p>
 <span>  register_reversed <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  normalize_template <span class="op">=</span> <span class="st">"mni_icbm152_nlin_asym_09b"</span>,</span>
 <span>  normalize_images <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"T1w"</span>, <span class="st">"T2w"</span>, <span class="st">"T1wContrast"</span>, <span class="st">"fGATIR"</span>, <span class="st">"preopCT"</span><span class="op">)</span>,</span>
+<span>  normalize_affine <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  run_recon_all <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  dry_run <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  use_antspynet <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -147,6 +149,12 @@ include common images before the implantation (if available)</p></dd>
 <dd><p>length of one (select from <code>normalize_template</code>),
 which template is to be used to generate native brain mask and transform
 matrices</p></dd>
+
+
+<dt id="arg-normalize-affine">normalize_affine<a class="anchor" aria-label="anchor" href="#arg-normalize-affine"></a></dt>
+<dd><p>optional path for initial affine transform: this
+allows to manually set the affine transform and perform non-linear
+normalization only; for advanced users only.</p></dd>
 
 
 <dt id="arg-atlases">atlases<a class="anchor" aria-label="anchor" href="#arg-atlases"></a></dt>

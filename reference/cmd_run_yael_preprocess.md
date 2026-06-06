@@ -24,6 +24,7 @@ yael_preprocess(
   normalize_policy = c("auto", "all"),
   normalize_images = c("T1w", "T2w", "T1wContrast", "fGATIR", "preopCT"),
   normalize_back = ifelse(length(normalize_template) >= 1, normalize_template[[1]], NA),
+  normalize_affine = NULL,
   atlases = list(),
   add_surfaces = FALSE,
   use_antspynet = TRUE,
@@ -43,6 +44,7 @@ cmd_run_yael_preprocess(
   register_reversed = FALSE,
   normalize_template = "mni_icbm152_nlin_asym_09b",
   normalize_images = c("T1w", "T2w", "T1wContrast", "fGATIR", "preopCT"),
+  normalize_affine = NULL,
   run_recon_all = TRUE,
   dry_run = FALSE,
   use_antspynet = TRUE,
@@ -104,6 +106,12 @@ cmd_run_yael_preprocess(
 
   length of one (select from `normalize_template`), which template is to
   be used to generate native brain mask and transform matrices
+
+- normalize_affine:
+
+  optional path for initial affine transform: this allows to manually
+  set the affine transform and perform non-linear normalization only;
+  for advanced users only.
 
 - atlases:
 
