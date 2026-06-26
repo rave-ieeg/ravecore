@@ -125,9 +125,9 @@ if ( !run_recon_all ) {
   # Copy so 3D viewer can recognize it (The YAEL pipeline does not conform, hence should have better quality)
   ants_vol <- file.path(wdir_actual, "rave-imaging", "ants", "mri", "brain.finalsurfs.nii.gz")
   dst_vol <- file.path(wdir_actual, "rave-imaging", "fs", "mri", "rave_slices.nii.gz")
-  if (file.exists(ants_vol)) {
-    file.copy(ants_vol, dst_vol, overwrite = TRUE)
-  }
+  # if (file.exists(ants_vol)) {
+  #   file.copy(ants_vol, dst_vol, overwrite = TRUE)
+  # }
 
   # Move the RAVE folder
   ants_ravedir <-  file.path(wdir_actual, "rave-imaging", "ants", "RAVE")
