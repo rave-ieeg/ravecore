@@ -25,6 +25,7 @@ yael_preprocess(
   add_surfaces = FALSE,
   use_antspynet = TRUE,
   verbose = TRUE,
+  additional_images = list(),
   ...
 )
 
@@ -57,7 +58,8 @@ system. Please align the image before feeding into this function. All images
 must contain skulls (do not strip skulls)}
 
 \item{ct_path, t2w_path, fgatir_path, preopct_path, flair_path, t1w_contrast_path}{additional optional images to be aligned to the underlay; the registration
-will be symmetric and the rigid-body transforms will be stored.}
+will be symmetric and the rigid-body transforms will be stored. Other
+images can be fed with named list \code{additional_images}}
 
 \item{register_policy}{whether to skip already registered images;
 default is true (\code{'auto'}); set to \code{'all'} to ignore existing
@@ -104,6 +106,9 @@ results.}
 
 \item{verbose}{whether to print out the information; default is \code{TRUE}}
 
+\item{additional_images}{named list offering additional image types that are
+not built-in. For example \code{'MEG'}}
+
 \item{...}{reserved for legacy code and deprecated arguments}
 
 \item{run_recon_all}{whether to run 'FreeSurfer'; default is true}
@@ -128,6 +133,10 @@ normalization.
 cmd_run_yael_preprocess(
   subject = "pt01",
   t1w_path = "/path/to/T1w.nii.gz",
+
+  additional_images = list(
+    MEG = "/path/to/meg.nii.gz"
+  ),
 
   # normalize T1 to MNI152
   normalize_template = 'mni_icbm152_nlin_asym_09b'

@@ -909,6 +909,7 @@ YAELProcess <- R6::R6Class(
 #' \code{\link{cmd_run_yael_preprocess}} to see how to run a built-in workflow
 #' @param subject character (subject code, or project name with subject code),
 #' or \code{\link{RAVESubject}} instance.
+#' @param ... internally used
 #' @returns A processing instance, see \code{\link{YAELProcess}}
 #' @examples
 #'
@@ -933,14 +934,14 @@ YAELProcess <- R6::R6Class(
 #'
 #'
 #' @export
-as_yael_process <- function(subject) {
+as_yael_process <- function(subject, ...) {
   if (!inherits(subject, "RAVESubject") && is.character(subject)) {
     if (!grepl("/", subject)) {
       subject <- sprintf("YAEL/%s", subject)
     }
   }
   subject <- restore_subject_instance(subject, strict = FALSE)
-  YAELProcess$new(subject = subject)
+  YAELProcess$new(subject = subject, ...)
 }
 
 

@@ -4,11 +4,13 @@
 \alias{as_yael_process}
 \title{Create a 'YAEL' imaging processing instance}
 \usage{
-as_yael_process(subject)
+as_yael_process(subject, ...)
 }
 \arguments{
 \item{subject}{character (subject code, or project name with subject code),
 or \code{\link{RAVESubject}} instance.}
+
+\item{...}{internally used}
 }
 \value{
 A processing instance, see \code{\link{YAELProcess}}

@@ -14,7 +14,10 @@
 #' must contain skulls (do not strip skulls)
 #' @param ct_path,t2w_path,fgatir_path,preopct_path,flair_path,t1w_contrast_path
 #' additional optional images to be aligned to the underlay; the registration
-#' will be symmetric and the rigid-body transforms will be stored.
+#' will be symmetric and the rigid-body transforms will be stored. Other
+#' images can be fed with named list \code{additional_images}
+#' @param additional_images named list offering additional image types that are
+#' not built-in. For example \code{'MEG'}
 #' @param register_policy whether to skip already registered images;
 #' default is true (\code{'auto'}); set to \code{'all'} to ignore existing
 #' registrations and force calculation
@@ -63,6 +66,10 @@
 #'   subject = "pt01",
 #'   t1w_path = "/path/to/T1w.nii.gz",
 #'
+#'   additional_images = list(
+#'     MEG = "/path/to/meg.nii.gz"
+#'   ),
+#'
 #'   # normalize T1 to MNI152
 #'   normalize_template = 'mni_icbm152_nlin_asym_09b'
 #' )
@@ -87,7 +94,8 @@ yael_preprocess <- function(
     atlases = list(),
     add_surfaces = FALSE,
     use_antspynet = TRUE,
-    verbose = TRUE, ...
+    verbose = TRUE,
+    additional_images = list(), ...
 ) {
   if (missing(subject)) {
     subject <- list(...)$subject_code
@@ -134,7 +142,7 @@ yael_preprocess <- function(
   }
 
   # DIPSAUS DEBUG START
-  # subject_code = "testtest2"
+  # subject = "YAEL/testtest2"
   # t1w_path = "/Users/dipterix/rave_data/raw_dir/DBS_93/rave-imaging/coregistration/MRI_reference.nii.gz"
   # ct_path = "/Users/dipterix/rave_data/raw_dir/DBS_93/rave-imaging/coregistration/CT_RAW.nii.gz"
   # preopct_path = NULL
@@ -142,12 +150,21 @@ yael_preprocess <- function(
   # register_policy = "auto"
   # normalize_policy = "auto"
   # register_reversed = FALSE
-  # yael_process <- YAELProcess$new(subject_code = subject_code)
+  # yael_process <- YAELProcess$new(subject)
   # normalize_template = c("mni_icbm152_nlin_asym_09a")
   # normalize_back <- normalize_template[[1]]
   # add_surfaces <- TRUE
+  # additional_images <- list(MEG = "/Users/dipterix/rave_data/raw_dir/DBS_93/rave-imaging/coregistration/MRI_reference.nii.gz")
 
-  yael_process <- as_yael_process(subject = subject)
+  additional_images <- as.list(additional_images)
+  image_types <- unique(c(
+    "T1w", "T2w", "FLAIR", "preopCT", "T1wContrast", "fGATIR",
+    "postopT1w", "postopT2w", "postopFLAIR", "CT", names(additional_images)))
+
+  image_types <- image_types[nzchar(image_types)]
+  additional_images <- additional_images[names(additional_images) %in% image_types]
+
+  yael_process <- as_yael_process(subject = subject, image_types = image_types)
   subject <- yael_process$get_subject()
   project_name <- subject$project_name
   subject_code <- subject$subject_code
@@ -163,34 +180,56 @@ yael_preprocess <- function(
     )
   }
 
+  ct_path <- ct_path %||% additional_images$CT
   if (length(ct_path) && !is.na(ct_path) && nzchar(ct_path)) {
     ravepipeline::logger(level = "trace", "Migrating CT image: ", ct_path)
     yael_process$set_input_image(path = ct_path, type = "CT", overwrite = TRUE)
   }
 
+  t2w_path <- t2w_path %||% additional_images$T2w
   if (length(t2w_path) && !is.na(t2w_path) && nzchar(t2w_path)) {
     ravepipeline::logger(level = "trace", "Migrating T2w image: ", t2w_path)
     yael_process$set_input_image(path = t2w_path, type = "T2w", overwrite = TRUE)
   }
 
+  fgatir_path <- fgatir_path %||% additional_images$fGATIR
   if (length(fgatir_path) && !is.na(fgatir_path) && nzchar(fgatir_path)) {
     ravepipeline::logger(level = "trace", "Migrating fGATIR image: ", fgatir_path)
     yael_process$set_input_image(path = fgatir_path, type = "fGATIR", overwrite = TRUE)
   }
 
+  preopct_path <- preopct_path %||% additional_images$preopCT
   if (length(preopct_path) && !is.na(preopct_path) && nzchar(preopct_path)) {
     ravepipeline::logger(level = "trace", "Migrating preop-CT image: ", preopct_path)
     yael_process$set_input_image(path = preopct_path, type = "preopCT", overwrite = TRUE)
   }
 
+  flair_path <- flair_path %||% additional_images$FLAIR
   if (length(flair_path) && !is.na(flair_path) && nzchar(flair_path)) {
     ravepipeline::logger(level = "trace", "Migrating FLAIR image: ", flair_path)
     yael_process$set_input_image(path = flair_path, type = "FLAIR", overwrite = TRUE)
   }
 
+  t1w_contrast_path <- t1w_contrast_path %||% additional_images$T1wContrast
   if (length(t1w_contrast_path) && !is.na(t1w_contrast_path) && nzchar(t1w_contrast_path)) {
     ravepipeline::logger(level = "trace", "Migrating T1w with contrast image: ", t1w_contrast_path)
     yael_process$set_input_image(path = t1w_contrast_path, type = "T1wContrast", overwrite = TRUE)
+  }
+
+  image_types <- unique(c(
+    "T1w", "T2w", "FLAIR", "preopCT", "T1wContrast", "fGATIR",
+    "postopT1w", "postopT2w", "postopFLAIR", "CT", names(additional_images)))
+
+  additional_images <- additional_images[!names(additional_images) %in% c(
+    "T1w", "T2w", "FLAIR", "preopCT", "T1wContrast", "fGATIR", "CT"
+  )]
+
+  for (additional_type in names(additional_images)) {
+    additional_path <- additional_images[[additional_type]]
+    if (length(additional_path) && !is.na(additional_path) && nzchar(additional_path)) {
+      ravepipeline::logger(level = "trace", sprintf("Migrating %s image: %s", additional_type, additional_path))
+      yael_process$set_input_image(path = additional_path, type = additional_type, overwrite = TRUE)
+    }
   }
 
   # Coregistration
