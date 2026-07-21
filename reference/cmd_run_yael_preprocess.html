@@ -71,6 +71,7 @@ normalization.</p>
 <span>  add_surfaces <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  use_antspynet <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  additional_images <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -112,7 +113,8 @@ must contain skulls (do not strip skulls)</p></dd>
 
 <dt id="arg-ct-path-t-w-path-fgatir-path-preopct-path-flair-path-t-w-contrast-path">ct_path, t2w_path, fgatir_path, preopct_path, flair_path, t1w_contrast_path<a class="anchor" aria-label="anchor" href="#arg-ct-path-t-w-path-fgatir-path-preopct-path-flair-path-t-w-contrast-path"></a></dt>
 <dd><p>additional optional images to be aligned to the underlay; the registration
-will be symmetric and the rigid-body transforms will be stored.</p></dd>
+will be symmetric and the rigid-body transforms will be stored. Other
+images can be fed with named list <code>additional_images</code></p></dd>
 
 
 <dt id="arg-register-policy">register_policy<a class="anchor" aria-label="anchor" href="#arg-register-policy"></a></dt>
@@ -182,6 +184,11 @@ results.</p></dd>
 <dd><p>whether to print out the information; default is <code>TRUE</code></p></dd>
 
 
+<dt id="arg-additional-images">additional_images<a class="anchor" aria-label="anchor" href="#arg-additional-images"></a></dt>
+<dd><p>named list offering additional image types that are
+not built-in. For example <code>'MEG'</code></p></dd>
+
+
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>reserved for legacy code and deprecated arguments</p></dd>
 
@@ -210,6 +217,10 @@ raw folder. It will take a while to run the workflow.</p>
 <span class="r-in"><span>  subject <span class="op">=</span> <span class="st">"pt01"</span>,</span></span>
 <span class="r-in"><span>  t1w_path <span class="op">=</span> <span class="st">"/path/to/T1w.nii.gz"</span>,</span></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span>  additional_images <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    MEG <span class="op">=</span> <span class="st">"/path/to/meg.nii.gz"</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span>,</span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># normalize T1 to MNI152</span></span></span>
 <span class="r-in"><span>  normalize_template <span class="op">=</span> <span class="st">'mni_icbm152_nlin_asym_09b'</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
@@ -227,7 +238,7 @@ raw folder. It will take a while to run the workflow.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

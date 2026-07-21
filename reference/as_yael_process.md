@@ -9,7 +9,7 @@ to see how to run a built-in workflow
 ## Usage
 
 ``` r
-as_yael_process(subject)
+as_yael_process(subject, ...)
 ```
 
 ## Arguments
@@ -19,6 +19,10 @@ as_yael_process(subject)
   character (subject code, or project name with subject code), or
   [`RAVESubject`](http://rave.wiki/ravecore/reference/RAVESubject.md)
   instance.
+
+- ...:
+
+  internally used
 
 ## Value
 

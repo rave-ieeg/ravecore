@@ -29,6 +29,7 @@ yael_preprocess(
   add_surfaces = FALSE,
   use_antspynet = TRUE,
   verbose = TRUE,
+  additional_images = list(),
   ...
 )
 
@@ -71,7 +72,7 @@ cmd_run_yael_preprocess(
 
   additional optional images to be aligned to the underlay; the
   registration will be symmetric and the rigid-body transforms will be
-  stored.
+  stored. Other images can be fed with named list `additional_images`
 
 - register_policy:
 
@@ -137,6 +138,11 @@ cmd_run_yael_preprocess(
 
   whether to print out the information; default is `TRUE`
 
+- additional_images:
+
+  named list offering additional image types that are not built-in. For
+  example `'MEG'`
+
 - ...:
 
   reserved for legacy code and deprecated arguments
@@ -164,6 +170,10 @@ if (FALSE) { # \dontrun{
 cmd_run_yael_preprocess(
   subject = "pt01",
   t1w_path = "/path/to/T1w.nii.gz",
+
+  additional_images = list(
+    MEG = "/path/to/meg.nii.gz"
+  ),
 
   # normalize T1 to MNI152
   normalize_template = 'mni_icbm152_nlin_asym_09b'
