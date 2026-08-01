@@ -52,3 +52,10 @@ MNI305_to_MNI152 <- matrix(
     -0.0429, 1.5496, 1.184, 1),
   nrow = 4L, byrow = FALSE
 )
+
+
+KEY_MISSING <- structure(list(), class = "key_missing")
+is_key_missing <- function(x) {
+  inherits(x, "key_missing")
+}
+

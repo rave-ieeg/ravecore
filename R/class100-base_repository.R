@@ -248,6 +248,66 @@ RAVESubjectBaseRepository <- R6::R6Class(
       )
 
       return(root_path)
+    },
+
+    #' @description Get loaded electrode coordinates by type
+    #' @param type length of one or more, electrode channel (signal) type;
+    #'    see constant \code{SIGNAL_TYPES}. Default is \code{'LFP'}
+    #' @param electrodes electrodes to subset, default is a missing key, which
+    #'    uses all the loaded electrodes to subset
+    #' @param strict whether the returned table must not be empty; default is
+    #'    true, which will raise errors when no electrode matches
+    #' @returns Filtered table; see \code{\link{load_meta2}} with meta type
+    #' \code{'electrodes'}. Besides the mandatory columns, the returned table
+    #' also contains \code{'LabelPrefix'}, used by \pkg{YAEL} to store surgical
+    #' labels to group channels by electrode device; \code{'LeadChannel'}
+    #' (logical) to indicate whether the channel is a leading channel in this
+    #' group, typically the inner-most channel; and \code{'ShortLabel'} for
+    #' short electrode label.
+    get_electrode_coordinate = function(type = "LFP", electrodes = KEY_MISSING, strict = TRUE) {
+      type <- match.arg(type, choices = SIGNAL_TYPES, several.ok = TRUE)
+
+      match_electrodes <- self$subject$electrodes[self$subject$electrode_types %in% type]
+
+      if (is_key_missing(electrodes)) {
+        electrodes <- self$electrode_list
+      } else {
+        electrodes <- parse_svec(unlist(electrodes))
+        electrodes <- electrodes[!is.na(electrodes)]
+      }
+      match_electrodes <- intersect(electrodes, match_electrodes)
+
+      # Constraint: Electrode column must be a superset of loaded electrodes
+      electrode_table <- self$electrode_table[self$electrode_table$Electrode %in% match_electrodes, ]
+
+      if (strict && !length(electrode_table)) {
+        stop(sprintf(
+          "No electrode channels selected filtered matching type(s) %s.",
+          paste(sprintf("`%s`", type), collapse = ", ")
+        ))
+      }
+
+      # Order by electrode number
+      electrode_table <- electrode_table[order(electrode_table$Electrode), ]
+
+      # Add labelprefix
+      labels <- electrode_table$Label
+      if (!length(electrode_table$LabelPrefix)) {
+        electrode_table$LabelPrefix <- gsub("[0-9]+$", "", labels)
+      }
+      label_prefix <- electrode_table$LabelPrefix
+      label_prefix_lag1 <- c("", label_prefix[-length(label_prefix)])
+      is_lead_channel <- label_prefix != label_prefix_lag1
+      electrode_table$ShortLabel <- ifelse(
+        !is_lead_channel,
+        gsub("^[a-zA-Z_-]+", "", labels), labels
+      )
+
+      # Inner-most channels
+      electrode_table$LeadChannel <- is_lead_channel
+
+      electrode_table
+
     }
 
   ),
