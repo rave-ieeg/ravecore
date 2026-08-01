@@ -9,7 +9,7 @@ please use prepare_subject_bare0 to create base repository."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ravecore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.10</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -156,6 +156,7 @@ different identifiers); generated from <code>digest_key</code></p></dd>
 <li><p><a href="#method-RAVESubjectRepository-print"><code>RAVESubjectRepository$print()</code></a></p></li>
 <li><p><a href="#method-RAVESubjectRepository-initialize"><code>RAVESubjectRepository$new()</code></a></p></li>
 <li><p><a href="#method-RAVESubjectRepository-export_matlab"><code>RAVESubjectRepository$export_matlab()</code></a></p></li>
+<li><p><a href="#method-RAVESubjectRepository-get_electrode_coordinate"><code>RAVESubjectRepository$get_electrode_coordinate()</code></a></p></li>
 <li><p><a href="#method-RAVESubjectRepository-clone"><code>RAVESubjectRepository$clone()</code></a></p></li>
 </ul></div><p><details open><summary>Inherited methods</summary><ul><li><span class="pkg-link" data-pkg="ravepipeline" data-topic="RAVESerializable" data-id="@compare"><a href="http://dipterix.org/ravepipeline/reference/RAVESerializable.html#method-@compare"><code>ravepipeline::RAVESerializable$@compare()</code></a></span></li>
 </ul></details></p><hr><a id="method-RAVESubjectRepository-@get_container"></a><div class="section">
@@ -281,13 +282,51 @@ errors out when subject is missing</p></dd>
 
 </div>
 
+<p></p><hr><a id="method-RAVESubjectRepository-get_electrode_coordinate"></a><div class="section">
+<h3 id="ravesubjectrepository-get-electrode-coordinate-"><code>RAVESubjectRepository$get_electrode_coordinate()</code><a class="anchor" aria-label="anchor" href="#ravesubjectrepository-get-electrode-coordinate-"></a></h3>
+<p>Get loaded electrode coordinates by type</p><div class="section">
+<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RAVESubjectRepository</span><span class="op">$</span><span class="fu">get_electrode_coordinate</span><span class="op">(</span></span>
+<span>  type <span class="op">=</span> <span class="st">"LFP"</span>,</span>
+<span>  electrodes <span class="op">=</span> <span class="va">KEY_MISSING</span>,</span>
+<span>  strict <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
+<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>type</code></dt>
+<dd><p>length of one or more, electrode channel (signal) type;
+see constant <code>SIGNAL_TYPES</code>. Default is <code>'LFP'</code></p></dd>
+
+      <dt><code>electrodes</code></dt>
+<dd><p>electrodes to subset, default is a missing key, which
+uses all the loaded electrodes to subset</p></dd>
+
+      <dt><code>strict</code></dt>
+<dd><p>whether the returned table must not be empty; default is
+true, which will raise errors when no electrode matches</p></dd>
+
+
+</dl><p></p></div>
+</div><p></p><div class="section">
+<h4 id="returns-1">Returns<a class="anchor" aria-label="anchor" href="#returns-1"></a></h4>
+<p>Filtered table; see <code><a href="meta-data.html">load_meta2</a></code> with meta type
+<code>'electrodes'</code>. Besides the mandatory columns, the returned table
+also contains <code>'LabelPrefix'</code>, used by <span class="pkg">YAEL</span> to store surgical
+labels to group channels by electrode device; <code>'LeadChannel'</code>
+(logical) to indicate whether the channel is a leading channel in this
+group, typically the inner-most channel; and <code>'ShortLabel'</code> for
+short electrode label.</p>
+</div>
+
+</div>
+
 <p></p><hr><a id="method-RAVESubjectRepository-clone"></a><div class="section">
 <h3 id="ravesubjectrepository-clone-"><code>RAVESubjectRepository$clone()</code><a class="anchor" aria-label="anchor" href="#ravesubjectrepository-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-6">Usage<a class="anchor" aria-label="anchor" href="#usage-6"></a></h4>
+<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">RAVESubjectRepository</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
-<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
+<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 

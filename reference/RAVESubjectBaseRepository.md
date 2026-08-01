@@ -120,6 +120,8 @@ to create base repository.
 
 - [`RAVESubjectRepository$export_matlab()`](#method-RAVESubjectRepository-export_matlab)
 
+- [`RAVESubjectRepository$get_electrode_coordinate()`](#method-RAVESubjectRepository-get_electrode_coordinate)
+
 - [`RAVESubjectRepository$clone()`](#method-RAVESubjectRepository-clone)
 
 Inherited methods
@@ -260,6 +262,48 @@ Export the repository to 'Matlab' for future analysis
 #### Returns
 
 The root directory where the files are stored.
+
+------------------------------------------------------------------------
+
+### `RAVESubjectRepository$get_electrode_coordinate()`
+
+Get loaded electrode coordinates by type
+
+#### Usage
+
+    RAVESubjectRepository$get_electrode_coordinate(
+      type = "LFP",
+      electrodes = KEY_MISSING,
+      strict = TRUE
+    )
+
+#### Arguments
+
+- `type`:
+
+  length of one or more, electrode channel (signal) type; see constant
+  `SIGNAL_TYPES`. Default is `'LFP'`
+
+- `electrodes`:
+
+  electrodes to subset, default is a missing key, which uses all the
+  loaded electrodes to subset
+
+- `strict`:
+
+  whether the returned table must not be empty; default is true, which
+  will raise errors when no electrode matches
+
+#### Returns
+
+Filtered table; see
+[`load_meta2`](http://rave.wiki/ravecore/reference/meta-data.md) with
+meta type `'electrodes'`. Besides the mandatory columns, the returned
+table also contains `'LabelPrefix'`, used by YAEL to store surgical
+labels to group channels by electrode device; `'LeadChannel'` (logical)
+to indicate whether the channel is a leading channel in this group,
+typically the inner-most channel; and `'ShortLabel'` for short electrode
+label.
 
 ------------------------------------------------------------------------
 

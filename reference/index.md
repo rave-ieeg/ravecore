@@ -247,6 +247,9 @@
   [`MNI305_to_MNI152`](http://rave.wiki/ravecore/reference/ravecore-constants.md)
   : 'RAVE' constants
 
+- [`realign_trials()`](http://rave.wiki/ravecore/reference/realign_trials.md)
+  : Re-align trials to a given event
+
 - [`run_wavelet()`](http://rave.wiki/ravecore/reference/run_wavelet.md)
   : Apply Morlet-Wavelet to subject
 

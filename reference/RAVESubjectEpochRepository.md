@@ -105,6 +105,7 @@ Inherited methods
 
 - [`ravepipeline::RAVESerializable$@compare()`](http://dipterix.org/ravepipeline/reference/RAVESerializable.html#method-@compare)
 - `RAVESubjectRepository$@get_container()`
+- `RAVESubjectRepository$get_electrode_coordinate()`
 - `RAVESubjectRepository$print()`
 
 ------------------------------------------------------------------------

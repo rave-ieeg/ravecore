@@ -42,6 +42,7 @@ Inherited methods
 
 - [`ravepipeline::RAVESerializable$@compare()`](http://dipterix.org/ravepipeline/reference/RAVESerializable.html#method-@compare)
 - `RAVESubjectRepository$@get_container()`
+- `RAVESubjectRepository$get_electrode_coordinate()`
 - `RAVESubjectRepository$print()`
 - [`RAVESubjectEpochRepository$export_matlab()`](http://rave.wiki/ravecore/reference/RAVESubjectEpochRepository.html#method-export_matlab)
 - [`RAVESubjectEpochRepository$get_container()`](http://rave.wiki/ravecore/reference/RAVESubjectEpochRepository.html#method-get_container)
