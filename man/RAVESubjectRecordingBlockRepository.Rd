@@ -47,6 +47,7 @@ repository signature}
 <ul>
   <li><span class="pkg-link" data-pkg="ravepipeline" data-topic="RAVESerializable" data-id="@compare"><a href='../../ravepipeline/html/RAVESerializable.html#method-RAVESerializable-@compare'><code>ravepipeline::RAVESerializable$@compare()</code></a></span></li>
   <li><code>RAVESubjectRepository$@get_container()</code></li>
+  <li><code>RAVESubjectRepository$get_electrode_coordinate()</code></li>
   <li><code>RAVESubjectRepository$print()</code></li>
 </ul>
 </details>}}

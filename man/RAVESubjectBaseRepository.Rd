@@ -84,6 +84,7 @@ different identifiers); generated from \code{digest_key}}
     \item \href{#method-RAVESubjectRepository-print}{\code{RAVESubjectRepository$print()}}
     \item \href{#method-RAVESubjectRepository-initialize}{\code{RAVESubjectRepository$new()}}
     \item \href{#method-RAVESubjectRepository-export_matlab}{\code{RAVESubjectRepository$export_matlab()}}
+    \item \href{#method-RAVESubjectRepository-get_electrode_coordinate}{\code{RAVESubjectRepository$get_electrode_coordinate()}}
     \item \href{#method-RAVESubjectRepository-clone}{\code{RAVESubjectRepository$clone()}}
   }
 }
@@ -212,6 +213,43 @@ errors out when subject is missing}
   }
   \subsection{Returns}{
     The root directory where the files are stored.
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-RAVESubjectRepository-get_electrode_coordinate"></a>}}
+\if{latex}{\out{\hypertarget{method-RAVESubjectRepository-get_electrode_coordinate}{}}}
+\subsection{\code{RAVESubjectRepository$get_electrode_coordinate()}}{
+  Get loaded electrode coordinates by type
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVESubjectRepository$get_electrode_coordinate(
+  type = "LFP",
+  electrodes = KEY_MISSING,
+  strict = TRUE
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{type}}{length of one or more, electrode channel (signal) type;
+see constant \code{SIGNAL_TYPES}. Default is \code{'LFP'}}
+      \item{\code{electrodes}}{electrodes to subset, default is a missing key, which
+uses all the loaded electrodes to subset}
+      \item{\code{strict}}{whether the returned table must not be empty; default is
+true, which will raise errors when no electrode matches}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Filtered table; see \code{\link{load_meta2}} with meta type
+\code{'electrodes'}. Besides the mandatory columns, the returned table
+also contains \code{'LabelPrefix'}, used by \pkg{YAEL} to store surgical
+labels to group channels by electrode device; \code{'LeadChannel'}
+(logical) to indicate whether the channel is a leading channel in this
+group, typically the inner-most channel; and \code{'ShortLabel'} for
+short electrode label.
   }
 }
 

@@ -47,10 +47,11 @@ and the values are the sampling frequencies}
     \item \href{#method-RAVESubjectRecordingBlockRawVoltageRepository-clone}{\code{RAVESubjectRecordingBlockRawVoltageRepository$clone()}}
   }
 }
-\if{html}{\out{<details open><summary>Inherited methods</summary>
+\if{html}{\out{<details><summary>Inherited methods</summary>
 <ul>
   <li><span class="pkg-link" data-pkg="ravepipeline" data-topic="RAVESerializable" data-id="@compare"><a href='../../ravepipeline/html/RAVESerializable.html#method-RAVESerializable-@compare'><code>ravepipeline::RAVESerializable$@compare()</code></a></span></li>
   <li><code>RAVESubjectRepository$@get_container()</code></li>
+  <li><code>RAVESubjectRepository$get_electrode_coordinate()</code></li>
   <li><code>RAVESubjectRepository$print()</code></li>
   <li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectRecordingBlockRepository" data-id="export_matlab"><a href='../../ravecore/html/RAVESubjectRecordingBlockRepository.html#method-RAVESubjectRecordingBlockRepository-export_matlab'><code>RAVESubjectRecordingBlockRepository$export_matlab()</code></a></span></li>
   <li><span class="pkg-link" data-pkg="ravecore" data-topic="RAVESubjectRecordingBlockRepository" data-id="get_container"><a href='../../ravecore/html/RAVESubjectRecordingBlockRepository.html#method-RAVESubjectRecordingBlockRepository-get_container'><code>RAVESubjectRecordingBlockRepository$get_container()</code></a></span></li>
