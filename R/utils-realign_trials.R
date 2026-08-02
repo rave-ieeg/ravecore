@@ -205,10 +205,20 @@ realign_trials <- function(x, event, epoch, sample_rate, time_margin = NA, trial
 
 
   # Load epoch
-  cname <- if (strict) {
-    epoch$get_event_colname(event = event, missing = "error")
-  } else {
-    epoch$get_event_colname(event = event, missing = "warning")
+  cname <- NA
+  event_lower <- tolower(event)
+  if (startsWith(event_lower, "event") || event_lower == "time") {
+    sel <- tolower(names(epoch$table)) %in% event_lower
+    if (any(sel)) {
+      cname <- names(epoch$table)[sel][[1]]
+    }
+  }
+  if (is.na(cname)) {
+    cname <- if (strict) {
+      epoch$get_event_colname(event = event, missing = "error")
+    } else {
+      epoch$get_event_colname(event = event, missing = "warning")
+    }
   }
 
   # get time differences by trial
