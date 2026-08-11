@@ -1,0 +1,313 @@
+---
+title: "Atlas Quality Control"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    theme: flatly
+    code_folding: hide
+    self_contained: true
+    toc: true
+    toc_depth: 3
+    toc_float: true
+params:
+  subject_id: ~
+  disable_viewer: yes
+  slice_zoom: 3
+  underlay: ~
+  atlas_name: ~
+  atlas_path: ~
+  atlas_colormap: ~
+  atlas_search_radius: 2
+---
+
+```{r setup, include=FALSE}
+# Report parameters (see `ravecore::generate_atlas_YBA`):
+#   subject_id          : character(1), "project/subject"; required
+#   disable_viewer      : logical(1), whether to omit the 3D viewer
+#   slice_zoom          : numeric(1), zoom level of the per-electrode slices
+#   underlay            : character(1) or NULL, path to the underlay volume;
+#                         defaults to the subject T1 when missing
+#   atlas_name          : character(1), e.g. "YBA696"
+#   atlas_path          : character(1), absolute path, or a file name relative
+#                         to the subject `fs/mri` folder
+#   atlas_colormap      : character(1), absolute path to a color lookup table,
+#                         or a file name shipped with `threeBrain`
+#   atlas_search_radius : numeric(1), label search radius, in millimeters
+knitr::opts_chunk$set(
+  warning = FALSE,
+  message = FALSE
+)
+
+if (length(params$subject_id) != 1) {
+  stop("Subject is missing.")
+}
+```
+
+```{r initialize_paths}
+# Load as RAVE subject
+subject <- ravecore::as_rave_subject(params$subject_id, strict = TRUE)
+
+# Load 3D brain
+brain <- ravecore::rave_brain(subject, overlays = NULL, annotations = NULL)
+if (is.null(brain)) {
+  stop("Unable to find RAVE brain instance. Please process the subject in YAEL.")
+}
+
+underlay_path <- as.character(params$underlay)
+if (length(underlay_path) != 1 || is.na(underlay_path) ||
+    !file.exists(underlay_path)) {
+  underlay_path <- as.character(
+    brain$volumes$T1$group$group_data$volume_data$absolute_path)
+  if (length(underlay_path) != 1 || is.na(underlay_path) ||
+      !file.exists(underlay_path)) {
+    stop("Unable to find the underlay (T1) volume. Please specify the ",
+         "`underlay` parameter, or process the subject in YAEL first.")
+  }
+}
+
+fs_path <- brain$base_path
+fs_path_mri <- ravepipeline::dir_create2(file.path(fs_path, "mri"))
+
+# Load atlas as overlay if provided
+has_atlas <- FALSE
+
+atlas_path <- params$atlas_path
+
+if (length(atlas_path) == 1) {
+  if (!file.exists(atlas_path)) {
+    atlas_path <- file.path(fs_path_mri, atlas_path)
+  }
+  if (file.exists(atlas_path)) {
+    has_atlas <- TRUE
+  }
+}
+
+if (!has_atlas) {
+  stop("Unable to find atlas file.")
+}
+
+atlas_name <- trimws(paste(params$atlas_name, collapse = ""))
+if (!nzchar(atlas_name)) {
+  atlas_name <- basename(atlas_path)
+  atlas_name <- gsub("(_aseg|)\\.(nii|nii\\.gz)$", "", atlas_name)
+}
+atlas_volume <- ieegio::read_volume(atlas_path)
+
+# Load colormap
+atlas_colormap <- params$atlas_colormap
+if (length(atlas_colormap) != 1) {
+  # using default colormap
+  atlas_colormap <- "FreeSurferColorLUT.json"
+}
+
+# Using threeBrain (YAEL) colormaps
+if (file.exists(atlas_colormap)) {
+  atlas_colormap_path <- atlas_colormap
+} else {
+  atlas_colormap_path <- system.file(
+    "palettes", "datacube2", atlas_colormap, 
+    package = "threeBrain")
+}
+
+if (atlas_colormap_path == "" || !file.exists(atlas_colormap_path)) {
+  # Default colormap -> freesurfer lut
+  atlas_colormap_path <- system.file(
+    "palettes", "datacube2", "FreeSurferColorLUT.json", 
+    package = "threeBrain")
+}
+atlas_colormap <- ieegio::read_colormap(atlas_colormap_path)
+
+# Now we need to calculate colors
+atlas_maxkey <- max(atlas_colormap$colors$color_table$Key, na.rm = TRUE)
+atlas_palette <- vapply(
+  seq(0, atlas_maxkey),
+  function(key) {
+    ieegio::calculate_color(x = key, atlas_colormap)
+  },
+  FUN.VALUE = ""
+)
+
+underlay <- ieegio::read_volume(underlay_path)
+
+# `threeBrain` copy of the underlay, used by the per-electrode slice plots
+underlay_volume <- threeBrain::read_volume(underlay_path)
+
+electrode_table <- brain$electrodes$raw_table
+has_electrodes <- is.data.frame(electrode_table) && nrow(electrode_table) > 0
+
+# initialized_data <- list(
+#   subject = subject,
+#   brain = brain,
+#   underlay_path = underlay_path,
+#   atlas_name = atlas_name,
+#   atlas_path = atlas_path,
+#   atlas_colormap_path = atlas_colormap_path
+# )
+
+```
+
+# Subject ID: ``r subject$subject_id``
+
+```{r}
+# Display the paths relative to the `FreeSurfer` folder when applicable
+display_path <- function(path) {
+  path <- normalizePath(path, winslash = "/", mustWork = FALSE)
+  root <- normalizePath(fs_path, winslash = "/", mustWork = FALSE)
+  if (startsWith(path, paste0(root, "/"))) {
+    return(substring(path, nchar(root) + 2L))
+  }
+  path
+}
+
+# Message out
+data.frame(
+  Project = subject$project_name,
+  Subject = subject$subject_code,
+  UnderlayFile = display_path(underlay_path),
+  AtlasFile = display_path(atlas_path),
+  ColormapFile = display_path(atlas_colormap_path)
+)
+```
+
+## Overview
+
+```{r, layout="l-screen-insert-right"}
+atlas_prefix <- gsub(
+  "\\.(nii\\.gz|nii)$",
+  "",
+  basename(atlas_path),
+  ignore.case = TRUE
+)
+brain$add_atlas(atlas_prefix, color_format = "RGBAFormat")
+
+if (isTRUE(params$disable_viewer)) {
+  message("Viewer is omitted...")
+} else {
+  brain$plot(
+    # palettes = list(Label1 = colors),
+    voxel_colormap = atlas_colormap_path,
+    controllers = list(
+      "Display Data" = "Label1",
+      "Voxel Display" = "anat. slices",
+      "Voxel Type" = atlas_prefix
+    )
+  )
+}
+```
+
+### Axial
+
+```{r overlay_inspection_axial, results='asis'}
+ravecore::plot_volume_slices(
+  underlay, overlay = atlas_volume, which = "axial", 
+  nc = 6, depths = seq(-70, 85, length.out = 24), 
+  overlay_col = atlas_palette, overlay_range = c(0, atlas_maxkey)
+)
+```
+
+### Sagittal
+
+```{r overlay_inspection_sagittal, results='asis'}
+ravecore::plot_volume_slices(
+  underlay, overlay = atlas_volume, which = "sagittal", 
+  nc = 6, depths = seq(-70, 70, length.out = 24),
+  overlay_col = atlas_palette, overlay_range = c(0, atlas_maxkey)
+)
+```
+  
+### Coronal
+
+```{r overlay_inspection_coronal, results='asis'}
+ravecore::plot_volume_slices(
+  underlay, overlay = atlas_volume, which = "coronal", 
+  nc = 6, depths = seq(-100, 70, length.out = 24),
+  overlay_col = atlas_palette, overlay_range = c(0, atlas_maxkey)
+)
+```  
+
+
+## Electrodes
+
+### Table of atlas labels
+
+Reproduce `r sprintf("electrode_atlas_%s.csv", atlas_name)` from the meta folder
+
+```{r no_electrodes, eval=!has_electrodes, results='asis'}
+cat("\nNo electrode contact has been localized for this subject.\n")
+```
+
+```{r label_table, eval=has_electrodes, layout="l-screen-insert-right"}
+label_table <- brain$electrodes$get_atlas_labels(
+  atlas = atlas_path,
+  lut = threeBrain::load_colormap(atlas_colormap_path),
+  radius = params$atlas_search_radius
+)
+label_table <- cbind(
+  data.frame(Electrode = electrode_table$Electrode),
+  label_table
+)
+rmarkdown::paged_table(
+  label_table,
+  options = list(rows.print = 20, rownames.print = FALSE)
+)
+```
+
+Per-electrode results:
+
+
+```{r slice_view, eval=has_electrodes, results='asis', out.width="100%", fig.width=12, fig.height=4.5, layout="l-screen-insert-right"}
+slice_zoom <- params$slice_zoom
+
+# label columns reported by `get_atlas_labels`, e.g. Label1, Label2, ...
+label_columns <- grep("^Label[0-9]+$", names(label_table), value = TRUE)
+
+dummy_output <- lapply(seq_len(nrow(electrode_table)), function(ii) {
+  row <- electrode_table[ii, ]
+
+  tmp <- sum(c(row$Coord_x, row$Coord_y, row$Coord_z, 0)^2)
+  is_hidden <- isTRUE(is.na(tmp) || tmp == 0)
+
+  if (is_hidden) {
+    cat(sprintf("\n\n### Electrode %d - %s (hidden) {#electrode-slice-%d}\n\n",
+              row$Electrode, row$Label, row$Electrode))
+    return()
+  }
+
+  cat(sprintf("\n\n### Electrode %d - %s {#electrode-slice-%d}\n\n",
+              row$Electrode, row$Label, row$Electrode))
+
+  label_row <- label_table[ii, ]
+  label_summary <- htmltools::tags$ul(
+    class = "ul-compact",
+    lapply(seq_along(label_columns), function(kk) {
+      label_name <- label_row[[label_columns[[kk]]]]
+      if (!length(label_name) || is.na(label_name) ||
+          identical(as.character(label_name), "Unknown")) {
+        if (kk == 1) {
+          return(htmltools::tags$li("Unknown"))
+        } else {
+          return()
+        }
+      }
+
+      # counts live in the label table (Count1, Count2, ...), not in the
+      # electrode table
+      count <- label_row[[sub("^Label", "Count", label_columns[[kk]])]]
+      if (!length(count) || is.na(count)) {
+        return(htmltools::tags$li(sprintf("`%s`\n", label_name)))
+      }
+
+      htmltools::tags$li(
+        sprintf("`%s` (n = %d)\n", label_name, as.integer(count))
+      )
+    })
+  )
+  cat(as.character(label_summary), "\n")
+
+  brain$plot_electrodes_on_slices(
+    row$Electrode, elec_table = row,
+    title_position = "top", verbose = FALSE,
+    zoom = slice_zoom, volume = underlay_volume,
+    adjust_brightness = FALSE)
+})
+```

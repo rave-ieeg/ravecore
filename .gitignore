@@ -6,3 +6,6 @@
 tmp
 docs
 .positai
+
+# rendered reports (build artifacts, see inst/reports/*.rmd)
+inst/reports/*.html

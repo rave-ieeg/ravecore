@@ -11,3 +11,4 @@
 ^\.lintr$
 ^\.positai$
 ^\.claude$
+^inst/reports/.*\.html$
