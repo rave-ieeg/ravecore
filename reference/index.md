@@ -138,6 +138,11 @@
   [`import_table()`](http://rave.wiki/ravecore/reference/export_table.md)
   : Export data frame to different common formats
 
+- [`generate_atlas_YBA()`](http://rave.wiki/ravecore/reference/generate_atlas_YBA.md)
+  :
+
+  Generate `YBA` atlas for a 'RAVE' subject
+
 - [`generate_atlases_from_template()`](http://rave.wiki/ravecore/reference/generate_atlases_from_template.md)
   : Create brain atlases from template
 
