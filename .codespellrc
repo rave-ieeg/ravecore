@@ -1,6 +1,7 @@
 [codespell]
 # Ref: https://github.com/codespell-project/codespell#using-a-config-file
-skip = .git,.gitignore,.gitattributes,*.css,.codespellrc
+skip = .git,.git-meta,.gitignore,.gitattributes,*.css,.codespellrc
 check-hidden = true
-# ignore-regex = 
-# ignore-words-list =
+# ignore-regex =
+# ans - variable name in R for user's menu answer (utils::menu return value)
+ignore-words-list = ans
