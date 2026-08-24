@@ -565,7 +565,7 @@ validate_subject_meta <- function(subject, verbose = TRUE, other_checks = NULL) 
         cols <- cols[!cols %in% names(tbl)]
 
         if (length(cols)) {
-          stop("electrodes.csv is mising the following column(s): ",
+          stop("electrodes.csv is missing the following column(s): ",
                paste(cols, collapse = ", "))
         }
 

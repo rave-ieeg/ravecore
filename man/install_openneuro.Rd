@@ -67,7 +67,7 @@ electrode_path <- bidsr::resolve_bids_path(
   x = proj_ds004100,
   format(electrode$parsed[[1]]))
 
-# laod electrode coordinate
+# load electrode coordinate
 tabular <- bidsr::as_bids_tabular(electrode_path)
 
 # Build RAVE electrode table

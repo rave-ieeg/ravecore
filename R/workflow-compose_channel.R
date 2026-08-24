@@ -36,7 +36,7 @@
 #' if(interactive() && has_rave_subject("demo/DemoSubject")) {
 #'
 #'   # the actual example code:
-#'   # new channel 100 = 2 x channel 14 - (channe 15 + 16)
+#'   # new channel 100 = 2 x channel 14 - (channel 15 + 16)
 #'   compose_channel(
 #'     subject = "demo/DemoSubject",
 #'     number = 100,

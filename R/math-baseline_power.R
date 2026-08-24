@@ -116,7 +116,7 @@ power_baseline.rave_prepare_power <- function(
   baseline_windows <- validate_time_window(baseline_windows)
   units <- units[!units %in% "Time"]
   if (!length(units) || !all(units %in% c("Frequency", "Trial", "Electrode"))) {
-    stop('`units` must contain 1-3 of the followings: "Frequency", "Trial", "Electrode" (case-sensitive)')
+    stop('`units` must contain 1-3 of the following: "Frequency", "Trial", "Electrode" (case-sensitive)')
   }
   unit_dims <- c(1L, 3L, 4L)[c("Frequency", "Trial", "Electrode") %in% units]
 
@@ -300,7 +300,7 @@ power_baseline.FileArray <- function(
   }
   units <- units[!units %in% "Time"]
   if (!length(units) || !all(units %in% dnn)) {
-    stop('`units` must contain 1-3 of the followings: "Frequency", "Trial", "Electrode" (case-sensitive)')
+    stop('`units` must contain 1-3 of the following: "Frequency", "Trial", "Electrode" (case-sensitive)')
   }
 
   unit_dims <- c(1L, 3L, 4L)[c("Frequency", "Trial", "Electrode") %in% units]
@@ -425,7 +425,7 @@ power_baseline.array <- function(
 
   units <- units[!units %in% "Time"]
   if (!length(units) || !all(units %in% dnn)) {
-    stop('`units` must contain 1-3 of the followings: "Frequency", "Trial", "Electrode" (case-sensitive)')
+    stop('`units` must contain 1-3 of the following: "Frequency", "Trial", "Electrode" (case-sensitive)')
   }
   unit_dims <- which(dnn %in% units)
 

@@ -14,7 +14,7 @@ if ( get0("check_rpymat", inherits = TRUE, ifnotfound = TRUE) ) {
     rpymat <- asNamespace("rpymat")
     existing_pkgs <- rpymat$list_pkgs()
     if (!isTRUE("nipy" %in% existing_pkgs$package)) {
-      # try to configure nipy to RAVE isolated envrionment
+      # try to configure nipy to RAVE isolated environment
       rpymat$add_packages("nipy", pip = TRUE)
     }
   }
