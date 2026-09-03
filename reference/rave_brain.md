@@ -11,6 +11,7 @@ rave_brain(
   surfaces = "pial",
   overlays = "aparc.a2009s+aseg",
   annotations = "label/aparc.a2009s",
+  streamlines = "default/*",
   ...,
   usetemplateifmissing = FALSE,
   include_electrodes = TRUE
@@ -41,6 +42,13 @@ rave_brain(
   surface annotation or curvature data to load; default is
   `'label/aparc.a2009s'`, referring to the `'*h.aparc.a2009s.annot'`
   under the label folder.
+
+- streamlines:
+
+  streamlines (poly-lines) to add to the viewer; stored under subject
+  FreeSurfer folder (under sub-folder `'streamline'`), default is
+  `'default/*'`, meaning all the supported files directly under the
+  `'streamline/default'` folder.
 
 - ...:
 

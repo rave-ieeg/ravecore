@@ -9,7 +9,7 @@ modern web browsers"></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ravecore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.12</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.13</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,6 +47,7 @@ modern web browsers</p>
 <span>  surfaces <span class="op">=</span> <span class="st">"pial"</span>,</span>
 <span>  overlays <span class="op">=</span> <span class="st">"aparc.a2009s+aseg"</span>,</span>
 <span>  annotations <span class="op">=</span> <span class="st">"label/aparc.a2009s"</span>,</span>
+<span>  streamlines <span class="op">=</span> <span class="st">"default/*"</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  usetemplateifmissing <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  include_electrodes <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -77,6 +78,13 @@ check <code><a href="https://dipterix.org/threeBrain/reference/threeBrain.html" 
 <dd><p>surface annotation or curvature data to load;
 default is <code>'label/aparc.a2009s'</code>, referring to the
 <code>'*h.aparc.a2009s.annot'</code> under the label folder.</p></dd>
+
+
+<dt id="arg-streamlines">streamlines<a class="anchor" aria-label="anchor" href="#arg-streamlines"></a></dt>
+<dd><p>streamlines (poly-lines) to add to the viewer; stored
+under subject <span class="pkg">FreeSurfer</span> folder (under sub-folder <code>'streamline'</code>),
+default is <code>'default/*'</code>, meaning all the supported files directly
+under the <code>'streamline/default'</code> folder.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
