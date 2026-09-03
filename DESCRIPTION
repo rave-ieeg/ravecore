@@ -1,8 +1,9 @@
 Package: ravecore
 Title: Core File Structures and Workflows for 'RAVE'
-Version: 0.1.1.12
+Version: 0.1.1.13
 Authors@R: c(
-    person("Zhengjia", "Wang", email = "dipterix.wang@gmail.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-5629-1116")),
+    person("Zhengjia", "Wang", email = "dipterix.wang@gmail.com", 
+            role = c("aut", "cre"), comment = c(ORCID = "0000-0001-5629-1116")),
     person("Xiang", "Zhang", email = "xiang.zhang@pennmedicine.upenn.edu", role = c("aut")),
     person("John", "Magnotti", email = "john.magnotti@pennmedicine.upenn.edu", role = c("aut")),
     person("Michael", "Beauchamp", email = "michael.beauchamp@pennmedicine.upenn.edu", role = c("aut")),
@@ -59,4 +60,4 @@ Suggests:
     shiny,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
-Config/roxygen2/version: 8.0.0
+Config/roxygen2/version: 8.1.0

@@ -9,6 +9,7 @@ rave_brain(
   surfaces = "pial",
   overlays = "aparc.a2009s+aseg",
   annotations = "label/aparc.a2009s",
+  streamlines = "default/*",
   ...,
   usetemplateifmissing = FALSE,
   include_electrodes = TRUE
@@ -28,6 +29,11 @@ check \code{\link[threeBrain]{threeBrain}}}
 \item{annotations}{surface annotation or curvature data to load;
 default is \code{'label/aparc.a2009s'}, referring to the
 \code{'*h.aparc.a2009s.annot'} under the label folder.}
+
+\item{streamlines}{streamlines (poly-lines) to add to the viewer; stored
+under subject \pkg{FreeSurfer} folder (under sub-folder \code{'streamline'}),
+default is \code{'default/*'}, meaning all the supported files directly
+under the \code{'streamline/default'} folder.}
 
 \item{...}{ignored, reserved for legacy code}
 

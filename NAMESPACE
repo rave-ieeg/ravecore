@@ -134,6 +134,8 @@ export(yael_macaque)
 export(yael_preprocess)
 importFrom(R6,R6Class)
 importFrom(bidsr,BIDSProject)
-importFrom(methods,getGeneric)
-importFrom(methods,setMethod)
+importFrom(methods,
+  getGeneric,
+  setMethod
+)
 importFrom(ravepipeline,RAVESerializable)

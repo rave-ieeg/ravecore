@@ -29,6 +29,10 @@ ensure_threeBrain_template <- function(template_subject) {
 #' @param annotations surface annotation or curvature data to load;
 #' default is \code{'label/aparc.a2009s'}, referring to the
 #' \code{'*h.aparc.a2009s.annot'} under the label folder.
+#' @param streamlines streamlines (poly-lines) to add to the viewer; stored
+#' under subject \pkg{FreeSurfer} folder (under sub-folder \code{'streamline'}),
+#' default is \code{'default/*'}, meaning all the supported files directly
+#' under the \code{'streamline/default'} folder.
 #' @param usetemplateifmissing whether to use template brain when the subject
 #' brain files are missing. If set to true, then a template (usually 'N27')
 #' brain will be displayed as an alternative solution, and electrodes will be
@@ -57,7 +61,8 @@ ensure_threeBrain_template <- function(template_subject) {
 #'
 #' @export
 rave_brain <- function(
-    subject, surfaces = "pial", overlays = "aparc.a2009s+aseg", annotations = "label/aparc.a2009s",
+    subject, surfaces = "pial", overlays = "aparc.a2009s+aseg",
+    annotations = "label/aparc.a2009s", streamlines = "default/*",
     ..., usetemplateifmissing = FALSE, include_electrodes = TRUE) {
 
   subject <- as_rave_subject(subject, strict = FALSE)
@@ -80,7 +85,8 @@ rave_brain <- function(
     brain <- threeBrain::merge_brain(
       template_surface_types = surfaces,
       template_atlas_types = overlays,
-      template_annotation_types = annotations
+      template_annotation_types = annotations,
+      template_streamline_types = streamlines
     )
 
     if (is.data.frame(electrode_table)) {
@@ -110,7 +116,8 @@ rave_brain <- function(
       subject_code = subject$subject_code,
       surface_types = surfaces,
       atlas_types = overlays,
-      annotation_types = annotations
+      annotation_types = annotations,
+      streamline_types = streamlines
     )
 
 
@@ -145,3 +152,4 @@ rave_brain <- function(
 
   brain
 }
+
