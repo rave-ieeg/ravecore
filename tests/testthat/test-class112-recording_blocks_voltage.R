@@ -469,7 +469,7 @@ testthat::test_that("RAVESubjectRecordingBlockVoltageRepository", {
   # New attributes
   testthat::expect_true(!is.null(repo_new$voltage))
 
-  # singal data
+  # signal data
   container_new <- repo_new$voltage
   container_old <- repo_old$block_data
 
@@ -547,7 +547,7 @@ testthat::test_that("RAVESubjectRecordingBlockVoltageRepository - downsampled", 
   # New attributes
   testthat::expect_true(!is.null(repo_new$voltage))
 
-  # singal data
+  # signal data
   container_new <- repo_new$voltage
   container_old <- repo_new0$voltage
 

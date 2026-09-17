@@ -118,7 +118,7 @@ LFP_electrode <- R6::R6Class(
         data = list(
           subject = self$subject$`@marshal`(),
           number = self$number,
-          refererence = self$reference_name,
+          reference = self$reference_name,
           signal_type = self$type,
           location_type = self$location,
           # epoch = epoch,
@@ -141,8 +141,10 @@ LFP_electrode <- R6::R6Class(
         re$set_epoch(epoch = object$data$epoch_name, stitch_events = object$data$stitch_events)
       }
       re$trial_intervals <- object$data$trial_intervals
-      if (length(object$data$refererence) > 0 && !identical(object$data$refererence, "noref")) {
-        re$set_reference(reference = object$data$refererence)
+      # Backward compat: older marshalled objects used a misspelled key
+      reference_name <- object$data$reference %||% object$data$refererence  # codespell:ignore refererence
+      if (length(reference_name) > 0 && !identical(reference_name, "noref")) {
+        re$set_reference(reference = reference_name)
       }
       re
     },
