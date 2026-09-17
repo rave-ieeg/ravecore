@@ -532,7 +532,8 @@ YAELProcess <- R6::R6Class(
     generate_atlas_from_template = function(
         template_name = rpyants_builtin_templates(),
         atlas_folder = NULL, surfaces = NA, verbose = TRUE,
-        lambda = 0.2, degree = 2, threshold_lb = 0.5, threshold_ub = NA) {
+        lambda = 0.2, degree = 2, threshold_lb = 0.5, threshold_ub = NA
+    ) {
       template_name <- match.arg(template_name)
       template_name2 <- camel_template_name(template_name)
 
@@ -587,6 +588,106 @@ YAELProcess <- R6::R6Class(
         sprintf("Generating surfaces | %s", fname)
       })
       invisible(volume_files)
+    },
+
+    #' @description Transform streamline tract files from template space to
+    #' native brain space
+    #' @param template_name which template to use; the template must have been
+    #' used in \code{map_to_template} prior to calling this method
+    #' @param streamlines_folder path to folder containing streamline tract
+    #' files (\code{'.tck'}, \code{'.trk'}, \code{'.tt'}, or \code{'.vtk'});
+    #' all matching files are processed recursively
+    #' @param verbose whether to print progress; default is \code{TRUE}
+    #' @param format output format for the saved streamlines; \code{"auto"}
+    #' (default) preserves the original file extension; other choices are
+    #' \code{"tck"}, \code{"trk"}, \code{"tt"}, and \code{"vtk"}
+    #' @param native_type which native image type defines the target space;
+    #' default is \code{"T1w"}
+    #' @returns Invisibly returns a character vector of the relative paths to
+    #' the input streamline files that were processed; transformed files are
+    #' written under \code{fs/streamline/} from the working directory.
+    generate_streamlines_from_template = function(
+        template_name = rpyants_builtin_templates(),
+        streamlines_folder = NULL, verbose = TRUE,
+        format = c("auto", "tck", "trk", "tt", "vtk"),
+        native_type = "T1w"
+    ) {
+      template_name <- match.arg(template_name)
+      template_name2 <- camel_template_name(template_name)
+      format <- match.arg(format)
+
+      # streamlines_folder <- '/Users/dipterix/PennNeurosurgery Dropbox/Dipterix W/Share_with_ZJ/Template Atlas/CIT168/CIT_Fiber/atlas_tck'
+      # self <- process
+      # private <- self$.__enclos_env__$private
+      # native_type = "T1w"
+      streamlines_folder <- path_abs(streamlines_folder, must_work = TRUE)
+
+      streamline_files <- list.files(
+        streamlines_folder,
+        pattern = "\\.(tck|trk|trk\\.gz|tt|tt\\.gz|vtk|vtp)$",
+        all.files = FALSE,
+        full.names = FALSE,
+        recursive = TRUE,
+        ignore.case = TRUE,
+        include.dirs = FALSE
+      )
+
+      if (!length(streamline_files)) {
+        return(invisible(streamline_files))
+      }
+
+      save_root <- file_path(self$work_path, "fs", "streamline")
+
+      yael_py <- private$.impl()
+
+      lapply(streamline_files, function(streamline_file) {
+        streamline <- tryCatch({
+          ieegio::as_ieegio_streamlines(file_path(streamlines_folder, streamline_file))
+        }, error = function(e) {
+          NULL
+        })
+        if (!inherits(streamline, "ieegio_streamlines") || !length(streamline)) {
+          next
+        }
+        streamline_data <- streamline[]
+        coords <- do.call("rbind", lapply(streamline_data, "[[", "coords"))
+        invalid_rows <- rowSums(is.na(coords)) > 0
+        coords[invalid_rows, ] <- 0.0
+        coords <- yael_py$transform_points_from_template(
+          points = coords, template_name = template_name2,
+          native_type = native_type, verbose = isTRUE(verbose)
+        )
+        coords <- call_rpyants("to_r", coords)
+        coords[invalid_rows] <- NA_real_
+
+        line_nsegs <- sapply(streamline_data, "[[", "num_points")
+        line_ends <- cumsum(line_nsegs)
+        line_start <- line_ends - line_ends[[1]] + 1
+
+        streamline_data <- lapply(seq_along(line_start), function(ii) {
+          idx <- seq(line_start[[ii]], line_ends[[ii]])
+          invalid_idx <- invalid_rows[idx]
+          idx <- idx[!invalid_idx]
+          if (!length(idx)) {
+            return(NULL)
+          }
+          coords[idx, , drop = FALSE]
+        })
+
+        streamline <- ieegio::as_ieegio_streamlines(streamline_data)
+        if (format != "auto") {
+          streamline_file <- gsub("\\.(tck|trk|trk\\.gz|tt|tt\\.gz|vtk|vtp)$", sprintf(".%s", format), streamline_file)
+        }
+        save_path <- file_path(save_root, streamline_file)
+        save_dir <- dirname(save_path)
+        dir_create2(save_dir)
+
+        ieegio::write_streamlines(streamline, save_path, format = format)
+
+        return()
+      })
+      
+      invisible(streamline_files)
     },
 
     #' @description Transform points from native images to template

@@ -39,6 +39,7 @@ regions of interest back to native brain. See examples at
     \item \href{#method-YAELProcess-transform_image_from_template}{\code{YAELProcess$transform_image_from_template()}}
     \item \href{#method-YAELProcess-transform_image_to_template}{\code{YAELProcess$transform_image_to_template()}}
     \item \href{#method-YAELProcess-generate_atlas_from_template}{\code{YAELProcess$generate_atlas_from_template()}}
+    \item \href{#method-YAELProcess-generate_streamlines_from_template}{\code{YAELProcess$generate_streamlines_from_template()}}
     \item \href{#method-YAELProcess-transform_points_to_template}{\code{YAELProcess$transform_points_to_template()}}
     \item \href{#method-YAELProcess-transform_points_from_template}{\code{YAELProcess$transform_points_from_template()}}
     \item \href{#method-YAELProcess-construct_ants_folder_from_template}{\code{YAELProcess$construct_ants_folder_from_template()}}
@@ -439,6 +440,47 @@ to disable this function. The generated surfaces will stay in native
   }
   \subsection{Returns}{
     Paths to the atlas (volume) files
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-YAELProcess-generate_streamlines_from_template"></a>}}
+\if{latex}{\out{\hypertarget{method-YAELProcess-generate_streamlines_from_template}{}}}
+\subsection{\code{YAELProcess$generate_streamlines_from_template()}}{
+  Transform streamline tract files from template space to
+native brain space
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{YAELProcess$generate_streamlines_from_template(
+  template_name = rpyants_builtin_templates(),
+  streamlines_folder = NULL,
+  verbose = TRUE,
+  format = c("auto", "tck", "trk", "tt", "vtk"),
+  native_type = "T1w"
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{template_name}}{which template to use; the template must have been
+used in \code{map_to_template} prior to calling this method}
+      \item{\code{streamlines_folder}}{path to folder containing streamline tract
+files (\code{'.tck'}, \code{'.trk'}, \code{'.tt'}, or \code{'.vtk'});
+all matching files are processed recursively}
+      \item{\code{verbose}}{whether to print progress; default is \code{TRUE}}
+      \item{\code{format}}{output format for the saved streamlines; \code{"auto"}
+(default) preserves the original file extension; other choices are
+\code{"tck"}, \code{"trk"}, \code{"tt"}, and \code{"vtk"}}
+      \item{\code{native_type}}{which native image type defines the target space;
+default is \code{"T1w"}}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Invisibly returns a character vector of the relative paths to
+the input streamline files that were processed; transformed files are
+written under \code{fs/streamline/} from the working directory.
   }
 }
 

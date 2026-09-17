@@ -247,7 +247,7 @@ RAVEPreprocessSettings <- R6::R6Class(
         original_srates <- self$sample_rates[imported]
         original_srates <- unique(original_srates)
         original_srates <- original_srates[!is.na(original_srates)]
-        if (length(original_srates) & any(original_srates != srate)) {
+        if (length(original_srates) && any(original_srates != srate)) {
           stop("Some/All electrodes with given types have been imported. Cannot change sample rate now.")
         }
       }
