@@ -54,6 +54,8 @@ atlas or regions of interest back to native brain. See examples at
 
 - [`YAELProcess$generate_atlas_from_template()`](#method-YAELProcess-generate_atlas_from_template)
 
+- [`YAELProcess$generate_streamlines_from_template()`](#method-YAELProcess-generate_streamlines_from_template)
+
 - [`YAELProcess$transform_points_to_template()`](#method-YAELProcess-transform_points_to_template)
 
 - [`YAELProcess$transform_points_from_template()`](#method-YAELProcess-transform_points_from_template)
@@ -507,6 +509,55 @@ Generate atlas maps from template and morph to native brain
 #### Returns
 
 Paths to the atlas (volume) files
+
+------------------------------------------------------------------------
+
+### `YAELProcess$generate_streamlines_from_template()`
+
+Transform streamline tract files from template space to native brain
+space
+
+#### Usage
+
+    YAELProcess$generate_streamlines_from_template(
+      template_name = rpyants_builtin_templates(),
+      streamlines_folder = NULL,
+      verbose = TRUE,
+      format = c("auto", "tck", "trk", "tt", "vtk"),
+      native_type = "T1w"
+    )
+
+#### Arguments
+
+- `template_name`:
+
+  which template to use; the template must have been used in
+  `map_to_template` prior to calling this method
+
+- `streamlines_folder`:
+
+  path to folder containing streamline tract files (`'.tck'`, `'.trk'`,
+  `'.tt'`, or `'.vtk'`); all matching files are processed recursively
+
+- `verbose`:
+
+  whether to print progress; default is `TRUE`
+
+- `format`:
+
+  output format for the saved streamlines; `"auto"` (default) preserves
+  the original file extension; other choices are `"tck"`, `"trk"`,
+  `"tt"`, and `"vtk"`
+
+- `native_type`:
+
+  which native image type defines the target space; default is `"T1w"`
+
+#### Returns
+
+Invisibly returns a character vector of the relative paths to the input
+streamline files that were processed; transformed files are written
+under `fs/streamline/` from the working directory.
 
 ------------------------------------------------------------------------
 
