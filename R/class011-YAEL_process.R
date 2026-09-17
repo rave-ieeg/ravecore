@@ -620,6 +620,8 @@ YAELProcess <- R6::R6Class(
       # self <- process
       # private <- self$.__enclos_env__$private
       # native_type = "T1w"
+      # template_name = "fsaverage"
+      # verbose = TRUE
       streamlines_folder <- path_abs(streamlines_folder, must_work = TRUE)
 
       streamline_files <- list.files(
@@ -641,6 +643,7 @@ YAELProcess <- R6::R6Class(
       yael_py <- private$.impl()
 
       lapply(streamline_files, function(streamline_file) {
+        # streamline_file <- streamline_files[[16]]
         streamline <- tryCatch({
           ieegio::as_ieegio_streamlines(file_path(streamlines_folder, streamline_file))
         }, error = function(e) {
@@ -658,11 +661,13 @@ YAELProcess <- R6::R6Class(
           native_type = native_type, verbose = isTRUE(verbose)
         )
         coords <- call_rpyants("to_r", coords)
-        coords[invalid_rows] <- NA_real_
+        coords[invalid_rows, ] <- NA_real_
 
-        line_nsegs <- sapply(streamline_data, "[[", "num_points")
+        line_nsegs <- vapply(streamline_data, function(item) {
+          nrow(item$coords)
+        }, 0L)
         line_ends <- cumsum(line_nsegs)
-        line_start <- line_ends - line_ends[[1]] + 1
+        line_start <- line_ends - line_nsegs + 1
 
         streamline_data <- lapply(seq_along(line_start), function(ii) {
           idx <- seq(line_start[[ii]], line_ends[[ii]])
@@ -673,6 +678,11 @@ YAELProcess <- R6::R6Class(
           }
           coords[idx, , drop = FALSE]
         })
+
+        streamline_data <- streamline_data[!vapply(streamline_data, is.null, FALSE)]
+        if (!length(streamline_data)) {
+          return()
+        }
 
         streamline <- ieegio::as_ieegio_streamlines(streamline_data)
         if (format != "auto") {
