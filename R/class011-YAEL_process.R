@@ -647,7 +647,7 @@ YAELProcess <- R6::R6Class(
           NULL
         })
         if (!inherits(streamline, "ieegio_streamlines") || !length(streamline)) {
-          next
+          return()
         }
         streamline_data <- streamline[]
         coords <- do.call("rbind", lapply(streamline_data, "[[", "coords"))
