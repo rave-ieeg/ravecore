@@ -194,6 +194,11 @@ power_baseline.rave_prepare_power <- function(
 
       res$set_header("ready", FALSE)
 
+      # Create the partition files before the workers start: each worker
+      # reloads `res`, which fails on a partition file that another worker is
+      # still creating (one partition per electrode)
+      res$initialize_partition(which(x$electrode_list %in% todo_elec))
+
       input_list <- lapply(todo_elec, function(e) {
         idx <- which(x$electrode_list == e)
         list(
@@ -364,6 +369,10 @@ power_baseline.FileArray <- function(
 
 
   if ("Electrode" %in% units) {
+
+    # Create the partition files before the workers start (see the
+    # `rave_prepare_power` method)
+    res$initialize_partition()
 
     ravepipeline::lapply_jobs(seq_len(dm[[length(dm)]]), function(ii) {
       res <- res_wrapper$`@impl`
