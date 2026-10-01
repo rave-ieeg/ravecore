@@ -798,18 +798,7 @@ RAVESubject <- R6::R6Class(
 
       }
 
-      if (!all && is.data.frame(registry) && nrow(registry) > 0) {
-        # remove duplicated labels
-        registry <- registry[order(registry$label,
-                                   registry$timestamp,
-                                   decreasing = TRUE,
-                                   na.last = TRUE), ]
-        split_list <- split(registry, registry$label)
-        registry <- data.table::rbindlist(
-          lapply(split_list, function(sub) {
-            sub[1, ]
-          }), use.names = FALSE)
-      } else {
+      if (!is.data.frame(registry) || nrow(registry) == 0) {
         registry <- data.table::data.table(
           project = character(0L),
           subject = character(0L),
@@ -820,6 +809,17 @@ RAVESubject <- R6::R6Class(
           policy = character(0L),
           version = character(0L)
         )
+      } else if (!all) {
+        # remove duplicated labels
+        registry <- registry[order(registry$label,
+                                   registry$timestamp,
+                                   decreasing = TRUE,
+                                   na.last = TRUE), ]
+        split_list <- split(registry, registry$label)
+        registry <- data.table::rbindlist(
+          lapply(split_list, function(sub) {
+            sub[1, ]
+          }), use.names = FALSE)
       }
 
       registry
