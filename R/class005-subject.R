@@ -517,10 +517,11 @@ RAVESubject <- R6::R6Class(
         stop("Cannot load epoch file correctly: \n  > Epoch file is missing or corrupted, or there is no trial in the epoch file. \nA typical RAVE-epoch file contains 4 columns (case-sensitive): \n  Block (characters), Time (numerical), Trial (integer), Condition (characters).")
       }
       # trial starts from -1 sec but only 0.5 seconds are allowed
-      invalid_trials <- unlist(lapply(epoch$trials, function(ii) {
-        info <- epoch$trial_at(ii, df = FALSE)
-        if (info$Time + trial_starts < 0) {
-          return(ii)
+      trials <- epoch$trials
+      times <- epoch$table$Time
+      invalid_trials <- unlist(lapply(seq_along(trials), function(ii) {
+        if (times[[ii]] + trial_starts < 0) {
+          return(trials[[ii]])
         }
         return()
       }))

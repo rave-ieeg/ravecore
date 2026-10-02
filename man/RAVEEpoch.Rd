@@ -7,7 +7,13 @@
 Trial epoch, contains the following information: \code{Block}
 experiment block/session string; \code{Time} trial onset within that block;
 \code{Trial} trial number; \code{Condition} trial condition. Other optional
-columns are \code{Event_xxx} (starts with "Event").
+columns are \code{Event_xxx} (starts with "Event"). Column
+\code{ExcludedHint} (logical, always present; missing or blank values are
+\code{FALSE}) marks trials that analyses may exclude; see
+\code{exclude_trials} and \code{save}. An epoch whose name ends with
+\code{"_OutlierRemoved"} is a trimmed copy: marked trials are removed,
+trials are renumbered from 1, and \code{OriginalTrial} holds the trial
+numbers of the epoch it was generated from.
 }
 \examples{
 
@@ -37,6 +43,10 @@ list(old_trial1, new_trial1)
 # To get updated trial table, must update first
 epoch$update_table()
 head(epoch$table)
+
+# Mark trials 1 and 3; pipelines decide whether to drop them
+epoch$exclude_trials(1, 3)
+epoch$excluded_trials
 
 }
 
@@ -68,6 +78,9 @@ head(epoch$table)
 
     \item{\code{trials}}{trial numbers}
 
+    \item{\code{excluded_trials}}{trial numbers whose \code{ExcludedHint} is
+\code{TRUE}}
+
     \item{\code{available_events}}{available events other than trial onset}
 
     \item{\code{available_condition_type}}{available condition type other than
@@ -84,6 +97,8 @@ the default}
     \item \href{#method-RAVEEpoch-trial_at}{\code{RAVEEpoch$trial_at()}}
     \item \href{#method-RAVEEpoch-update_table}{\code{RAVEEpoch$update_table()}}
     \item \href{#method-RAVEEpoch-set_trial}{\code{RAVEEpoch$set_trial()}}
+    \item \href{#method-RAVEEpoch-exclude_trials}{\code{RAVEEpoch$exclude_trials()}}
+    \item \href{#method-RAVEEpoch-save}{\code{RAVEEpoch$save()}}
     \item \href{#method-RAVEEpoch-get_event_colname}{\code{RAVEEpoch$get_event_colname()}}
     \item \href{#method-RAVEEpoch-get_condition_colname}{\code{RAVEEpoch$get_condition_colname()}}
     \item \href{#method-RAVEEpoch-clone}{\code{RAVEEpoch$clone()}}
@@ -205,9 +220,65 @@ folder}
       \item{\code{Time}}{time in second}
       \item{\code{Trial}}{positive integer, trial number}
       \item{\code{Condition}}{character, trial condition}
-      \item{\code{...}}{other key-value pairs corresponding to other optional columns}
+      \item{\code{...}}{other key-value pairs corresponding to other optional columns;
+\code{ExcludedHint} defaults to \code{FALSE}}
     }
     \if{html}{\out{</div>}}
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-RAVEEpoch-exclude_trials"></a>}}
+\if{latex}{\out{\hypertarget{method-RAVEEpoch-exclude_trials}{}}}
+\subsection{\code{RAVEEpoch$exclude_trials()}}{
+  Mark trials as excluded through the \code{ExcludedHint}
+column. Nothing is removed: pipelines decide whether to drop marked
+trials. Use \code{save} to write the marks to disk.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVEEpoch$exclude_trials(..., add = TRUE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{...}}{trial numbers; flattened with \code{unlist(list(...))}}
+      \item{\code{add}}{whether to add to the trials already marked (default);
+\code{FALSE} replaces them, so \code{exclude_trials(add = FALSE)}
+clears every mark}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    The epoch instance, invisibly
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-RAVEEpoch-save"></a>}}
+\if{latex}{\out{\hypertarget{method-RAVEEpoch-save}{}}}
+\subsection{\code{RAVEEpoch$save()}}{
+  Save the epoch to the subject's meta folder. A regular
+epoch writes \code{epoch_<name>.csv} with \code{ExcludedHint} (the
+existing file is renamed to a time-stamped backup first), then rebuilds
+\code{epoch_<name>_OutlierRemoved.csv}: the existing copy is always
+backed up and removed, and a new one is written when some (not all)
+trials are marked, without them, with trials renumbered from 1 and
+\code{OriginalTrial} holding the trial numbers of
+\code{epoch_<name>.csv}. An epoch whose name ends with
+\code{_OutlierRemoved} is saved trimmed the same way: its file is
+backed up and removed, then the unmarked trials are written. Its marked
+trials, including rows marked by hand in the replaced file, are also
+marked in the upstream epoch (the name without the suffix) when that
+epoch exists and the trial still matches by \code{Block} and
+\code{Time}; otherwise only the trimmed file is saved.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVEEpoch$save()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Paths of the written files, invisibly
   }
 }
 
