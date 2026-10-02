@@ -3,7 +3,12 @@
 Trial epoch, contains the following information: `Block` experiment
 block/session string; `Time` trial onset within that block; `Trial`
 trial number; `Condition` trial condition. Other optional columns are
-`Event_xxx` (starts with "Event").
+`Event_xxx` (starts with "Event"). Column `ExcludedHint` (logical,
+always present; missing or blank values are `FALSE`) marks trials that
+analyses may exclude; see `exclude_trials` and `save`. An epoch whose
+name ends with `"_OutlierRemoved"` is a trimmed copy: marked trials are
+removed, trials are renumbered from 1, and `OriginalTrial` holds the
+trial numbers of the epoch it was generated from.
 
 ## Super class
 
@@ -46,6 +51,10 @@ trial number; `Condition` trial condition. Other optional columns are
 
   trial numbers
 
+- `excluded_trials`:
+
+  trial numbers whose `ExcludedHint` is `TRUE`
+
 - `available_events`:
 
   available events other than trial onset
@@ -69,6 +78,10 @@ trial number; `Condition` trial condition. Other optional columns are
 - [`RAVEEpoch$update_table()`](#method-RAVEEpoch-update_table)
 
 - [`RAVEEpoch$set_trial()`](#method-RAVEEpoch-set_trial)
+
+- [`RAVEEpoch$exclude_trials()`](#method-RAVEEpoch-exclude_trials)
+
+- [`RAVEEpoch$save()`](#method-RAVEEpoch-save)
 
 - [`RAVEEpoch$get_event_colname()`](#method-RAVEEpoch-get_event_colname)
 
@@ -196,7 +209,61 @@ set one trial
 
 - `...`:
 
-  other key-value pairs corresponding to other optional columns
+  other key-value pairs corresponding to other optional columns;
+  `ExcludedHint` defaults to `FALSE`
+
+------------------------------------------------------------------------
+
+### `RAVEEpoch$exclude_trials()`
+
+Mark trials as excluded through the `ExcludedHint` column. Nothing is
+removed: pipelines decide whether to drop marked trials. Use `save` to
+write the marks to disk.
+
+#### Usage
+
+    RAVEEpoch$exclude_trials(..., add = TRUE)
+
+#### Arguments
+
+- `...`:
+
+  trial numbers; flattened with `unlist(list(...))`
+
+- `add`:
+
+  whether to add to the trials already marked (default); `FALSE`
+  replaces them, so `exclude_trials(add = FALSE)` clears every mark
+
+#### Returns
+
+The epoch instance, invisibly
+
+------------------------------------------------------------------------
+
+### `RAVEEpoch$save()`
+
+Save the epoch to the subject's meta folder. A regular epoch writes
+`epoch_<name>.csv` with `ExcludedHint` (the existing file is renamed to
+a time-stamped backup first), then rebuilds
+`epoch_<name>_OutlierRemoved.csv`: the existing copy is always backed up
+and removed, and a new one is written when some (not all) trials are
+marked, without them, with trials renumbered from 1 and `OriginalTrial`
+holding the trial numbers of `epoch_<name>.csv`. An epoch whose name
+ends with `_OutlierRemoved` is saved trimmed the same way: its file is
+backed up and removed, then the unmarked trials are written. Its marked
+trials, including rows marked by hand in the replaced file, are also
+marked in the upstream epoch (the name without the suffix) when that
+epoch exists and the trial still matches by `Block` and `Time`;
+otherwise only the trimmed file is saved.
+
+#### Usage
+
+    RAVEEpoch$save()
+
+#### Returns
+
+Paths of the written files, invisibly
 
 ------------------------------------------------------------------------
 
@@ -312,6 +379,10 @@ list(old_trial1, new_trial1)
 # To get updated trial table, must update first
 epoch$update_table()
 head(epoch$table)
+
+# Mark trials 1 and 3; pipelines decide whether to drop them
+epoch$exclude_trials(1, 3)
+epoch$excluded_trials
 
 }
 ```
