@@ -21,6 +21,7 @@
 
 ### Bug Fixes
 
+* `cmd_run_dcm2niix()` now remembers the imported image source under the `yael_preprocess` module (it used the old module ID `surface_reconstruction`), as a path relative to the subject's raw folder (or `BIDS` raw folder), so the module loader can select it.
 * Fixed HDF5 links not being closed promptly, which could cause resource leaks (`#a5e95fe`).
 * Fixed `LFP_reference` serialization error and added additional validation checks (`#93ad452`, `#f39f51a`).
 * Fixed error message displayed when `rpymat` is not configured (`#ff5a6b2`).

@@ -86,6 +86,22 @@
 #   return(dst_path)
 # }
 
+# Image source path relative to the first root folder that contains it
+# (e.g. the subject's raw folder, then its 'BIDS' raw folder); absolute when
+# no root contains it
+image_source_relpath <- function(path, roots) {
+  path <- normalizePath(path, winslash = "/", mustWork = FALSE)
+  for (root in roots) {
+    if (length(root) != 1 || is.na(root) || !nzchar(root)) { next }
+    root <- normalizePath(root, winslash = "/", mustWork = FALSE)
+    prefix <- paste0(sub("/+$", "", root), "/")
+    if (startsWith(path, prefix) && nchar(path) > nchar(prefix)) {
+      return(substring(path, nchar(prefix) + 1L))
+    }
+  }
+  path
+}
+
 #' @title Convert DICOM to NIfTI via \code{'dcm2niix'}
 #' @description
 #' Check \url{https://rave.wiki} on how to set up \code{'conda'} environment
@@ -163,11 +179,18 @@ cmd_run_dcm2niix <- function(subject, src_path, type = c("MRI", "CT"),
       # no need to import
       stop(sprintf("`cmd_run_dcm2niix`: `src_path` cannot be from within the following subject path [raw]/rave-imageing/inputs/%s", type))
     }
-    # set default for modules
-    ravepipeline::logger("Setting default {type} path: [{src_path}]",
+    # remember the source for the `yael_preprocess` module loader, which
+    # lists sources relative to the subject's raw folders
+    default_path <- image_source_relpath(
+      src_path,
+      roots = c(subject$preprocess_settings$raw_path,
+                subject$preprocess_settings$raw_path2)
+    )
+    ravepipeline::logger("Setting default {type} path: [{default_path}]",
                          level = "trace",
                          use_glue = TRUE)
-    subject$set_default(sprintf("raw_%s_path", tolower(type)), src_path, namespace = "surface_reconstruction")
+    subject$set_default(sprintf("raw_%s_path", tolower(type)), default_path,
+                        namespace = "yael_preprocess")
   }
 
   log_path <- normalizePath(
