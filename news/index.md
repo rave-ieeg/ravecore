@@ -37,6 +37,11 @@ CRAN release: 2026-04-02
 
 #### Bug Fixes
 
+- [`cmd_run_dcm2niix()`](http://rave.wiki/ravecore/reference/cmd_run_dcm2niix.md)
+  now remembers the imported image source under the `yael_preprocess`
+  module (it used the old module ID `surface_reconstruction`), as a path
+  relative to the subject’s raw folder (or `BIDS` raw folder), so the
+  module loader can select it.
 - Fixed HDF5 links not being closed promptly, which could cause resource
   leaks (`#a5e95fe`).
 - Fixed `LFP_reference` serialization error and added additional

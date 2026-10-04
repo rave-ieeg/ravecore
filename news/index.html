@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ravecore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.18</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.19</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,7 +55,9 @@
 </ul></div>
 <div class="section level4">
 <h4 id="bug-fixes-0-1-1">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-1"></a></h4>
-<ul><li>Fixed HDF5 links not being closed promptly, which could cause resource leaks (<code>#a5e95fe</code>).</li>
+<ul><li>
+<code><a href="../reference/cmd_run_dcm2niix.html">cmd_run_dcm2niix()</a></code> now remembers the imported image source under the <code>yael_preprocess</code> module (it used the old module ID <code>surface_reconstruction</code>), as a path relative to the subject’s raw folder (or <code>BIDS</code> raw folder), so the module loader can select it.</li>
+<li>Fixed HDF5 links not being closed promptly, which could cause resource leaks (<code>#a5e95fe</code>).</li>
 <li>Fixed <code>LFP_reference</code> serialization error and added additional validation checks (<code>#93ad452</code>, <code>#f39f51a</code>).</li>
 <li>Fixed error message displayed when <code>rpymat</code> is not configured (<code>#ff5a6b2</code>).</li>
 <li>Fixed <code>ensure_py_package()</code> to install <code>spikeinterface</code> via pip correctly (<code>#1bcd358</code>).</li>
