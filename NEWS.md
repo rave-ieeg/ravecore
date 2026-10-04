@@ -1,3 +1,32 @@
+# ravecore 0.1.2
+
+### New Features
+
+* Added `yael_macaque()` and macaque support in the YAEL preprocessing pipeline (`#32dcb87`, `#6c864e2`).
+* Added `generate_atlas_YBA()` to morph `YBA690` / `YBA696` atlases from the `MNI152` symmetric template to the subject, with an atlas-overlay report (`#f45c574`).
+* Added streamline support: `rave_brain()` gains a `streamlines` argument, and the YAEL process can generate streamlines from a template (`#fbd913a`, `#f79c06e`, `#6adff48`).
+* `yael_preprocess()` accepts `additional_images` so that more image modalities can be used for co-registration (`#e6d97ba`).
+* Added `realign_trials()` to realign arrays by event; `event` can be an event string or a column name such as `"Time"` or `"Event_*"` (`#f4fc653`, `#db09e00`).
+* Added `validate_condition_groupings()` to validate and clean condition-group lists; the epoch table is ordered by trial number (`#923c913`, `#509570b`).
+* Added `"db_zscore"` baseline method to `power_baseline()` (`#ea95dc4`).
+* Repositories gain `get_electrode_coordinate()` to subset the electrode table by channel numbers and types (`#9c7f5df`).
+* `RAVEEpoch` supports an `ExcludedHint` column and an `exclude_trials()` method; saving produces a trimmed `_OutlierRemoved` epoch (`#33c828c`).
+
+### Bug Fixes
+
+* `cmd_run_dcm2niix()` now remembers the imported image source under the `yael_preprocess` module (it used the old module ID `surface_reconstruction`), as a path relative to the subject's raw folder (or `BIDS` raw folder), so the module loader can select it (`#57c7684`).
+* Subject pipeline listing is backward compatible with old pipeline paths, and listing all pipelines works again (`#f428fc0`, `#e9ebb8e`, `#7922564`).
+* `filearray` partitions are created before parallel workers start during power baseline, preventing a rare write race (`#9dadfec`).
+* `rave_slices` is no longer copied when normalization fails (`#2dd9c41`).
+* Fixed a `read_mat2()` call signature in the per-channel `HDF5`/MATLAB importer (`#6872bfc`).
+* Fixed a syntax issue in the YAEL process (`#61016f5`).
+
+### Other Changes
+
+* Added tests that check function-call signatures through `asNamespace()` (`#633cde9`).
+
+---
+
 # ravecore 0.1.1
 
 ### New Features
@@ -21,7 +50,6 @@
 
 ### Bug Fixes
 
-* `cmd_run_dcm2niix()` now remembers the imported image source under the `yael_preprocess` module (it used the old module ID `surface_reconstruction`), as a path relative to the subject's raw folder (or `BIDS` raw folder), so the module loader can select it.
 * Fixed HDF5 links not being closed promptly, which could cause resource leaks (`#a5e95fe`).
 * Fixed `LFP_reference` serialization error and added additional validation checks (`#93ad452`, `#f39f51a`).
 * Fixed error message displayed when `rpymat` is not configured (`#ff5a6b2`).
