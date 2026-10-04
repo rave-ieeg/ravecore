@@ -33,6 +33,39 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.2" id="ravecore-012">ravecore 0.1.2<a class="anchor" aria-label="anchor" href="#ravecore-012"></a></h2>
+<div class="section level4">
+<h4 id="new-features-0-1-2">New Features<a class="anchor" aria-label="anchor" href="#new-features-0-1-2"></a></h4>
+<ul><li>Added <code><a href="../reference/yael_macaque.html">yael_macaque()</a></code> and macaque support in the YAEL preprocessing pipeline (<code>#32dcb87</code>, <code>#6c864e2</code>).</li>
+<li>Added <code><a href="../reference/generate_atlas_YBA.html">generate_atlas_YBA()</a></code> to morph <code>YBA690</code> / <code>YBA696</code> atlases from the <code>MNI152</code> symmetric template to the subject, with an atlas-overlay report (<code>#f45c574</code>).</li>
+<li>Added streamline support: <code><a href="../reference/rave_brain.html">rave_brain()</a></code> gains a <code>streamlines</code> argument, and the YAEL process can generate streamlines from a template (<code>#fbd913a</code>, <code>#f79c06e</code>, <code>#6adff48</code>).</li>
+<li>
+<code><a href="../reference/cmd_run_yael_preprocess.html">yael_preprocess()</a></code> accepts <code>additional_images</code> so that more image modalities can be used for co-registration (<code>#e6d97ba</code>).</li>
+<li>Added <code><a href="../reference/realign_trials.html">realign_trials()</a></code> to realign arrays by event; <code>event</code> can be an event string or a column name such as <code>"Time"</code> or <code>"Event_*"</code> (<code>#f4fc653</code>, <code>#db09e00</code>).</li>
+<li>Added <code><a href="../reference/validate_condition_groupings.html">validate_condition_groupings()</a></code> to validate and clean condition-group lists; the epoch table is ordered by trial number (<code>#923c913</code>, <code>#509570b</code>).</li>
+<li>Added <code>"db_zscore"</code> baseline method to <code><a href="../reference/power_baseline.html">power_baseline()</a></code> (<code>#ea95dc4</code>).</li>
+<li>Repositories gain <code>get_electrode_coordinate()</code> to subset the electrode table by channel numbers and types (<code>#9c7f5df</code>).</li>
+<li>
+<code>RAVEEpoch</code> supports an <code>ExcludedHint</code> column and an <code>exclude_trials()</code> method; saving produces a trimmed <code>_OutlierRemoved</code> epoch (<code>#33c828c</code>).</li>
+</ul></div>
+<div class="section level4">
+<h4 id="bug-fixes-0-1-2">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-2"></a></h4>
+<ul><li>
+<code><a href="../reference/cmd_run_dcm2niix.html">cmd_run_dcm2niix()</a></code> now remembers the imported image source under the <code>yael_preprocess</code> module (it used the old module ID <code>surface_reconstruction</code>), as a path relative to the subject’s raw folder (or <code>BIDS</code> raw folder), so the module loader can select it (<code>#57c7684</code>).</li>
+<li>Subject pipeline listing is backward compatible with old pipeline paths, and listing all pipelines works again (<code>#f428fc0</code>, <code>#e9ebb8e</code>, <code>#7922564</code>).</li>
+<li>
+<code>filearray</code> partitions are created before parallel workers start during power baseline, preventing a rare write race (<code>#9dadfec</code>).</li>
+<li>
+<code>rave_slices</code> is no longer copied when normalization fails (<code>#2dd9c41</code>).</li>
+<li>Fixed a <code>read_mat2()</code> call signature in the per-channel <code>HDF5</code>/MATLAB importer (<code>#6872bfc</code>).</li>
+<li>Fixed a syntax issue in the YAEL process (<code>#61016f5</code>).</li>
+</ul></div>
+<div class="section level4">
+<h4 id="other-changes-0-1-2">Other Changes<a class="anchor" aria-label="anchor" href="#other-changes-0-1-2"></a></h4>
+<ul><li>Added tests that check function-call signatures through <code><a href="https://rdrr.io/r/base/ns-internal.html" class="external-link">asNamespace()</a></code> (<code>#633cde9</code>).</li>
+</ul><hr></div>
+</div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.1" id="ravecore-011">ravecore 0.1.1<a class="anchor" aria-label="anchor" href="#ravecore-011"></a></h2><p class="text-muted">CRAN release: 2026-04-02</p>
 <div class="section level4">
 <h4 id="new-features-0-1-1">New Features<a class="anchor" aria-label="anchor" href="#new-features-0-1-1"></a></h4>
@@ -55,9 +88,7 @@
 </ul></div>
 <div class="section level4">
 <h4 id="bug-fixes-0-1-1">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-1"></a></h4>
-<ul><li>
-<code><a href="../reference/cmd_run_dcm2niix.html">cmd_run_dcm2niix()</a></code> now remembers the imported image source under the <code>yael_preprocess</code> module (it used the old module ID <code>surface_reconstruction</code>), as a path relative to the subject’s raw folder (or <code>BIDS</code> raw folder), so the module loader can select it.</li>
-<li>Fixed HDF5 links not being closed promptly, which could cause resource leaks (<code>#a5e95fe</code>).</li>
+<ul><li>Fixed HDF5 links not being closed promptly, which could cause resource leaks (<code>#a5e95fe</code>).</li>
 <li>Fixed <code>LFP_reference</code> serialization error and added additional validation checks (<code>#93ad452</code>, <code>#f39f51a</code>).</li>
 <li>Fixed error message displayed when <code>rpymat</code> is not configured (<code>#ff5a6b2</code>).</li>
 <li>Fixed <code>ensure_py_package()</code> to install <code>spikeinterface</code> via pip correctly (<code>#1bcd358</code>).</li>
