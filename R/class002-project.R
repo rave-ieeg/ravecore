@@ -429,7 +429,7 @@ RAVEProject <- R6::R6Class(
 #'     "audiovisual@bids", strict = FALSE,
 #'     parent_path = file.path(examples, "ieeg_epilepsy_ecog"))
 #'
-#'   # RAVE processed data is under BIDS dirivative folder
+#'   # RAVE processed data is under BIDS derivative folder
 #'   project$path
 #'
 #'   # "audiovisual@bids:ieeg_epilepsy_ecog"

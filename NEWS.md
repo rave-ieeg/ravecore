@@ -11,6 +11,7 @@
 * Added `"db_zscore"` baseline method to `power_baseline()` (`#ea95dc4`).
 * Repositories gain `get_electrode_coordinate()` to subset the electrode table by channel numbers and types (`#9c7f5df`).
 * `RAVEEpoch` supports an `ExcludedHint` column and an `exclude_trials()` method; saving produces a trimmed `_OutlierRemoved` epoch (`#33c828c`).
+* Added `reg3d_rigid()` and `cmd_run_reg3d_rigid()` to rigidly co-register `CT` to `MRI` with the built-in `ravetools::register_volume3d()` (`YAEL-reg3d`; no external program needed), with `Rigid`, `DenseRigid` and `FastRigid` presets and mutual-information or cross-correlation cost; images with a side of 384 voxels or more are also saved as down-sampled copies for viewers. Requires `ravetools` 0.3.1 or later.
 
 ### Bug Fixes
 
