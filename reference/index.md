@@ -255,6 +255,13 @@
 - [`realign_trials()`](http://rave.wiki/ravecore/reference/realign_trials.md)
   : Re-align trials to a given event
 
+- [`reg3d_rigid()`](http://rave.wiki/ravecore/reference/reg3d_rigid.md)
+  [`cmd_run_reg3d_rigid()`](http://rave.wiki/ravecore/reference/reg3d_rigid.md)
+  :
+
+  Rigidly register a computerized tomography (CT) image to MRI with the
+  built-in `YAEL-reg3d` engine
+
 - [`run_wavelet()`](http://rave.wiki/ravecore/reference/run_wavelet.md)
   : Apply Morlet-Wavelet to subject
 

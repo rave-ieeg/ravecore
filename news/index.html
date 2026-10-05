@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ravecore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.19</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.20</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -47,6 +47,7 @@
 <li>Repositories gain <code>get_electrode_coordinate()</code> to subset the electrode table by channel numbers and types (<code>#9c7f5df</code>).</li>
 <li>
 <code>RAVEEpoch</code> supports an <code>ExcludedHint</code> column and an <code>exclude_trials()</code> method; saving produces a trimmed <code>_OutlierRemoved</code> epoch (<code>#33c828c</code>).</li>
+<li>Added <code><a href="../reference/reg3d_rigid.html">reg3d_rigid()</a></code> and <code><a href="../reference/reg3d_rigid.html">cmd_run_reg3d_rigid()</a></code> to rigidly co-register <code>CT</code> to <code>MRI</code> with the built-in <code><a href="https://dipterix.org/ravetools/reference/register_volume3d.html" class="external-link">ravetools::register_volume3d()</a></code> (<code>YAEL-reg3d</code>; no external program needed), with <code>Rigid</code>, <code>DenseRigid</code> and <code>FastRigid</code> presets and mutual-information or cross-correlation cost; images with a side of 384 voxels or more are also saved as down-sampled copies for viewers. Requires <code>ravetools</code> 0.3.1 or later.</li>
 </ul></div>
 <div class="section level4">
 <h4 id="bug-fixes-0-1-2">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-2"></a></h4>

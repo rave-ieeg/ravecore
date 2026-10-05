@@ -35,6 +35,16 @@
 - `RAVEEpoch` supports an `ExcludedHint` column and an
   `exclude_trials()` method; saving produces a trimmed `_OutlierRemoved`
   epoch (`#33c828c`).
+- Added
+  [`reg3d_rigid()`](http://rave.wiki/ravecore/reference/reg3d_rigid.md)
+  and
+  [`cmd_run_reg3d_rigid()`](http://rave.wiki/ravecore/reference/reg3d_rigid.md)
+  to rigidly co-register `CT` to `MRI` with the built-in
+  [`ravetools::register_volume3d()`](https://dipterix.org/ravetools/reference/register_volume3d.html)
+  (`YAEL-reg3d`; no external program needed), with `Rigid`, `DenseRigid`
+  and `FastRigid` presets and mutual-information or cross-correlation
+  cost; images with a side of 384 voxels or more are also saved as
+  down-sampled copies for viewers. Requires `ravetools` 0.3.1 or later.
 
 #### Bug Fixes
 
