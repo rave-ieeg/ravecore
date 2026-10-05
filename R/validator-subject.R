@@ -565,7 +565,7 @@ validate_subject_meta <- function(subject, verbose = TRUE, other_checks = NULL) 
         cols <- cols[!cols %in% names(tbl)]
 
         if (length(cols)) {
-          stop("electrodes.csv is mising the following column(s): ",
+          stop("electrodes.csv is missing the following column(s): ",
                paste(cols, collapse = ", "))
         }
 
@@ -623,10 +623,10 @@ validate_subject_meta <- function(subject, verbose = TRUE, other_checks = NULL) 
           }
 
           if (!is.numeric(tbl$Time)) {
-            stop("epoch table onset time (colume: Time) contains non-numeric")
+            stop("epoch table onset time (column: Time) contains non-numeric")
           }
           if (!all(as.integer(tbl$Trial) == tbl$Trial)) {
-            stop("epoch table trial index (colume: Trial) must be all positive integers")
+            stop("epoch table trial index (column: Trial) must be all positive integers")
           }
 
           if (any(duplicated(tbl$Trial))) {
@@ -641,7 +641,7 @@ validate_subject_meta <- function(subject, verbose = TRUE, other_checks = NULL) 
             events <- gsub("^Event_", "", nms)
             for (ii in seq_along(nms)) {
               if (!is.numeric(tbl[[nms[[ii]]]])) {
-                stop(sprintf("detected event [%s] in the epoch table (colume: [%s]) containing non-numerical values", events[[ii]], nms[[ii]]))
+                stop(sprintf("detected event [%s] in the epoch table (column: [%s]) containing non-numerical values", events[[ii]], nms[[ii]]))
               }
             }
           }

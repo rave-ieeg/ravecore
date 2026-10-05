@@ -80,7 +80,7 @@ glimpse_voltage_repository_with_blocks <- function(
     highpass_freq = NA, lowpass_freq = NA) {
 
   if (!package_installed("plotly")) {
-    stop("This function requires package `plotly`. Please instal this package first.")
+    stop("This function requires package `plotly`. Please install this package first.")
   }
 
   # repository <- ravecore::prepare_subject_voltage_with_blocks("demo/DemoSubject")
@@ -534,7 +534,7 @@ glimpse_voltage_filearray <- function(
 ) {
 
   if (!package_installed("plotly")) {
-    stop("This function requires package `plotly`. Please instal this package first.")
+    stop("This function requires package `plotly`. Please install this package first.")
   }
 
   if (!inherits(filearray, "FileArray")) {

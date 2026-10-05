@@ -74,7 +74,7 @@ Spike_electrode <- R6::R6Class(
         data = list(
           subject = self$subject$`@marshal`(),
           number = self$number,
-          # refererence = self$reference_name,
+          # reference = self$reference_name,
           signal_type = self$type,
           location_type = self$location,
           # epoch = epoch,
