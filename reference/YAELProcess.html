@@ -13,7 +13,7 @@ as_yael_process"></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ravecore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.20</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.21</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,6 +88,7 @@ regions of interest back to native brain. See examples at
 <li><p><a href="#method-YAELProcess-generate_streamlines_from_template"><code>YAELProcess$generate_streamlines_from_template()</code></a></p></li>
 <li><p><a href="#method-YAELProcess-transform_points_to_template"><code>YAELProcess$transform_points_to_template()</code></a></p></li>
 <li><p><a href="#method-YAELProcess-transform_points_from_template"><code>YAELProcess$transform_points_from_template()</code></a></p></li>
+<li><p><a href="#method-YAELProcess-write_talairach_xfm"><code>YAELProcess$write_talairach_xfm()</code></a></p></li>
 <li><p><a href="#method-YAELProcess-construct_ants_folder_from_template"><code>YAELProcess$construct_ants_folder_from_template()</code></a></p></li>
 <li><p><a href="#method-YAELProcess-get_brain"><code>YAELProcess$get_brain()</code></a></p></li>
 <li><p><a href="#method-YAELProcess-clone"><code>YAELProcess$clone()</code></a></p></li>
@@ -620,19 +621,51 @@ invalid rows will be filled with <code>NA</code>)</p>
 
 </div>
 
+<p></p><hr><a id="method-YAELProcess-write_talairach_xfm"></a><div class="section">
+<h3 id="yaelprocess-write-talairach-xfm-"><code>YAELProcess$write_talairach_xfm()</code><a class="anchor" aria-label="anchor" href="#yaelprocess-write-talairach-xfm-"></a></h3>
+<p>Write the linear transform <code>'ants/mri/transforms/talairach.xfm'</code>
+from native <code>'T1w'</code> scanner <code>'RAS'</code> coordinates to
+<code>'MNI305'</code> space, using the affine part of the normalization
+created by <code>map_to_template</code>. For templates that are not in
+<code>'MNI152'</code> space, the transform maps to the template space
+instead (<code>'fsaverage'</code> is already in <code>'MNI305'</code> space).
+This method is called by <code>construct_ants_folder_from_template</code>,
+and can be called alone to repair subjects processed by earlier
+versions, where this transform was computed in the wrong direction
+and coordinate convention.</p><div class="section">
+<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">YAELProcess</span><span class="op">$</span><span class="fu">write_talairach_xfm</span><span class="op">(</span>template_name <span class="op">=</span> <span class="fu">rpyants_builtin_templates</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div><p></p><div class="section">
+<h4 id="arguments-16">Arguments<a class="anchor" aria-label="anchor" href="#arguments-16"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>template_name</code></dt>
+<dd><p>template that has been used in
+<code>map_to_template</code></p></dd>
+
+
+</dl><p></p></div>
+</div><p></p><div class="section">
+<h4 id="returns-13">Returns<a class="anchor" aria-label="anchor" href="#returns-13"></a></h4>
+<p>The path to the transform file, invisibly</p>
+</div>
+
+</div>
+
 <p></p><hr><a id="method-YAELProcess-construct_ants_folder_from_template"></a><div class="section">
 <h3 id="yaelprocess-construct-ants-folder-from-template-"><code>YAELProcess$construct_ants_folder_from_template()</code><a class="anchor" aria-label="anchor" href="#yaelprocess-construct-ants-folder-from-template-"></a></h3>
 <p>Create a reconstruction folder (as an alternative option) that
 is generated from template brain to facilitate the three-dimensional
 viewer. Please make sure method <code>map_to_template</code> is called before
-using this method (or the program will fail)</p><div class="section">
-<h4 id="usage-16">Usage<a class="anchor" aria-label="anchor" href="#usage-16"></a></h4>
+using this method (or the program will fail). The linear transform
+<code>'mri/transforms/talairach.xfm'</code> is written by
+<code>write_talairach_xfm</code>; if that fails, the file is removed and a
+warning is logged.</p><div class="section">
+<h4 id="usage-17">Usage<a class="anchor" aria-label="anchor" href="#usage-17"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">YAELProcess</span><span class="op">$</span><span class="fu">construct_ants_folder_from_template</span><span class="op">(</span></span>
 <span>  template_name <span class="op">=</span> <span class="fu">rpyants_builtin_templates</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  add_surfaces <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
-<h4 id="arguments-16">Arguments<a class="anchor" aria-label="anchor" href="#arguments-16"></a></h4>
+<h4 id="arguments-17">Arguments<a class="anchor" aria-label="anchor" href="#arguments-17"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>template_name</code></dt>
 <dd><p>template to use for mapping</p></dd>
 
@@ -652,14 +685,14 @@ you are studying the deep brain structures). Always use
 <p></p><hr><a id="method-YAELProcess-get_brain"></a><div class="section">
 <h3 id="yaelprocess-get-brain-"><code>YAELProcess$get_brain()</code><a class="anchor" aria-label="anchor" href="#yaelprocess-get-brain-"></a></h3>
 <p>Get three-dimensional brain model</p><div class="section">
-<h4 id="usage-17">Usage<a class="anchor" aria-label="anchor" href="#usage-17"></a></h4>
+<h4 id="usage-18">Usage<a class="anchor" aria-label="anchor" href="#usage-18"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">YAELProcess</span><span class="op">$</span><span class="fu">get_brain</span><span class="op">(</span></span>
 <span>  electrodes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  coord_sys <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"scannerRAS"</span>, <span class="st">"tkrRAS"</span>, <span class="st">"MNI152"</span>, <span class="st">"MNI305"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
-<h4 id="arguments-17">Arguments<a class="anchor" aria-label="anchor" href="#arguments-17"></a></h4>
+<h4 id="arguments-18">Arguments<a class="anchor" aria-label="anchor" href="#arguments-18"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>electrodes</code></dt>
 <dd><p>whether to add electrodes to the viewers; can be
 logical, data frame, or a character (path to electrode table). When
@@ -692,10 +725,10 @@ subjects; this coordinate system used by templates such as
 <p></p><hr><a id="method-YAELProcess-clone"></a><div class="section">
 <h3 id="yaelprocess-clone-"><code>YAELProcess$clone()</code><a class="anchor" aria-label="anchor" href="#yaelprocess-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-18">Usage<a class="anchor" aria-label="anchor" href="#usage-18"></a></h4>
+<h4 id="usage-19">Usage<a class="anchor" aria-label="anchor" href="#usage-19"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">YAELProcess</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
-<h4 id="arguments-18">Arguments<a class="anchor" aria-label="anchor" href="#arguments-18"></a></h4>
+<h4 id="arguments-19">Arguments<a class="anchor" aria-label="anchor" href="#arguments-19"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 

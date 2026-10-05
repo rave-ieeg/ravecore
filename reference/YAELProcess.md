@@ -60,6 +60,8 @@ atlas or regions of interest back to native brain. See examples at
 
 - [`YAELProcess$transform_points_from_template()`](#method-YAELProcess-transform_points_from_template)
 
+- [`YAELProcess$write_talairach_xfm()`](#method-YAELProcess-write_talairach_xfm)
+
 - [`YAELProcess$construct_ants_folder_from_template()`](#method-YAELProcess-construct_ants_folder_from_template)
 
 - [`YAELProcess$get_brain()`](#method-YAELProcess-get_brain)
@@ -640,12 +642,42 @@ will be filled with `NA`)
 
 ------------------------------------------------------------------------
 
+### `YAELProcess$write_talairach_xfm()`
+
+Write the linear transform `'ants/mri/transforms/talairach.xfm'` from
+native `'T1w'` scanner `'RAS'` coordinates to `'MNI305'` space, using
+the affine part of the normalization created by `map_to_template`. For
+templates that are not in `'MNI152'` space, the transform maps to the
+template space instead (`'fsaverage'` is already in `'MNI305'` space).
+This method is called by `construct_ants_folder_from_template`, and can
+be called alone to repair subjects processed by earlier versions, where
+this transform was computed in the wrong direction and coordinate
+convention.
+
+#### Usage
+
+    YAELProcess$write_talairach_xfm(template_name = rpyants_builtin_templates())
+
+#### Arguments
+
+- `template_name`:
+
+  template that has been used in `map_to_template`
+
+#### Returns
+
+The path to the transform file, invisibly
+
+------------------------------------------------------------------------
+
 ### `YAELProcess$construct_ants_folder_from_template()`
 
 Create a reconstruction folder (as an alternative option) that is
 generated from template brain to facilitate the three-dimensional
 viewer. Please make sure method `map_to_template` is called before using
-this method (or the program will fail)
+this method (or the program will fail). The linear transform
+`'mri/transforms/talairach.xfm'` is written by `write_talairach_xfm`; if
+that fails, the file is removed and a warning is logged.
 
 #### Usage
 

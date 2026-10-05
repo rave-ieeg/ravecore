@@ -45,9 +45,25 @@
   and `FastRigid` presets and mutual-information or cross-correlation
   cost; images with a side of 384 voxels or more are also saved as
   down-sampled copies for viewers. Requires `ravetools` 0.3.1 or later.
+- Added `YAELProcess$write_talairach_xfm()` to write
+  `ants/mri/transforms/talairach.xfm` from an existing template
+  normalization.
 
 #### Bug Fixes
 
+- `YAELProcess$construct_ants_folder_from_template()` wrote
+  `ants/mri/transforms/talairach.xfm` from the template-to-native `ANTs`
+  affine without inverting it or converting `LPS` to `RAS`, and applied
+  the `MNI152`-to-`MNI305` correction to every template. For subjects
+  without `rave-imaging/fs`, `MNI305`/`MNI152` electrode coordinates
+  derived from this file could be off by several centimeters. The
+  transform is now inverted, converted to `RAS`, and corrected only for
+  `MNI152` templates; failures are logged and the stale file is removed.
+  To repair a subject, run
+  `as_yael_process("<project>/<subject>")$write_talairach_xfm("<template>")`,
+  then re-save the electrode localization, or re-import an electrode
+  table without the `MNI305_*`/`MNI152_*` columns (or with them set to
+  zero); existing `MNI` columns are kept as they are.
 - [`cmd_run_dcm2niix()`](http://rave.wiki/ravecore/reference/cmd_run_dcm2niix.md)
   now remembers the imported image source under the `yael_preprocess`
   module (it used the old module ID `surface_reconstruction`), as a path

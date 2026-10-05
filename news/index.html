@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ravecore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.20</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.21</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,10 +48,13 @@
 <li>
 <code>RAVEEpoch</code> supports an <code>ExcludedHint</code> column and an <code>exclude_trials()</code> method; saving produces a trimmed <code>_OutlierRemoved</code> epoch (<code>#33c828c</code>).</li>
 <li>Added <code><a href="../reference/reg3d_rigid.html">reg3d_rigid()</a></code> and <code><a href="../reference/reg3d_rigid.html">cmd_run_reg3d_rigid()</a></code> to rigidly co-register <code>CT</code> to <code>MRI</code> with the built-in <code><a href="https://dipterix.org/ravetools/reference/register_volume3d.html" class="external-link">ravetools::register_volume3d()</a></code> (<code>YAEL-reg3d</code>; no external program needed), with <code>Rigid</code>, <code>DenseRigid</code> and <code>FastRigid</code> presets and mutual-information or cross-correlation cost; images with a side of 384 voxels or more are also saved as down-sampled copies for viewers. Requires <code>ravetools</code> 0.3.1 or later.</li>
+<li>Added <code>YAELProcess$write_talairach_xfm()</code> to write <code>ants/mri/transforms/talairach.xfm</code> from an existing template normalization.</li>
 </ul></div>
 <div class="section level4">
 <h4 id="bug-fixes-0-1-2">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-2"></a></h4>
 <ul><li>
+<code>YAELProcess$construct_ants_folder_from_template()</code> wrote <code>ants/mri/transforms/talairach.xfm</code> from the template-to-native <code>ANTs</code> affine without inverting it or converting <code>LPS</code> to <code>RAS</code>, and applied the <code>MNI152</code>-to-<code>MNI305</code> correction to every template. For subjects without <code>rave-imaging/fs</code>, <code>MNI305</code>/<code>MNI152</code> electrode coordinates derived from this file could be off by several centimeters. The transform is now inverted, converted to <code>RAS</code>, and corrected only for <code>MNI152</code> templates; failures are logged and the stale file is removed. To repair a subject, run <code>as_yael_process("&lt;project&gt;/&lt;subject&gt;")$write_talairach_xfm("&lt;template&gt;")</code>, then re-save the electrode localization, or re-import an electrode table without the <code>MNI305_*</code>/<code>MNI152_*</code> columns (or with them set to zero); existing <code>MNI</code> columns are kept as they are.</li>
+<li>
 <code><a href="../reference/cmd_run_dcm2niix.html">cmd_run_dcm2niix()</a></code> now remembers the imported image source under the <code>yael_preprocess</code> module (it used the old module ID <code>surface_reconstruction</code>), as a path relative to the subject’s raw folder (or <code>BIDS</code> raw folder), so the module loader can select it (<code>#57c7684</code>).</li>
 <li>Subject pipeline listing is backward compatible with old pipeline paths, and listing all pipelines works again (<code>#f428fc0</code>, <code>#e9ebb8e</code>, <code>#7922564</code>).</li>
 <li>
