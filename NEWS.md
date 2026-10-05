@@ -12,9 +12,11 @@
 * Repositories gain `get_electrode_coordinate()` to subset the electrode table by channel numbers and types (`#9c7f5df`).
 * `RAVEEpoch` supports an `ExcludedHint` column and an `exclude_trials()` method; saving produces a trimmed `_OutlierRemoved` epoch (`#33c828c`).
 * Added `reg3d_rigid()` and `cmd_run_reg3d_rigid()` to rigidly co-register `CT` to `MRI` with the built-in `ravetools::register_volume3d()` (`YAEL-reg3d`; no external program needed), with `Rigid`, `DenseRigid` and `FastRigid` presets and mutual-information or cross-correlation cost; images with a side of 384 voxels or more are also saved as down-sampled copies for viewers. Requires `ravetools` 0.3.1 or later.
+* Added `YAELProcess$write_talairach_xfm()` to write `ants/mri/transforms/talairach.xfm` from an existing template normalization.
 
 ### Bug Fixes
 
+* `YAELProcess$construct_ants_folder_from_template()` wrote `ants/mri/transforms/talairach.xfm` from the template-to-native `ANTs` affine without inverting it or converting `LPS` to `RAS`, and applied the `MNI152`-to-`MNI305` correction to every template. For subjects without `rave-imaging/fs`, `MNI305`/`MNI152` electrode coordinates derived from this file could be off by several centimeters. The transform is now inverted, converted to `RAS`, and corrected only for `MNI152` templates; failures are logged and the stale file is removed. To repair a subject, run `as_yael_process("<project>/<subject>")$write_talairach_xfm("<template>")`, then re-save the electrode localization, or re-import an electrode table without the `MNI305_*`/`MNI152_*` columns (or with them set to zero); existing `MNI` columns are kept as they are.
 * `cmd_run_dcm2niix()` now remembers the imported image source under the `yael_preprocess` module (it used the old module ID `surface_reconstruction`), as a path relative to the subject's raw folder (or `BIDS` raw folder), so the module loader can select it (`#57c7684`).
 * Subject pipeline listing is backward compatible with old pipeline paths, and listing all pipelines works again (`#f428fc0`, `#e9ebb8e`, `#7922564`).
 * `filearray` partitions are created before parallel workers start during power baseline, preventing a rare write race (`#9dadfec`).

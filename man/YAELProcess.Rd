@@ -42,6 +42,7 @@ regions of interest back to native brain. See examples at
     \item \href{#method-YAELProcess-generate_streamlines_from_template}{\code{YAELProcess$generate_streamlines_from_template()}}
     \item \href{#method-YAELProcess-transform_points_to_template}{\code{YAELProcess$transform_points_to_template()}}
     \item \href{#method-YAELProcess-transform_points_from_template}{\code{YAELProcess$transform_points_from_template()}}
+    \item \href{#method-YAELProcess-write_talairach_xfm}{\code{YAELProcess$write_talairach_xfm()}}
     \item \href{#method-YAELProcess-construct_ants_folder_from_template}{\code{YAELProcess$construct_ants_folder_from_template()}}
     \item \href{#method-YAELProcess-get_brain}{\code{YAELProcess$get_brain()}}
     \item \href{#method-YAELProcess-clone}{\code{YAELProcess$clone()}}
@@ -551,13 +552,48 @@ invalid rows will be filled with \code{NA})
 }
 
 \if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-YAELProcess-write_talairach_xfm"></a>}}
+\if{latex}{\out{\hypertarget{method-YAELProcess-write_talairach_xfm}{}}}
+\subsection{\code{YAELProcess$write_talairach_xfm()}}{
+  Write the linear transform \code{'ants/mri/transforms/talairach.xfm'}
+from native \code{'T1w'} scanner \code{'RAS'} coordinates to
+\code{'MNI305'} space, using the affine part of the normalization
+created by \code{map_to_template}. For templates that are not in
+\code{'MNI152'} space, the transform maps to the template space
+instead (\code{'fsaverage'} is already in \code{'MNI305'} space).
+This method is called by \code{construct_ants_folder_from_template},
+and can be called alone to repair subjects processed by earlier
+versions, where this transform was computed in the wrong direction
+and coordinate convention.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{YAELProcess$write_talairach_xfm(template_name = rpyants_builtin_templates())}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{template_name}}{template that has been used in
+\code{map_to_template}}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    The path to the transform file, invisibly
+  }
+}
+
+\if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-YAELProcess-construct_ants_folder_from_template"></a>}}
 \if{latex}{\out{\hypertarget{method-YAELProcess-construct_ants_folder_from_template}{}}}
 \subsection{\code{YAELProcess$construct_ants_folder_from_template()}}{
   Create a reconstruction folder (as an alternative option) that
 is generated from template brain to facilitate the three-dimensional
 viewer. Please make sure method \code{map_to_template} is called before
-using this method (or the program will fail)
+using this method (or the program will fail). The linear transform
+\code{'mri/transforms/talairach.xfm'} is written by
+\code{write_talairach_xfm}; if that fails, the file is removed and a
+warning is logged.
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
     \preformatted{YAELProcess$construct_ants_folder_from_template(
