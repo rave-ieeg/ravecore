@@ -45,10 +45,119 @@ RAVESubject <- R6::R6Class(
       ))
     },
 
-    #' @description override print method
-    #' @param ... ignored
+    #' @description override print method: prints \code{format()}
+    #' @param ... passed to \code{format()}
     print = function(...) {
-      cat("RAVE subject <", self$subject_id, ">\n", sep = "")
+      cat(self$format(...), sep = "\n")
+      invisible(self)
+    },
+
+    #' @description summary of the subject's data
+    #' @param ... ignored
+    #' @returns A character vector, one element per line
+    format = function(...) {
+      quietly <- function(expr, default = NULL) {
+        tryCatch(expr, error = function(e) default)
+      }
+      listing <- function(x, empty = "none") {
+        if (!length(x)) { return(empty) }
+        paste(x, collapse = ", ")
+      }
+      mark_default <- function(names, default) {
+        default <- as.character(unlist(default))
+        is_default <- names %in% default
+        names[is_default] <- paste(names[is_default], "(default)")
+        names
+      }
+      found <- function(x) {
+        if (isTRUE(x)) "found" else "missing"
+      }
+
+      lines <- sprintf("RAVE subject <%s>", self$subject_id)
+      lines <- c(lines, sprintf("  Blocks: %s", listing(quietly(self$blocks))))
+
+      electrodes <- quietly(self$electrodes)
+      if (length(electrodes)) {
+        n <- length(electrodes)
+        per_electrode <- function(x, default) {
+          if (length(x) == n) x else rep(default, n)
+        }
+        types <- per_electrode(quietly(self$electrode_types), "Unknown")
+        rates <- per_electrode(quietly(self$raw_sample_rates), NA)
+        notch <- per_electrode(as.logical(quietly(self$notch_filtered)), FALSE)
+        wavelet <- per_electrode(as.logical(quietly(self$has_wavelet)), FALSE)
+        power_rate <- quietly(self$power_sample_rate)
+        notch[is.na(notch)] <- FALSE
+        wavelet[is.na(wavelet)] <- FALSE
+
+        lines <- c(lines, sprintf("  Electrodes: %s", deparse_svec(electrodes)))
+        for (type in unique(types)) {
+          sel <- types == type
+          rate <- unique(rates[sel])
+          rate <- rate[!is.na(rate)]
+          rate_text <- if (length(rate)) {
+            sprintf(" at %s Hz", paste(rate, collapse = "/"))
+          } else {
+            ""
+          }
+          details <- character(0)
+          if (any(sel & notch)) {
+            details <- c(details, sprintf("notch filtered: %s",
+                                          deparse_svec(electrodes[sel & notch])))
+          }
+          if (any(sel & wavelet)) {
+            details <- c(details, sprintf(
+              "wavelet: %s%s", deparse_svec(electrodes[sel & wavelet]),
+              if (length(power_rate)) sprintf(" at %s Hz", power_rate[[1]]) else ""
+            ))
+          }
+          lines <- c(lines, sprintf(
+            "    %s: %s%s%s", type, deparse_svec(electrodes[sel]), rate_text,
+            if (length(details)) sprintf(" (%s)", paste(details, collapse = "; ")) else ""
+          ))
+        }
+      } else {
+        lines <- c(lines, "  Electrodes: none imported")
+      }
+
+      lines <- c(
+        lines,
+        sprintf("  Epochs: %s", listing(mark_default(
+          quietly(self$epoch_names, character(0)),
+          quietly(self$get_default("epoch_name"))
+        ))),
+        sprintf("  References: %s", listing(mark_default(
+          quietly(self$reference_names, character(0)),
+          quietly(self$get_default("reference_name"))
+        )))
+      )
+
+      a_path <- function(path) {
+        if (length(path) == 1L && is.character(path) && !is.na(path)) {
+          path
+        } else {
+          ""
+        }
+      }
+      imaging_path <- a_path(quietly(self$imaging_path))
+      native_mri <- nzchar(imaging_path) && length(list.files(
+        file.path(imaging_path, "inputs", "MRI"),
+        pattern = "\\.nii(\\.gz)?$", ignore.case = TRUE
+      )) > 0
+      coregistration <- nzchar(imaging_path) && length(list.files(
+        file.path(imaging_path, "coregistration")
+      )) > 0
+      freesurfer_path <- a_path(quietly(self$freesurfer_path))
+      freesurfer <- nzchar(freesurfer_path) && dir.exists(freesurfer_path)
+      c(
+        lines,
+        sprintf("  Native MRI: %s", found(native_mri)),
+        sprintf("  MNI normalization: %s", listing(
+          subject_normalization_templates(imaging_path, self$subject_code)
+        )),
+        sprintf("  CT-MRI coregistration: %s", found(coregistration)),
+        sprintf("  FreeSurfer: %s", found(freesurfer))
+      )
     },
 
     #' @description constructor
@@ -1008,6 +1117,34 @@ RAVESubject <- R6::R6Class(
     }
   )
 )
+
+# Templates the subject is normalized to: the `template` entity of the
+# mapping logs in `<imaging_path>/normalization/log`, e.g.
+# `sub-<code>_desc-preproc_template-MNI152NLin2009bAsym_native-T1w_mappings.json`.
+# Subject codes may contain underscores, which are not valid in BIDS labels,
+# so the `sub-<code>_` part is dropped before the name is parsed.
+subject_normalization_templates <- function(imaging_path, subject_code) {
+  files <- list.files(file.path(imaging_path, "normalization", "log"),
+                      pattern = "_mappings\\.json$", ignore.case = TRUE)
+  prefix <- paste0("sub-", subject_code, "_")
+  templates <- vapply(files, function(file) {
+    if (startsWith(file, prefix)) {
+      file <- substring(file, nchar(prefix) + 1L)
+    }
+    template <- tryCatch(
+      bidsr::get_bids_entity(bidsr::parse_path_bids_entity(file), "template"),
+      error = function(e) NULL
+    )
+    template <- as.character(unlist(template))
+    if (length(template) == 1L && !is.na(template) && nzchar(template)) {
+      template
+    } else {
+      NA_character_
+    }
+  }, NA_character_, USE.NAMES = FALSE)
+  # the same order in every locale
+  sort(unique(templates[!is.na(templates)]), method = "radix")
+}
 
 #' @name new_rave_subject
 #' @title Get \code{\link{RAVESubject}} instance from character

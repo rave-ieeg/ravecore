@@ -83,6 +83,7 @@ physically contacts, but is generated from those physically ones}
     \item \href{#method-RAVESubject-@marshal}{\code{RAVESubject$@marshal()}}
     \item \href{#method-RAVESubject-@unmarshal}{\code{RAVESubject$@unmarshal()}}
     \item \href{#method-RAVESubject-print}{\code{RAVESubject$print()}}
+    \item \href{#method-RAVESubject-format}{\code{RAVESubject$format()}}
     \item \href{#method-RAVESubject-initialize}{\code{RAVESubject$new()}}
     \item \href{#method-RAVESubject-meta_data}{\code{RAVESubject$meta_data()}}
     \item \href{#method-RAVESubject-valid_electrodes}{\code{RAVESubject$valid_electrodes()}}
@@ -146,7 +147,7 @@ physically contacts, but is generated from those physically ones}
 \if{html}{\out{<a id="method-RAVESubject-print"></a>}}
 \if{latex}{\out{\hypertarget{method-RAVESubject-print}{}}}
 \subsection{\code{RAVESubject$print()}}{
-  override print method
+  override print method: prints \code{format()}
   \subsection{Usage}{
     \if{html}{\out{<div class="r">}}
     \preformatted{RAVESubject$print(...)}
@@ -155,9 +156,31 @@ physically contacts, but is generated from those physically ones}
   \subsection{Arguments}{
     \if{html}{\out{<div class="arguments">}}
     \describe{
+      \item{\code{...}}{passed to \code{format()}}
+    }
+    \if{html}{\out{</div>}}
+  }
+}
+
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-RAVESubject-format"></a>}}
+\if{latex}{\out{\hypertarget{method-RAVESubject-format}{}}}
+\subsection{\code{RAVESubject$format()}}{
+  summary of the subject's data
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{RAVESubject$format(...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
       \item{\code{...}}{ignored}
     }
     \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A character vector, one element per line
   }
 }
 
