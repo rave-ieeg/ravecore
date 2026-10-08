@@ -479,7 +479,9 @@ Generate atlas maps from template and morph to native brain
       lambda = 0.2,
       degree = 2,
       threshold_lb = 0.5,
-      threshold_ub = NA
+      threshold_ub = NA,
+      smooth_method = c("implicit", "explicit"),
+      max_vertices = 5e+05
     )
 
 #### Arguments
@@ -507,6 +509,22 @@ Generate atlas maps from template and morph to native brain
 
   passed to
   [`volume_to_surf`](https://dipterix.org/threeBrain/reference/volume_to_surf.html)
+
+- `smooth_method`:
+
+  how to smooth the surfaces: `"implicit"` (default,
+  [`vcg_smooth_implicit`](https://dipterix.org/ravetools/reference/vcg_smooth.html)
+  with `lambda` and `degree`) or `"explicit"`
+  ([`mris_smooth`](https://dipterix.org/ravetools/reference/mris_smooth.html));
+  passed to
+  [`volume_to_surf`](https://dipterix.org/threeBrain/reference/volume_to_surf.html)
+
+- `max_vertices`:
+
+  surfaces with more vertices are reduced to about this many after
+  smoothing; passed to
+  [`volume_to_surf`](https://dipterix.org/threeBrain/reference/volume_to_surf.html);
+  default is `500000`
 
 #### Returns
 

@@ -13,7 +13,7 @@ as_yael_process"></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ravecore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.21</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.22</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -469,7 +469,9 @@ otherwise.</p></dd>
 <span>  lambda <span class="op">=</span> <span class="fl">0.2</span>,</span>
 <span>  degree <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  threshold_lb <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>  threshold_ub <span class="op">=</span> <span class="cn">NA</span></span>
+<span>  threshold_ub <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  smooth_method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"implicit"</span>, <span class="st">"explicit"</span><span class="op">)</span>,</span>
+<span>  max_vertices <span class="op">=</span> <span class="fl">5e+05</span></span>
 <span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div><p></p><div class="section">
 <h4 id="arguments-12">Arguments<a class="anchor" aria-label="anchor" href="#arguments-12"></a></h4>
@@ -493,6 +495,18 @@ to disable this function. The generated surfaces will stay in native
       <dt><code>lambda, degree, threshold_lb, threshold_ub</code></dt>
 <dd><p>passed to
 <code><a href="https://dipterix.org/threeBrain/reference/volume_to_surf.html" class="external-link">volume_to_surf</a></code></p></dd>
+
+      <dt><code>smooth_method</code></dt>
+<dd><p>how to smooth the surfaces: <code>"implicit"</code>
+(default, <code><a href="https://dipterix.org/ravetools/reference/vcg_smooth.html" class="external-link">vcg_smooth_implicit</a></code> with
+<code>lambda</code> and <code>degree</code>) or <code>"explicit"</code>
+(<code><a href="https://dipterix.org/ravetools/reference/mris_smooth.html" class="external-link">mris_smooth</a></code>); passed to
+<code><a href="https://dipterix.org/threeBrain/reference/volume_to_surf.html" class="external-link">volume_to_surf</a></code></p></dd>
+
+      <dt><code>max_vertices</code></dt>
+<dd><p>surfaces with more vertices are reduced to about
+this many after smoothing; passed to
+<code><a href="https://dipterix.org/threeBrain/reference/volume_to_surf.html" class="external-link">volume_to_surf</a></code>; default is <code>500000</code></p></dd>
 
 
 </dl><p></p></div>

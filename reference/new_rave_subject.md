@@ -54,6 +54,14 @@ subject <- new_rave_subject(project_name = "demo@bids:ds04001",
 
 subject
 #> RAVE subject <demo@bids:ds04001/DemoSubject>
+#>   Blocks: none
+#>   Electrodes: none imported
+#>   Epochs: none
+#>   References: none
+#>   Native MRI: missing
+#>   MNI normalization: none
+#>   CT-MRI coregistration: missing
+#>   FreeSurfer: missing
 
 subject$project$path
 #> /home/runner/rave_data/bids_dir/ds04001/derivatives/rave/data_dir/demo

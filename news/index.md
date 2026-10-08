@@ -48,9 +48,31 @@
 - Added `YAELProcess$write_talairach_xfm()` to write
   `ants/mri/transforms/talairach.xfm` from an existing template
   normalization.
+- `YAELProcess$generate_atlas_from_template()` gains
+  `smooth_method = "explicit"` to smooth atlas surfaces with
+  [`ravetools::mris_smooth()`](https://dipterix.org/ravetools/reference/mris_smooth.html),
+  and `max_vertices` (500,000 by default) to reduce very large atlas
+  surfaces after smoothing; both are passed to
+  [`ieegio::volume_to_surface()`](http://dipterix.org/ieegio/reference/volume_to_surface.md)
+  when the installed `ieegio` accepts them.
+- `RAVESubject` gains [`format()`](https://rdrr.io/r/base/format.html),
+  which [`print()`](https://rdrr.io/r/base/print.html) now shows: the
+  subject’s blocks, its electrodes by signal type with sample rates and
+  which ones are `Notch`-filtered or have `Wavelet` power, its epoch and
+  reference names (with the subject’s defaults marked), and its imaging
+  state (native `MRI`, `MNI` normalization templates, `CT`-`MRI`
+  co-registration, `FreeSurfer`). Only metadata are read.
 
 #### Bug Fixes
 
+- `YAELProcess$generate_atlas_from_template()` reports each atlas
+  surface it fails to generate as a warning naming the volume; failures
+  were hidden by a silent [`try()`](https://rdrr.io/r/base/try.html).
+  Generating the surface of a whole-brain `parcellation` such as
+  `YBA690` (millions of vertices) crashed `R` inside
+  [`ravetools::vcg_smooth_implicit()`](https://dipterix.org/ravetools/reference/vcg_smooth.html);
+  with `ravetools` 0.3.3 the full-resolution surface is smoothed in
+  about 20 seconds and then reduced to `max_vertices`.
 - `YAELProcess$construct_ants_folder_from_template()` wrote
   `ants/mri/transforms/talairach.xfm` from the template-to-native `ANTs`
   affine without inverting it or converting `LPS` to `RAS`, and applied

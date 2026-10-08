@@ -139,6 +139,8 @@
 
 - [`RAVESubject$print()`](#method-RAVESubject-print)
 
+- [`RAVESubject$format()`](#method-RAVESubject-format)
+
 - [`RAVESubject$new()`](#method-RAVESubject-initialize)
 
 - [`RAVESubject$meta_data()`](#method-RAVESubject-meta_data)
@@ -207,7 +209,8 @@ Internal method
 
 ### `RAVESubject$print()`
 
-override print method
+override print method: prints
+[`format()`](https://rdrr.io/r/base/format.html)
 
 #### Usage
 
@@ -217,7 +220,27 @@ override print method
 
 - `...`:
 
+  passed to [`format()`](https://rdrr.io/r/base/format.html)
+
+------------------------------------------------------------------------
+
+### `RAVESubject$format()`
+
+summary of the subject's data
+
+#### Usage
+
+    RAVESubject$format(...)
+
+#### Arguments
+
+- `...`:
+
   ignored
+
+#### Returns
+
+A character vector, one element per line
 
 ------------------------------------------------------------------------
 
