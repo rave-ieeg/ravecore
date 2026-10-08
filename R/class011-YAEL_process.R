@@ -81,6 +81,40 @@ ants_affine_to_talairach_xfm <- function(template_to_native_lps, coord_sys) {
   native_to_template_ras
 }
 
+# Surface of one atlas volume, written next to it as `.gii`. A failure is
+# reported as a warning naming the file: the other atlases are still
+# processed, but a missing surface is no longer silent
+generate_atlas_surface <- function(path, overwrite, lambda, degree,
+                                   threshold_lb, threshold_ub,
+                                   ...) {
+  fname <- gsub("\\.(nii|nii\\.gz)$", "", basename(path), ignore.case = TRUE)
+  dst_path <- file.path(dirname(path), sprintf("%s.gii", fname))
+  if (isTRUE(overwrite) || !file.exists(dst_path)) {
+    tryCatch({
+      args <- list(
+        volume = path,
+        lambda = lambda,
+        degree = degree,
+        threshold_lb = threshold_lb,
+        threshold_ub = threshold_ub,
+        ...
+      )
+      args <- args[names(args) %in% names(formals(ieegio::volume_to_surface))]
+      surf <- do.call(ieegio::volume_to_surface, args)
+      if (length(surf$geometry$vertices) && length(surf$geometry$transforms)) {
+        transform <- surf$geometry$transforms[[1]]
+        surf$geometry$vertices <- transform %*% surf$geometry$vertices
+        surf$geometry$transforms[[1]] <- diag(1, 4)
+      }
+      ieegio::write_surface(surf, dst_path, format = "gifti")
+    }, error = function(e) {
+      warning(sprintf("Failed to generate the surface for %s: %s",
+                      basename(path), conditionMessage(e)), call. = FALSE)
+    })
+  }
+  path
+}
+
 
 #' @title Class definition of 'YAEL' image pipeline
 #' @description
@@ -558,13 +592,23 @@ YAELProcess <- R6::R6Class(
     #' @param verbose whether the print out the progress
     #' @param lambda,degree,threshold_lb,threshold_ub passed to
     #' \code{\link[threeBrain]{volume_to_surf}}
+    #' @param smooth_method how to smooth the surfaces: \code{"implicit"}
+    #' (default, \code{\link[ravetools]{vcg_smooth_implicit}} with
+    #' \code{lambda} and \code{degree}) or \code{"explicit"}
+    #' (\code{\link[ravetools]{mris_smooth}}); passed to
+    #' \code{\link[threeBrain]{volume_to_surf}}
+    #' @param max_vertices surfaces with more vertices are reduced to about
+    #' this many after smoothing; passed to
+    #' \code{\link[threeBrain]{volume_to_surf}}; default is \code{500000}
     #' @returns Paths to the atlas (volume) files
     generate_atlas_from_template = function(
         template_name = rpyants_builtin_templates(),
         atlas_folder = NULL, surfaces = NA, verbose = TRUE,
-        lambda = 0.2, degree = 2, threshold_lb = 0.5, threshold_ub = NA
+        lambda = 0.2, degree = 2, threshold_lb = 0.5, threshold_ub = NA,
+        smooth_method = c("implicit", "explicit"), max_vertices = 500000
     ) {
       template_name <- match.arg(template_name)
+      smooth_method <- match.arg(smooth_method)
       template_name2 <- camel_template_name(template_name)
 
       if ( length(atlas_folder) != 1 || is.na(atlas_folder) || !nzchar(atlas_folder) ) {
@@ -590,29 +634,24 @@ YAELProcess <- R6::R6Class(
       )
       if (isFALSE(surfaces)) { return(invisible(volume_files)) }
       paths <- ravepipeline::lapply_jobs(volume_files, function(path) {
-        dname <- dirname(path)
-        fname <- gsub("\\.(nii|nii\\.gz)$", "", basename(path), ignore.case = TRUE)
-        fname <- sprintf("%s.gii", fname)
-        dst_path <- file.path(dname, fname)
-        try(silent = TRUE, {
-          if (isTRUE(surfaces) || !file.exists(dst_path)) {
-            mesh <- threeBrain::volume_to_surf(
-              path,
-              save_to = dst_path,
-              lambda = lambda,
-              degree = degree,
-              threshold_lb = threshold_lb,
-              threshold_ub = threshold_ub
-            )
-          }
-        })
-        path
+        asNamespace("ravecore")$generate_atlas_surface(
+          path,
+          overwrite = surfaces,
+          lambda = lambda,
+          degree = degree,
+          threshold_lb = threshold_lb,
+          threshold_ub = threshold_ub,
+          smooth_method = smooth_method, 
+          max_vertices = max_vertices
+        )
       }, .globals = list(
         surfaces = surfaces,
         lambda = lambda,
         degree = degree,
         threshold_lb = threshold_lb,
-        threshold_ub = threshold_ub
+        threshold_ub = threshold_ub,
+        smooth_method = smooth_method, 
+        max_vertices = max_vertices
       ), callback = function(path) {
         fname <- gsub("\\.(nii|nii\\.gz)$", "", basename(path), ignore.case = TRUE)
         sprintf("Generating surfaces | %s", fname)

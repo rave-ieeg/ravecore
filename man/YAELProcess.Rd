@@ -418,7 +418,9 @@ otherwise.}
   lambda = 0.2,
   degree = 2,
   threshold_lb = 0.5,
-  threshold_ub = NA
+  threshold_ub = NA,
+  smooth_method = c("implicit", "explicit"),
+  max_vertices = 5e+05
 )}
     \if{html}{\out{</div>}}
   }
@@ -436,6 +438,14 @@ to disable this function. The generated surfaces will stay in native
       \item{\code{verbose}}{whether the print out the progress}
       \item{\code{lambda, degree, threshold_lb, threshold_ub}}{passed to
 \code{\link[threeBrain]{volume_to_surf}}}
+      \item{\code{smooth_method}}{how to smooth the surfaces: \code{"implicit"}
+(default, \code{\link[ravetools]{vcg_smooth_implicit}} with
+\code{lambda} and \code{degree}) or \code{"explicit"}
+(\code{\link[ravetools]{mris_smooth}}); passed to
+\code{\link[threeBrain]{volume_to_surf}}}
+      \item{\code{max_vertices}}{surfaces with more vertices are reduced to about
+this many after smoothing; passed to
+\code{\link[threeBrain]{volume_to_surf}}; default is \code{500000}}
     }
     \if{html}{\out{</div>}}
   }
