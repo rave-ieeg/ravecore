@@ -50,7 +50,7 @@
 #'   x = proj_ds004100,
 #'   format(electrode$parsed[[1]]))
 #'
-#' # laod electrode coordinate
+#' # load electrode coordinate
 #' tabular <- bidsr::as_bids_tabular(electrode_path)
 #'
 #' # Build RAVE electrode table
@@ -115,7 +115,7 @@ install_openneuro <- function(
   rpymat::ensure_rpymat(verbose = FALSE)
   openneuro <- rpymat::import("openneuro")
 
-  # Intialize directories
+  # Initialize directories
   parent_folder <- dir_create2(parent_folder)
 
   target_dir <- file_path(parent_folder, accession_number)

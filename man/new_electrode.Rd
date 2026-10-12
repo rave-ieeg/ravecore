@@ -40,7 +40,7 @@ Create new electrode channel instance or a reference signal instance
 \details{
 In \code{new_electrode}, \code{number} should be a positive
 valid integer indicating the electrode number. In \code{new_reference},
-\code{number} can be one of the followings:
+\code{number} can be one of the following:
 \describe{
 \item{\code{'noref'}, or \code{NULL}}{no reference is needed}
 \item{\code{'ref_X'}}{where \code{'X'} is a single number, then the
@@ -55,7 +55,7 @@ average of electrode 13, 14, 15, 16, and 24.}
 
 In \code{new_electrode}, \code{number} should be a positive
 valid integer indicating the electrode number. In \code{new_reference},
-\code{number} can be one of the followings:
+\code{number} can be one of the following:
 \describe{
 \item{\code{'noref'}, or \code{NULL}}{no reference is needed}
 \item{\code{'ref_X'}}{where \code{'X'} is a single number, then the

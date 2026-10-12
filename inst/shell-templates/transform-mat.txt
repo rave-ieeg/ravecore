@@ -39,7 +39,7 @@ The top-left 3x3 sub-matrix [R] defines the rotation & scaling in the 3D space. 
 * xfm: From [mri_RAS] in scanner space to MNI305 space [MNI305_RAS]
   - [MNI305_R MNI305_A MNI305_S 1]' = xfm * [R A S 1]'
 
-* qform/sform: Used by nifti, refering to a 4x4 transform matrix from [IJK] of the enclosing volume image to an [RAS] coordinate. The space of [RAS] is determined by `qform_code/sform_code`
+* qform/sform: Used by nifti, referring to a 4x4 transform matrix from [IJK] of the enclosing volume image to an [RAS] coordinate. The space of [RAS] is determined by `qform_code/sform_code`
   - q/sform_code=0 : RAS is arbitrary coordinate
   - q/sform_code=1 : RAS is in scanner-based anatomical coordinate (e.g. `Norig` is q/sform of `T1.mgz` with q/sform_code=1)
   - q/sform_code=2 : RAS coordinate is aligned to another file, or to anatomical "truth"

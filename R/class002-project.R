@@ -440,7 +440,7 @@ RAVEProject <- R6::R6Class(
 #'
 #' @export
 as_rave_project <- function(x, ...) {
-  # For compability
+  # For compatibility
   if (missing(x)) {
     project <- list(...)$project
     if (length(project) == 1) {
