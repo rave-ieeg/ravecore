@@ -13,7 +13,6 @@ reg3d_rigid(
   reg_type = c("Rigid", "DenseRigid", "FastRigid"),
   cost = c("mattes", "cc"),
   interp = c("trilinear", "bspline", "nearest"),
-  max_side = 384,
   verbose = TRUE,
   ...
 )
@@ -45,13 +44,10 @@ levels, fewer iterations, 5 percent of the voxels sampled; fast)}
 information, suitable for 'CT' to 'MRI') or \code{'cc'} (normalized
 cross-correlation, for images of the same modality)}
 
-\item{interp}{interpolation used to re-sample the saved images; choices
-are \code{'trilinear'}, \code{'bspline'}, or \code{'nearest'}; the
-alignment itself does not depend on it}
-
-\item{max_side}{images with any side of at least this many voxels are also
-saved as copies whose sides are at most \code{max_side} voxels; default is
-\code{384}}
+\item{interp}{interpolation used to re-sample the 'CT' onto the 'MRI' grid
+(\code{'ct_in_t1.nii.gz'}); choices are \code{'trilinear'},
+\code{'bspline'}, or \code{'nearest'}; the alignment itself does not
+depend on it}
 
 \item{verbose}{whether to print the registration progress}
 
@@ -68,10 +64,7 @@ default is false}
 directory (\code{coreg_path}) and the names of the files in it:
 \describe{
 \item{\code{'CT_RAW.nii.gz'}, \code{'MRI_reference.nii.gz'}}{the 'CT' and
-'MR' images; an image with any side of \code{max_side} voxels or more is
-saved as a down-sampled copy with the same field of view}
-\item{\code{'CT_ORIG.nii.gz'}, \code{'MRI_ORIG.nii.gz'}}{the original
-images; only saved when the images above are down-sampled copies}
+'MR' images at their original resolution}
 \item{\code{'ct_in_t1.nii.gz'}}{the 'CT' re-sampled onto the grid of
 \code{'MRI_reference.nii.gz'}}
 \item{\code{'CT_RAS_to_MR_RAS.txt'}}{transform from the 'CT' scanner
@@ -81,8 +74,7 @@ images; only saved when the images above are down-sampled copies}
 coordinates}
 \item{\code{'reg3d/reg3d.dcf'}}{registration record written by
 \code{\link[ravetools]{save_registration}}, with the 'ANTs'-style affine
-transform \code{'reg3d/reg3d0GenericAffine.mat'}; it refers to the
-full-resolution images}
+transform \code{'reg3d/reg3d0GenericAffine.mat'}}
 }
 \code{cmd_run_reg3d_rigid} returns a list with the script, its path, the
 log file, the image paths, and a function \code{execute} that runs the
@@ -91,10 +83,8 @@ script.
 \description{
 Aligns the 'CT' to the 'MRI' with
 \code{\link[ravetools]{register_volume3d}}, which is built into 'RAVE' and
-needs no external program. The registration always runs on the
-full-resolution images. Images with any side of \code{max_side} voxels or
-more are additionally saved as down-sampled copies (same field of view) so
-that viewers can load them; the original images are kept. Please use
+needs no external program. The images are registered and saved at their
+original resolution. Please use
 \code{cmd_run_reg3d_rigid} from pipelines: it saves a script that runs
 \code{reg3d_rigid} and records the results for the electrode localization.
 }

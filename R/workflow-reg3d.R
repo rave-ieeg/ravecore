@@ -3,10 +3,8 @@
 #' the built-in \verb{YAEL-reg3d} engine
 #' @description Aligns the 'CT' to the 'MRI' with
 #' \code{\link[ravetools]{register_volume3d}}, which is built into 'RAVE' and
-#' needs no external program. The registration always runs on the
-#' full-resolution images. Images with any side of \code{max_side} voxels or
-#' more are additionally saved as down-sampled copies (same field of view) so
-#' that viewers can load them; the original images are kept. Please use
+#' needs no external program. The images are registered and saved at their
+#' original resolution. Please use
 #' \code{cmd_run_reg3d_rigid} from pipelines: it saves a script that runs
 #' \code{reg3d_rigid} and records the results for the electrode localization.
 #' @param ct_path,mri_path absolute paths to 'CT' and 'MR' image files
@@ -20,12 +18,10 @@
 #' @param cost cost function; choices are \code{'mattes'} (mutual
 #' information, suitable for 'CT' to 'MRI') or \code{'cc'} (normalized
 #' cross-correlation, for images of the same modality)
-#' @param interp interpolation used to re-sample the saved images; choices
-#' are \code{'trilinear'}, \code{'bspline'}, or \code{'nearest'}; the
-#' alignment itself does not depend on it
-#' @param max_side images with any side of at least this many voxels are also
-#' saved as copies whose sides are at most \code{max_side} voxels; default is
-#' \code{384}
+#' @param interp interpolation used to re-sample the 'CT' onto the 'MRI' grid
+#' (\code{'ct_in_t1.nii.gz'}); choices are \code{'trilinear'},
+#' \code{'bspline'}, or \code{'nearest'}; the alignment itself does not
+#' depend on it
 #' @param verbose whether to print the registration progress
 #' @param ... passed to \code{\link[ravetools]{register_volume3d}}; overrides
 #' the preset, for example \code{iterations} or \code{sampling_rate}
@@ -36,10 +32,7 @@
 #' directory (\code{coreg_path}) and the names of the files in it:
 #' \describe{
 #' \item{\code{'CT_RAW.nii.gz'}, \code{'MRI_reference.nii.gz'}}{the 'CT' and
-#' 'MR' images; an image with any side of \code{max_side} voxels or more is
-#' saved as a down-sampled copy with the same field of view}
-#' \item{\code{'CT_ORIG.nii.gz'}, \code{'MRI_ORIG.nii.gz'}}{the original
-#' images; only saved when the images above are down-sampled copies}
+#' 'MR' images at their original resolution}
 #' \item{\code{'ct_in_t1.nii.gz'}}{the 'CT' re-sampled onto the grid of
 #' \code{'MRI_reference.nii.gz'}}
 #' \item{\code{'CT_RAS_to_MR_RAS.txt'}}{transform from the 'CT' scanner
@@ -49,8 +42,7 @@
 #' coordinates}
 #' \item{\code{'reg3d/reg3d.dcf'}}{registration record written by
 #' \code{\link[ravetools]{save_registration}}, with the 'ANTs'-style affine
-#' transform \code{'reg3d/reg3d0GenericAffine.mat'}; it refers to the
-#' full-resolution images}
+#' transform \code{'reg3d/reg3d0GenericAffine.mat'}}
 #' }
 #' \code{cmd_run_reg3d_rigid} returns a list with the script, its path, the
 #' log file, the image paths, and a function \code{execute} that runs the
@@ -61,7 +53,7 @@ reg3d_rigid <- function(
     reg_type = c("Rigid", "DenseRigid", "FastRigid"),
     cost = c("mattes", "cc"),
     interp = c("trilinear", "bspline", "nearest"),
-    max_side = 384, verbose = TRUE, ...) {
+    verbose = TRUE, ...) {
 
   ct_path <- normalizePath(ct_path, winslash = "/", mustWork = TRUE)
   mri_path <- normalizePath(mri_path, winslash = "/", mustWork = TRUE)
@@ -72,10 +64,6 @@ reg3d_rigid <- function(
   reg_type <- match.arg(reg_type)
   cost <- match.arg(cost)
   interp <- match.arg(interp)
-  max_side <- as.numeric(max_side)
-  if (length(max_side) != 1 || is.na(max_side) || max_side < 2) {
-    stop("`reg3d_rigid`: `max_side` must be a number of at least 2.")
-  }
 
   ct <- reg3d_read_image(ct_path)
   mri <- reg3d_read_image(mri_path)
@@ -96,10 +84,6 @@ reg3d_rigid <- function(
     reg_args
   ))
 
-  # copies with at most `max_side` voxels per side for viewers
-  ct_small <- reg3d_cap_image(ct, max_side = max_side, interp = interp)
-  mri_small <- reg3d_cap_image(mri, max_side = max_side, interp = interp)
-
   # write everything into a temporary folder next to `coreg_path`, so an
   # existing result is replaced only when the new one is complete
   dir_create2(dirname(coreg_path))
@@ -112,41 +96,23 @@ reg3d_rigid <- function(
     }
   }, add = TRUE)
 
-  reg3d_write_image(ct, ct_small, file.path(tmp_path, "CT_RAW.nii.gz"),
-                    file.path(tmp_path, "CT_ORIG.nii.gz"))
-  reg3d_write_image(mri, mri_small, file.path(tmp_path, "MRI_reference.nii.gz"),
-                    file.path(tmp_path, "MRI_ORIG.nii.gz"))
+  # the input images (header kept) as NIfTI-1
+  ieegio::write_volume(ct$volume, con = file.path(tmp_path, "CT_RAW.nii.gz"),
+                       version = 1)
+  ieegio::write_volume(mri$volume, con = file.path(tmp_path, "MRI_reference.nii.gz"),
+                       version = 1)
 
-  # CT re-sampled onto the grid of the saved MRI_reference.nii.gz
-  if (is.null(mri_small)) {
-    t1_dim <- dim(mri$data)
-    t1_vox2ras <- mri$vox2ras
-    ct_in_t1 <- result$image
-  } else {
-    t1_dim <- dim(mri_small$data)
-    t1_vox2ras <- mri_small$vox2ras
-    ct_in_t1 <- ravetools::apply_transform3d(
-      volume = reg3d_as_double(ct$data),
-      vox2ras = ct$vox2ras,
-      transform = result$transform,
-      reference_dim = t1_dim,
-      reference_vox2ras = t1_vox2ras,
-      interpolation = interp
-    )
-  }
-  ct_in_t1 <- array(as.numeric(ct_in_t1), dim = t1_dim)
+  # CT re-sampled onto the grid of MRI_reference.nii.gz
+  ct_in_t1 <- array(as.numeric(result$image), dim = dim(mri$data))
   ieegio::write_volume(
-    ieegio::as_ieegio_volume(ct_in_t1, vox2ras = t1_vox2ras),
+    ieegio::as_ieegio_volume(ct_in_t1, vox2ras = mri$vox2ras),
     con = file.path(tmp_path, "ct_in_t1.nii.gz"),
     version = 1
   )
 
-  # `result$transform` maps MR scanner RAS to CT scanner RAS. The field of
-  # view of CT_RAW.nii.gz is that of the original CT, so only the voxel
-  # transform depends on which CT image is saved
+  # `result$transform` maps MR scanner RAS to CT scanner RAS
   ct_ras_to_mri_ras <- solve(result$transform)
-  ct_raw_vox2ras <- if (is.null(ct_small)) ct$vox2ras else ct_small$vox2ras
-  ct_ijk_to_mri_ras <- ct_ras_to_mri_ras %*% ct_raw_vox2ras
+  ct_ijk_to_mri_ras <- ct_ras_to_mri_ras %*% ct$vox2ras
   utils::write.table(
     x = ct_ras_to_mri_ras, sep = "\t", row.names = FALSE, col.names = FALSE,
     file = file.path(tmp_path, "CT_RAS_to_MR_RAS.txt"))
@@ -164,8 +130,7 @@ reg3d_rigid <- function(
 
   invisible(list(
     coreg_path = coreg_path,
-    files = list.files(coreg_path, recursive = TRUE),
-    resampled = c(CT = !is.null(ct_small), MRI = !is.null(mri_small))
+    files = list.files(coreg_path, recursive = TRUE)
   ))
 }
 
@@ -285,60 +250,4 @@ reg3d_read_image <- function(path) {
     data = data,
     vox2ras = matrix(as.numeric(volume$transforms$vox2ras)[seq_len(16)], nrow = 4L)
   )
-}
-
-reg3d_as_double <- function(x) {
-  if (!is.double(x)) {
-    storage.mode(x) <- "double"
-  }
-  x
-}
-
-# Down-samples every side longer than `max_side` voxels to `max_side`,
-# keeping the field of view; returns NULL when nothing changes
-reg3d_cap_image <- function(image, max_side, interp) {
-  dm <- dim(image$data)
-  new_dim <- as.integer(pmin(dm, floor(max_side)))
-  if (all(new_dim == dm)) { return(NULL) }
-
-  # 0-based voxel centres: new voxel j sits at old (continuous) index
-  # j * s + (s - 1) / 2, so the outer voxel edges stay in place
-  s <- dm / new_dim
-  scale <- diag(c(s, 1))
-  scale[1:3, 4] <- (s - 1) / 2
-  vox2ras <- image$vox2ras %*% scale
-
-  x <- image$data
-  is_integer <- is.integer(x) || is.logical(x)
-  # trilinear and bspline need a double volume
-  x <- reg3d_as_double(x)
-  data <- ravetools::resample_3d_volume(
-    x,
-    new_dim = new_dim,
-    vox2ras_old = image$vox2ras,
-    vox2ras_new = vox2ras,
-    na_fill = min(x, na.rm = TRUE),
-    interpolation = interp
-  )
-  data <- array(as.numeric(data), dim = new_dim)
-  if (is_integer) {
-    data <- round(data)
-    storage.mode(data) <- "integer"
-  }
-  list(data = data, vox2ras = vox2ras)
-}
-
-# Writes the image (header kept) as `path`; when a down-sampled copy exists,
-# the original goes to `orig_path` and the copy to `path`
-reg3d_write_image <- function(image, small, path, orig_path) {
-  if (is.null(small)) {
-    ieegio::write_volume(image$volume, con = path, version = 1)
-  } else {
-    ieegio::write_volume(image$volume, con = orig_path, version = 1)
-    ieegio::write_volume(
-      ieegio::as_ieegio_volume(small$data, vox2ras = small$vox2ras),
-      con = path, version = 1
-    )
-  }
-  invisible(path)
 }

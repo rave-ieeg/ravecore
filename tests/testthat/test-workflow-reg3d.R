@@ -68,7 +68,7 @@ test_that("reg3d_rigid() presets", {
     iterations = c(200, 150, 100), sampling_rate = 0.05))
 })
 
-test_that("reg3d_rigid() recovers a known transform and saves viewer copies", {
+test_that("reg3d_rigid() recovers a known transform and saves full-resolution images", {
   skip_on_cran()
   root <- tempfile(pattern = "ravecore_reg3d_test_")
   dir.create(root, recursive = TRUE)
@@ -76,15 +76,14 @@ test_that("reg3d_rigid() recovers a known transform and saves viewer copies", {
 
   ph <- make_reg3d_phantom(root)
   out <- file.path(root, "coregistration")
-  re <- reg3d_rigid(ph$ct_path, ph$mr_path, coreg_path = out, max_side = 64,
+  re <- reg3d_rigid(ph$ct_path, ph$mr_path, coreg_path = out,
                     verbose = FALSE, sampling_rate = 0.4,
                     iterations = c(300, 200, 100))
 
   expect_setequal(re$files, c(
-    "CT_RAW.nii.gz", "CT_ORIG.nii.gz", "MRI_reference.nii.gz", "ct_in_t1.nii.gz",
+    "CT_RAW.nii.gz", "MRI_reference.nii.gz", "ct_in_t1.nii.gz",
     "CT_RAS_to_MR_RAS.txt", "CT_IJK_to_MR_RAS.txt",
     "reg3d/reg3d.dcf", "reg3d/reg3d0GenericAffine.mat"))
-  expect_equal(unname(re$resampled), c(TRUE, FALSE))
 
   ct_ras_to_mr_ras <- read_matrix(file.path(out, "CT_RAS_to_MR_RAS.txt"))
   ct_ijk_to_mr_ras <- read_matrix(file.path(out, "CT_IJK_to_MR_RAS.txt"))
@@ -100,44 +99,46 @@ test_that("reg3d_rigid() recovers a known transform and saves viewer copies", {
   expect_lt(angle, 1)
   expect_lt(sqrt(mean(shift^2)), 1)
 
-  # the viewer copy: sides capped at 64, same field of view, integers kept
+  # the saved images keep the input grids; the CT stays integer
   ct_raw <- ieegio::read_volume(file.path(out, "CT_RAW.nii.gz"))
-  ct_orig <- ieegio::read_volume(file.path(out, "CT_ORIG.nii.gz"))
+  mr_ref <- ieegio::read_volume(file.path(out, "MRI_reference.nii.gz"))
+  ct_in_t1 <- ieegio::read_volume(file.path(out, "ct_in_t1.nii.gz"))
   raw_v2r <- image_vox2ras(file.path(out, "CT_RAW.nii.gz"))
-  orig_v2r <- image_vox2ras(file.path(out, "CT_ORIG.nii.gz"))
-  expect_equal(dim(ct_raw[])[1:3], c(64L, 64L, 60L))
-  expect_equal(dim(ct_orig[])[1:3], c(100L, 90L, 60L))
+  mr_v2r <- image_vox2ras(ph$mr_path)
+  expect_equal(dim(ct_raw[])[1:3], c(100L, 90L, 60L))
   expect_true(is.integer(ct_raw[]))
-  expect_equal(raw_v2r %*% c(-0.5, -0.5, -0.5, 1), orig_v2r %*% c(-0.5, -0.5, -0.5, 1),
+  expect_equal(raw_v2r, image_vox2ras(ph$ct_path), tolerance = 1e-6)
+  expect_equal(dim(mr_ref[])[1:3], c(48L, 48L, 48L))
+  expect_equal(image_vox2ras(file.path(out, "MRI_reference.nii.gz")), mr_v2r,
                tolerance = 1e-6)
-  expect_equal(raw_v2r %*% c(c(64, 64, 60) - 0.5, 1),
-               orig_v2r %*% c(c(100, 90, 60) - 0.5, 1), tolerance = 1e-6)
+  expect_equal(dim(ct_in_t1[])[1:3], c(48L, 48L, 48L))
+  expect_equal(image_vox2ras(file.path(out, "ct_in_t1.nii.gz")), mr_v2r,
+               tolerance = 1e-6)
 
-  # the voxel transform refers to the viewer copy
+  # the voxel transform refers to CT_RAW.nii.gz
   expect_equal(ct_ijk_to_mr_ras, ct_ras_to_mr_ras %*% raw_v2r, tolerance = 1e-6)
 
-  # the landmark found in the viewer copy lands on its MR position
+  # the landmark found in CT_RAW.nii.gz lands on its MR position
   voxels <- which(ct_raw[] > 0.6 * 4000 - 1000, arr.ind = TRUE) - 1
   landmark <- (ct_ijk_to_mr_ras %*% c(colMeans(voxels), 1))[1:3]
   expect_lt(sqrt(sum((landmark - ph$p)^2)), 1.5)
 
-  # registered at full resolution: the record keeps the original CT grid
+  # the record refers to the same CT grid
   record <- ravetools::load_registration(file.path(out, "reg3d", "reg3d.dcf"))
-  expect_equal(unname(record$geometry$source_vox2ras), orig_v2r, tolerance = 1e-6)
+  expect_equal(unname(record$geometry$source_vox2ras), raw_v2r, tolerance = 1e-6)
   expect_equal(unname(record$transform), solve(ct_ras_to_mr_ras), tolerance = 1e-6)
 
   # every image is NIfTI-1, which the electrode localization can read
-  for (f in c("CT_RAW", "CT_ORIG", "MRI_reference", "ct_in_t1")) {
+  for (f in c("CT_RAW", "MRI_reference", "ct_in_t1")) {
     expect_equal(RNifti::niftiHeader(file.path(out, sprintf("%s.nii.gz", f)))$sizeof_hdr, 348)
   }
 
   # a new run backs up the previous result and leaves no temporary folder
   reg3d_rigid(ph$ct_path, ph$mr_path, coreg_path = out, reg_type = "FastRigid",
-              max_side = 384, verbose = FALSE)
+              verbose = FALSE)
   siblings <- list.files(root, all.files = TRUE, no.. = TRUE)
   expect_length(grep("^coregistration_\\[backup_", siblings), 1)
   expect_length(grep("reg3d-", siblings), 0)
-  expect_false(file.exists(file.path(out, "CT_ORIG.nii.gz")))
 })
 
 test_that("reg3d_rigid() keeps an existing result when it fails", {
