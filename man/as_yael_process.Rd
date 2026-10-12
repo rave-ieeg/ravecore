@@ -4,16 +4,23 @@
 \alias{as_yael_process}
 \title{Create a 'YAEL' imaging processing instance}
 \usage{
-as_yael_process(subject, ...)
+as_yael_process(subject, ..., engine = c("rpyANTs", "native"))
 }
 \arguments{
 \item{subject}{character (subject code, or project name with subject code),
 or \code{\link{RAVESubject}} instance.}
 
 \item{...}{internally used}
+
+\item{engine}{which implementation to use: \code{'rpyANTs'} (default,
+\code{\link{YAELProcess}}, which runs \verb{ANTs} through 'Python') or
+\code{'native'} (\code{\link{YAELNativeProcess}}, built on \pkg{ravetools}
+without 'Python'). Both have the same methods and read and write the same
+files}
 }
 \value{
-A processing instance, see \code{\link{YAELProcess}}
+A processing instance, see \code{\link{YAELProcess}} and
+\code{\link{YAELNativeProcess}}
 }
 \description{
 Image registration across different modals. Normalize brain 'T1'-weighted
@@ -23,6 +30,9 @@ Image registration across different modals. Normalize brain 'T1'-weighted
 \examples{
 
 process <- as_yael_process("YAEL/test_subject")
+
+# the same process without 'Python'
+process_native <- as_yael_process("YAEL/test_subject", engine = "native")
 
 \dontrun{
 
