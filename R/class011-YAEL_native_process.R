@@ -107,7 +107,7 @@ yael_native_interpolation <- function(interpolator, volume = NULL) {
     "linear" = "trilinear",
     {
       ravepipeline::logger(
-        level = "warn", use_glue = FALSE,
+        level = "warning", use_glue = FALSE,
         sprintf("Interpolator `%s` is not available in the native engine; using linear (trilinear) interpolation instead.", interpolator)
       )
       "trilinear"
