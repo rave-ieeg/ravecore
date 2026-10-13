@@ -890,6 +890,8 @@ test_that("normalization starts from a given affine and can keep the skull", {
 
 test_that("yael_preprocess_native runs the YAEL workflow on toy images", {
   skip_on_cran()
+  # 'fs' refuses paths longer than 260 bytes on Windows (r-lib/fs#420)
+  skip_on_os("windows")
   skip_if_no_native_yael()
   local_yael_sandbox()
   template <- yael_toy_dataset("template")
@@ -1137,6 +1139,8 @@ test_that("cmd_run_yael_preprocess_native builds the script without running it",
 
 test_that("the script of cmd_run_yael_preprocess_native runs the native workflow", {
   skip_on_cran()
+  # 'fs' refuses paths longer than 260 bytes on Windows (r-lib/fs#420)
+  skip_on_os("windows")
   skip_if_no_native_yael()
   local_yael_sandbox()
   template <- yael_toy_dataset("template")

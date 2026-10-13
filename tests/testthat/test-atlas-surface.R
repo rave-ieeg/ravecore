@@ -25,12 +25,15 @@ test_that("generate_atlas_surface reports a surface it cannot make", {
   writeLines("not a volume", bad)
   on.exit(unlink(bad), add = TRUE)
 
-  expect_warning(
+  # the reader warns about the broken header as well; only the warning of
+  # `generate_atlas_surface` is checked
+  warnings <- capture_warnings(
     res <- generate_atlas_surface(bad, overwrite = TRUE, lambda = 0.2,
                                   degree = 2, threshold_lb = 0.5,
-                                  threshold_ub = NA),
-    basename(bad), fixed = TRUE
+                                  threshold_ub = NA)
   )
+  expect_match(warnings, sprintf("Failed to generate the surface for %s", basename(bad)),
+               fixed = TRUE, all = FALSE)
   expect_identical(res, bad)
 })
 

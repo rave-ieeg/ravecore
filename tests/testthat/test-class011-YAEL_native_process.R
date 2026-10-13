@@ -635,6 +635,8 @@ test_that("register_to_T1w recovers a known CT/MR transform in both directions",
 
 test_that("map_to_template normalizes a toy head and writes the files of rpyANTs", {
   skip_on_cran()
+  # 'fs' refuses paths longer than 260 bytes on Windows (r-lib/fs#420)
+  skip_on_os("windows")
   skip_if_no_native_yael()
   local_yael_sandbox()
   template <- yael_toy_dataset("template")
@@ -817,6 +819,8 @@ test_that("map_to_template normalizes a toy head and writes the files of rpyANTs
 
 test_that("map_to_template registers the other images first and adds them as channels", {
   skip_on_cran()
+  # 'fs' refuses paths longer than 260 bytes on Windows (r-lib/fs#420)
+  skip_on_os("windows")
   skip_if_no_native_yael()
   local_yael_sandbox()
   template <- yael_toy_dataset("template")
@@ -972,6 +976,8 @@ test_that("map_to_template passes its tuning arguments and keeps old results whe
 
 test_that("atlases, streamlines and the ants folder come from the toy template", {
   skip_on_cran()
+  # 'fs' refuses paths longer than 260 bytes on Windows (r-lib/fs#420)
+  skip_on_os("windows")
   skip_if_no_native_yael()
   skip_if_old_testthat()
   local_yael_sandbox()
