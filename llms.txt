@@ -120,6 +120,11 @@ pak::pak("rave-ieeg/ravecore")
 - [`Spike_electrode`](http://rave.wiki/ravecore/reference/Spike_electrode.md)
   : Class definition for micro-wire spike channels
 
+- [`YAELNativeProcess`](http://rave.wiki/ravecore/reference/YAELNativeProcess.md)
+  :
+
+  Class definition of the native `YAEL` image pipeline
+
 - [`YAELProcess`](http://rave.wiki/ravecore/reference/YAELProcess.md) :
   Class definition of 'YAEL' image pipeline
 
@@ -167,6 +172,12 @@ pak::pak("rave-ieeg/ravecore")
 - [`yael_preprocess()`](http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess.md)
   [`cmd_run_yael_preprocess()`](http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess.md)
   : Run a built-in 'YAEL' imaging processing workflow
+
+- [`yael_preprocess_native()`](http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess_native.md)
+  [`cmd_run_yael_preprocess_native()`](http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess_native.md)
+  :
+
+  Run the native `YAEL` imaging processing workflow (without 'Python')
 
 - [`collapse2()`](http://rave.wiki/ravecore/reference/collapse2.md) :
   Collapse high-dimensional tensor array

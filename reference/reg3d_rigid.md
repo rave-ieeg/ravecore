@@ -2,13 +2,10 @@
 
 Aligns the 'CT' to the 'MRI' with
 [`register_volume3d`](https://dipterix.org/ravetools/reference/register_volume3d.html),
-which is built into 'RAVE' and needs no external program. The
-registration always runs on the full-resolution images. Images with any
-side of `max_side` voxels or more are additionally saved as down-sampled
-copies (same field of view) so that viewers can load them; the original
-images are kept. Please use `cmd_run_reg3d_rigid` from pipelines: it
-saves a script that runs `reg3d_rigid` and records the results for the
-electrode localization.
+which is built into 'RAVE' and needs no external program. The images are
+registered and saved at their original resolution. Please use
+`cmd_run_reg3d_rigid` from pipelines: it saves a script that runs
+`reg3d_rigid` and records the results for the electrode localization.
 
 ## Usage
 
@@ -20,7 +17,6 @@ reg3d_rigid(
   reg_type = c("Rigid", "DenseRigid", "FastRigid"),
   cost = c("mattes", "cc"),
   interp = c("trilinear", "bspline", "nearest"),
-  max_side = 384,
   verbose = TRUE,
   ...
 )
@@ -64,14 +60,9 @@ cmd_run_reg3d_rigid(
 
 - interp:
 
-  interpolation used to re-sample the saved images; choices are
-  `'trilinear'`, `'bspline'`, or `'nearest'`; the alignment itself does
-  not depend on it
-
-- max_side:
-
-  images with any side of at least this many voxels are also saved as
-  copies whose sides are at most `max_side` voxels; default is `384`
+  interpolation used to re-sample the 'CT' onto the 'MRI' grid
+  (`'ct_in_t1.nii.gz'`); choices are `'trilinear'`, `'bspline'`, or
+  `'nearest'`; the alignment itself does not depend on it
 
 - verbose:
 
@@ -98,13 +89,7 @@ cmd_run_reg3d_rigid(
 
 - `'CT_RAW.nii.gz'`, `'MRI_reference.nii.gz'`:
 
-  the 'CT' and 'MR' images; an image with any side of `max_side` voxels
-  or more is saved as a down-sampled copy with the same field of view
-
-- `'CT_ORIG.nii.gz'`, `'MRI_ORIG.nii.gz'`:
-
-  the original images; only saved when the images above are down-sampled
-  copies
+  the 'CT' and 'MR' images at their original resolution
 
 - `'ct_in_t1.nii.gz'`:
 
@@ -125,8 +110,7 @@ cmd_run_reg3d_rigid(
   registration record written by
   [`save_registration`](https://dipterix.org/ravetools/reference/save_registration.html),
   with the 'ANTs'-style affine transform
-  `'reg3d/reg3d0GenericAffine.mat'`; it refers to the full-resolution
-  images
+  `'reg3d/reg3d0GenericAffine.mat'`
 
 `cmd_run_reg3d_rigid` returns a list with the script, its path, the log
 file, the image paths, and a function `execute` that runs the script.

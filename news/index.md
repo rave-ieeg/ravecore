@@ -43,8 +43,66 @@
   [`ravetools::register_volume3d()`](https://dipterix.org/ravetools/reference/register_volume3d.html)
   (`YAEL-reg3d`; no external program needed), with `Rigid`, `DenseRigid`
   and `FastRigid` presets and mutual-information or cross-correlation
-  cost; images with a side of 384 voxels or more are also saved as
-  down-sampled copies for viewers. Requires `ravetools` 0.3.1 or later.
+  cost. Requires `ravetools` 0.3.1 or later.
+- Added `YAELNativeProcess`, `as_yael_process(engine = "native")`,
+  [`yael_preprocess_native()`](http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess_native.md)
+  and
+  [`cmd_run_yael_preprocess_native()`](http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess_native.md):
+  the YAEL co-registration, template normalization and atlas mapping
+  without `Python`, built on `ravetools` (`N4`, tissue segmentation with
+  template priors, affine and `SyN` registration). They take the same
+  arguments and write the same files as `YAELProcess`, and either engine
+  reads the results of the other (checked against `ANTs` on toy images);
+  `YAELProcess` stays the default. Requires `ravetools` 0.3.3 or later;
+  with an older version the native functions stop with an explanation.
+  Differences from `YAELProcess` (details in
+  [`?YAELNativeProcess`](http://rave.wiki/ravecore/reference/YAELNativeProcess.md)):
+  - No `deep_atropos` (`use_antspynet` is ignored): the tissue
+    segmentation with the template priors always runs. A tissue class
+    whose prior is empty inside the brain is left out (with a warning)
+    instead of failing, and the template brain mask is made binary.
+  - Every image of the non-linear stage uses local cross-correlation (no
+    non-linear mutual information), also when `normalize_affine` is
+    given.
+  - `ravetools` runs a greedy single-field `SyN` with a fixed-point
+    inverse. Its linear stages use an automatic step size, random
+    (`Bernoulli`) sampling and no histogram matching, and its affine
+    registration starts with a rigid pass.
+  - The update-field smoothing takes the `rpyANTs` values (3 and 3.5) as
+    a standard deviation in voxels, where `ANTs` reads a variance; for
+    templates with more voxels per brain it is multiplied by up to 2
+    (the 0.5 mm `09b` templates), since the 1 mm values folded the
+    deformation in about 1.5% of the brain on
+    `mni_icbm152_nlin_asym_09b`. The share of the brain where the final
+    deformation folds is logged, with a warning above 1%.
+  - When the k-means segmentation that finds the white matter fails on a
+    few extreme intensities, it is run again with the intensities
+    clipped at their 99.9% (then 99%) quantile.
+  - Additional images are resampled onto the native `T1w` grid and left
+    out (with a warning) when they cover less than 95% of the brain; the
+    template tissue priors are resampled onto the template `T1` grid;
+    the outermost voxel layer of the stored warp fields has no
+    displacement.
+  - `transform_image_from_template()` and
+    `transform_image_to_template()` return `ieegio_volume` objects, with
+    nearest-neighbor or linear interpolation only, and
+    `interpolator = "auto"` follows the documented rule.
+  - Normalization results are replaced together once the new ones are
+    complete, and stale `ants<K>` transforms of earlier layouts are
+    removed; queries never create folders; `set_input_image()` reads the
+    new image before removing the old one; nothing is written into the
+    template folders.
+  - Streamlines in `VTK` format are neither read nor written (they need
+    `Python`), and `TT` files are saved as `TCK`.
+  - Memory: with a 1 mm `T1w` image, the normalization to
+    `mni_icbm152_nlin_asym_09a` peaked at about 8 GB of resident memory,
+    and to `mni_icbm152_nlin_asym_09b` at about 15 GB (22 GB with
+    compressed memory). The script of
+    [`cmd_run_yael_preprocess_native()`](http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess_native.md)
+    therefore switches from `09b` to `09a` below 32 GB of memory (12 GB
+    for
+    [`cmd_run_yael_preprocess()`](http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess.md)),
+    and `map_to_template()` warns for such templates below 32 GB.
 - Added `YAELProcess$write_talairach_xfm()` to write
   `ants/mri/transforms/talairach.xfm` from an existing template
   normalization.

@@ -29,6 +29,7 @@
 <url><loc>http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockTimeFreqCoefRepository.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/RAVESubjectRecordingBlockVoltageRepository.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/Spike_electrode.html</loc></url>
+<url><loc>http://rave.wiki/ravecore/reference/YAELNativeProcess.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/YAELProcess.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/archive_subject.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/as_rave_project.html</loc></url>
@@ -42,6 +43,7 @@
 <url><loc>http://rave.wiki/ravecore/reference/cmd_run_freesurfer_recon_all.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/cmd_run_fsl_flirt.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess.html</loc></url>
+<url><loc>http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess_native.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/collapse2.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/collapse_power.html</loc></url>
 <url><loc>http://rave.wiki/ravecore/reference/compose_channel.html</loc></url>

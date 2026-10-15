@@ -9,7 +9,7 @@ to see how to run a built-in workflow
 ## Usage
 
 ``` r
-as_yael_process(subject, ...)
+as_yael_process(subject, ..., engine = c("rpyANTs", "native"))
 ```
 
 ## Arguments
@@ -24,16 +24,29 @@ as_yael_process(subject, ...)
 
   internally used
 
+- engine:
+
+  which implementation to use: `'rpyANTs'` (default,
+  [`YAELProcess`](http://rave.wiki/ravecore/reference/YAELProcess.md),
+  which runs `ANTs` through 'Python') or `'native'`
+  ([`YAELNativeProcess`](http://rave.wiki/ravecore/reference/YAELNativeProcess.md),
+  built on ravetools without 'Python'). Both have the same methods and
+  read and write the same files
+
 ## Value
 
 A processing instance, see
-[`YAELProcess`](http://rave.wiki/ravecore/reference/YAELProcess.md)
+[`YAELProcess`](http://rave.wiki/ravecore/reference/YAELProcess.md) and
+[`YAELNativeProcess`](http://rave.wiki/ravecore/reference/YAELNativeProcess.md)
 
 ## Examples
 
 ``` r
 
 process <- as_yael_process("YAEL/test_subject")
+
+# the same process without 'Python'
+process_native <- as_yael_process("YAEL/test_subject", engine = "native")
 
 if (FALSE) { # \dontrun{
 
