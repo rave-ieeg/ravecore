@@ -6,7 +6,6 @@ mri_path0 <- normalizePath("{{ mri_path }}", mustWork = TRUE, winslash = "/")
 reg_type <- "{{ reg_type }}"
 cost <- "{{ cost }}"
 interp <- "{{ interp }}"
-max_side <- 384
 verbose <- TRUE
 
 coreg_path <- file.path(work_path, "coregistration")
@@ -21,7 +20,6 @@ reg_results <- ravecore::reg3d_rigid(
   reg_type = reg_type,
   cost = cost,
   interp = interp,
-  max_side = max_side,
   verbose = verbose
 )
 
@@ -73,23 +71,9 @@ outputs <- list(
   registration = list(
     type = "ravetools-registration",
     path = "./coregistration/reg3d/reg3d.dcf",
-    comment = "ravetools registration record of the full-resolution images; ANTs-style affine in reg3d0GenericAffine.mat"
+    comment = "ravetools registration record; ANTs-style affine in reg3d0GenericAffine.mat"
   )
 )
-if (isTRUE(reg_results$resampled[["CT"]])) {
-  outputs$CT_ORIG <- list(
-    type = "nifti",
-    path = "./coregistration/CT_ORIG.nii.gz",
-    comment = "original CT; CT_RAW.nii.gz is this image down-sampled for viewers (same field of view)"
-  )
-}
-if (isTRUE(reg_results$resampled[["MRI"]])) {
-  outputs$MRI_ORIG <- list(
-    type = "nifti",
-    path = "./coregistration/MRI_ORIG.nii.gz",
-    comment = "original MRI; MRI_reference.nii.gz is this image down-sampled for viewers (same field of view)"
-  )
-}
 
 # Keep a copy of the previous configuration
 ravecore::backup_file(file.path(deriv_path, "conf-coregistration.yaml"),
@@ -108,8 +92,7 @@ ieegio::io_write_yaml(
       arguments = list(
         reg_type = reg_type,
         cost = cost,
-        interp = interp,
-        max_side = max_side
+        interp = interp
       )
     ),
     input_image = list(

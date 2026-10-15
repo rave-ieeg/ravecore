@@ -8,6 +8,20 @@ package_installed <- function(pkgs, all = FALSE) {
   re
 }
 
+ravetools_version <- function(missing = "0.0.0") {
+  if (!package_installed("ravetools")) {
+    return(missing)
+  }
+  tryCatch(
+    {
+      as.character(utils::packageVersion("ravetools"))
+    },
+    error = function(e) {
+      missing
+    }
+  )
+}
+
 
 call_pkg_fun <- function(package, f_name, ...,
          .if_missing = c("error", "warning", "none"),

@@ -1127,10 +1127,19 @@ YAELProcess <- R6::R6Class(
 #' @param subject character (subject code, or project name with subject code),
 #' or \code{\link{RAVESubject}} instance.
 #' @param ... internally used
-#' @returns A processing instance, see \code{\link{YAELProcess}}
+#' @param engine which implementation to use: \code{'rpyANTs'} (default,
+#' \code{\link{YAELProcess}}, which runs \verb{ANTs} through 'Python') or
+#' \code{'native'} (\code{\link{YAELNativeProcess}}, built on \pkg{ravetools}
+#' without 'Python'). Both have the same methods and read and write the same
+#' files
+#' @returns A processing instance, see \code{\link{YAELProcess}} and
+#' \code{\link{YAELNativeProcess}}
 #' @examples
 #'
 #' process <- as_yael_process("YAEL/test_subject")
+#'
+#' # the same process without 'Python'
+#' process_native <- as_yael_process("YAEL/test_subject", engine = "native")
 #'
 #' \dontrun{
 #'
@@ -1151,14 +1160,20 @@ YAELProcess <- R6::R6Class(
 #'
 #'
 #' @export
-as_yael_process <- function(subject, ...) {
+as_yael_process <- function(subject, ..., engine = c("rpyANTs", "native")) {
+  engine <- match.arg(engine)
   if (!inherits(subject, "RAVESubject") && is.character(subject)) {
     if (!grepl("/", subject)) {
       subject <- sprintf("YAEL/%s", subject)
     }
   }
   subject <- restore_subject_instance(subject, strict = FALSE)
-  YAELProcess$new(subject = subject, ...)
+  generator <- switch(
+    engine,
+    "native" = YAELNativeProcess,
+    YAELProcess
+  )
+  generator$new(subject = subject, ...)
 }
 
 
