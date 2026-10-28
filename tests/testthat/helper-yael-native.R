@@ -152,9 +152,12 @@ local_yael_toy_template <- function(root, name = "mni_icbm152_nlin_asym_09a",
 
 # Records the calls of `ravetools::register_volume3d` for the rest of the
 # calling frame: the type, number of channels, weights, whether masks are
-# given, the initial transform, some settings, and the resulting transform,
-# and with `keep_sources` the moving image of each channel (`sources`, a
-# list). The registration itself runs unchanged
+# given (`masked`: both; `source_masked`, `target_masked`), the initial
+# transform, some settings (the convergence stop included), and the resulting
+# transform, and with
+# `keep_sources` the moving and fixed image of each channel (`sources`,
+# `targets`, lists) and the masks (`source_mask`, `target_mask`). The
+# registration itself runs unchanged
 local_yael_registration_spy <- function(keep_sources = FALSE, env = parent.frame()) {
   skip_if_old_testthat()
   calls <- new.env(parent = emptyenv())
@@ -168,14 +171,21 @@ local_yael_registration_spy <- function(keep_sources = FALSE, env = parent.frame
       channels = if (is.list(source)) length(source) else 1L,
       weights = args$weights,
       masked = !is.null(args$target_mask) && !is.null(args$source_mask),
+      source_masked = !is.null(args$source_mask),
+      target_masked = !is.null(args$target_mask),
       init_transform = args$init_transform,
       shrink_factors = args$shrink_factors,
       iterations = args$iterations,
       syn_iterations = args$syn_iterations,
       syn_grad_step = args$syn_grad_step,
       syn_sigma = args$syn_sigma,
+      syn_convergence = args$syn_convergence,
+      syn_convergence_window = args$syn_convergence_window,
       transform = result$transform,
-      sources = if (keep_sources) { if (is.list(source)) source else list(source) }
+      sources = if (keep_sources) { if (is.list(source)) source else list(source) },
+      source_mask = if (keep_sources) { args$source_mask },
+      targets = if (keep_sources) { if (is.list(target)) target else list(target) },
+      target_mask = if (keep_sources) { args$target_mask }
     )
     result
   }

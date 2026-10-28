@@ -47,6 +47,17 @@ when a few extreme intensities inside the brain leave one of its classes
 empty (\verb{Atropos} keeps going, \pkg{ravetools} stops), it is run again
 with the intensities clipped at their 99.9 percent quantile inside the
 brain (then at the 99 percent quantile).
+\item White-matter artifacts: the template brain mask can take in a thick,
+bright skull marrow, which the tissue segmentation labels as white matter
+and the final registration would pull into the brain. White-matter voxels
+within 10 voxels of the edge of the brain mask from which at least a
+quarter of the rays cast in 42 directions miss the gray-matter surface,
+except the cone below the center of the white matter that holds the brain
+stem, are dilated by two voxels and left out of the white-matter channel,
+the brain mask and the brain image of the final registration; the removed
+volume is logged. The tissue classes keep the order of their priors; when
+the median intensities of the \verb{CSF}, gray-matter and white-matter
+classes do not increase, a warning is given and nothing is left out.
 \item Grids: additional images are resampled onto the grid of the native
 \code{'T1w'} image, and left out (with a warning) when they cover less than
 95 percent of the brain mask; template tissue priors are resampled onto the

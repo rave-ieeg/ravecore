@@ -207,6 +207,17 @@ yael_native_fs_tkr_to_scanner <- function(fs_dir) {
 #' empty (\verb{Atropos} keeps going, \pkg{ravetools} stops), it is run again
 #' with the intensities clipped at their 99.9 percent quantile inside the
 #' brain (then at the 99 percent quantile).
+#' \item White-matter artifacts: the template brain mask can take in a thick,
+#' bright skull marrow, which the tissue segmentation labels as white matter
+#' and the final registration would pull into the brain. White-matter voxels
+#' within 10 voxels of the edge of the brain mask from which at least a
+#' quarter of the rays cast in 42 directions miss the gray-matter surface,
+#' except the cone below the center of the white matter that holds the brain
+#' stem, are dilated by two voxels and left out of the white-matter channel,
+#' the brain mask and the brain image of the final registration; the removed
+#' volume is logged. The tissue classes keep the order of their priors; when
+#' the median intensities of the \verb{CSF}, gray-matter and white-matter
+#' classes do not increase, a warning is given and nothing is left out.
 #' \item Grids: additional images are resampled onto the grid of the native
 #' \code{'T1w'} image, and left out (with a warning) when they cover less than
 #' 95 percent of the brain mask; template tissue priors are resampled onto the
@@ -833,7 +844,7 @@ YAELNativeProcess <- R6::R6Class(
       if (isTRUE(use_antspynet) && verbose) {
         ravepipeline::logger(
           level = "info", use_glue = FALSE,
-          "The native engine has no `deep_atropos` (antspynet); the tissue segmentation uses the template priors."
+          "The native engine has no `deep_atropos`; the tissue segmentation uses the template priors."
         )
       }
 
@@ -871,18 +882,33 @@ YAELNativeProcess <- R6::R6Class(
       work_path <- as.character(self$work_path)
       working_path <- file.path(work_path, "tmp", sprintf(
         "coregister_%s_with_%s", native_type, template_name2))
-      if (file.exists(working_path)) { unlink(working_path, recursive = TRUE) }
+      if (file.exists(working_path)) {
+        unlink(working_path, recursive = TRUE)
+      }
       dir_create2(working_path)
       dir_create2(file.path(work_path, "normalization"))
 
       # 'Python' passes these through `**kwargs`; others are ignored
       args <- list(...)
       cost_function <- args[["cost_function"]]
-      if (!length(cost_function)) { cost_function <- "CC" }
-      yael_native_log(verbose, sprintf(
-        "Normalizing [%s] to template [%s] with %d additional image(s)%s",
-        native_type, template_name, length(other_images),
-        ifelse(length(other_images), sprintf(" (%s)", paste(names(other_images), collapse = ", ")), "")))
+      if (!length(cost_function)) {
+        cost_function <- "CC"
+      }
+      yael_native_log(
+        verbose,
+        sprintf(
+          "Normalizing [%s] to template [%s] with %d additional image(s)%s",
+          native_type,
+          template_name,
+          length(other_images),
+          ifelse(
+            length(other_images),
+            sprintf(" (%s)", paste(names(other_images), collapse = ", ")),
+            ""
+          )
+        )
+      )
+      
       result <- yael_native_normalize(
         fix_path = template$t1,
         mov_paths = c(native_path, unlist(other_images)),

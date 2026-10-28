@@ -18,6 +18,7 @@
     * `ravetools` runs a greedy single-field `SyN` with a fixed-point inverse. Its linear stages use an automatic step size, random (`Bernoulli`) sampling and no histogram matching, and its affine registration starts with a rigid pass.
     * The update-field smoothing takes the `rpyANTs` values (3 and 3.5) as a standard deviation in voxels, where `ANTs` reads a variance; for templates with more voxels per brain it is multiplied by up to 2 (the 0.5 mm `09b` templates), since the 1 mm values folded the deformation in about 1.5% of the brain on `mni_icbm152_nlin_asym_09b`. The share of the brain where the final deformation folds is logged, with a warning above 1%.
     * When the k-means segmentation that finds the white matter fails on a few extreme intensities, it is run again with the intensities clipped at their 99.9% (then 99%) quantile.
+    * White-matter voxels near the edge of the brain mask that lie outside the gray-matter surface (at least a quarter of the rays cast from them miss it), such as a thick, bright skull marrow that the initial registration left inside the template brain mask, are dilated by two voxels and left out of the white-matter channel, the brain mask and the brain image of the final registration; the cone below the center of the white matter, which holds the brain stem, is kept. The removed volume is logged. The tissue classes keep the order of their priors, with a warning when their median intensities are not in that order.
     * Additional images are resampled onto the native `T1w` grid and left out (with a warning) when they cover less than 95% of the brain; the template tissue priors are resampled onto the template `T1` grid; the outermost voxel layer of the stored warp fields has no displacement.
     * `transform_image_from_template()` and `transform_image_to_template()` return `ieegio_volume` objects, with nearest-neighbor or linear interpolation only, and `interpolator = "auto"` follows the documented rule.
     * Normalization results are replaced together once the new ones are complete, and stale `ants<K>` transforms of earlier layouts are removed; queries never create folders; `set_input_image()` reads the new image before removing the old one; nothing is written into the template folders.
@@ -41,6 +42,7 @@
 ### Other Changes
 
 * Added tests that check function-call signatures through `asNamespace()` (`#633cde9`).
+* Importing `NEV`/`NSx` data hashes each `NEV` file once per session; validation and import used to hash the whole file again for every channel type (up to six times per file). The hash still names the cache folder, so existing caches are reused.
 
 ---
 

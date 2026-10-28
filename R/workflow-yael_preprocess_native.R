@@ -808,10 +808,20 @@ yael_native_kmeans_wm <- function(t1, mask, vox2ras, verbose = TRUE) {
 #' the native grid; also writes \code{brain.nii.gz}), \code{atropos_prior}
 #' (template \code{atropos_2} to \code{atropos_7} on the native grid),
 #' \code{atropos} (segmentation and four tissue posteriors: \verb{CSF}, gray
-#' matter, white matter with deep gray matter and brain stem, cerebellum), and
+#' matter, white matter with deep gray matter and brain stem, cerebellum),
+#' \code{wm_artifacts} (white matter outside the gray-matter envelope, such as
+#' a thick skull marrow, dilated by 2 voxels, except the cone below the center
+#' of the white matter that holds the brain stem; see
+#' \code{yael_native_clean_wm_mask}), \code{brain_mask_cleaned} (the brain
+#' mask without these artifacts, also used for the brain image of the next
+#' stage), and
 #' \code{SyN_w_atropos} (masked affine, then a deformable stage with the brain,
-#' the additional images, and the \verb{CSF} and deep-structure posteriors; also
-#' writes \code{brain2.nii.gz} and \code{brainmask2.nii.gz}). A tissue prior
+#' the additional images, and the \verb{CSF} and deep-structure posteriors, the
+#' latter zero on the artifacts; also writes \code{brain2.nii.gz}
+#' and \code{brainmask2.nii.gz}). The classes keep the order of their priors;
+#' when the median intensities of the \verb{CSF}, gray-matter and white-matter
+#' labels do not increase, a warning is given and no artifact is left out (see
+#' \code{yael_native_segmentation_class_order}). A tissue prior
 #' that is zero everywhere inside the brain mask is left out of the
 #' segmentation with a warning (its posterior is zero). An additional image
 #' that is not 3D, or covers less than 95 percent of the brain mask, is left
@@ -833,6 +843,16 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
                                   weights = 1, with_skull = FALSE,
                                   cost_function = "CC", affine_transform = NULL,
                                   verbose = TRUE) {
+  
+  # DIPSAUS DEBUG START
+  # list2env(
+  #   envir = globalenv(),
+  #   list(fix_path = "/Users/dipterix/Library/Application Support/org.R-project.R/R/rpyANTs/templates/mni_icbm152_nlin_sym_09a/T1.nii.gz", 
+  #     mov_paths = "/Users/dipterix/rave_data/raw_dir/K20/rave-imaging/inputs/anat/sub-K20_ses-preop_desc-preproc_T1w.nii.gz", 
+  #     working_path = "/Users/dipterix/rave_data/raw_dir/K20/rave-imaging/tmp/coregister_T1w_with_MNI152NLin2009aSym", 
+  #     weights = 1.25, with_skull = FALSE, cost_function = "CC", 
+  #     affine_transform = NULL, verbose = TRUE)
+  # )
 
   verbose <- isTRUE(verbose)
   with_skull <- isTRUE(with_skull)
@@ -900,7 +920,9 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
   })
 
   # template image and its brain mask (binarized), on the template T1 grid
-  template <- yael_native_read_volume(fix_paths[[1]])
+  template <- stage("fixing", "image", "Template fixing image", function() {
+    yael_native_read_volume(fix_paths[[1]])
+  })
   template_dim <- dim(template)
   template_vox2ras <- attr(template, "vox2ras")
   template_mask <- yael_native_resample(
@@ -928,11 +950,16 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
       )
       init_transform <- linear$transform
       rm(linear)
-      syn_settings <- list(syn_iterations = c(50, 10, 0), syn_grad_step = 0.1)
+      # 'ANTsPy' leaves the convergence of 'SyNabp' to the defaults of
+      # 'antsRegistration' (1e-6, window 10)
+      syn_settings <- list(syn_iterations = c(50, 10, 0), syn_grad_step = 0.1,
+                           syn_convergence = 1e-6, syn_convergence_window = 10L)
     } else {
-      # 'SyNOnly' from the given affine
+      # 'SyNOnly' from the given affine, with the convergence of the 'ANTsPy'
+      # 'SyN' transforms (1e-7, window 8)
       init_transform <- affine_transform
-      syn_settings <- list(syn_iterations = c(40, 20, 0), syn_grad_step = 0.2)
+      syn_settings <- list(syn_iterations = c(40, 20, 0), syn_grad_step = 0.2,
+                           syn_convergence = 1e-7, syn_convergence_window = 8L)
     }
     # `syn_sigma` takes the flow sigma of 'ANTsPy' (3), but 'ravetools' reads
     # it as a Gaussian standard deviation in voxels, whereas 'ANTs' reads it
@@ -947,7 +974,10 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
       shrink_factors = c(4, 2, 1), smoothing_sigmas = c(2, 1, 0),
       syn_iterations = syn_settings$syn_iterations,
       syn_grad_step = syn_settings$syn_grad_step, syn_sigma = 3 * syn_scale,
-      syn_total_sigma = 0, syn_cc_radius = 4L, verbose = verbose
+      syn_total_sigma = 0, syn_cc_radius = 4L,
+      syn_convergence = syn_settings$syn_convergence,
+      syn_convergence_window = syn_settings$syn_convergence_window,
+      verbose = verbose
     )
     warped <- registration$image
     attr(warped, "vox2ras") <- template_vox2ras
@@ -981,9 +1011,14 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
     wm_prob <- wm$prob
     rm(wm)
     ravetools::bias_correction_n4(
-      t1 * scale, vox2ras = native_vox2ras, weight_mask = wm_prob,
-      intensity_truncation = NULL, rescale_intensities = TRUE,
-      shrink_factor = 1, iterations = c(50, 50, 30, 20), tolerance = 1e-7
+      t1 * scale,
+      vox2ras = native_vox2ras,
+      weight_mask = wm_prob > 0.5,
+      intensity_truncation = NULL,
+      shrink_factor = 1,
+      iterations = c(50, 50, 30, 20),
+      tolerance = 1e-7,
+      rescale_intensities = TRUE
     )
   })
   rm(t1)
@@ -1014,9 +1049,9 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
     })
     priors <- list(
       priors[[1]] * 0.2 + 0.4,                               # CSF: 0.4 to 0.6
-      priors[[2]] * 0.6 + 0.2,                               # gray matter: 0.2 to 0.8
-      (priors[[3]] + priors[[4]] + priors[[5]]) * 0.6 + 0.2, # white matter, deep gray matter, brain stem
-      priors[[6]]                                            # cerebellum
+      priors[[2]] * 0.2 + 0.4,                               # gray matter: 0.2 to 0.8
+      (priors[[3]] + priors[[4]] + priors[[5]]) * 0.2 + 0.4, # white matter, deep gray matter, brain stem
+      priors[[6]] * 0.4 + 0.2                                # cerebellum
     )
     # a class whose prior is zero inside the brain mask cannot be estimated
     inside <- brain_mask > 0
@@ -1032,7 +1067,7 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
     }
     seg <- ravetools::segment_volume_tissue_gmm(
       nu2, mask = brain_mask, priors = priors[keep], prior_weight = 0,
-      mrf_beta = 0.2, mrf_radius = 1L, iterations = 25L,
+      mrf_beta = 0.3, mrf_radius = 1L, iterations = 50L,
       vox2ras = native_vox2ras, verbose = verbose
     )
     rm(priors)
@@ -1056,6 +1091,43 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
   res_abp <- NULL
   free_memory()
 
+  # ---- wm_artifacts: white matter outside the gray-matter envelope ----
+  # the template mask is only placed to a few millimeters: bright non-brain
+  # tissue next to the brain (a thick skull marrow) is segmented as white
+  # matter and would pull the final registration, so it is left out of the
+  # white-matter channel and of the brain mask. The classes keep the order of
+  # their priors
+  classes_ordered <- yael_native_segmentation_class_order(nu2, atropos[[1]])
+  # how the gray-matter surface is wrapped (see `yael_native_gm_envelope`)
+  wm_envelope_method <- "outer_smoothed"
+  wm_artifacts <- stage("wm_artifacts", "image", "clean white matter outside of the gray-matter envelope", function() {
+    if (!classes_ordered) {
+      mask <- array(0, dim = native_dim)
+      attr(mask, "vox2ras") <- native_vox2ras
+      return(mask)
+    }
+    mask <- yael_native_clean_wm_mask(atropos[[1]], native_vox2ras,
+                                      dgwbs = atropos[[4]],
+                                      method = wm_envelope_method)
+    voxel_ml <- abs(det(native_vox2ras[1:3, 1:3])) / 1000
+    yael_native_log(verbose, sprintf(
+      "Stage `wm_artifacts`: %.1f mL of white matter outside the gray-matter envelope (%.1f mL after dilating by 2 voxels) is left out of the white-matter channel and of the brain mask",
+      attr(mask, "artifact_voxels") * voxel_ml, sum(mask > 0) * voxel_ml))
+    mask
+  })
+
+  # ---- brain_mask_cleaned: brain mask without the white-matter artifacts ----
+  # only the artifact voxels labeled white matter leave the mask: the dilated
+  # artifacts also cover gray matter and CSF, which stay. The final
+  # registration uses this mask for its masks and its brain image
+  brain_mask <- stage("brain_mask_cleaned", "image", "brain mask without the white-matter artifacts", function() {
+    mask <- brain_mask
+    mask[wm_artifacts > 0 & atropos[[1]] == 3] <- 0
+    mask
+  })
+  brain <- nu2 * brain_mask
+  attr(brain, "vox2ras") <- native_vox2ras
+
   # ---- SyN_w_atropos: masked affine, then multi-channel deformable stage ----
   res_syn <- stage("SyN_w_atropos", "registration", "affine and deformable registration with the tissue posteriors", function() {
     # template CSF and deep-structure maps on the template T1 grid
@@ -1075,6 +1147,11 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
     fixing_dgwbs <- template_prior(5:7)
     moving_csf <- atropos[[2]]
     moving_dgwbs <- atropos[[4]]
+    # white matter outside the gray matter (artifacts) is not white matter;
+    # the gray matter and CSF that the dilated artifacts cover keep their
+    # posteriors, as they stay in the brain mask
+    moving_csf[wm_artifacts > 0 & atropos[[1]] == 3] <- 1
+    moving_dgwbs[wm_artifacts > 0] <- 0
 
     # additional images (with skull) and their template images
     extra_moving <- list()
@@ -1123,6 +1200,17 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
       moving_main <- brain
       fixed_main <- template * template_mask
       grad_step <- 0.15
+      # the deformable stage has no target mask (see below): the other fixed
+      # images are zero outside the template brain too, like the moving
+      # channels outside the native brain
+      mask_template <- function(image) {
+        image <- image * template_mask
+        attr(image, "vox2ras") <- template_vox2ras
+        image
+      }
+      fixing_csf <- mask_template(fixing_csf)
+      fixing_dgwbs <- mask_template(fixing_dgwbs)
+      extra_fixed <- lapply(extra_fixed, mask_template)
     }
     attr(fixed_main, "vox2ras") <- template_vox2ras
     # the template with skull is only kept if a channel uses it
@@ -1147,7 +1235,13 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
     # additional images and the tissue posteriors as extra channels. As in
     # 'SyNabp', `syn_sigma` (3.5, the 'ANTsPy' flow sigma) is a standard
     # deviation in voxels for 'ravetools' but a variance for 'ANTs' (sigma
-    # about 1.9), so the native update field is smoothed more
+    # about 1.9), so the native update field is smoothed more. Without the
+    # skull it has no target mask: 'ravetools' only drives the voxels inside
+    # the target mask, so the moving tissue that the affine leaves outside the
+    # template mask is never pulled in, and the edge of the brain is pushed
+    # outward at every iteration (the brain inflates). The levels end with the
+    # convergence of the 'ANTsPy' 'SyN' transforms (1e-7, window 8): a level
+    # runs at least 8 iterations, and stops once its cost no longer decreases
     yael_native_log(verbose, sprintf(
       "Stage `SyN_w_atropos`: deformable stage with %d channels (weights: %s)",
       length(extra_moving) + 3L,
@@ -1156,17 +1250,22 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
       source = c(list(moving_main), extra_moving, list(moving_csf, moving_dgwbs)),
       target = c(list(fixed_main), extra_fixed, list(fixing_csf, fixing_dgwbs)),
       source_vox2ras = native_vox2ras, target_vox2ras = template_vox2ras,
-      source_mask = brain_mask, target_mask = template_mask,
+      source_mask = brain_mask, target_mask = if (with_skull) template_mask,
       weights = c(1, extra_weights, 0.1, 0.5), metric = "mattes",
-      type = "syn_only", init_transform = affine_matrix,
+      type = "syn_only", 
+      init_transform = affine_matrix,
       shrink_factors = c(8, 4, 2, 1), smoothing_sigmas = c(3, 2, 1, 0),
       syn_iterations = c(100, 70, 50, 0), syn_grad_step = grad_step,
       syn_sigma = 3.5 * syn_scale, syn_total_sigma = 0, syn_cc_radius = 4L,
+      syn_convergence = 1e-7, syn_convergence_window = 8L,
       verbose = verbose
     )
     rm(extra_moving, extra_fixed, fixing_csf, fixing_dgwbs, moving_csf,
        moving_dgwbs, moving_main)
     warpedmovout <- registration$image
+    # tmp <- ravetools::apply_transform3d_volume(brain_mask, registration)
+    # fields::image.plot((tmp)[,150,], asp=1)
+    # fields::image.plot((registration$image)[,150,], asp=1)
     attr(warpedmovout, "vox2ras") <- template_vox2ras
     registration$image <- NULL
     registration$images <- NULL
@@ -1340,6 +1439,34 @@ yael_preprocess_native <- function(
     verbose = TRUE,
     additional_images = list(), ...
 ) {
+
+  # DIPSAUS DEBUG START
+  # list2env(
+  #   envir = globalenv(),
+  #   list(
+  #     subject = "YAEL/K20",
+  #     t1w_path = "/Users/dipterix/rave_data/raw_dir/K20/rave-imaging/inputs/MRI/MRI_RAW.nii.gz",
+  #     ct_path = NULL,
+  #     t2w_path = NULL,
+  #     fgatir_path = NULL,
+  #     preopct_path = NULL,
+  #     flair_path = NULL,
+  #     t1w_contrast_path = NULL,
+  #     register_policy = "auto",
+  #     register_reversed = FALSE,
+  #     normalize_template = "mni_icbm152_nlin_sym_09a",
+  #     normalize_policy = "auto",
+  #     normalize_images = "T1w",
+  #     normalize_back = "mni_icbm152_nlin_sym_09a",
+  #     normalize_affine = NULL,
+  #     atlases = list(),
+  #     add_surfaces = FALSE,
+  #     use_antspynet = TRUE,
+  #     verbose = TRUE,
+  #     additional_images = list()
+  #   )
+  # )
+
   if (missing(subject)) {
     subject <- list(...)$subject_code
     if (!length(subject)) {

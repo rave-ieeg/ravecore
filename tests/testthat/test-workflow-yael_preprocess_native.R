@@ -585,6 +585,110 @@ test_that("the white matter of stage `nu2` is found despite extreme intensities"
                "mask contains no voxel")
 })
 
+test_that("rays away from a center find the points outside a surface", {
+  skip_if_no_native_yael()
+  sphere <- function(radius) {
+    mesh <- ravetools::vcg_sphere(3L)
+    mesh$vb[1:3, ] <- mesh$vb[1:3, ] * radius
+    mesh
+  }
+
+  # the ray away from the center hits a closed surface from inside, and
+  # misses it from outside; the center itself is inside
+  outer <- sphere(10)
+  expect_equal(
+    yael_native_check_maybe_outside(
+      outer, rbind(c(0, 0, 0), c(3, 2, 1), c(-4, 5, -6), c(15, 0, 0), c(0, 0, 20)),
+      center = c(0, 0, 0)),
+    c(FALSE, FALSE, FALSE, TRUE, TRUE))
+  expect_length(yael_native_check_maybe_outside(outer, matrix(0, 0, 3), c(0, 0, 0)), 0)
+
+  # two sheets, like the outer and the inner surface of the cortex: the
+  # points in the inner cavity and between the sheets are inside
+  nested <- outer
+  inner <- sphere(5)
+  nested$vb <- cbind(outer$vb, inner$vb)
+  nested$it <- cbind(outer$it, inner$it + ncol(outer$vb))
+  nested$normals <- NULL
+  expect_equal(
+    yael_native_check_maybe_outside(
+      nested, rbind(c(1, 0, 0), c(7, 0, 0), c(12, 0, 0)), center = c(0, 0, 0)),
+    c(FALSE, FALSE, TRUE))
+})
+
+test_that("white matter outside the gray matter is left out of the white-matter channel", {
+  skip_if_no_native_yael()
+  # a toy brain: white matter (r < 16) in a closed gray-matter shell, CSF, a
+  # cap of marrow on top that is segmented as white matter, and a brain stem
+  # that leaves the brain downward through the gray matter; the voxels are
+  # flipped and shifted in 'RAS', like a scanner grid
+  n <- 64L
+  grid <- expand.grid(x = seq_len(n), y = seq_len(n), z = seq_len(n))
+  center <- (n + 1) / 2
+  r <- array(sqrt((grid$x - center)^2 + (grid$y - center)^2 + (grid$z - center)^2),
+             rep(n, 3))
+  cap <- r >= 21 & r < 23 & array(grid$z > center + 14, rep(n, 3))
+  stem <- r < 23 & array((grid$x - center)^2 + (grid$y - center)^2 <= 9 &
+                           grid$z < center, rep(n, 3))
+  labels <- array(0, rep(n, 3))
+  labels[r < 23] <- 1
+  labels[r < 19] <- 2
+  labels[r < 16] <- 3
+  labels[cap | stem] <- 3
+  vox2ras <- diag(c(-1, 1, 1, 1))
+  vox2ras[1:3, 4] <- c(40, -30, -20)
+  dgwbs <- (labels == 3) * 1
+  to_ras <- function(index) {
+    ijk <- arrayInd(index, dim(labels)) - 1
+    t(vox2ras[1:3, 1:3] %*% t(ijk) + vox2ras[1:3, 4])
+  }
+
+  # the cap, dilated by two voxels, with the gray-matter surface as it is and
+  # with its convex hull (the shell is convex); the brain stem is kept
+  # although its lowest voxel lies outside the gray matter
+  near_cap <- array(ravetools::grow_volume(cap * 1, 5) > 0, dim(cap))
+  for (method in c("none", "convex_hull")) {
+    artifacts <- yael_native_clean_wm_mask(labels, vox2ras, dgwbs = dgwbs,
+                                           method = method)
+    expect_equal(attr(artifacts, "vox2ras"), vox2ras)
+    expect_equal(attr(artifacts, "artifact_voxels"), sum(cap), label = method)
+    expect_equal(which(artifacts > 0), which(near_cap), label = method)
+    expect_false(any(artifacts[r < 16 | stem] > 0), label = method)
+  }
+  lowest <- which(stem)[which.min(grid$z[which(stem)])]
+  expect_true(yael_native_check_maybe_outside(
+    yael_native_gm_envelope(labels, vox2ras), to_ras(lowest),
+    center = colMeans(to_ras(which(dgwbs > 0.5)))))
+  expect_equal(
+    yael_native_brainstem_cone(rbind(c(0, 0, -5), c(0, 0, 5), c(3, 4, -4), c(3, 4, -6)),
+                               c(0, 0, 0)),
+    c(TRUE, FALSE, FALSE, TRUE))
+
+  # without the cap, nothing is left out
+  no_cap <- labels
+  no_cap[cap] <- 1
+  expect_equal(sum(yael_native_clean_wm_mask(no_cap, vox2ras, dgwbs = dgwbs)), 0)
+
+  # the convex hull is a closed mesh around the gray matter; the smoothed
+  # outer surface is not available yet
+  hull <- yael_native_gm_envelope(labels, vox2ras, "convex_hull")
+  expect_s3_class(hull, "mesh3d")
+  expect_equal(ravetools::vcg_mesh_volume(hull), 4 / 3 * pi * 19^3, tolerance = 0.05)
+  expect_error(yael_native_gm_envelope(labels, vox2ras, "outer_smoothed"),
+               "mris_outer_smoothed")
+})
+
+test_that("tissue classes out of intensity order give a warning", {
+  labels <- array(rep(1:3, each = 8), c(4, 3, 2))
+  nu2 <- array(rep(c(30, 70, 110), each = 8), c(4, 3, 2))
+  expect_silent(ordered <- yael_native_segmentation_class_order(nu2, labels))
+  expect_true(ordered)
+  swapped <- array(rep(c(70, 30, 110), each = 8), c(4, 3, 2))
+  expect_warning(ordered <- yael_native_segmentation_class_order(swapped, labels),
+                 "not ordered by intensity")
+  expect_false(ordered)
+})
+
 test_that("normalization aligns a toy head to a toy template", {
   skip_on_cran()
   skip_if_no_native_yael()
@@ -602,12 +706,15 @@ test_that("normalization aligns a toy head to a toy template", {
   expect_lt(elapsed, 120)
 
   # registrations: SyNabp (affine, then deformable without masks), then the
-  # two stages of 'SyNAggro' with masks; the deformable stage starts from the
+  # two stages of 'SyNAggro': the affine with both masks, the deformable
+  # stage with the moving mask only (with a target mask, 'ravetools' pushes
+  # the edge of the brain outward). The deformable stage starts from the
   # masked affine and adds the CSF and deep-structure posteriors
   calls <- spy()
   expect_equal(vapply(calls, `[[`, "", "type"),
                c("affine", "syn_only", "affine", "syn_only"))
-  expect_equal(vapply(calls, `[[`, FALSE, "masked"), c(FALSE, FALSE, TRUE, TRUE))
+  expect_equal(vapply(calls, `[[`, FALSE, "source_masked"), c(FALSE, FALSE, TRUE, TRUE))
+  expect_equal(vapply(calls, `[[`, FALSE, "target_masked"), c(FALSE, FALSE, TRUE, FALSE))
   expect_equal(calls[[1]]$shrink_factors, c(8, 4, 2, 1))
   expect_equal(calls[[2]]$init_transform, calls[[1]]$transform)
   expect_equal(calls[[2]]$syn_iterations, c(50, 10, 0))
@@ -615,6 +722,10 @@ test_that("normalization aligns a toy head to a toy template", {
   # the update-field smoothing of rpyANTs, unscaled for a template with
   # fewer brain voxels than a 1 mm human template
   expect_equal(calls[[2]]$syn_sigma, 3)
+  # the convergence of 'antsRegistration' for 'SyNabp', of the 'ANTsPy' 'SyN'
+  # transforms for the final deformable stage
+  expect_equal(c(calls[[2]]$syn_convergence, calls[[2]]$syn_convergence_window), c(1e-6, 10))
+  expect_equal(c(calls[[4]]$syn_convergence, calls[[4]]$syn_convergence_window), c(1e-7, 8))
   expect_null(calls[[3]]$init_transform)
   expect_equal(calls[[3]]$shrink_factors, c(4, 2, 2, 1))
   expect_equal(calls[[3]]$iterations, c(2100, 1200, 1200, 100))
@@ -637,7 +748,8 @@ test_that("normalization aligns a toy head to a toy template", {
   expect_equal(attr(res$warpedfixout, "vox2ras"), native$vox2ras, tolerance = 1e-6)
   expect_setequal(
     list.files(work),
-    c("T1.nii.gz", "nu.nii.gz", "nu2.nii.gz", "brainmask.nii.gz", "brain.nii.gz",
+    c("T1.nii.gz", "nu.nii.gz", "fixing.nii.gz", "nu2.nii.gz", "brainmask.nii.gz",
+      "brain.nii.gz", "wm_artifacts.nii.gz", "brain_mask_cleaned.nii.gz",
       sprintf("atropos_prior_%d.nii.gz", 0:5), sprintf("atropos_%d.nii.gz", 0:4),
       "brain2.nii.gz", "brainmask2.nii.gz",
       "SyNabp.dcf", "SyNabp0GenericAffine.mat", "SyNabp1Warp.nii.gz",
@@ -645,6 +757,17 @@ test_that("normalization aligns a toy head to a toy template", {
       "SyN_w_atropos.dcf", "SyN_w_atropos0GenericAffine.mat",
       "SyN_w_atropos1Warp.nii.gz", "SyN_w_atropos1InverseWarp.nii.gz",
       "SyN_w_atropos_warped_mov.nii.gz", "SyN_w_atropos_warped_fix.nii.gz"))
+  # little white matter is left out as artifacts (none when this test was
+  # written), and the cleaned brain mask is the template mask without the
+  # artifacts labeled white matter
+  wm_artifacts <- yael_native_read_volume(file.path(work, "wm_artifacts.nii.gz"))
+  expect_equal(dim(wm_artifacts), native$dim)
+  expect_lt(mean(wm_artifacts[native$truth == 3] > 0), 0.05)
+  segmentation <- yael_native_read_volume(file.path(work, "atropos_0.nii.gz"))
+  expect_equal(
+    as.vector(yael_native_read_volume(file.path(work, "brain_mask_cleaned.nii.gz")) > 0),
+    as.vector(yael_native_read_volume(file.path(work, "brainmask.nii.gz")) > 0 &
+                !(wm_artifacts > 0 & segmentation == 3)))
 
   # the template labels on the native grid overlap the true labels
   labels <- yael_native_read_volume(template$atropos[[1]])
@@ -675,7 +798,7 @@ test_that("normalization aligns a toy head to a toy template", {
   error <- sqrt(rowSums((to_template - yael_toy_native_to_template(points))^2))
   expect_lte(stats::median(error), 1.5)
   # the deformable stage matters: where the bumps move the points by more than
-  # 1.5 mm, the affine part alone is much further off (0.45 versus 1.28 mm
+  # 1.5 mm, the affine part alone is much further off (0.66 versus 1.60 mm
   # when this test was written), although the medians over the whole brain
   # are about the same
   affine_points <- t(solve(reg$transform) %*% rbind(t(points), 1))[, 1:3]
@@ -696,6 +819,90 @@ test_that("normalization aligns a toy head to a toy template", {
   expect_equal(as.vector(res2$registration$forward_field),
                as.vector(reg$forward_field), tolerance = 1e-5)
   expect_equal(as.vector(res2$warpedmovout), as.vector(res$warpedmovout), tolerance = 1e-4)
+})
+
+test_that("white matter outside the gray matter leaves the white-matter channel", {
+  skip_on_cran()
+  skip_if_no_native_yael()
+  local_yael_sandbox()
+  template <- yael_toy_dataset("template")
+  native <- yael_toy_dataset("native")
+  work <- tempfile(pattern = "ravecore-yael-normalize-")
+  dir.create(work)
+  on.exit({ unlink(work, recursive = TRUE) }, add = TRUE)
+
+  # a brain mask that took in the skull and the inner half of the scalp on top
+  # of the head (the toy scalp is brighter than the white matter, like a thick
+  # skull marrow; the edge of the mask cuts through it); the `brainmask`
+  # stage reads it from its cache
+  points <- yael_toy_grid(native$dim, native$vox2ras)
+  head <- yael_toy_native_to_template(points)
+  codes <- array(yael_toy_codes(head), native$dim)
+  inner_scalp <- (head[, 1] / 44)^2 + ((head[, 2] - 2) / 54)^2 + (head[, 3] / 42)^2 <= 1
+  leak <- codes >= 7 & array(inner_scalp & points[, 3] > 15, native$dim)
+  mask <- (codes >= 1 & codes <= 6 | leak) * 1
+  yael_native_write_volume(mask, file.path(work, "brainmask.nii.gz"),
+                           vox2ras = native$vox2ras)
+
+  spy <- local_yael_registration_spy(keep_sources = TRUE)
+  res <- yael_native_normalize(template$t1, native$t1, work, verbose = FALSE)
+
+  # the scalp segmented as white matter is left out of the white-matter
+  # channel, of the brain mask and of the brain image; the white matter and
+  # the brain stem are not (all 729 such scalp voxels and none of the brain
+  # when this test was written). The gray matter and CSF that the dilated
+  # artifacts cover stay in the brain mask
+  wm_artifacts <- yael_native_read_volume(file.path(work, "wm_artifacts.nii.gz"))
+  segmentation <- yael_native_read_volume(file.path(work, "atropos_0.nii.gz"))
+  scalp <- leak & codes == 8
+  expect_gt(sum(scalp & segmentation == 3), 100)
+  expect_gte(mean(wm_artifacts[scalp & segmentation == 3] > 0), 0.9)
+  expect_lt(mean(wm_artifacts[codes == 3 | codes == 5] > 0), 0.05)
+  removed <- wm_artifacts > 0 & segmentation == 3
+  cleaned <- yael_native_read_volume(file.path(work, "brain_mask_cleaned.nii.gz"))
+  expect_equal(as.vector(cleaned > 0), as.vector(mask > 0 & !removed))
+  expect_true(any(wm_artifacts > 0 & segmentation != 3 & cleaned > 0))
+  calls <- spy()
+  for (call in calls[3:4]) {
+    expect_equal(as.vector(call$source_mask > 0), as.vector(cleaned > 0))
+  }
+  # only the affine stage has a target mask; the fixed tissue channels of the
+  # deformable stage are zero outside the template brain, like the moving
+  # channels outside the native brain
+  expect_false(is.null(calls[[3]]$target_mask))
+  expect_null(calls[[4]]$target_mask)
+  template_brain <- yael_native_read_volume(template$mask) > 0
+  for (channel in calls[[4]]$targets[2:3]) {
+    expect_equal(dim(channel), dim(template_brain))
+    expect_true(all(channel[!template_brain] == 0))
+  }
+  sources <- calls[[4]]$sources
+  expect_length(sources, 3L)
+  expect_true(all(sources[[1]][removed] == 0))
+  # the channels are the posteriors (read back from the stage files). In the
+  # CSF channel, the removed white matter is CSF, while the gray matter and
+  # CSF that the dilated artifacts cover keep their own posterior
+  csf <- yael_native_read_volume(file.path(work, "atropos_1.nii.gz"))
+  dgwbs <- yael_native_read_volume(file.path(work, "atropos_3.nii.gz"))
+  expect_true(all(sources[[2]][removed] == 1))
+  kept <- wm_artifacts > 0 & segmentation != 3
+  expect_gt(sum(kept), 0)
+  expect_equal(sources[[2]][kept], csf[kept], tolerance = 1e-6)
+  expect_true(all(sources[[3]][wm_artifacts > 0] == 0))
+  expect_equal(sources[[3]][wm_artifacts == 0], dgwbs[wm_artifacts == 0], tolerance = 1e-6)
+
+  # the template labels on the native grid still overlap the true labels. The
+  # mask took in the skull and the scalp on top of the head; without a target
+  # mask, the deformable stage pulls them into the template brain, which
+  # thins the CSF (label 1; Dice 0.839 when this test was written)
+  labels <- yael_native_read_volume(template$atropos[[1]])
+  warped <- ravetools::apply_transform3d_volume(
+    labels, res$registration, vox2ras = attr(labels, "vox2ras"),
+    direction = "inverse", reference_dim = native$dim,
+    reference_vox2ras = native$vox2ras, interpolation = "nearest")
+  dice <- yael_toy_dice(warped, native$truth)
+  expect_true(dice[[1]] >= 0.8 && all(dice[-1] >= 0.85),
+              label = sprintf("Dice %s", paste(round(dice, 3), collapse = ", ")))
 })
 
 test_that("normalization uses additional images that cover the brain", {
@@ -739,6 +946,11 @@ test_that("normalization uses additional images that cover the brain", {
   expect_false(anyNA(t2_channel))
   inside <- native$truth > 0
   expect_gt(stats::cor(t2_channel[inside], yael_toy_native_t2(native)[inside]), 0.8)
+  # its template image (the template with skull) is zero outside the
+  # template brain, like the moving channels outside the native brain
+  template_brain <- yael_native_read_volume(template$mask) > 0
+  expect_true(all(calls[[4]]$targets[[2]][!template_brain] == 0))
+  expect_true(any(calls[[4]]$targets[[2]][template_brain] != 0))
 
   # other cost functions are not available for the deformable stage
   expect_warning(
@@ -856,6 +1068,7 @@ test_that("normalization starts from a given affine and can keep the skull", {
   expect_equal(calls[[1]]$init_transform, affine, tolerance = 1e-10)
   expect_equal(calls[[1]]$syn_iterations, c(40, 20, 0))
   expect_equal(calls[[1]]$syn_grad_step, 0.2)
+  expect_equal(c(calls[[1]]$syn_convergence, calls[[1]]$syn_convergence_window), c(1e-7, 8))
   expect_equal(calls[[2]]$init_transform, affine, tolerance = 1e-10)
   expect_equal(calls[[3]]$init_transform, calls[[2]]$transform)
 
