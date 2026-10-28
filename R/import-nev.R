@@ -77,7 +77,7 @@ import_from_nevnsx <- function(subject, blocks, electrodes, sample_rate, add = F
 
       unpacked <- lapply(paths, function(path) {
         # path <- paths[[1]]
-        digest <- ravepipeline::digest(file = path)
+        digest <- nev_cache_key(path)
         ieegio::read_nsx(
           file = path,
           extract_path = file_path(temporary_path, digest),

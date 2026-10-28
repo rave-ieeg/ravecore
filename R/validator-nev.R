@@ -1,3 +1,23 @@
+# MD5 of a NEV file: names its cache folder (`neuroevent/<md5>`). Validation
+# and import hash the same files several times in one session (once per
+# channel type), so each key is kept until the file size or modification time
+# changes.
+nev_cache_keys <- new.env(parent = emptyenv())
+
+nev_cache_key <- function(path) {
+  info <- file.info(path, extra_cols = FALSE)
+  memo_key <- paste(
+    normalizePath(path, mustWork = TRUE), info$size,
+    format(as.numeric(info$mtime), digits = 15), sep = "|"
+  )
+  key <- nev_cache_keys[[memo_key]]
+  if (is.null(key)) {
+    key <- ravepipeline::digest(file = path)
+    nev_cache_keys[[memo_key]] <- key
+  }
+  key
+}
+
 validate_raw_nevnsx <- function(subject, blocks, electrodes, check_content = TRUE, ...) {
 
   # DIPSAUS DEBUG START
@@ -128,7 +148,7 @@ validate_raw_nevnsx <- function(subject, blocks, electrodes, check_content = TRU
         if ( check_content && length(electrodes) > 0 ) {
 
           channel_table <- lapply(paths, function(path) {
-            digest <- ravepipeline::digest(file = path)
+            digest <- nev_cache_key(path)
             header_info <- ieegio::read_nsx(
               file = path,
               extract_path = file_path(temporary_path, digest),
