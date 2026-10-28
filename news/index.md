@@ -78,6 +78,16 @@
   - When the k-means segmentation that finds the white matter fails on a
     few extreme intensities, it is run again with the intensities
     clipped at their 99.9% (then 99%) quantile.
+  - White-matter voxels near the edge of the brain mask that lie outside
+    the gray-matter surface (at least a quarter of the rays cast from
+    them miss it), such as a thick, bright skull marrow that the initial
+    registration left inside the template brain mask, are dilated by two
+    voxels and left out of the white-matter channel, the brain mask and
+    the brain image of the final registration; the cone below the center
+    of the white matter, which holds the brain stem, is kept. The
+    removed volume is logged. The tissue classes keep the order of their
+    priors, with a warning when their median intensities are not in that
+    order.
   - Additional images are resampled onto the native `T1w` grid and left
     out (with a warning) when they cover less than 95% of the brain; the
     template tissue priors are resampled onto the template `T1` grid;
@@ -165,6 +175,10 @@
 - Added tests that check function-call signatures through
   [`asNamespace()`](https://rdrr.io/r/base/ns-internal.html)
   (`#633cde9`).
+- Importing `NEV`/`NSx` data hashes each `NEV` file once per session;
+  validation and import used to hash the whole file again for every
+  channel type (up to six times per file). The hash still names the
+  cache folder, so existing caches are reused.
 
 ------------------------------------------------------------------------
 
