@@ -36,8 +36,9 @@ yael_native_segmentation_class_order <- function(nu2, labels) {
 #' @param method how the gray-matter surface is wrapped: \code{'none'} keeps
 #' the surface as it is (its outer and its inner sheet), \code{'convex_hull'}
 #' takes its convex hull (\code{ravetools::vcg_convex_hull} with its
-#' defaults); \code{'outer_smoothed'} is reserved for a wrapper of
-#' \pkg{ravetools} that is not available yet
+#' defaults), and \code{'outer_smoothed'} its smoothed outer surface
+#' (\code{ravetools::mris_outer_surface} with its defaults; the method of
+#' \code{yael_native_normalize})
 #' @returns A \code{'mesh3d'} surface in 'RAS' around the gray matter and the
 #' cerebellum
 #' @noRd

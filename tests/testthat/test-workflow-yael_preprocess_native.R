@@ -669,13 +669,10 @@ test_that("white matter outside the gray matter is left out of the white-matter 
   no_cap[cap] <- 1
   expect_equal(sum(yael_native_clean_wm_mask(no_cap, vox2ras, dgwbs = dgwbs)), 0)
 
-  # the convex hull is a closed mesh around the gray matter; the smoothed
-  # outer surface is not available yet
+  # the convex hull is a closed mesh around the gray matter
   hull <- yael_native_gm_envelope(labels, vox2ras, "convex_hull")
   expect_s3_class(hull, "mesh3d")
   expect_equal(ravetools::vcg_mesh_volume(hull), 4 / 3 * pi * 19^3, tolerance = 0.05)
-  expect_error(yael_native_gm_envelope(labels, vox2ras, "outer_smoothed"),
-               "mris_outer_smoothed")
 })
 
 test_that("tissue classes out of intensity order give a warning", {

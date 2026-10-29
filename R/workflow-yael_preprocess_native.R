@@ -1047,13 +1047,12 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
         prior
       })
     })
-    priors <- list(
-      priors[[1]] * 0.2 + 0.4,                               # CSF: 0.4 to 0.6
-      priors[[2]] * 0.2 + 0.4,                               # gray matter: 0.2 to 0.8
-      (priors[[3]] + priors[[4]] + priors[[5]]) * 0.2 + 0.4, # white matter, deep gray matter, brain stem
-      priors[[6]] * 0.4 + 0.2                                # cerebellum
-    )
-    # a class whose prior is zero inside the brain mask cannot be estimated
+    # CSF, gray matter, white matter with deep gray matter and brain stem,
+    # cerebellum
+    priors <- list(priors[[1]], priors[[2]],
+                   priors[[3]] + priors[[4]] + priors[[5]], priors[[6]])
+    # a class whose prior is zero inside the brain mask cannot be estimated;
+    # checked before the flattening below, which lifts every prior above zero
     inside <- brain_mask > 0
     keep <- vapply(priors, function(p) { any(p[inside] > 0) }, FALSE)
     rm(inside)
@@ -1065,6 +1064,12 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
     if (sum(keep) < 2) {
       stop("yael_native_normalize: fewer than two tissue priors overlap the brain mask; please check the template `atropos_*` images.")
     }
+    priors <- list(
+      priors[[1]] * 0.2 + 0.4, # CSF: 0.4 to 0.6
+      priors[[2]] * 0.2 + 0.4, # gray matter: 0.4 to 0.6
+      priors[[3]] * 0.2 + 0.4, # white matter, deep gray matter, brain stem
+      priors[[4]] * 0.4 + 0.2  # cerebellum: 0.2 to 0.6
+    )
     seg <- ravetools::segment_volume_tissue_gmm(
       nu2, mask = brain_mask, priors = priors[keep], prior_weight = 0,
       mrf_beta = 0.3, mrf_radius = 1L, iterations = 50L,
