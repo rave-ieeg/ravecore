@@ -78,16 +78,17 @@
   - When the k-means segmentation that finds the white matter fails on a
     few extreme intensities, it is run again with the intensities
     clipped at their 99.9% (then 99%) quantile.
-  - White-matter voxels near the edge of the brain mask that lie outside
-    the gray-matter surface (at least a quarter of the rays cast from
-    them miss it), such as a thick, bright skull marrow that the initial
-    registration left inside the template brain mask, are dilated by two
-    voxels and left out of the white-matter channel, the brain mask and
-    the brain image of the final registration; the cone below the center
-    of the white matter, which holds the brain stem, is kept. The
-    removed volume is logged. The tissue classes keep the order of their
-    priors, with a warning when their median intensities are not in that
-    order.
+  - White-matter voxels whose ray cast away from the center of the white
+    matter misses the smoothed outer surface of the gray matter and the
+    cerebellum (`ravetools::mris_outer_surface()`), such as a thick,
+    bright skull marrow that the initial registration left inside the
+    template brain mask, are dilated by two voxels and left out of the
+    white-matter channel; those labeled white matter also leave the
+    brain mask and the brain image of the final registration. The cone
+    below the center of the white matter, which holds the brain stem, is
+    kept. The removed volume is logged. The tissue classes keep the
+    order of their priors, with a warning (and nothing left out) when
+    their median intensities are not in that order.
   - Additional images are resampled onto the native `T1w` grid and left
     out (with a warning) when they cover less than 95% of the brain; the
     template tissue priors are resampled onto the template `T1` grid;
