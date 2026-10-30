@@ -134,6 +134,15 @@
 
 #### Bug Fixes
 
+- [`cmd_run_yael_preprocess()`](http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess.md)
+  and
+  [`cmd_run_yael_preprocess_native()`](http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess_native.md)
+  gain `overwrite` (default `FALSE`). With `run_recon_all = TRUE`, their
+  scripts always deleted the existing `FreeSurfer` folder; they now do
+  so only with `overwrite = TRUE`, which also removes the `tmp` folder
+  under the imaging folder and calculates the normalization again even
+  if it exists. Code that relies on the old behavior needs
+  `overwrite = TRUE`.
 - `YAELProcess$generate_atlas_from_template()` reports each atlas
   surface it fails to generate as a warning naming the volume; failures
   were hidden by a silent [`try()`](https://rdrr.io/r/base/try.html).

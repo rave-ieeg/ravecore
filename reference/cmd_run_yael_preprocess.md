@@ -50,6 +50,7 @@ cmd_run_yael_preprocess(
   dry_run = FALSE,
   use_antspynet = TRUE,
   verbose = TRUE,
+  overwrite = FALSE,
   ...
 )
 ```
@@ -154,6 +155,14 @@ cmd_run_yael_preprocess(
 - dry_run:
 
   whether to dry-run
+
+- overwrite:
+
+  whether the command should start over: when true, it removes the
+  temporary folder `'tmp'` under the imaging folder, calculates the
+  normalization again even if it exists, and deletes the existing
+  'FreeSurfer' folder; default is false, which keeps existing
+  normalization, and lets 'FreeSurfer' continue with its existing folder
 
 ## Value
 
