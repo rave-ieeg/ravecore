@@ -46,6 +46,7 @@ cmd_run_yael_preprocess_native(
   dry_run = FALSE,
   use_antspynet = TRUE,
   verbose = TRUE,
+  overwrite = FALSE,
   ...
 )
 }
@@ -115,6 +116,12 @@ not built-in. For example \code{'MEG'}}
 \item{run_recon_all}{whether to run \verb{FreeSurfer}; default is true}
 
 \item{dry_run}{whether to dry-run}
+
+\item{overwrite}{whether the command should start over: when true, it
+removes the temporary folder \code{'tmp'} under the imaging folder,
+calculates the normalization again even if it exists, and deletes the
+existing 'FreeSurfer' folder; default is false, which keeps existing
+normalization, and lets 'FreeSurfer' continue with its existing folder}
 }
 \value{
 \code{yael_preprocess_native} returns nothing; the subject imaging

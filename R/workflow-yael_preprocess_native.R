@@ -50,14 +50,32 @@ yael_native_require_ravetools <- function() {
 #' rules of that type (such as a required \code{sub}), and caches the class
 #' @returns A \code{bidsr} \code{BIDSEntityFile} (its \code{suffix} is the
 #' image type), or \code{NULL} for names \pkg{bidsr} rejects (such as
-#' \code{'.DS_Store'}, or an entity without value)
+#' \code{'.DS_Store'}, or an entity without value). Subject codes may contain
+#' underscores, which \pkg{bidsr} takes for entities without value: as in
+#' rpyANTs, tokens without dash after \code{sub} belong to the subject code
 #' @noRd
 yael_parse_bids_filename <- function(path) {
   if (length(path) != 1 || is.na(path)) { return(NULL) }
-  tryCatch(
-    bidsr::parse_path_bids_entity(basename(path)),
-    error = function(e) { NULL }
-  )
+  tryCatch({
+    tokens <- strsplit(basename(path), "_", fixed = TRUE)[[1]]
+    n_sub <- 1L
+    if (startsWith(tokens[[1]], "sub-")) {
+      # the last token is the type
+      while (n_sub + 1L < length(tokens) &&
+             !grepl("-", tokens[[n_sub + 1L]], fixed = TRUE)) {
+        n_sub <- n_sub + 1L
+      }
+    }
+    if (n_sub == 1L) {
+      return(bidsr::parse_path_bids_entity(basename(path)))
+    }
+    parsed <- bidsr::parse_path_bids_entity(
+      paste(c("sub-x", tokens[-seq_len(n_sub)]), collapse = "_"))
+    entities <- parsed@entities
+    entities$sub@value <- sub("^sub-", "", paste(tokens[seq_len(n_sub)], collapse = "_"))
+    parsed@entities <- entities
+    parsed
+  }, error = function(e) { NULL })
 }
 
 # Entity values of a file parsed by `yael_parse_bids_filename`, as a named list
@@ -1688,7 +1706,7 @@ cmd_run_yael_preprocess_native <- function(
     run_recon_all = TRUE,
     dry_run = FALSE,
     use_antspynet = TRUE,
-    verbose = TRUE, ...) {
+    verbose = TRUE, overwrite = FALSE, ...) {
 
   use_antspynet <- isTRUE(use_antspynet)
 
@@ -1706,6 +1724,7 @@ cmd_run_yael_preprocess_native <- function(
 
   run_recon_all <- as.integer(isTRUE(as.logical(run_recon_all)))
   register_reversed <- isTRUE(as.logical(register_reversed))
+  overwrite <- isTRUE(as.logical(overwrite))
   if (!dry_run) {
     # the script would fail in the child process
     yael_native_require_ravetools()

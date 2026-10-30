@@ -54,6 +54,11 @@
 #' @param verbose whether to print out the information; default is \code{TRUE}
 #' @param run_recon_all whether to run 'FreeSurfer'; default is true
 #' @param dry_run whether to dry-run
+#' @param overwrite whether the command should start over: when true, it
+#' removes the temporary folder \code{'tmp'} under the imaging folder,
+#' calculates the normalization again even if it exists, and deletes the
+#' existing 'FreeSurfer' folder; default is false, which keeps existing
+#' normalization, and lets 'FreeSurfer' continue with its existing folder
 #' @param ... reserved for legacy code and deprecated arguments
 #' @returns Nothing, a subject imaging folder will be created under 'RAVE'
 #' raw folder. It will take a while to run the workflow.
@@ -330,7 +335,7 @@ cmd_run_yael_preprocess <- function(
     run_recon_all = TRUE,
     dry_run = FALSE,
     use_antspynet = TRUE,
-    verbose = TRUE, ...) {
+    verbose = TRUE, overwrite = FALSE, ...) {
   # DIPSAUS DEBUG START
   # subject_code = "testtest3"
   # t1w_path = "/Users/dipterix/rave_data/raw_dir/DBS_93/rave-imaging/coregistration/MRI_reference.nii.gz"
@@ -362,6 +367,7 @@ cmd_run_yael_preprocess <- function(
 
   run_recon_all <- as.integer(isTRUE(as.logical(run_recon_all)))
   register_reversed <- isTRUE(as.logical(register_reversed))
+  overwrite <- isTRUE(as.logical(overwrite))
 
   yael_process <- as_yael_process(subject = subject)
   subject <- yael_process$get_subject()

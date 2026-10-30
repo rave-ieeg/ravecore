@@ -23,6 +23,7 @@ normalize_images <- {{ normalize_images_str }}
 normalize_affine <- "{{ paste(normalize_affine, collapse = '') }}"
 run_recon_all <- {{ run_recon_all }}
 use_antspynet <- {{ use_antspynet }}
+overwrite <- {{ overwrite }}
 
 if (!nzchar(normalize_affine) || !file.exists(normalize_affine)) {
   normalize_affine <- NULL
@@ -31,6 +32,13 @@ if (!nzchar(normalize_affine) || !file.exists(normalize_affine)) {
 subject <- ravecore::RAVESubject$new(project_name = project_name,
                                      subject_code = subject_code,
                                      strict = FALSE)
+
+# Start over: remove temporary files and calculate the normalization again
+normalize_policy <- "auto"
+if (overwrite) {
+  normalize_policy <- "all"
+  unlink(file.path(subject$imaging_path, "tmp"), recursive = TRUE)
+}
 
 max_mem_size <- ravepipeline::raveio_getopt("max_mem", default = 8)
 if (length(max_mem_size) == 1 && is.numeric(max_mem_size) && !is.na(max_mem_size) && isTRUE(max_mem_size < 12)) {
@@ -62,6 +70,7 @@ if ( !run_recon_all ) {
     register_reversed = register_reversed,
     normalize_template = normalize_template,
     normalize_images = normalize_images,
+    normalize_policy = normalize_policy,
     normalize_affine = normalize_affine,
     use_antspynet = use_antspynet,
     add_surfaces = TRUE
@@ -109,6 +118,7 @@ if ( !run_recon_all ) {
     register_reversed = register_reversed,
     normalize_template = normalize_template,
     normalize_images = normalize_images,
+    normalize_policy = normalize_policy,
     normalize_affine = normalize_affine,
     use_antspynet = use_antspynet,
     add_surfaces = FALSE
@@ -118,7 +128,7 @@ if ( !run_recon_all ) {
     subject = subject,
     mri_path = file.path(wdir_actual, "rave-imaging", "inputs", "MRI", "MRI_RAW.nii.gz"),
     args = "-all",
-    overwrite = TRUE,
+    overwrite = overwrite,
     verbose = TRUE,
     dry_run = FALSE
   )

@@ -105,6 +105,55 @@ test_that("BIDS file names are parsed by bidsr", {
   expect_null(yael_parse_bids_filename(NA_character_))
 })
 
+test_that("subject codes with underscores stay in the `sub` entity", {
+  parsed <- yael_parse_bids_filename("sub-LOC_01_LT_ses-preop_desc-preproc_T1w.nii.gz")
+  expect_equal(parsed@suffix, "T1w")
+  expect_equal(parsed@extension, "nii.gz")
+  expect_equal(yael_bids_entities(parsed),
+               list(sub = "LOC_01_LT", ses = "preop", desc = "preproc"))
+
+  parsed <- yael_parse_bids_filename(
+    "/some/anat/sub-LOC_01_LT_from-T1w_to-MNI152NLin2009aAsym_desc-affine+SyN_ants1.nii.gz")
+  expect_equal(parsed@suffix, "ants1")
+  expect_equal(bidsr::get_bids_entity(parsed, "sub"), "LOC_01_LT")
+  expect_equal(bidsr::get_bids_entity(parsed, "to"), "MNI152NLin2009aAsym")
+
+  # no other entity: the last token is the type
+  parsed <- yael_parse_bids_filename("sub-LOC_01_T1w.nii.gz")
+  expect_equal(parsed@suffix, "T1w")
+  expect_equal(yael_bids_entities(parsed), list(sub = "LOC_01"))
+})
+
+test_that("the native engine reads images and ANTs transforms of subject codes with underscores", {
+  skip_if_old_testthat()
+  local_yael_sandbox()
+  local_yael_rpyants_guard()
+  root <- tempfile(pattern = "ravecore-yael-underscore-")
+  dir.create(root)
+  on.exit({ unlink(root, recursive = TRUE) }, add = TRUE)
+  t1_path <- yael_native_write_volume(array(0, c(4, 4, 4)), file.path(root, "t1.nii.gz"),
+                                      vox2ras = diag(4))
+  code <- "LOC_01_LT"
+  process <- as_yael_process(paste0("YAEL/", code), imaging_path = file.path(root, "imaging"),
+                             engine = "native")
+
+  expect_true(process$set_input_image(path = t1_path, type = "T1w", overwrite = TRUE))
+  expect_equal(basename(process$get_input_image("T1w")),
+               sprintf("sub-%s_ses-preop_desc-preproc_T1w.nii.gz", code))
+
+  # the names that the 'rpyANTs' engine writes
+  transform_dir <- file.path(root, "imaging", "normalization", "transformations")
+  dir.create(transform_dir, recursive = TRUE)
+  forward <- sprintf("sub-%s_from-T1w_to-MNI152NLin2009aAsym_desc-affine+SyN_ants%s",
+                     code, c("1.nii.gz", "0.mat"))
+  inverse <- sprintf("sub-%s_from-MNI152NLin2009aAsym_to-T1w_desc-affine+SyN_ants%s",
+                     code, c("1.mat", "0.nii.gz"))
+  file.create(file.path(transform_dir, c(forward, inverse)))
+  mapping <- process$get_template_mapping("mni_icbm152_nlin_asym_09a", relative = TRUE)
+  expect_equal(basename(unlist(mapping$native_to_template$transformlist)), forward)
+  expect_equal(basename(unlist(mapping$template_to_native$transformlist)), inverse)
+})
+
 test_that("BIDS prefixes keep the reserved entity order of rpyANTs", {
   expect_equal(
     yael_bids_prefix(list(sub = "X", from = "T1w", to = "CT", desc = "rigid")),
@@ -1219,6 +1268,80 @@ test_that("the native workflow functions take the arguments of the rpyANTs ones"
       "      \"It seems your computer memory is \", max_mem_size, \"GB. You need at least 16GB to normalize to MNI152b template. \",",
       "## END OF RAVE Script: YAEL Preprocessing + (optional) FreeSurfer recon-all ##"))
   expect_true(any(grepl("isTRUE(max_mem_size < 32)", native, fixed = TRUE)))
+})
+
+test_that("the YAEL scripts start over only with `overwrite = TRUE`", {
+  skip_if_old_testthat()
+  expect_false(formals(cmd_run_yael_preprocess_native)$overwrite)
+  local_yael_sandbox()
+  local_yael_rpyants_guard()
+  root <- tempfile(pattern = "ravecore-yael-overwrite-")
+  dir.create(root)
+  on.exit({ unlink(root, recursive = TRUE) }, add = TRUE)
+  t1_path <- yael_native_write_volume(array(0, c(4, 4, 4)), file.path(root, "t1.nii.gz"),
+                                      vox2ras = diag(4))
+  subject_id <- "YAEL/YAELOverwrite"
+  dir.create(as_rave_subject(subject_id, strict = FALSE)$imaging_path, recursive = TRUE)
+
+  find_calls <- function(exprs, fun) {
+    calls <- list()
+    walk <- function(e) {
+      if (!is.call(e)) { return() }
+      if (identical(e[[1]], fun)) { calls[[length(calls) + 1L]] <<- e }
+      for (ii in seq_along(e)) {
+        if (!identical(e[[ii]], quote(expr = ))) { walk(e[[ii]]) }
+      }
+    }
+    for (e in exprs) { walk(e) }
+    calls
+  }
+
+  check_script <- function(cmd, workflow, overwrite) {
+    # no template: the 'rpyANTs' command would look for it, even for a dry run
+    re <- cmd(subject = subject_id, t1w_path = t1_path, normalize_template = NULL,
+              run_recon_all = TRUE, overwrite = overwrite, dry_run = TRUE,
+              verbose = FALSE)
+    exprs <- as.list(parse(text = re$script, keep.source = FALSE))
+
+    # run what the script does first, on a folder that holds old temporary files
+    imaging_path <- tempfile(tmpdir = root)
+    old_file <- file.path(imaging_path, "tmp", "coregister_T1w_with_template", "old.txt")
+    dir.create(dirname(old_file), recursive = TRUE)
+    file.create(old_file)
+    kept_file <- file.path(imaging_path, "normalization", "kept.txt")
+    dir.create(dirname(kept_file), recursive = TRUE)
+    file.create(kept_file)
+    env <- new.env(parent = baseenv())
+    env$subject <- list(imaging_path = imaging_path)
+    for (e in exprs) {
+      is_setting <- is.call(e) && identical(e[[1]], as.name("<-")) &&
+        as.character(e[[2]]) %in% c("overwrite", "normalize_policy")
+      is_start_over <- is.call(e) && identical(e[[1]], as.name("if")) &&
+        identical(e[[2]], as.name("overwrite"))
+      if (is_setting || is_start_over) { eval(e, envir = env) }
+    }
+    expect_identical(env$overwrite, overwrite)
+    expect_identical(env$normalize_policy, ifelse(overwrite, "all", "auto"))
+    expect_identical(file.exists(old_file), !overwrite)
+    expect_identical(dir.exists(file.path(imaging_path, "tmp")), !overwrite)
+    expect_true(file.exists(kept_file))
+
+    # both calls of the workflow follow it, and so does 'FreeSurfer'
+    calls <- find_calls(exprs, workflow)
+    expect_length(calls, 2)
+    for (call in calls) {
+      expect_identical(call$normalize_policy, quote(normalize_policy))
+    }
+    calls <- find_calls(exprs, quote(ravecore::cmd_run_freesurfer_recon_all))
+    expect_length(calls, 1)
+    expect_identical(calls[[1]]$overwrite, quote(overwrite))
+  }
+
+  for (overwrite in c(FALSE, TRUE)) {
+    check_script(cmd_run_yael_preprocess, quote(ravecore::yael_preprocess), overwrite)
+    check_script(cmd_run_yael_preprocess_native, quote(ravecore::yael_preprocess_native),
+                 overwrite)
+  }
 })
 
 test_that("cmd_run_yael_preprocess_native builds the script without running it", {
