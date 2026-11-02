@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ravecore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.25</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.26</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,8 +67,8 @@
 <dt id="arg-template-name">template_name<a class="anchor" aria-label="anchor" href="#arg-template-name"></a></dt>
 <dd><p>template name where the atlases are created;
 see <code><a href="get_available_morph_to_template.html">get_available_morph_to_template</a></code> to get available templates
-and <code><a href="cmd_run_yael_preprocess.html">cmd_run_yael_preprocess</a></code> to generate transforms to the
-templates</p></dd>
+and <code><a href="cmd_run_yael_preprocess_native.html">cmd_run_yael_preprocess_native</a></code> to generate transforms to
+the templates</p></dd>
 
 
 <dt id="arg-any-mni-">any_mni152<a class="anchor" aria-label="anchor" href="#arg-any-mni-"></a></dt>
@@ -99,7 +99,9 @@ default is <code>NULL</code>, see 'Details'.</p></dd>
 
 <dt id="arg-extra-transform-type">extra_transform_type<a class="anchor" aria-label="anchor" href="#arg-extra-transform-type"></a></dt>
 <dd><p>type of transform if <code>extra_transform</code> is
-provided.</p></dd>
+provided: <code>'ants'</code> (default) for an <code>'ANTs'</code> <code>.mat</code> file or a
+matrix from <code>'LPS'</code> to <code>'LPS'</code>, and <code>'native'</code> for a text
+file or a matrix from 'RAS' to 'RAS'.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -111,6 +113,7 @@ provided.</p></dd>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The workflow generates atlases from a template. To run this function, a
 separate normalization is required (see
+<code><a href="cmd_run_yael_preprocess_native.html">cmd_run_yael_preprocess_native</a></code> or
 <code><a href="cmd_run_yael_preprocess.html">cmd_run_yael_preprocess</a></code>). That function normalizes
 native subject's brain (<code>'T1w'</code> image) to
 a specified template (typically 'MNI152b' non-linear asymmetric version) via
@@ -141,10 +144,7 @@ with transformed files aligned to 'DICOM' stored.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Please check out https://rave.wiki to configure Python for RAVE</span></span></span>
-<span class="r-in"><span><span class="co"># or run ravemanager::configure_python()</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">generate_atlases_from_template</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"YAEL/OCD07"</span>, <span class="st">"/path/to/OCD_atlases"</span><span class="op">)</span></span></span>

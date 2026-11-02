@@ -33,7 +33,7 @@ generate_atlases_from_template(
   template name where the atlases are created; see
   [`get_available_morph_to_template`](http://rave.wiki/ravecore/reference/get_available_morph_to_template.md)
   to get available templates and
-  [`cmd_run_yael_preprocess`](http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess.md)
+  [`cmd_run_yael_preprocess_native`](http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess_native.md)
   to generate transforms to the templates
 
 - any_mni152:
@@ -64,7 +64,9 @@ generate_atlases_from_template(
 
 - extra_transform_type:
 
-  type of transform if `extra_transform` is provided.
+  type of transform if `extra_transform` is provided: `'ants'` (default)
+  for an `'ANTs'` `.mat` file or a matrix from `'LPS'` to `'LPS'`, and
+  `'native'` for a text file or a matrix from 'RAS' to 'RAS'.
 
 ## Value
 
@@ -75,6 +77,8 @@ under raw subject `'rave-imaging'` folder.
 
 The workflow generates atlases from a template. To run this function, a
 separate normalization is required (see
+[`cmd_run_yael_preprocess_native`](http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess_native.md)
+or
 [`cmd_run_yael_preprocess`](http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess.md)).
 That function normalizes native subject's brain (`'T1w'` image) to a
 specified template (typically 'MNI152b' non-linear asymmetric version)
@@ -109,9 +113,6 @@ folder, with transformed files aligned to 'DICOM' stored.
 ## Examples
 
 ``` r
-
-# Please check out https://rave.wiki to configure Python for RAVE
-# or run ravemanager::configure_python()
 if (FALSE) { # \dontrun{
 
 generate_atlases_from_template(

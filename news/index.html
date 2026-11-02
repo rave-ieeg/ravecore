@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ravecore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.25</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.26</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -63,6 +63,8 @@
 <li>Streamlines in <code>VTK</code> format are neither read nor written (they need <code>Python</code>), and <code>TT</code> files are saved as <code>TCK</code>.</li>
 <li>Memory: with a 1 mm <code>T1w</code> image, the normalization to <code>mni_icbm152_nlin_asym_09a</code> peaked at about 8 GB of resident memory, and to <code>mni_icbm152_nlin_asym_09b</code> at about 15 GB (22 GB with compressed memory). The script of <code><a href="../reference/cmd_run_yael_preprocess_native.html">cmd_run_yael_preprocess_native()</a></code> therefore switches from <code>09b</code> to <code>09a</code> below 32 GB of memory (12 GB for <code><a href="../reference/cmd_run_yael_preprocess.html">cmd_run_yael_preprocess()</a></code>), and <code>map_to_template()</code> warns for such templates below 32 GB.</li>
 </ul></li>
+<li>
+<code><a href="../reference/get_available_morph_to_template.html">get_available_morph_to_template()</a></code>, <code><a href="../reference/generate_atlases_from_template.html">generate_atlases_from_template()</a></code>, <code><a href="../reference/generate_atlas_YBA.html">generate_atlas_YBA()</a></code>, <code><a href="../reference/transform_point_to_template.html">transform_point_to_template()</a></code> and <code><a href="../reference/transform_point_to_template.html">transform_thinfilm_to_mni152()</a></code> read the normalization with the native engine, so they no longer need <code>Python</code>, whichever engine processed the subject. <code><a href="../reference/get_available_morph_to_template.html">get_available_morph_to_template()</a></code> runs in the current session instead of a separate job. Atlases written by the native engine are <code>float32</code>, as with <code>ANTs</code>. <code><a href="../reference/yael_macaque.html">yael_macaque()</a></code> stays on <code>rpyANTs</code>.</li>
 <li>Added <code>YAELProcess$write_talairach_xfm()</code> to write <code>ants/mri/transforms/talairach.xfm</code> from an existing template normalization.</li>
 <li>
 <code>YAELProcess$generate_atlas_from_template()</code> gains <code>smooth_method = "explicit"</code> to smooth atlas surfaces with <code><a href="https://dipterix.org/ravetools/reference/mris_smooth.html" class="external-link">ravetools::mris_smooth()</a></code>, and <code>max_vertices</code> (500,000 by default) to reduce very large atlas surfaces after smoothing; both are passed to <code><a href="http://dipterix.org/ieegio/reference/volume_to_surface.html" class="external-link">ieegio::volume_to_surface()</a></code> when the installed <code>ieegio</code> accepts them.</li>
@@ -71,7 +73,12 @@
 </ul></div>
 <div class="section level4">
 <h4 id="bug-fixes-0-1-2">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-2"></a></h4>
-<ul><li>
+<ul><li>Without <code>Python</code>, <code>transform_point_to_template(volumetric_transform = "auto")</code> and <code><a href="../reference/transform_point_to_template.html">transform_thinfilm_to_mni152()</a></code> silently returned affine coordinates even when a non-linear deformation existed, because a failed lookup looked the same as a missing deformation. The deformation is now read without <code>Python</code>, and a failed lookup gives a warning before the affine is used. The <code>group_3d_viewer</code> module may have saved such coordinates in <code>electrodes_normalization_mni152.csv</code> as non-linear results; to regenerate this file for subjects viewed without <code>Python</code>, choose the non-linear volumetric mapping and enable “Clear existing cache and force re-calculating normalization” in the module.</li>
+<li>
+<code><a href="../reference/transform_point_to_template.html">transform_point_to_template()</a></code> treated the results of a normalization to <code>fsaverage</code> as <code>MNI152</code>. For subjects with no <code>MNI152</code> normalization, the <code>MNI152_*</code> columns held <code>MNI305</code> coordinates and the <code>MNI305_*</code> columns were converted a second time, which gave errors of about 2 mm. <code><a href="../reference/transform_point_to_template.html">transform_thinfilm_to_mni152()</a></code> used these columns.</li>
+<li>
+<code><a href="../reference/generate_atlases_from_template.html">generate_atlases_from_template()</a></code> ignored <code>extra_transform</code> when it was a matrix, or when <code>surfaces = FALSE</code>, without any message, and failed on a file path with <code>extra_transform_type = "native"</code>. All of these now create the <code>atlases_extra</code> folder. With <code>extra_transform_type = "ants"</code>, the default, a matrix is read as <code>LPS</code> to <code>LPS</code>, like an <code>ANTs</code> file; with <code>"native"</code>, a matrix or text file is read as <code>RAS</code> to <code>RAS</code>. Reading an <code>ANTs</code> file no longer needs <code>Python</code>.</li>
+<li>
 <code><a href="../reference/cmd_run_yael_preprocess.html">cmd_run_yael_preprocess()</a></code> and <code><a href="../reference/cmd_run_yael_preprocess_native.html">cmd_run_yael_preprocess_native()</a></code> gain <code>overwrite</code> (default <code>FALSE</code>). With <code>run_recon_all = TRUE</code>, their scripts always deleted the existing <code>FreeSurfer</code> folder; they now do so only with <code>overwrite = TRUE</code>, which also removes the <code>tmp</code> folder under the imaging folder and calculates the normalization again even if it exists. Code that relies on the old behavior needs <code>overwrite = TRUE</code>.</li>
 <li>
 <code>YAELProcess$generate_atlas_from_template()</code> reports each atlas surface it fails to generate as a warning naming the volume; failures were hidden by a silent <code><a href="https://rdrr.io/r/base/try.html" class="external-link">try()</a></code>. Generating the surface of a whole-brain <code>parcellation</code> such as <code>YBA690</code> (millions of vertices) crashed <code>R</code> inside <code><a href="https://dipterix.org/ravetools/reference/vcg_smooth.html" class="external-link">ravetools::vcg_smooth_implicit()</a></code>; with <code>ravetools</code> 0.3.3 the full-resolution surface is smoothed in about 20 seconds and then reduced to <code>max_vertices</code>.</li>
@@ -90,6 +97,7 @@
 <div class="section level4">
 <h4 id="other-changes-0-1-2">Other Changes<a class="anchor" aria-label="anchor" href="#other-changes-0-1-2"></a></h4>
 <ul><li>Added tests that check function-call signatures through <code><a href="https://rdrr.io/r/base/ns-internal.html" class="external-link">asNamespace()</a></code> (<code>#633cde9</code>).</li>
+<li>Added tests that run each function that moved to the native engine on both engines and compare the outputs; they skip on <code>CRAN</code> and without <code>Python</code>.</li>
 <li>Importing <code>NEV</code>/<code>NSx</code> data hashes each <code>NEV</code> file once per session; validation and import used to hash the whole file again for every channel type (up to six times per file). The hash still names the cache folder, so existing caches are reused.</li>
 </ul><hr></div>
 </div>

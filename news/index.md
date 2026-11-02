@@ -114,6 +114,19 @@
     for
     [`cmd_run_yael_preprocess()`](http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess.md)),
     and `map_to_template()` warns for such templates below 32 GB.
+- [`get_available_morph_to_template()`](http://rave.wiki/ravecore/reference/get_available_morph_to_template.md),
+  [`generate_atlases_from_template()`](http://rave.wiki/ravecore/reference/generate_atlases_from_template.md),
+  [`generate_atlas_YBA()`](http://rave.wiki/ravecore/reference/generate_atlas_YBA.md),
+  [`transform_point_to_template()`](http://rave.wiki/ravecore/reference/transform_point_to_template.md)
+  and
+  [`transform_thinfilm_to_mni152()`](http://rave.wiki/ravecore/reference/transform_point_to_template.md)
+  read the normalization with the native engine, so they no longer need
+  `Python`, whichever engine processed the subject.
+  [`get_available_morph_to_template()`](http://rave.wiki/ravecore/reference/get_available_morph_to_template.md)
+  runs in the current session instead of a separate job. Atlases written
+  by the native engine are `float32`, as with `ANTs`.
+  [`yael_macaque()`](http://rave.wiki/ravecore/reference/yael_macaque.md)
+  stays on `rpyANTs`.
 - Added `YAELProcess$write_talairach_xfm()` to write
   `ants/mri/transforms/talairach.xfm` from an existing template
   normalization.
@@ -134,6 +147,33 @@
 
 #### Bug Fixes
 
+- Without `Python`,
+  `transform_point_to_template(volumetric_transform = "auto")` and
+  [`transform_thinfilm_to_mni152()`](http://rave.wiki/ravecore/reference/transform_point_to_template.md)
+  silently returned affine coordinates even when a non-linear
+  deformation existed, because a failed lookup looked the same as a
+  missing deformation. The deformation is now read without `Python`, and
+  a failed lookup gives a warning before the affine is used. The
+  `group_3d_viewer` module may have saved such coordinates in
+  `electrodes_normalization_mni152.csv` as non-linear results; to
+  regenerate this file for subjects viewed without `Python`, choose the
+  non-linear volumetric mapping and enable “Clear existing cache and
+  force re-calculating normalization” in the module.
+- [`transform_point_to_template()`](http://rave.wiki/ravecore/reference/transform_point_to_template.md)
+  treated the results of a normalization to `fsaverage` as `MNI152`. For
+  subjects with no `MNI152` normalization, the `MNI152_*` columns held
+  `MNI305` coordinates and the `MNI305_*` columns were converted a
+  second time, which gave errors of about 2 mm.
+  [`transform_thinfilm_to_mni152()`](http://rave.wiki/ravecore/reference/transform_point_to_template.md)
+  used these columns.
+- [`generate_atlases_from_template()`](http://rave.wiki/ravecore/reference/generate_atlases_from_template.md)
+  ignored `extra_transform` when it was a matrix, or when
+  `surfaces = FALSE`, without any message, and failed on a file path
+  with `extra_transform_type = "native"`. All of these now create the
+  `atlases_extra` folder. With `extra_transform_type = "ants"`, the
+  default, a matrix is read as `LPS` to `LPS`, like an `ANTs` file; with
+  `"native"`, a matrix or text file is read as `RAS` to `RAS`. Reading
+  an `ANTs` file no longer needs `Python`.
 - [`cmd_run_yael_preprocess()`](http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess.md)
   and
   [`cmd_run_yael_preprocess_native()`](http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess_native.md)
@@ -185,6 +225,9 @@
 - Added tests that check function-call signatures through
   [`asNamespace()`](https://rdrr.io/r/base/ns-internal.html)
   (`#633cde9`).
+- Added tests that run each function that moved to the native engine on
+  both engines and compare the outputs; they skip on `CRAN` and without
+  `Python`.
 - Importing `NEV`/`NSx` data hashes each `NEV` file once per session;
   validation and import used to hash the whole file again for every
   channel type (up to six times per file). The hash still names the

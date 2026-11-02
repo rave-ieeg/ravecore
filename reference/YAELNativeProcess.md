@@ -85,7 +85,8 @@ the rpyANTs pipeline behind it:
   and `interpolator = "auto"` follows its documented rule (`YAELProcess`
   uses nearest-neighbor); the queries never create folders;
   `set_input_image` reads the new image before it removes the old one;
-  the `'NIfTI'` data types are chosen by ieegio; normalization results
+  atlases are saved as `float32` as with `'ANTs'`, and the `'NIfTI'`
+  data types of other images are chosen by ieegio; normalization results
   are replaced together, after the new ones are complete, and stale
   `ants<K>` transforms of earlier layouts are removed; nothing is
   written into the template folders.

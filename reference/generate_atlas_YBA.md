@@ -5,7 +5,7 @@ native space, calculates the anatomical labels for the electrode
 contacts, and optionally creates a quality-control report. This function
 requires the subject to be normalized to a `MNI152` symmetric template
 first; see
-[`cmd_run_yael_preprocess`](http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess.md).
+[`cmd_run_yael_preprocess_native`](http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess_native.md).
 
 ## Usage
 
@@ -87,7 +87,7 @@ An invisible named list of
 
 The workflow requires an existing non-linear normalization from the
 subject native `T1w` image to a `MNI152` symmetric template. Please run
-[`cmd_run_yael_preprocess`](http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess.md)
+[`cmd_run_yael_preprocess_native`](http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess_native.md)
 with `normalize_template` set to one of `"mni_icbm152_nlin_sym_09a"`,
 `"mni_icbm152_nlin_sym_09b"`, or `"mni_icbm152_nlin_sym_09c"` if such
 mapping is missing.
@@ -108,14 +108,11 @@ the subject meta folder.
 ## See also
 
 [`generate_atlases_from_template`](http://rave.wiki/ravecore/reference/generate_atlases_from_template.md),
-[`cmd_run_yael_preprocess`](http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess.md)
+[`cmd_run_yael_preprocess_native`](http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess_native.md)
 
 ## Examples
 
 ``` r
-
-# Please check out https://rave.wiki to configure Python for RAVE
-# or run ravemanager::configure_python()
 if (FALSE) { # \dontrun{
 
 subject_id <- "YAEL/subject_code"
@@ -123,7 +120,7 @@ subject_id <- "YAEL/subject_code"
 # ---- Step 1: normalization ------------------------------------------
 # Map the native `T1w` image to a `MNI152` symmetric template. This step
 # is only needed once per subject; skip it when the mapping is available
-cmd_run_yael_preprocess(
+cmd_run_yael_preprocess_native(
   subject = subject_id,
   t1w_path = "/path/to/T1w.nii.gz",
 

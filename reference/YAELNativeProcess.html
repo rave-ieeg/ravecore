@@ -25,7 +25,7 @@ bias-field correction and tissue segmentation come from ravetools
 
     <a class="navbar-brand me-2" href="../index.html">ravecore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.25</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.26</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -125,7 +125,8 @@ only nearest-neighbor and linear (<code>trilinear</code>) interpolation are
 available, and <code>interpolator = "auto"</code> follows its documented rule
 (<code>YAELProcess</code> uses nearest-neighbor); the queries never create
 folders; <code>set_input_image</code> reads the new image before it removes the
-old one; the <code>'NIfTI'</code> data types are chosen by <span class="pkg">ieegio</span>;
+old one; atlases are saved as <code>float32</code> as with <code>'ANTs'</code>, and
+the <code>'NIfTI'</code> data types of other images are chosen by <span class="pkg">ieegio</span>;
 normalization results are replaced together, after the new ones are
 complete, and stale <code>ants&lt;K&gt;</code> transforms of earlier layouts are
 removed; nothing is written into the template folders.</p></li>
