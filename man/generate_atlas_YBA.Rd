@@ -58,13 +58,13 @@ Morphs a \verb{YBA} atlas from the \verb{MNI152} symmetric template to the
 subject native space, calculates the anatomical labels for the electrode
 contacts, and optionally creates a quality-control report. This function
 requires the subject to be normalized to a \verb{MNI152} symmetric template
-first; see \code{\link{cmd_run_yael_preprocess}}.
+first; see \code{\link{cmd_run_yael_preprocess_native}}.
 }
 \details{
 The workflow requires an existing non-linear normalization from the subject
 native \verb{T1w} image to a \verb{MNI152} symmetric template. Please run
-\code{\link{cmd_run_yael_preprocess}} with \code{normalize_template} set to
-one of \verb{"mni_icbm152_nlin_sym_09a"}, \verb{"mni_icbm152_nlin_sym_09b"},
+\code{\link{cmd_run_yael_preprocess_native}} with \code{normalize_template}
+set to one of \verb{"mni_icbm152_nlin_sym_09a"}, \verb{"mni_icbm152_nlin_sym_09b"},
 or \verb{"mni_icbm152_nlin_sym_09c"} if such mapping is missing.
 
 Given the mapping, the template atlas is inverse-transformed to the native
@@ -80,9 +80,6 @@ center, and are stored as \code{'electrode_atlas_<name>.csv'} under the
 subject meta folder.
 }
 \examples{
-
-# Please check out https://rave.wiki to configure Python for RAVE
-# or run ravemanager::configure_python()
 \dontrun{
 
 subject_id <- "YAEL/subject_code"
@@ -90,7 +87,7 @@ subject_id <- "YAEL/subject_code"
 # ---- Step 1: normalization ------------------------------------------
 # Map the native `T1w` image to a `MNI152` symmetric template. This step
 # is only needed once per subject; skip it when the mapping is available
-cmd_run_yael_preprocess(
+cmd_run_yael_preprocess_native(
   subject = subject_id,
   t1w_path = "/path/to/T1w.nii.gz",
 
@@ -119,5 +116,5 @@ utils::browseURL(results$report_file)
 }
 \seealso{
 \code{\link{generate_atlases_from_template}},
-\code{\link{cmd_run_yael_preprocess}}
+\code{\link{cmd_run_yael_preprocess_native}}
 }

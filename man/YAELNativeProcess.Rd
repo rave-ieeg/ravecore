@@ -76,7 +76,8 @@ only nearest-neighbor and linear (\verb{trilinear}) interpolation are
 available, and \code{interpolator = "auto"} follows its documented rule
 (\code{YAELProcess} uses nearest-neighbor); the queries never create
 folders; \code{set_input_image} reads the new image before it removes the
-old one; the \verb{'NIfTI'} data types are chosen by \pkg{ieegio};
+old one; atlases are saved as \verb{float32} as with \verb{'ANTs'}, and
+the \verb{'NIfTI'} data types of other images are chosen by \pkg{ieegio};
 normalization results are replaced together, after the new ones are
 complete, and stale \code{ants<K>} transforms of earlier layouts are
 removed; nothing is written into the template folders.

@@ -241,7 +241,7 @@ transform_point_to_template_volumetric <- function(subject, scan_ras_mat, method
   if (method %in% c("auto", "nonlinear")) {
     # check if nonlinear exists
     mapping <- tryCatch({
-      yael <- as_yael_process(subject = subject)
+      yael <- as_yael_process(subject = subject, engine = "native")
       mapping <- yael$get_template_mapping(template_name = "mni_icbm152_nlin_asym_09b")
       if (!length(mapping)) {
         mapping <- yael$get_template_mapping(template_name = "mni_icbm152_nlin_asym_09a")
@@ -257,6 +257,9 @@ transform_point_to_template_volumetric <- function(subject, scan_ras_mat, method
       }
       mapping
     }, error = function(e) {
+      # not the same as having no deformation: the affine is only a fallback
+      warning("Unable to read the non-linear mapping of subject ",
+              subject$subject_id, ": ", conditionMessage(e), call. = FALSE)
       NULL
     })
 
@@ -264,7 +267,7 @@ transform_point_to_template_volumetric <- function(subject, scan_ras_mat, method
       method <- "nonlinear"
     } else {
       if (method == "nonlinear") {
-        stop("Unable to map points from native to template using non-linear method. Missing non-linear deformation files or Python for RAVE is not configured properly.")
+        stop("Unable to map points from native to template using non-linear method. Missing non-linear deformation files.")
       }
       method <- "affine"
     }
@@ -276,7 +279,7 @@ transform_point_to_template_volumetric <- function(subject, scan_ras_mat, method
     }
 
     # map to template using non-linear deformation
-    yael <- as_yael_process(subject = subject)
+    yael <- as_yael_process(subject = subject, engine = "native")
 
 
     scan_ras_selected <- scan_ras_mat[valid_positions, , drop = FALSE]
@@ -287,6 +290,10 @@ transform_point_to_template_volumetric <- function(subject, scan_ras_mat, method
     mni152_ras <- yael$transform_points_to_template(native_ras = scan_ras_selected,
                                                     template_name = template_name,
                                                     verbose = FALSE)
+    if (identical(call_rpyants("template_urls")[[template_name]]$coord_sys, "MNI305")) {
+      # such as `fsaverage`: the points are not in MNI152 space yet
+      mni152_ras <- t(MNI305_to_MNI152 %*% rbind(t(mni152_ras), 1))[, 1:3, drop = FALSE]
+    }
     tmp <- scan_ras_mat
     tmp[valid_positions, ] <- mni152_ras[seq_len(sum(valid_positions)), ]
     tmp[!valid_positions, ] <- NA_real_

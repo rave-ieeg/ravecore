@@ -1,16 +1,13 @@
 #' @title Get names of available non-linear transforms to the templates
 #' @description
 #' This function obtains existing transforms rather than creating new
-#' transforms. Please check function \code{\link{cmd_run_yael_preprocess}}
-#' about mapping native images to the templates. This function requires
-#' additional 'Python' configuration.
+#' transforms. Please check function
+#' \code{\link{cmd_run_yael_preprocess_native}} about mapping native images to
+#' the templates.
 #' @param subject 'RAVE' subject instance or character; see
 #' \code{\link{as_rave_subject}}
 #' @returns Template names with valid non-linear transforms.
 #' @examples
-#'
-#' # Please check out https://rave.wiki to configure Python for RAVE
-#' # or run ravemanager::configure_python()
 #' \dontrun{
 #'
 #' get_available_morph_to_template("project_name/subject_code")
@@ -21,20 +18,12 @@
 #' @export
 get_available_morph_to_template <- function(subject) {
   subject <- restore_subject_instance(subject)
-  job_id <- ravepipeline::start_job(
-    fun = function(subject) {
-      ravecore <- asNamespace("ravecore")
-      yael_process <- ravecore$as_yael_process(subject)
-      template_names <- ravecore$rpyants_builtin_templates()
-      missing_template <- vapply(template_names, function(template_name) {
-        is.null(yael_process$get_template_mapping(template_name = template_name))
-      }, FALSE)
-      template_names[!missing_template]
-    },
-    fun_args = list(subject = subject),
-    ensure_init = TRUE
-  )
-  ravepipeline::resolve_job(job_id, timeout = 90)
+  yael_process <- as_yael_process(subject, engine = "native")
+  template_names <- rpyants_builtin_templates()
+  missing_template <- vapply(template_names, function(template_name) {
+    is.null(yael_process$get_template_mapping(template_name = template_name))
+  }, FALSE)
+  template_names[!missing_template]
 }
 
 #' @title Create brain atlases from template
@@ -45,8 +34,8 @@ get_available_morph_to_template <- function(subject) {
 #' @param atlas_folders paths to the atlas folders
 #' @param template_name template name where the atlases are created;
 #' see \code{\link{get_available_morph_to_template}} to get available templates
-#' and \code{\link{cmd_run_yael_preprocess}} to generate transforms to the
-#' templates
+#' and \code{\link{cmd_run_yael_preprocess_native}} to generate transforms to
+#' the templates
 #' @param any_mni152 if the template is 'MNI152', then whether to check other
 #' template folders; default is true
 #' @param surfaces whether to generate surfaces; if true, then a 'GIfTI' file
@@ -62,7 +51,9 @@ get_available_morph_to_template <- function(subject) {
 #' argument is for pipelines that take in transformed/processed images as input;
 #' default is \code{NULL}, see 'Details'.
 #' @param extra_transform_type type of transform if \code{extra_transform} is
-#' provided.
+#' provided: \code{'ants'} (default) for an \verb{'ANTs'} \code{.mat} file or a
+#' matrix from \verb{'LPS'} to \verb{'LPS'}, and \code{'native'} for a text
+#' file or a matrix from 'RAS' to 'RAS'.
 #'
 #' @returns The function returns nothing, but will create a folder named
 #' \code{'atlases'} under raw subject \code{'rave-imaging'} folder.
@@ -70,6 +61,7 @@ get_available_morph_to_template <- function(subject) {
 #' @details
 #' The workflow generates atlases from a template. To run this function, a
 #' separate normalization is required (see
+#' \code{\link[ravecore]{cmd_run_yael_preprocess_native}} or
 #' \code{\link[ravecore]{cmd_run_yael_preprocess}}). That function normalizes
 #' native subject's brain (\code{'T1w'} image) to
 #' a specified template (typically 'MNI152b' non-linear asymmetric version) via
@@ -101,9 +93,6 @@ get_available_morph_to_template <- function(subject) {
 #' with transformed files aligned to 'DICOM' stored.
 #'
 #' @examples
-#'
-#' # Please check out https://rave.wiki to configure Python for RAVE
-#' # or run ravemanager::configure_python()
 #' \dontrun{
 #'
 #' generate_atlases_from_template(
@@ -134,7 +123,7 @@ generate_atlases_from_template <- function(
 
   available_mappings <- get_available_morph_to_template(subject)
   if (!length(available_mappings)) {
-    stop("No non-linear morph available. Please run `ravecore::cmd_run_yael_preprocess` first.")
+    stop("No non-linear morph available. Please run `ravecore::cmd_run_yael_preprocess_native` first.")
   }
   template_name <- template_name[[1]]
   template_name0 <- template_name
@@ -195,25 +184,24 @@ generate_atlases_from_template <- function(
 
   job_fun <- function(subject, template_name, atlas_folders, surfaces, extra_transform, extra_transform_type) {
     ravecore <- asNamespace("ravecore")
-    yael_process <- ravecore$as_yael_process(subject)
+    yael_process <- ravecore$as_yael_process(subject, engine = "native")
 
-    if (length(extra_transform) && is.character(extra_transform)) {
-      switch(
-        extra_transform_type,
-        "ants" = {
-          # LPS to LPS
-          extra_transform <- rpyANTs::as_ANTsTransform(extra_transform)[]
+    if (length(extra_transform)) {
+      if (is.character(extra_transform)) {
+        extra_transform <- switch(
+          extra_transform_type,
           # RAS to RAS
-          extra_transform <- diag(c(-1, -1, 1, 1)) %*% extra_transform %*% diag(c(-1, -1, 1, 1))
-        },
-        {
-          # native, assuming extra_transform is a 4x4 RAS to RAS matrix
-        }
-      )
+          "ants" = ravetools::read_ants_transform(extra_transform),
+          # native, assuming a text file with a 4x4 RAS to RAS matrix
+          unname(as.matrix(utils::read.table(extra_transform, header = FALSE)))
+        )
+      } else if (identical(extra_transform_type, "ants")) {
+        # LPS to LPS -> RAS to RAS
+        extra_transform <- diag(c(-1, -1, 1, 1)) %*% extra_transform %*% diag(c(-1, -1, 1, 1))
+      }
       image_transform <- extra_transform
       point_transform <- solve(image_transform)
     } else {
-      image_transform_ants <- NULL
       point_transform <- NULL
     }
 
@@ -229,11 +217,11 @@ generate_atlases_from_template <- function(
         surfaces = surfaces
       )
 
-      if (surfaces && length(atlas_paths) > 0) {
+      if ((surfaces || is.matrix(point_transform)) && length(atlas_paths) > 0) {
         lapply(atlas_paths, function(atlas_path) {
           gii_path <- gsub("\\.(nii|nii\\.gz)$", ".gii", x = atlas_path, ignore.case = TRUE)
           stl_path <- gsub("\\.(nii|nii\\.gz)$", ".stl", x = atlas_path, ignore.case = TRUE)
-          if (file.exists(gii_path)) {
+          if (surfaces && file.exists(gii_path)) {
             tryCatch({
               surf <- ieegio::read_surface(gii_path)
               lps <- diag(c(-1, -1, 1, 1)) %*% surf$geometry$transforms[[1]] %*% surf$geometry$vertices
@@ -257,7 +245,7 @@ generate_atlases_from_template <- function(
             ieegio::write_volume(volume, con = extrapath_nii)
 
             # transform surface
-            if (file.exists(gii_path)) {
+            if (surfaces && file.exists(gii_path)) {
               extrapath_gii <- file.path(atlas_extra, ravecore$path_rel(gii_path, start = atlas_root))
               surf <- ieegio::read_surface(gii_path)
               ras_pos <- point_transform %*% surf$geometry$transforms[[1]] %*% surf$geometry$vertices

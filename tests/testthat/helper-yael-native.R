@@ -150,6 +150,16 @@ local_yael_toy_template <- function(root, name = "mni_icbm152_nlin_asym_09a",
   invisible(info)
 }
 
+# Refuses child jobs for the rest of the calling frame: a child process would
+# load the real settings and leave the sandbox
+local_yael_no_jobs <- function(env = parent.frame()) {
+  skip_if_old_testthat()
+  testthat::local_mocked_bindings(
+    start_job = function(...) { stop("a child job was started") },
+    .package = "ravepipeline", .env = env
+  )
+}
+
 # Records the calls of `ravetools::register_volume3d` for the rest of the
 # calling frame: the type, number of channels, weights, whether masks are
 # given (`masked`: both; `source_masked`, `target_masked`), the initial
@@ -488,6 +498,51 @@ yael_toy_dataset <- function(name = c("template", "template_shared", "native")) 
     )
   }
   yael_toy_cache[[name]]
+}
+
+# A subject with a known deformation, for the functions that read a
+# normalization: a `T1w` image, identity affines and, for each template, warps
+# that move points by `shift` mm along the first axis
+# (`transform_points_to_template` gives `x + shift`, and a template image moves
+# by `-shift` on the native grid), with an `ants` folder and a `talairach.xfm`
+# from the first template. Call it in the sandbox
+yael_toy_warped_subject <- function(code, template_names = "mni_icbm152_nlin_asym_09a",
+                                    shift = 5) {
+  dim <- c(40L, 40L, 40L)
+  vox2ras <- diag(4)
+  vox2ras[1:3, 4] <- -20
+  t1_path <- tempfile(pattern = "ravecore-yael-warped-", fileext = ".nii.gz")
+  on.exit({ unlink(t1_path) }, add = TRUE)
+  yael_native_write_volume(array(rep(c(10, 60), length.out = prod(dim)), dim),
+                           t1_path, vox2ras = vox2ras)
+  process <- as_yael_process(sprintf("YAEL/%s", code), engine = "native")
+  process$set_input_image(t1_path, type = "T1w", overwrite = TRUE)
+
+  field <- array(0, c(dim, 3L))
+  field[, , , 1] <- shift
+  transform_dir <- file.path(as.character(process$work_path), "normalization",
+                             "transformations")
+  dir.create(transform_dir, recursive = TRUE, showWarnings = FALSE)
+  for (template_name in template_names) {
+    camel <- camel_template_name(template_name)
+    forward <- sprintf("sub-%s_from-T1w_to-%s_desc-affine+SyN_ants%s", code, camel,
+                       c("1.nii.gz", "0.mat"))
+    inverse <- sprintf("sub-%s_from-%s_to-T1w_desc-affine+SyN_ants%s", code, camel,
+                       c("1.mat", "0.nii.gz"))
+    ravetools::write_ants_warp(-field, file.path(transform_dir, forward[[1]]),
+                               vox2ras = vox2ras)
+    ravetools::write_ants_transform(diag(4), file.path(transform_dir, forward[[2]]))
+    ravetools::write_ants_transform(diag(4), file.path(transform_dir, inverse[[1]]))
+    ravetools::write_ants_warp(field, file.path(transform_dir, inverse[[2]]),
+                               vox2ras = vox2ras)
+  }
+
+  process$construct_ants_folder_from_template(template_name = NULL)
+  if (length(template_names)) {
+    process$write_talairach_xfm(template_names[[1]])
+  }
+  list(process = process, subject = process$get_subject(), code = code,
+       dim = dim, vox2ras = vox2ras, work_path = as.character(process$work_path))
 }
 
 # Overlap (Dice) of each label between two label arrays

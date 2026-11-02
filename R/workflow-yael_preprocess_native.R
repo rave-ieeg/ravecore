@@ -327,11 +327,13 @@ yael_native_read_volume <- function(path, allow_4d = FALSE) {
 #' @param path file path; \code{'.mgz'}/\code{'.mgh'} are written as 'MGH',
 #' anything else as \code{'NIfTI-1'}
 #' @param vox2ras voxel to 'RAS' matrix; default is the attribute of \code{x}
+#' @param ... passed to \code{ieegio::write_volume} for \code{'NIfTI-1'}
+#' images, such as \code{datatype}; default lets \pkg{ieegio} choose
 #' @returns \code{path}, invisibly. The header is always built from
 #' \code{vox2ras} (editing the transforms of an image that was read is ignored
 #' when writing, hence a new volume)
 #' @noRd
-yael_native_write_volume <- function(x, path, vox2ras = attr(x, "vox2ras")) {
+yael_native_write_volume <- function(x, path, vox2ras = attr(x, "vox2ras"), ...) {
   if (is.null(vox2ras)) {
     stop("`yael_native_write_volume`: `vox2ras` is missing for ", basename(path))
   }
@@ -347,7 +349,7 @@ yael_native_write_volume <- function(x, path, vox2ras = attr(x, "vox2ras")) {
   if (grepl("\\.(mgz|mgh)$", path, ignore.case = TRUE)) {
     ieegio::write_volume(volume, con = path, format = "mgh")
   } else {
-    ieegio::write_volume(volume, con = path, format = "nifti", version = 1)
+    ieegio::write_volume(volume, con = path, format = "nifti", version = 1, ...)
   }
   invisible(path)
 }

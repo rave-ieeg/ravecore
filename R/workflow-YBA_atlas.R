@@ -5,7 +5,7 @@
 #' subject native space, calculates the anatomical labels for the electrode
 #' contacts, and optionally creates a quality-control report. This function
 #' requires the subject to be normalized to a \verb{MNI152} symmetric template
-#' first; see \code{\link{cmd_run_yael_preprocess}}.
+#' first; see \code{\link{cmd_run_yael_preprocess_native}}.
 #'
 #' @param subject 'RAVE' subject instance or character; see
 #' \code{\link{as_rave_subject}}
@@ -41,8 +41,8 @@
 #' @details
 #' The workflow requires an existing non-linear normalization from the subject
 #' native \verb{T1w} image to a \verb{MNI152} symmetric template. Please run
-#' \code{\link{cmd_run_yael_preprocess}} with \code{normalize_template} set to
-#' one of \verb{"mni_icbm152_nlin_sym_09a"}, \verb{"mni_icbm152_nlin_sym_09b"},
+#' \code{\link{cmd_run_yael_preprocess_native}} with \code{normalize_template}
+#' set to one of \verb{"mni_icbm152_nlin_sym_09a"}, \verb{"mni_icbm152_nlin_sym_09b"},
 #' or \verb{"mni_icbm152_nlin_sym_09c"} if such mapping is missing.
 #'
 #' Given the mapping, the template atlas is inverse-transformed to the native
@@ -58,12 +58,9 @@
 #' subject meta folder.
 #'
 #' @seealso \code{\link{generate_atlases_from_template}},
-#' \code{\link{cmd_run_yael_preprocess}}
+#' \code{\link{cmd_run_yael_preprocess_native}}
 #'
 #' @examples
-#'
-#' # Please check out https://rave.wiki to configure Python for RAVE
-#' # or run ravemanager::configure_python()
 #' \dontrun{
 #'
 #' subject_id <- "YAEL/subject_code"
@@ -71,7 +68,7 @@
 #' # ---- Step 1: normalization ------------------------------------------
 #' # Map the native `T1w` image to a `MNI152` symmetric template. This step
 #' # is only needed once per subject; skip it when the mapping is available
-#' cmd_run_yael_preprocess(
+#' cmd_run_yael_preprocess_native(
 #'   subject = subject_id,
 #'   t1w_path = "/path/to/T1w.nii.gz",
 #'
@@ -128,7 +125,7 @@ generate_atlas_YBA <- function(
 
   # Initialize subject
   subject <- as_rave_subject(subject, strict = TRUE)
-  yael <- as_yael_process(subject)
+  yael <- as_yael_process(subject, engine = "native")
   t1_path <- yael$get_input_image("T1w")
 
   # Check if there is any template mapping to MNI152 sym
@@ -174,13 +171,13 @@ generate_atlas_YBA <- function(
     }
     stop(
       "No normalization mapping to MNI152 symmetric template. ",
-      "Please run `ravecore::cmd_run_yael_preprocess(...)` with ",
+      "Please run `ravecore::cmd_run_yael_preprocess_native(...)` with ",
       "`normalize_template` set to one of the following options first: \n",
       "  * 'mni_icbm152_nlin_sym_09b': symmetric, (0.5 mm)^3 voxel size, ~16GB RAM needed;\n",
       "  * 'mni_icbm152_nlin_sym_09a': symmetric, (1 mm)^3 voxel size, ~8GB RAM needed;\n",
       "  * 'mni_icbm152_nlin_sym_09c': symmetric, (1 mm)^3 voxel size, ~8GB RAM needed.\n\n",
       "For example:\n\n",
-      "  ravecore::cmd_run_yael_preprocess(\n",
+      "  ravecore::cmd_run_yael_preprocess_native(\n",
       sprintf("    subject = \"%s\",\n", subject$subject_id),
       sprintf("    t1w_path = \"%s\",\n", t1_path),
       sprintf("    normalize_template = \"%s\",\n", template_names[[1]]),
@@ -275,7 +272,7 @@ generate_atlas_YBA <- function(
       !nzchar(freesurfer_path)) {
     stop("Unable to resolve the `FreeSurfer` folder for subject ",
          subject$subject_id, ". Please run ",
-         "`ravecore::cmd_run_yael_preprocess` to initialize the imaging ",
+         "`ravecore::cmd_run_yael_preprocess_native` to initialize the imaging ",
          "folder first.")
   }
   freesurfer_mri_path <- dir_create2(file.path(freesurfer_path, "mri"))

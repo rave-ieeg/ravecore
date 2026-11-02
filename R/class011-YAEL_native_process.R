@@ -71,8 +71,10 @@ yael_native_read_header <- function(path) {
   header <- withCallingHandlers(
     ieegio::read_volume(path, header_only = TRUE),
     warning = function(w) {
-      # header-only reading does not use 'RNifti', which is expected
-      if (grepl("header-only mode", conditionMessage(w), fixed = TRUE)) {
+      # header-only reading does not use 'RNifti', which is expected, and
+      # there are no voxels for the reader to take the range of
+      if (grepl("header-only mode|no non-missing arguments to m(in|ax)",
+                conditionMessage(w))) {
         invokeRestart("muffleWarning")
       }
     }
@@ -236,7 +238,8 @@ yael_native_fs_tkr_to_scanner <- function(fs_dir) {
 #' available, and \code{interpolator = "auto"} follows its documented rule
 #' (\code{YAELProcess} uses nearest-neighbor); the queries never create
 #' folders; \code{set_input_image} reads the new image before it removes the
-#' old one; the \verb{'NIfTI'} data types are chosen by \pkg{ieegio};
+#' old one; atlases are saved as \verb{float32} as with \verb{'ANTs'}, and
+#' the \verb{'NIfTI'} data types of other images are chosen by \pkg{ieegio};
 #' normalization results are replaced together, after the new ones are
 #' complete, and stale \code{ants<K>} transforms of earlier layouts are
 #' removed; nothing is written into the template folders.
@@ -1267,7 +1270,9 @@ YAELNativeProcess <- R6::R6Class(
           path = file.path(atlas_folder, atlas_file),
           template_name = template_name, native_type = "T1w",
           interpolator = "auto", verbose = verbose)
-        yael_native_write_volume(volume, file.path(atlas_root, atlas_file))
+        # `float32` whatever the values are, the type of the 'ANTs' engine
+        yael_native_write_volume(volume, file.path(atlas_root, atlas_file),
+                                 datatype = "float")
         rm(volume)
       }
 

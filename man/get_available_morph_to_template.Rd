@@ -15,14 +15,11 @@ Template names with valid non-linear transforms.
 }
 \description{
 This function obtains existing transforms rather than creating new
-transforms. Please check function \code{\link{cmd_run_yael_preprocess}}
-about mapping native images to the templates. This function requires
-additional 'Python' configuration.
+transforms. Please check function
+\code{\link{cmd_run_yael_preprocess_native}} about mapping native images to
+the templates.
 }
 \examples{
-
-# Please check out https://rave.wiki to configure Python for RAVE
-# or run ravemanager::configure_python()
 \dontrun{
 
 get_available_morph_to_template("project_name/subject_code")

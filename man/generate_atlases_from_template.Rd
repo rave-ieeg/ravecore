@@ -23,8 +23,8 @@ generate_atlases_from_template(
 
 \item{template_name}{template name where the atlases are created;
 see \code{\link{get_available_morph_to_template}} to get available templates
-and \code{\link{cmd_run_yael_preprocess}} to generate transforms to the
-templates}
+and \code{\link{cmd_run_yael_preprocess_native}} to generate transforms to
+the templates}
 
 \item{any_mni152}{if the template is 'MNI152', then whether to check other
 template folders; default is true}
@@ -45,7 +45,9 @@ argument is for pipelines that take in transformed/processed images as input;
 default is \code{NULL}, see 'Details'.}
 
 \item{extra_transform_type}{type of transform if \code{extra_transform} is
-provided.}
+provided: \code{'ants'} (default) for an \verb{'ANTs'} \code{.mat} file or a
+matrix from \verb{'LPS'} to \verb{'LPS'}, and \code{'native'} for a text
+file or a matrix from 'RAS' to 'RAS'.}
 }
 \value{
 The function returns nothing, but will create a folder named
@@ -57,6 +59,7 @@ Reverse-transform from template atlases via volume mapping
 \details{
 The workflow generates atlases from a template. To run this function, a
 separate normalization is required (see
+\code{\link[ravecore]{cmd_run_yael_preprocess_native}} or
 \code{\link[ravecore]{cmd_run_yael_preprocess}}). That function normalizes
 native subject's brain (\code{'T1w'} image) to
 a specified template (typically 'MNI152b' non-linear asymmetric version) via
@@ -88,9 +91,6 @@ When \code{extra_transform} is non-empty, an extra folder
 with transformed files aligned to 'DICOM' stored.
 }
 \examples{
-
-# Please check out https://rave.wiki to configure Python for RAVE
-# or run ravemanager::configure_python()
 \dontrun{
 
 generate_atlases_from_template(
