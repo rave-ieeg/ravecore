@@ -145,13 +145,16 @@ can be read by either engine.
 }
 \details{
 Templates are located (and downloaded when missing) by \pkg{rpyANTs}, whose
-template functions are pure 'R'; 'Python' is never started. The full
-template resolution is used, which takes a lot of memory. With a 1 mm
+template functions are pure 'R'; 'Python' is never started. The final
+registration uses the full template resolution, which takes a lot of memory;
+the first one, which only places the template brain mask and tissue priors,
+runs at 1 mm. With a 1 mm
 'T1' image (256 by 204 by 256 voxels), the normalization to
 \code{'mni_icbm152_nlin_asym_09a'} (1 mm, with 0.5 mm tissue maps) took
 about 2 minutes and peaked at about 8 gigabytes of resident memory; the
-normalization to \code{'mni_icbm152_nlin_asym_09b'} (0.5 mm) took about 7
-minutes and peaked at 15 gigabytes of resident memory, 22 gigabytes with
+normalization to \code{'mni_icbm152_nlin_asym_09b'} (0.5 mm) took about 4
+minutes, less than one of them for the brain mask, and peaked at 15
+gigabytes of resident memory, 22 gigabytes with
 the memory that the operating system compressed. Hence the script built by
 \code{cmd_run_yael_preprocess_native} switches from
 \code{'mni_icbm152_nlin_asym_09b'} to \code{'mni_icbm152_nlin_asym_09a'}

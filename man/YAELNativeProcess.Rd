@@ -40,16 +40,41 @@ the cube root of the ratio of brain voxels, rounded to a half (2 for the
 with the 1 mm values, the greedy update folded the deformation in about
 1.5 percent of the brain on \code{'mni_icbm152_nlin_asym_09b'}. The share
 of the template brain mask where the final deformation folds (is not
-one-to-one) is logged, with a warning above 1 percent.
+one-to-one) is logged, with a warning above 1 percent. On these templates
+the initial registration runs on a grid that many times as coarse (1 mm
+for the 0.5 mm templates), where \pkg{ANTs} uses the template grid: it only
+places the template brain mask and the tissue priors, and the finest level
+of its deformable stage has no iterations, so the levels that do run stay
+at the same millimeters.
 \item The quick three-class segmentation that finds the white matter for
 the intensity normalization runs on the raw image, as in \pkg{rpyANTs};
 when a few extreme intensities inside the brain leave one of its classes
 empty (\verb{Atropos} keeps going, \pkg{ravetools} stops), it is run again
 with the intensities clipped at their 99.9 percent quantile inside the
 brain (then at the 99 percent quantile).
-\item White-matter artifacts: the template brain mask can take in a thick,
-bright skull marrow, which the tissue segmentation labels as white matter
-and the final registration would pull into the brain. Each white-matter
+\item Brain extraction: the template brain mask mapped to the native image
+is adjusted to the subject, as in \verb{antsBrainExtraction.sh}. A
+three-class segmentation of the mask grown by 2 mm finds the largest
+connected white and gray matter; an erosion, the largest component, a
+dilation, hole filling and a closing cut what hangs on the brain by a
+thread, and the mapped mask is added back. Then, as in the watershed of
+'FreeSurfer', the gray and white matter that dark voxels (\verb{CSF} or
+bone) cut off from the brain, such as skull marrow, dura or scalp, leaves
+the mask, also where the mapped mask held it, which
+\verb{antsBrainExtraction.sh} keeps whole. The distances are millimeters
+along each axis of the image, so they hold on thick slices.
+The result replaces the mapped mask in the tissue segmentation, in the final
+registration, and in \code{construct_ants_folder_from_template}. The
+\pkg{rpyANTs} engine uses a network mask from \code{deep_atropos} for the
+registration when \code{'antspynet'} is available, and always saves the
+mapped mask. The mapped mask is kept, with a warning, when the segmentation
+fails or the volume changes by more than 20 percent, and with a line in the
+log when \pkg{ravetools} has no \code{morph_volume} with a radius per axis
+(before version 0.4.2).
+\item White-matter artifacts: the brain mask can still hold skull marrow
+that touches the brain with no dark voxel between, which the tissue
+segmentation labels as white matter and the final registration would pull
+into the brain. Each white-matter
 voxel casts one ray away from the center of the white matter; when the ray
 misses the smoothed outer surface of the gray matter and the cerebellum
 (\code{ravetools::mris_outer_surface}), the voxel is taken to lie outside
@@ -723,7 +748,8 @@ is generated from template brain to facilitate the three-dimensional
 viewer. Please make sure method \code{map_to_template} is called before
 using this method (or the program will fail). The folder holds the
 conformed \code{'mri/T1.mgz'}, the template brain mask mapped to the
-native image (\code{'mri/brainmask.nii.gz'}, binary), the bias-corrected
+native image and adjusted to the subject
+(\code{'mri/brainmask.nii.gz'}, binary), the bias-corrected
 image (\code{'mri/nu.nii.gz'}), its skull-stripped version scaled to
 0 to 255 (\code{'mri/brain.finalsurfs.nii.gz'}), and the linear
 transform \code{'mri/transforms/talairach.xfm'} written by

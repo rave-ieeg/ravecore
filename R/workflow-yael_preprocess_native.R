@@ -399,6 +399,20 @@ yael_native_resample <- function(x, reference_dim, reference_vox2ras,
   )
 }
 
+# An image on a coarser grid with the same field of view, cell-centered like the
+# levels of `register_volume3d`: with a factor of 2, each voxel is the mean of
+# eight voxels of the image. A factor of 1 returns the image unchanged
+yael_native_coarsen <- function(x, factor) {
+  if (factor <= 1) { return(x) }
+  vox2ras <- yael_native_vox2ras(x)
+  coarse_vox2ras <- vox2ras %*% rbind(cbind(diag(factor, 3), (factor - 1) / 2),
+                                      c(0, 0, 0, 1))
+  coarse <- yael_native_resample(x, as.integer(round(dim(x)[1:3] / factor)),
+                                 coarse_vox2ras)
+  attr(coarse, "vox2ras") <- coarse_vox2ras
+  coarse
+}
+
 # Resample a template-space image onto the native grid through a registration
 # (template = target, native = source). The image always passes its own grid:
 # without it the registration geometry would be used silently
@@ -670,7 +684,10 @@ yael_native_coregister_rigid <- function(fixed, moving, verbose = TRUE) {
 #' @returns A number, at least 1, that multiplies \code{syn_sigma} (given in
 #' voxels of the template grid): the cube root of the ratio between the brain
 #' voxels of the template and two million (a human brain at 1 mm), rounded to
-#' a half. The \pkg{rpyANTs} values (3 and 3.5) were validated on 1 mm
+#' a half. The first registration also runs on a grid this many times as
+#' coarse (\code{yael_native_coarsen}), with its shrink factors divided by it
+#' so that its levels stay at the same millimeters. The \pkg{rpyANTs} values
+#' (3 and 3.5) were validated on 1 mm
 #' templates (factor 1); the 0.5 mm \code{09b} templates hold eight times as
 #' many brain voxels (factor 2) and the 0.25 mm macaque template about three
 #' times as many (factor 1.5), so their update fields are smoothed the same
@@ -753,45 +770,63 @@ yael_native_folding <- function(field, mask, vox2ras = attr(field, "vox2ras"),
   n_folded / n_voxels
 }
 
-#' White matter of a quick 3-class segmentation (the \verb{k-means}
-#' \verb{Atropos} call of stage \code{nu2} in rpyANTs)
-#' @param t1 raw native image
-#' @param mask brain mask on the grid of \code{t1}
-#' @param vox2ras voxel to 'RAS' matrix of \code{t1}
+#' Quick 3-class segmentation (the \verb{k-means} \verb{Atropos} calls of
+#' 'rpyANTs' and \verb{antsBrainExtraction.sh})
+#' @param x native image
+#' @param mask mask on the grid of \code{x}
+#' @param vox2ras voxel to 'RAS' matrix of \code{x}
+#' @param iterations number of iterations
+#' @param stage stage name for the log
 #' @param verbose whether to log the fallback below
-#' @returns A list with \code{mean} (the posterior-weighted mean of the raw
-#' intensities of the brightest class, taken as the white matter) and
-#' \code{prob} (that posterior). The raw intensities are segmented, as in
-#' rpyANTs. A few extreme intensities can leave a \verb{k-means} class
-#' without voxels, which \pkg{ravetools} reports as an error while
-#' \verb{Atropos} keeps the empty class and goes on; the segmentation is
-#' then run again on a copy clipped at the 99.9 percent (then the 99 percent)
-#' quantile of the intensities inside the mask. The means are always computed
-#' from the raw intensities
+#' @returns The result of \code{ravetools::segment_volume_tissue_gmm}. A few
+#' extreme intensities can leave a \verb{k-means} class without voxels, which
+#' \pkg{ravetools} reports as an error while \verb{Atropos} keeps the empty
+#' class and goes on; the segmentation is then run again on a copy clipped at
+#' the 99.9 percent (then the 99 percent) quantile of the intensities inside
+#' the mask
 #' @noRd
-yael_native_kmeans_wm <- function(t1, mask, vox2ras, verbose = TRUE) {
+yael_native_kmeans3 <- function(x, mask, vox2ras, iterations, stage, verbose = TRUE) {
   segment <- function(x) {
     ravetools::segment_volume_tissue_gmm(
       x, mask = mask, n_classes = 3L, mrf_beta = 0.1, mrf_radius = 1L,
-      iterations = 5L, vox2ras = vox2ras
+      iterations = iterations, vox2ras = vox2ras
     )
   }
-  seg3 <- tryCatch(segment(t1), error = function(e) { e })
+  seg3 <- tryCatch(segment(x), error = function(e) { e })
   if (inherits(seg3, "error")) {
-    inside <- t1[mask > 0 & is.finite(t1)]
+    inside <- x[mask > 0 & is.finite(x)]
     for (probability in c(0.999, 0.99)) {
       if (!length(inside)) { break }
       upper <- stats::quantile(inside, probability, names = FALSE)
       # nothing left to clip: the failure has another cause
       if (max(inside) <= upper) { break }
       yael_native_log(verbose, sprintf(
-        "Stage `nu2`: the 3-class k-means of the raw image failed (%s); segmenting again with the intensities clipped at %.6g (the %g%% quantile inside the brain mask)",
-        conditionMessage(seg3), upper, probability * 100))
-      seg3 <- tryCatch(segment(pmin(t1, upper)), error = function(e) { e })
+        "Stage `%s`: the 3-class k-means failed (%s); segmenting again with the intensities clipped at %.6g (the %g%% quantile inside the mask)",
+        stage, conditionMessage(seg3), upper, probability * 100))
+      seg3 <- tryCatch(segment(pmin(x, upper)), error = function(e) { e })
       if (!inherits(seg3, "error")) { break }
     }
     if (inherits(seg3, "error")) { stop(seg3) }
   }
+  seg3
+}
+
+#' White matter of a quick 3-class segmentation (the \verb{k-means}
+#' \verb{Atropos} call of stage \code{nu2} in rpyANTs)
+#' @param t1 raw native image
+#' @param mask brain mask on the grid of \code{t1}
+#' @param vox2ras voxel to 'RAS' matrix of \code{t1}
+#' @param verbose whether to log the fallback of
+#' \code{yael_native_kmeans3}
+#' @returns A list with \code{mean} (the posterior-weighted mean of the raw
+#' intensities of the brightest class, taken as the white matter) and
+#' \code{prob} (that posterior). The raw intensities are segmented, as in
+#' rpyANTs, and the means are always computed from them, also when
+#' \code{yael_native_kmeans3} had to clip the image
+#' @noRd
+yael_native_kmeans_wm <- function(t1, mask, vox2ras, verbose = TRUE) {
+  seg3 <- yael_native_kmeans3(t1, mask, vox2ras, iterations = 5L, stage = "nu2",
+                              verbose = verbose)
   # the brightest class is the white matter
   means <- vapply(seg3$posteriors, function(p) {
     sum(t1 * p) / (sum(p) + 1e-8)
@@ -822,15 +857,18 @@ yael_native_kmeans_wm <- function(t1, mask, vox2ras, verbose = TRUE) {
 #' @param verbose whether to log the stages and print the registration progress
 #' @details Stages (cached in \code{working_path}): \code{T1} (raw image),
 #' \code{nu} (\code{N4}), \code{SyNabp} (affine and deformable registration
-#' without masks), \code{nu2} (k-means white matter normalized to 110, then
+#' without masks, on a coarser grid for templates with more voxels per brain
+#' than a 1 mm human template), \code{nu2} (k-means white matter normalized to 110, then
 #' \code{N4} weighted by the white matter; see \code{yael_native_kmeans_wm}
 #' for the k-means of images with extreme intensities), \code{brainmask} (template mask on
-#' the native grid; also writes \code{brain.nii.gz}), \code{atropos_prior}
+#' the native grid, adjusted to the subject by
+#' \code{yael_native_brain_extraction}; also writes \code{brain.nii.gz}),
+#' \code{atropos_prior}
 #' (template \code{atropos_2} to \code{atropos_7} on the native grid),
 #' \code{atropos} (segmentation and four tissue posteriors: \verb{CSF}, gray
 #' matter, white matter with deep gray matter and brain stem, cerebellum),
 #' \code{wm_artifacts} (white matter outside the gray-matter envelope, such as
-#' a thick skull marrow, dilated by 2 voxels, except the cone below the center
+#' skull marrow that touches the brain, dilated by 2 voxels, except the cone below the center
 #' of the white matter that holds the brain stem; see
 #' \code{yael_native_clean_wm_mask}), \code{brain_mask_cleaned} (the brain
 #' mask without these artifacts, also used for the brain image of the next
@@ -847,7 +885,8 @@ yael_native_kmeans_wm <- function(t1, mask, vox2ras, verbose = TRUE) {
 #' that is not 3D, or covers less than 95 percent of the brain mask, is left
 #' out with a warning. The smoothing of the deformable update fields
 #' (\code{syn_sigma}) is multiplied by \code{yael_native_syn_scale} of the
-#' template brain voxels (2 for the 0.5 mm templates). The final deformation is
+#' template brain voxels (2 for the 0.5 mm templates), which also gives how
+#' much coarser the grid of \code{SyNabp} is. The final deformation is
 #' checked with \code{yael_native_folding}: the share of the template brain
 #' mask where it folds is logged, and above 1 percent a warning is given.
 #' @returns A list with \code{registration} (the final 'ravetools'
@@ -949,20 +988,27 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
     yael_native_read_mask(template_files$mask),
     template_dim, template_vox2ras, interpolation = "nearest")
   # the update fields of the deformable stages are smoothed relative to the
-  # template brain (the settings were validated on 1 mm templates)
+  # template brain (the settings were validated on 1 mm templates), and the
+  # first registration runs on a grid as coarse as a 1 mm template
   syn_scale <- yael_native_syn_scale(sum(template_mask > 0))
   if (syn_scale != 1) {
     yael_native_log(verbose, sprintf(
-      "The template brain spans more voxels than at 1 mm: the update fields of the deformable stages are smoothed %g times as many voxels",
-      syn_scale))
+      "The template brain spans more voxels than at 1 mm: the first registration runs on a grid %g times as coarse, and the update fields of the deformable stages are smoothed %g times as many voxels",
+      syn_scale, syn_scale))
   }
 
   # ---- SyNabp: initial registration of the whole head, without masks ----
+  # it only places the template mask, which the brain extraction then adjusts,
+  # and the tissue priors. The finest level of its deformable stage has no
+  # iterations, so a 0.5 mm grid would only cost time: on the coarser grid the
+  # deformable stage keeps its levels in millimeters
   res_abp <- stage("SyNabp", "registration", "initial registration of the head (affine and deformable)", function() {
+    coarse <- yael_native_coarsen(template, syn_scale)
+    coarse_vox2ras <- attr(coarse, "vox2ras")
     if (is.null(affine_transform)) {
       linear <- ravetools::register_volume3d(
-        source = nu, target = template,
-        source_vox2ras = native_vox2ras, target_vox2ras = template_vox2ras,
+        source = nu, target = coarse,
+        source_vox2ras = native_vox2ras, target_vox2ras = coarse_vox2ras,
         type = "affine", metric = "mattes",
         shrink_factors = c(8, 4, 2, 1), smoothing_sigmas = c(4, 2, 1, 0),
         iterations = c(1000, 500, 250, 100), sampling_rate = 0.25,
@@ -988,10 +1034,11 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
     # data with a 1 mm template), and more again for templates with more
     # voxels per brain (`syn_scale`)
     registration <- ravetools::register_volume3d(
-      source = nu, target = template,
-      source_vox2ras = native_vox2ras, target_vox2ras = template_vox2ras,
+      source = nu, target = coarse,
+      source_vox2ras = native_vox2ras, target_vox2ras = coarse_vox2ras,
       type = "syn_only", metric = "mattes", init_transform = init_transform,
-      shrink_factors = c(4, 2, 1), smoothing_sigmas = c(2, 1, 0),
+      shrink_factors = pmax(1, round(c(4, 2, 1) / syn_scale)),
+      smoothing_sigmas = c(2, 1, 0),
       syn_iterations = syn_settings$syn_iterations,
       syn_grad_step = syn_settings$syn_grad_step, syn_sigma = 3 * syn_scale,
       syn_total_sigma = 0, syn_cc_radius = 4L,
@@ -1000,13 +1047,12 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
       verbose = verbose
     )
     warped <- registration$image
-    attr(warped, "vox2ras") <- template_vox2ras
+    attr(warped, "vox2ras") <- coarse_vox2ras
     registration$image <- NULL
     registration$images <- NULL
     list(registration = registration, warpedmovout = warped, warpedfixout = NULL)
   })$registration
-  # template images are brought onto the native grid with the inverse field
-  # only; the forward field is large for 0.5 mm templates
+  # template images are brought onto the native grid with the inverse field only
   res_abp$forward_field <- NULL
   rm(nu)
   free_memory()
@@ -1044,9 +1090,10 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
   rm(t1)
   free_memory()
 
-  # ---- brainmask: template mask on the native grid ----
-  brain_mask <- stage("brainmask", "image", "template brain mask on the native image", function() {
-    mask <- initial_native_mask()
+  # ---- brainmask: template mask on the native grid, adjusted to the subject ----
+  brain_mask <- stage("brainmask", "image", "brain extraction from the template brain mask", function() {
+    mask <- yael_native_brain_extraction(nu2, initial_native_mask(), native_vox2ras,
+                                         verbose = verbose)
     yael_native_write_volume(nu2 * mask, file.path(working_path, "brain.nii.gz"),
                              vox2ras = native_vox2ras)
     mask
@@ -1117,11 +1164,11 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
   free_memory()
 
   # ---- wm_artifacts: white matter outside the gray-matter envelope ----
-  # the template mask is only placed to a few millimeters: bright non-brain
-  # tissue next to the brain (a thick skull marrow) is segmented as white
-  # matter and would pull the final registration, so it is left out of the
-  # white-matter channel and of the brain mask. The classes keep the order of
-  # their priors
+  # the brain extraction leaves out the bright tissue that dark voxels cut off
+  # from the brain, but skull marrow that touches the brain can stay, is
+  # segmented as white matter and would pull the final registration, so it is
+  # left out of the white-matter channel and of the brain mask. The classes
+  # keep the order of their priors
   classes_ordered <- yael_native_segmentation_class_order(nu2, atropos[[1]])
   # how the gray-matter surface is wrapped (see `yael_native_gm_envelope`)
   wm_envelope_method <- "outer_smoothed"
@@ -1387,13 +1434,16 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
 #' the arguments are the same as \code{\link{cmd_run_yael_preprocess}}
 #' @details
 #' Templates are located (and downloaded when missing) by \pkg{rpyANTs}, whose
-#' template functions are pure 'R'; 'Python' is never started. The full
-#' template resolution is used, which takes a lot of memory. With a 1 mm
+#' template functions are pure 'R'; 'Python' is never started. The final
+#' registration uses the full template resolution, which takes a lot of memory;
+#' the first one, which only places the template brain mask and tissue priors,
+#' runs at 1 mm. With a 1 mm
 #' 'T1' image (256 by 204 by 256 voxels), the normalization to
 #' \code{'mni_icbm152_nlin_asym_09a'} (1 mm, with 0.5 mm tissue maps) took
 #' about 2 minutes and peaked at about 8 gigabytes of resident memory; the
-#' normalization to \code{'mni_icbm152_nlin_asym_09b'} (0.5 mm) took about 7
-#' minutes and peaked at 15 gigabytes of resident memory, 22 gigabytes with
+#' normalization to \code{'mni_icbm152_nlin_asym_09b'} (0.5 mm) took about 4
+#' minutes, less than one of them for the brain mask, and peaked at 15
+#' gigabytes of resident memory, 22 gigabytes with
 #' the memory that the operating system compressed. Hence the script built by
 #' \code{cmd_run_yael_preprocess_native} switches from
 #' \code{'mni_icbm152_nlin_asym_09b'} to \code{'mni_icbm152_nlin_asym_09a'}

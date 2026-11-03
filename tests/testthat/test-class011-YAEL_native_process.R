@@ -1140,10 +1140,17 @@ test_that("atlases, streamlines and the ants folder come from the toy template",
     "mri/T1.mgz", "mri/brainmask.nii.gz", "mri/nu.nii.gz", "mri/brain.finalsurfs.nii.gz",
     "mri/transforms/talairach.xfm", "README.txt", "surf/lh.pial.T1")))))
   expect_false(file.exists(file.path(ants_dir, "surf", "rh.pial.T1")))
-  # the template mask (intensities) on the native image, binarized
+  # the template mask (intensities) on the native image, binarized and
+  # adjusted to the subject
   mask <- yael_native_read_volume(file.path(ants_dir, "mri", "brainmask.nii.gz"))
   expect_setequal(unique(as.vector(mask)), c(0, 1))
   expect_gt(2 * sum(mask > 0 & native$truth > 0) / (sum(mask > 0) + sum(native$truth > 0)), 0.9)
+  if (!is.null(yael_native_morph_volume())) {
+    warped_mask <- process$transform_image_from_template(
+      file.path(template_root, "T1_brainmask.nii.gz"), "mni_icbm152_nlin_asym_09a",
+      native_type = "T1w", interpolator = "nearestNeighbor", verbose = FALSE)
+    expect_gt(sum((mask > 0) != (as.array(warped_mask[]) > 0)), 0)
+  }
   brain <- yael_native_read_volume(file.path(ants_dir, "mri", "brain.finalsurfs.nii.gz"))
   expect_equal(max(brain), 255)
   expect_true(all(brain >= 0 & brain == round(brain)))
