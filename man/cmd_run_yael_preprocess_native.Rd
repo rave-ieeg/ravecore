@@ -135,8 +135,8 @@ without \verb{FreeSurfer}) under the imaging folder when it runs.
 \description{
 The image processing pipeline of \code{\link{cmd_run_yael_preprocess}}
 (\doi{10.1523/ENEURO.0328-23.2023}), with every step computed in 'R' by
-\code{\link{YAELNativeProcess}} on top of \pkg{ravetools} (version 0.3.3 or
-later) instead of \verb{ANTs} through 'Python': cross-modality rigid
+\code{\link{YAELNativeProcess}} on top of \pkg{ravetools} instead of
+\verb{ANTs} through 'Python': cross-modality rigid
 registration, normalization of the 'T1'-weighted 'MRI' to template brains,
 and subject-level atlases from the inverse normalization. The functions
 take the same arguments, run the same steps and write the same files as

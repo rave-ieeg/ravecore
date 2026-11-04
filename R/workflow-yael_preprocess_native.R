@@ -17,31 +17,6 @@
 # source (moving), hence `registration$transform` maps template 'RAS' to native
 # 'RAS', the same point map as the 'ANTs' affine of rpyANTs.
 
-# ---- Requirements ------------------------------------------------------------
-
-# Whether the installed 'ravetools' has the functions and arguments the native
-# engine calls: released 'ravetools' 0.3.2 has none of them, and development
-# builds before 0.3.2.3 lack some (the transform appliers, and the arguments
-# `syn_grad_step`, `syn_total_sigma` and `syn_cc_radius` of
-# `register_volume3d`, which are checked through the version since a wrapper
-# of that function may hide its arguments)
-yael_native_ravetools_ok <- function() {
-  version <- ravetools_version()
-  isTRUE(utils::compareVersion(version, "0.3.2.3") >= 0)
-}
-
-# Stops with an explanation unless 'ravetools' is recent enough; called before
-# anything is computed or removed
-yael_native_require_ravetools <- function() {
-  if (!yael_native_ravetools_ok()) {
-    stop(sprintf(
-      "The native YAEL engine requires `ravetools` 0.3.3 or later (installed: %s). Please update `ravetools`, or use `as_yael_process(engine = \"rpyANTs\")`.",
-      ravetools_version(missing = "none")
-    ), call. = FALSE)
-  }
-  invisible(TRUE)
-}
-
 # ---- BIDS file names ---------------------------------------------------------
 
 #' Parse a 'BIDS'-like file name with \pkg{bidsr}
@@ -411,20 +386,6 @@ yael_native_coarsen <- function(x, factor) {
                                  coarse_vox2ras)
   attr(coarse, "vox2ras") <- coarse_vox2ras
   coarse
-}
-
-# Resample a template-space image onto the native grid through a registration
-# (template = target, native = source). The image always passes its own grid:
-# without it the registration geometry would be used silently
-yael_native_to_native <- function(x, registration, reference_dim,
-                                  reference_vox2ras,
-                                  interpolation = c("trilinear", "nearest")) {
-  interpolation <- match.arg(interpolation)
-  ravetools::apply_transform3d_volume(
-    x, registration, vox2ras = yael_native_vox2ras(x, "template image"),
-    reference_dim = reference_dim, reference_vox2ras = reference_vox2ras,
-    direction = "inverse", interpolation = interpolation
-  )
 }
 
 # ---- Templates ------------------------------------------------------------------
@@ -955,7 +916,6 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
   # the first template image (the T1) locates the template files
   template_files <- yael_native_template_files(dirname(fix_paths[[1]]),
                                                require_t1 = FALSE)
-  yael_native_require_ravetools()
   working_path <- normalizePath(working_path, winslash = "/", mustWork = FALSE)
   dir_create2(working_path)
 
@@ -1057,13 +1017,17 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
   rm(nu)
   free_memory()
 
-  # template mask on the native grid through the initial registration
+  # template mask on the native grid through the initial registration. A
+  # template image goes to the native grid with the inverse direction (the
+  # template is the target) and passes its own grid: without it, the geometry
+  # of the registration would be used silently
   native_mask0 <- NULL
   initial_native_mask <- function() {
     if (is.null(native_mask0)) {
-      native_mask0 <<- yael_native_to_native(
-        template_mask, res_abp, native_dim, native_vox2ras,
-        interpolation = "nearest")
+      native_mask0 <<- ravetools::apply_transform3d_volume(
+        template_mask, res_abp, vox2ras = yael_native_vox2ras(template_mask, "template mask"),
+        reference_dim = native_dim, reference_vox2ras = native_vox2ras,
+        direction = "inverse", interpolation = "nearest")
     }
     native_mask0
   }
@@ -1107,9 +1071,11 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
     priors <- stage("atropos_prior", "images", "template tissue priors on the native image", n = 6L, compute = function() {
       # one map at a time, each with its own grid (0.5 mm for some templates)
       lapply(template_files$atropos[3:8], function(path) {
-        prior <- yael_native_to_native(
-          yael_native_read_volume(path), res_abp, native_dim, native_vox2ras,
-          interpolation = "trilinear")
+        prior <- yael_native_read_volume(path)
+        prior <- ravetools::apply_transform3d_volume(
+          prior, res_abp, vox2ras = yael_native_vox2ras(prior, "template prior"),
+          reference_dim = native_dim, reference_vox2ras = native_vox2ras,
+          direction = "inverse", interpolation = "trilinear")
         free_memory()
         prior
       })
@@ -1367,13 +1333,17 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
     }
 
     # the registered template image on the native grid
-    warpedfixout <- yael_native_to_native(fixed_main, registration, native_dim,
-                                          native_vox2ras)
+    warpedfixout <- ravetools::apply_transform3d_volume(
+      fixed_main, registration, vox2ras = yael_native_vox2ras(fixed_main, "template image"),
+      reference_dim = native_dim, reference_vox2ras = native_vox2ras,
+      direction = "inverse", interpolation = "trilinear")
     rm(fixed_main)
 
     # final brain mask, and the raw image restored from its stage
-    brain_mask2 <- yael_native_to_native(template_mask, registration, native_dim,
-                                         native_vox2ras, interpolation = "nearest")
+    brain_mask2 <- ravetools::apply_transform3d_volume(
+      template_mask, registration, vox2ras = yael_native_vox2ras(template_mask, "template mask"),
+      reference_dim = native_dim, reference_vox2ras = native_vox2ras,
+      direction = "inverse", interpolation = "nearest")
     raw <- tryCatch(yael_native_stage_read("T1", "image", working_path),
                     error = function(e) { NULL })
     if (!is.null(raw)) {
@@ -1399,8 +1369,8 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
 #' @description
 #' The image processing pipeline of \code{\link{cmd_run_yael_preprocess}}
 #' (\doi{10.1523/ENEURO.0328-23.2023}), with every step computed in 'R' by
-#' \code{\link{YAELNativeProcess}} on top of \pkg{ravetools} (version 0.3.3 or
-#' later) instead of \verb{ANTs} through 'Python': cross-modality rigid
+#' \code{\link{YAELNativeProcess}} on top of \pkg{ravetools} instead of
+#' \verb{ANTs} through 'Python': cross-modality rigid
 #' registration, normalization of the 'T1'-weighted 'MRI' to template brains,
 #' and subject-level atlases from the inverse normalization. The functions
 #' take the same arguments, run the same steps and write the same files as
@@ -1556,8 +1526,6 @@ yael_preprocess_native <- function(
 
   register_policy <- match.arg(register_policy)
   normalize_policy <- match.arg(normalize_policy)
-  # fail before any image is imported or registered
-  yael_native_require_ravetools()
 
   if (!is.null(normalize_affine)) {
     affine_transform <- normalizePath(normalize_affine, winslash = "/", mustWork = TRUE)
@@ -1777,10 +1745,6 @@ cmd_run_yael_preprocess_native <- function(
   run_recon_all <- as.integer(isTRUE(as.logical(run_recon_all)))
   register_reversed <- isTRUE(as.logical(register_reversed))
   overwrite <- isTRUE(as.logical(overwrite))
-  if (!dry_run) {
-    # the script would fail in the child process
-    yael_native_require_ravetools()
-  }
 
   yael_process <- as_yael_process(subject = subject, engine = "native")
   subject <- yael_process$get_subject()

@@ -389,78 +389,6 @@ test_that("queries before any registration give empty results and the errors of 
   expect_true(file.exists(file.path(work_path, "ants", "mri", "T1.mgz")))
 })
 
-# ---- Requirements -------------------------------------------------------------------
-
-test_that("with an older ravetools the native engine stops before it computes or removes anything", {
-  skip_if_old_testthat()
-  local_yael_sandbox()
-  # no template may be located (or downloaded) either
-  local_yael_rpyants_guard()
-  testthat::local_mocked_bindings(yael_native_ravetools_ok = function() { FALSE })
-  expect_error(yael_native_require_ravetools(),
-               "requires `ravetools` 0.3.3 or later \\(installed: [0-9.]+\\)")
-  root <- tempfile(pattern = "ravecore-yael-requirements-")
-  dir.create(root)
-  on.exit({ unlink(root, recursive = TRUE) }, add = TRUE)
-  t1_path <- yael_native_write_volume(array(1, c(4, 4, 4)), file.path(root, "t1.nii.gz"),
-                                      vox2ras = diag(4))
-
-  # the workflow stops before it imports the images; the script can be built
-  expect_error(
-    yael_preprocess_native(subject = "YAEL/YAELNativeOld", t1w_path = t1_path,
-                           normalize_template = "mni_icbm152_nlin_asym_09a",
-                           verbose = FALSE),
-    "requires `ravetools`")
-  process <- as_yael_process("YAEL/YAELNativeOld", engine = "native")
-  expect_false(dir.exists(process$work_path))
-  expect_no_error(cmd_run_yael_preprocess_native(
-    subject = "YAEL/YAELNativeOld", t1w_path = t1_path,
-    normalize_template = "mni_icbm152_nlin_asym_09a", dry_run = TRUE, verbose = FALSE))
-
-  # images are imported, but the normalization stops before it removes the
-  # stage folder (the cache of an earlier run)
-  expect_true(process$set_input_image(t1_path, type = "T1w"))
-  work_path <- as.character(process$work_path)
-  camel <- "MNI152NLin2009aAsym"
-  stage_file <- file.path(work_path, "tmp", sprintf("coregister_T1w_with_%s", camel),
-                          "T1.nii.gz")
-  dir.create(dirname(stage_file), recursive = TRUE)
-  file.create(stage_file)
-  expect_error(process$map_to_template("mni_icbm152_nlin_asym_09a", verbose = FALSE),
-               "requires `ravetools`")
-  expect_true(file.exists(stage_file))
-
-  # with a (fabricated) normalization, the transforms stop as well
-  transform_dir <- file.path(work_path, "normalization", "transformations")
-  dir.create(transform_dir, recursive = TRUE)
-  code <- process$subject_code
-  file.create(file.path(transform_dir, c(
-    sprintf("sub-%s_from-T1w_to-%s_desc-affine+SyN_ants%s", code, camel, c("0.mat", "1.nii.gz")),
-    sprintf("sub-%s_from-%s_to-T1w_desc-affine+SyN_ants%s", code, camel, c("0.nii.gz", "1.mat")))))
-  expect_length(process$get_template_mapping("mni_icbm152_nlin_asym_09a")$native_to_template$transformlist, 2)
-  template_name <- "mni_icbm152_nlin_asym_09a"
-  expect_error(process$transform_points_to_template(c(0, 0, 0), template_name), "requires `ravetools`")
-  expect_error(process$transform_points_from_template(c(0, 0, 0), template_name), "requires `ravetools`")
-  expect_error(process$transform_image_from_template(t1_path, template_name), "requires `ravetools`")
-  expect_error(process$transform_image_to_template(t1_path, template_name), "requires `ravetools`")
-  expect_error(process$construct_ants_folder_from_template(template_name), "requires `ravetools`")
-  expect_false(dir.exists(file.path(work_path, "ants")))
-  atlas_dir <- file.path(root, "atlas")
-  dir.create(atlas_dir)
-  file.copy(t1_path, atlas_dir)
-  expect_error(process$generate_atlas_from_template(template_name, atlas_folder = atlas_dir,
-                                                    surfaces = FALSE),
-               "requires `ravetools`")
-  expect_false(dir.exists(file.path(work_path, "atlases")))
-  tract_dir <- file.path(root, "tracts")
-  dir.create(tract_dir)
-  ieegio::write_streamlines(ieegio::as_ieegio_streamlines(list(cbind(1:3, 0, 0))),
-                            file.path(tract_dir, "tract.tck"))
-  expect_error(process$generate_streamlines_from_template(template_name, tract_dir),
-               "requires `ravetools`")
-  expect_false(dir.exists(file.path(work_path, "fs")))
-})
-
 # ---- Input images -------------------------------------------------------------------
 
 test_that("set_input_image imports images like YAELPreprocess.set_image", {
@@ -928,9 +856,7 @@ test_that("map_to_template passes its tuning arguments and keeps old results whe
     yael_native_normalize = function(...) {
       recorded <<- list(...)
       stop("the engine failed")
-    },
-    # the engine is mocked: this test also runs with an older 'ravetools'
-    yael_native_require_ravetools = function() { invisible(TRUE) }
+    }
   )
 
   process <- as_yael_process("YAEL/YAELNativeArguments", engine = "native")
@@ -1145,12 +1071,10 @@ test_that("atlases, streamlines and the ants folder come from the toy template",
   mask <- yael_native_read_volume(file.path(ants_dir, "mri", "brainmask.nii.gz"))
   expect_setequal(unique(as.vector(mask)), c(0, 1))
   expect_gt(2 * sum(mask > 0 & native$truth > 0) / (sum(mask > 0) + sum(native$truth > 0)), 0.9)
-  if (!is.null(yael_native_morph_volume())) {
-    warped_mask <- process$transform_image_from_template(
-      file.path(template_root, "T1_brainmask.nii.gz"), "mni_icbm152_nlin_asym_09a",
-      native_type = "T1w", interpolator = "nearestNeighbor", verbose = FALSE)
-    expect_gt(sum((mask > 0) != (as.array(warped_mask[]) > 0)), 0)
-  }
+  warped_mask <- process$transform_image_from_template(
+    file.path(template_root, "T1_brainmask.nii.gz"), "mni_icbm152_nlin_asym_09a",
+    native_type = "T1w", interpolator = "nearestNeighbor", verbose = FALSE)
+  expect_gt(sum((mask > 0) != (as.array(warped_mask[]) > 0)), 0)
   brain <- yael_native_read_volume(file.path(ants_dir, "mri", "brain.finalsurfs.nii.gz"))
   expect_equal(max(brain), 255)
   expect_true(all(brain >= 0 & brain == round(brain)))

@@ -751,7 +751,6 @@ test_that("brain extraction distances scale with the voxels and the brain", {
 
 test_that("brain extraction measures its distances along each axis", {
   skip_if_no_native_yael()
-  skip_if_no_morph_volume()
   skip_if_old_testthat()
   # the round head on 2 x 2 x 6 mm voxels: 2, 4 and 5 mm on an adult brain
   # are 1, 2 and 3 voxels in-plane and one voxel across the slices, where the
@@ -762,23 +761,22 @@ test_that("brain extraction measures its distances along each axis", {
   vox2ras[3, ] <- c(0, 0, 6, head$vox2ras[3, 4] + 2)
   image <- head$image[, , slices]
   rough <- array((head$r[, , slices] < 80) * 1, dim(image))
-  morph <- yael_native_morph_volume()
+  morph <- ravetools::morph_volume
   radii <- list()
-  testthat::local_mocked_bindings(yael_native_morph_volume = function() {
-    function(volume, operation, radius = 1L) {
+  testthat::local_mocked_bindings(
+    morph_volume = function(volume, operation, radius = 1L) {
       if (operation %in% c("erode", "dilate")) {
         radii[[length(radii) + 1L]] <<- as.integer(radius)
       }
       morph(volume, operation, radius)
-    }
-  })
+    },
+    .package = "ravetools")
   suppressWarnings(yael_native_brain_extraction(image, rough, vox2ras, verbose = FALSE))
   expect_setequal(unique(radii), list(c(1L, 1L, 1L), c(2L, 2L, 1L), c(3L, 3L, 1L)))
 })
 
 test_that("brain extraction adds the cortex that the warped mask missed", {
   skip_if_no_native_yael()
-  skip_if_no_morph_volume()
   head <- yael_toy_round_head()
   # the brain (r < 70 mm), moved by 4 mm toward positive `x`: a warp that
   # misses the cortex on one side and takes in CSF and skull on the other
@@ -796,7 +794,6 @@ test_that("brain extraction adds the cortex that the warped mask missed", {
 
 test_that("brain extraction keeps the dark voxels of the warped mask", {
   skip_if_no_native_yael()
-  skip_if_no_morph_volume()
   # the template masks hold the CSF around the brain, and FreeSurfer keeps it
   # too; moved like above, the mask reaches the skull on one side
   head <- yael_toy_round_head()
@@ -809,7 +806,6 @@ test_that("brain extraction keeps the dark voxels of the warped mask", {
 
 test_that("brain extraction removes the marrow that the warped mask took in", {
   skip_if_no_native_yael()
-  skip_if_no_morph_volume()
   # the warp reaches the marrow: the CSF and the skull cut it off from the
   # brain, so it leaves, as in the watershed of FreeSurfer, and they stay
   head <- yael_toy_round_head()
@@ -822,9 +818,50 @@ test_that("brain extraction removes the marrow that the warped mask took in", {
   expect_equal(mean(brain[head$r < 76]), 1)
 })
 
+test_that("brain extraction drops the thin strands that the marrow leaves", {
+  skip_if_no_native_yael()
+  # marrow as dark as gray matter: a cap inside the bright marrow, joined to
+  # the cortex by a thin rod, so it belongs to the largest gray matter. Once
+  # the bright marrow leaves, the cap and the dark voxels outside it, which
+  # the warped mask holds on that side, hang on the brain by the rod
+  head <- yael_toy_round_head()
+  image <- head$image
+  axis <- head$x[, 1, 1]
+  middle <- length(axis) %/% 2L
+  cap <- head$r >= 80 & head$r < 82 & head$x > 55
+  image[cap] <- abs(70 + stats::rnorm(sum(cap), sd = 3))
+  rod <- which(axis > 64 & axis < 81)
+  image[rod, middle, middle] <- abs(70 + stats::rnorm(length(rod), sd = 3))
+  rough <- array(((head$r < 78) | (head$r < 84 & head$x > 50)) * 1, dim(head$r))
+  expect_gt(sum(cap), 100)
+  # silent: the warning of the volume guard would hand back the warped mask
+  expect_silent(
+    brain <- yael_native_brain_extraction(image, rough, head$vox2ras, verbose = FALSE))
+  expect_equal(sum(brain[head$r >= 80]), 0)
+  expect_equal(mean(brain[head$r < 76]), 1)
+})
+
+test_that("brain extraction keeps a gyrus whose white matter looks cut off", {
+  skip_if_no_native_yael()
+  # a gyrus on the cortex (8 mm around the point 72 mm along +x), whose white
+  # matter (4 mm around it) does not touch the rest, as partial volumes can
+  # make it look: that white matter leaves as cut-off tissue, the hole it
+  # leaves is filled, and the gyrus around it must not be taken for a strand
+  head <- yael_toy_round_head()
+  image <- head$image
+  to_center <- sqrt(head$r^2 - 144 * head$x + 72^2)
+  gyrus <- to_center < 8
+  core <- to_center < 4
+  image[gyrus] <- abs(70 + stats::rnorm(sum(gyrus), sd = 3))
+  image[core] <- abs(110 + stats::rnorm(sum(core), sd = 3))
+  rough <- array(((head$r < 76) | gyrus) * 1, dim(head$r))
+  expect_silent(
+    brain <- yael_native_brain_extraction(image, rough, head$vox2ras, verbose = FALSE))
+  expect_equal(mean(brain[gyrus]), 1)
+})
+
 test_that("brain extraction cuts a thin bright bridge to the marrow", {
   skip_if_no_native_yael()
-  skip_if_no_morph_volume()
   # the rod joins the white matter and the marrow, which is only in the band
   # around the mask, into one component
   head <- yael_toy_round_head(bridge = TRUE)
@@ -837,7 +874,6 @@ test_that("brain extraction cuts a thin bright bridge to the marrow", {
 
 test_that("brain extraction keeps the warped mask when it cannot be trusted", {
   skip_if_no_native_yael()
-  skip_if_no_morph_volume()
   head <- yael_toy_round_head()
   rough <- array((head$r < 82) * 1, dim(head$r))
 
@@ -866,40 +902,6 @@ test_that("brain extraction keeps the warped mask when it cannot be trusted", {
     brain <- yael_native_brain_extraction(head$image, empty, head$vox2ras, verbose = FALSE),
     "the segmentation failed")
   expect_equal(as.vector(brain), as.vector(empty))
-})
-
-test_that("brain extraction falls back quietly without `morph_volume`", {
-  skip_if_no_native_yael()
-  skip_if_old_testthat()
-  testthat::local_mocked_bindings(yael_native_morph_volume = function() { NULL })
-  logged <- character(0)
-  testthat::local_mocked_bindings(
-    logger = function(..., level = "info", use_glue = FALSE) {
-      logged <<- c(logged, paste0(level, ": ", paste0(..., collapse = "")))
-    },
-    .package = "ravepipeline")
-  rough <- array(0, c(4, 4, 4))
-  rough[2:3, 2:3, 2:3] <- 1
-  expect_silent(brain <- yael_native_brain_extraction(rough, rough, diag(4), verbose = FALSE))
-  expect_equal(as.vector(brain), as.vector(rough))
-  expect_equal(attr(brain, "vox2ras"), diag(4))
-  expect_length(logged, 1)
-  expect_match(logged, "^warning: .*`morph_volume`")
-})
-
-test_that("brain extraction needs a `morph_volume` with a radius per axis", {
-  skip_if_old_testthat()
-  testthat::skip_if(
-    is.null(get0("morph_volume", envir = asNamespace("ravetools"), inherits = FALSE)),
-    message = "ravetools lacks `morph_volume`")
-  # the first version took one radius only
-  testthat::local_mocked_bindings(
-    morph_volume = function(volume, operation, radius = 1L) {
-      if (length(radius) != 1L) { stop("`radius` must be a non-negative integer.") }
-      volume
-    },
-    .package = "ravetools")
-  expect_null(yael_native_morph_volume())
 })
 
 test_that("normalization aligns a toy head to a toy template", {
@@ -1030,17 +1032,17 @@ test_that("normalization aligns a toy head to a toy template", {
 
   # the brain mask of the stages is the warped template mask adjusted to the
   # subject, at least as close to the true brain
-  if (!is.null(yael_native_morph_volume())) {
-    res_abp <- yael_native_stage_read("SyNabp", "registration", work)$registration
-    warped_mask <- yael_native_to_native(template_mask, res_abp, native$dim,
-                                         native$vox2ras, interpolation = "nearest")
-    brain_mask <- yael_native_read_volume(file.path(work, "brainmask.nii.gz"))
-    dice_with_truth <- function(x) {
-      2 * sum(x > 0 & native$truth > 0) / (sum(x > 0) + sum(native$truth > 0))
-    }
-    expect_gt(sum((brain_mask > 0) != (warped_mask > 0)), 0)
-    expect_gte(dice_with_truth(brain_mask), dice_with_truth(warped_mask) - 0.01)
+  res_abp <- yael_native_stage_read("SyNabp", "registration", work)$registration
+  warped_mask <- ravetools::apply_transform3d_volume(
+    template_mask, res_abp, vox2ras = yael_native_vox2ras(template_mask),
+    reference_dim = native$dim, reference_vox2ras = native$vox2ras,
+    direction = "inverse", interpolation = "nearest")
+  brain_mask <- yael_native_read_volume(file.path(work, "brainmask.nii.gz"))
+  dice_with_truth <- function(x) {
+    2 * sum(x > 0 & native$truth > 0) / (sum(x > 0) + sum(native$truth > 0))
   }
+  expect_gt(sum((brain_mask > 0) != (warped_mask > 0)), 0)
+  expect_gte(dice_with_truth(brain_mask), dice_with_truth(warped_mask) - 0.01)
 
   # normalizing again uses the cached stages
   res2 <- yael_native_normalize(template$t1, native$t1, work, verbose = FALSE)
@@ -1265,11 +1267,7 @@ test_that("normalization completes when a voxel inside the brain is extremely br
   )
   res <- yael_native_normalize(template$t1, path, file.path(root, "work"),
                                verbose = FALSE)
-  if (is.null(yael_native_morph_volume())) {
-    expect_equal(outcomes, c("error", "ok", "ok"))
-  } else {
-    expect_equal(outcomes, c("error", "ok", "error", "ok", "ok"))
-  }
+  expect_equal(outcomes, c("error", "ok", "error", "ok", "ok"))
   expect_s3_class(res$registration, "ravetools_register_volume3d")
   expect_true(file.exists(file.path(root, "work", "SyN_w_atropos.dcf")))
   # the white matter was scaled to about 110, not the bright voxel

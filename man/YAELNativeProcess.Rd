@@ -11,8 +11,8 @@ template atlases or regions of interest back to the native brain, without
 \code{\link{YAELProcess}} and writes the same files (names, folders,
 \verb{'ANTs'}-compatible \code{.mat} and warp files, \verb{'JSON'} logs), so
 the results of one class can be read by the other. The registrations,
-bias-field correction and tissue segmentation come from \pkg{ravetools}
-(version 0.3.3 or later). See examples at \code{\link{as_yael_process}}
+bias-field correction and tissue segmentation come from \pkg{ravetools}.
+See examples at \code{\link{as_yael_process}}
 (with \code{engine = "native"}) and \code{\link{yael_preprocess_native}}.
 }
 \details{
@@ -61,16 +61,18 @@ thread, and the mapped mask is added back. Then, as in the watershed of
 'FreeSurfer', the gray and white matter that dark voxels (\verb{CSF} or
 bone) cut off from the brain, such as skull marrow, dura or scalp, leaves
 the mask, also where the mapped mask held it, which
-\verb{antsBrainExtraction.sh} keeps whole. The distances are millimeters
-along each axis of the image, so they hold on thick slices.
+\verb{antsBrainExtraction.sh} keeps whole. The thin strands this can leave
+(such as marrow as dark as gray matter) go too: the part of the mask that
+survives an erosion by 2 mm, grown back by 3 mm and kept inside the mask,
+holds the brain but not what is thinner than about 4 mm and reaches more
+than about 1 mm out. The distances are millimeters along each axis of the
+image, so they hold on thick slices.
 The result replaces the mapped mask in the tissue segmentation, in the final
 registration, and in \code{construct_ants_folder_from_template}. The
 \pkg{rpyANTs} engine uses a network mask from \code{deep_atropos} for the
 registration when \code{'antspynet'} is available, and always saves the
 mapped mask. The mapped mask is kept, with a warning, when the segmentation
-fails or the volume changes by more than 20 percent, and with a line in the
-log when \pkg{ravetools} has no \code{morph_volume} with a radius per axis
-(before version 0.4.2).
+fails or the volume changes by more than 20 percent.
 \item White-matter artifacts: the brain mask can still hold skull marrow
 that touches the brain with no dark voxel between, which the tissue
 segmentation labels as white matter and the final registration would pull

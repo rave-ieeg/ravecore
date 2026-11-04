@@ -5,14 +5,17 @@
 
 # ---- Sandbox and mocks ---------------------------------------------------------
 
-# Skips unless 'ravetools' has every function and argument of the native
-# pipeline ('ravetools' 0.3.3 or later; released 0.3.2 and the development
-# builds before 0.3.2.3 lack some of them)
+# Skips unless 'ravetools' exports every function the native pipeline calls
+# (the package calls them directly, so an older 'ravetools' would fail)
 skip_if_no_native_yael <- function() {
-  testthat::skip_if_not(
-    yael_native_ravetools_ok(),
-    message = "ravetools lacks the native YAEL functions (needs ravetools >= 0.3.3)"
-  )
+  needed <- c("register_volume3d", "apply_transform3d_volume", "apply_transform3d_points",
+              "read_ants_transform", "write_ants_transform", "write_ants_warp",
+              "save_registration", "load_registration", "bias_correction_n4",
+              "segment_volume_tissue_gmm", "morph_volume", "grow_volume",
+              "mris_outer_surface", "vcg_convex_hull", "vcg_raycaster", "vcg_isosurface")
+  missing <- setdiff(needed, getNamespaceExports("ravetools"))
+  testthat::skip_if(length(missing) > 0, message = sprintf(
+    "ravetools lacks %s", paste(missing, collapse = ", ")))
 }
 
 # Skips with 'testthat' older than 3.1.7, which has no
@@ -290,13 +293,6 @@ yael_toy_blur <- function(x, sigma) {
 yael_toy_write <- function(x, vox2ras, path) {
   ieegio::write_volume(ieegio::as_ieegio_volume(x, vox2ras = vox2ras), path)
   path
-}
-
-# Skips unless 'ravetools' can run the brain extraction (`morph_volume`,
-# 'ravetools' 0.4.2 or later); older versions keep the warped template mask
-skip_if_no_morph_volume <- function() {
-  testthat::skip_if(is.null(yael_native_morph_volume()),
-                    message = "ravetools lacks `morph_volume`")
 }
 
 # A round head of adult size on a 2 mm grid: a ventricle (r < 20 mm), white

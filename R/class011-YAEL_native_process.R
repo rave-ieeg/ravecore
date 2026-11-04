@@ -174,8 +174,8 @@ yael_native_fs_tkr_to_scanner <- function(fs_dir) {
 #' \code{\link{YAELProcess}} and writes the same files (names, folders,
 #' \verb{'ANTs'}-compatible \code{.mat} and warp files, \verb{'JSON'} logs), so
 #' the results of one class can be read by the other. The registrations,
-#' bias-field correction and tissue segmentation come from \pkg{ravetools}
-#' (version 0.3.3 or later). See examples at \code{\link{as_yael_process}}
+#' bias-field correction and tissue segmentation come from \pkg{ravetools}.
+#' See examples at \code{\link{as_yael_process}}
 #' (with \code{engine = "native"}) and \code{\link{yael_preprocess_native}}.
 #' @details
 #' Differences from \code{\link{YAELProcess}} and the \pkg{rpyANTs} pipeline
@@ -223,16 +223,18 @@ yael_native_fs_tkr_to_scanner <- function(fs_dir) {
 #' 'FreeSurfer', the gray and white matter that dark voxels (\verb{CSF} or
 #' bone) cut off from the brain, such as skull marrow, dura or scalp, leaves
 #' the mask, also where the mapped mask held it, which
-#' \verb{antsBrainExtraction.sh} keeps whole. The distances are millimeters
-#' along each axis of the image, so they hold on thick slices.
+#' \verb{antsBrainExtraction.sh} keeps whole. The thin strands this can leave
+#' (such as marrow as dark as gray matter) go too: the part of the mask that
+#' survives an erosion by 2 mm, grown back by 3 mm and kept inside the mask,
+#' holds the brain but not what is thinner than about 4 mm and reaches more
+#' than about 1 mm out. The distances are millimeters along each axis of the
+#' image, so they hold on thick slices.
 #' The result replaces the mapped mask in the tissue segmentation, in the final
 #' registration, and in \code{construct_ants_folder_from_template}. The
 #' \pkg{rpyANTs} engine uses a network mask from \code{deep_atropos} for the
 #' registration when \code{'antspynet'} is available, and always saves the
 #' mapped mask. The mapped mask is kept, with a warning, when the segmentation
-#' fails or the volume changes by more than 20 percent, and with a line in the
-#' log when \pkg{ravetools} has no \code{morph_volume} with a radius per axis
-#' (before version 0.4.2).
+#' fails or the volume changes by more than 20 percent.
 #' \item White-matter artifacts: the brain mask can still hold skull marrow
 #' that touches the brain with no dark voxel between, which the tissue
 #' segmentation labels as white matter and the final registration would pull
@@ -430,7 +432,6 @@ YAELNativeProcess <- R6::R6Class(
       if (is.null(native_path)) {
         stop(sprintf("Missing image for type `%s`. Please set the image first via `set_input_image`.", native_type))
       }
-      yael_native_require_ravetools()
       reference <- yael_native_read_header(native_path)
       volume <- yael_native_read_volume(path, allow_4d = TRUE)
       interpolation <- yael_native_interpolation(interpolator, volume)
@@ -465,7 +466,6 @@ YAELNativeProcess <- R6::R6Class(
           "Missing mapping from %s to %s. Please register the image to the template first.",
           native_type, camel_template_name(template_name)))
       }
-      yael_native_require_ravetools()
       if (to_template) {
         transforms <- mapping$template_to_native$transformlist
       } else {
@@ -854,9 +854,6 @@ YAELNativeProcess <- R6::R6Class(
                                verbose = TRUE, ...) {
       template_name <- match.arg(template_name)
       verbose <- isTRUE(verbose)
-      # before the template is located (or downloaded), other images are
-      # registered, or the stage folder is removed
-      yael_native_require_ravetools()
       template <- yael_native_template(template_name)
       # the final registration on the full template grid takes a lot of memory
       yael_native_check_memory(template$t1)
@@ -1207,7 +1204,6 @@ YAELNativeProcess <- R6::R6Class(
           "Missing mapping from %s to %s. Please register the image to the template first.",
           native_type, camel_template_name(template_name)))
       }
-      yael_native_require_ravetools()
       reference <- yael_native_read_header(yael_native_template(template_name)$t1)
       volume <- yael_native_read_volume(native_roi_path, allow_4d = TRUE)
       interpolation <- yael_native_interpolation(interpolator, volume)
@@ -1285,7 +1281,6 @@ YAELNativeProcess <- R6::R6Class(
             "Missing mapping from %s to %s. Please register the image to the template first.",
             "T1w", camel_template_name(template_name)))
         }
-        yael_native_require_ravetools()
       }
       for (folder in folders) {
         dir_create2(if (nzchar(folder)) file.path(atlas_root, folder) else atlas_root)
@@ -1399,7 +1394,6 @@ YAELNativeProcess <- R6::R6Class(
       if (!length(streamline_files)) {
         return(invisible(streamline_files))
       }
-      yael_native_require_ravetools()
 
       # 'ieegio' must not start (or install) 'Python' from here on
       no_python <- Sys.getenv("IEEGIO_NO_PYTHON", unset = NA)
@@ -1606,10 +1600,6 @@ YAELNativeProcess <- R6::R6Class(
       mr_path <- self$get_input_image("T1w")
       if (length(mr_path) != 1 || is.na(mr_path) || !file.exists(mr_path)) {
         stop("T1w image is not set. Please set the input image via\n\tself$set_input_image('/path/to/T1-weighted/MRI.nii.gz', type = 'T1w')")
-      }
-      if (length(template_name)) {
-        # the brain mask and the bias correction below need it
-        yael_native_require_ravetools()
       }
 
       dir_create2(mri_dir)
