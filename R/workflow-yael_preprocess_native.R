@@ -865,14 +865,14 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
                                   verbose = TRUE) {
   
   # DIPSAUS DEBUG START
-  # list2env(
-  #   envir = globalenv(),
-  #   list(fix_path = "/Users/dipterix/Library/Application Support/org.R-project.R/R/rpyANTs/templates/mni_icbm152_nlin_sym_09a/T1.nii.gz", 
-  #     mov_paths = "/Users/dipterix/rave_data/raw_dir/K20/rave-imaging/inputs/anat/sub-K20_ses-preop_desc-preproc_T1w.nii.gz", 
-  #     working_path = "/Users/dipterix/rave_data/raw_dir/K20/rave-imaging/tmp/coregister_T1w_with_MNI152NLin2009aSym", 
-  #     weights = 1.25, with_skull = FALSE, cost_function = "CC", 
-  #     affine_transform = NULL, verbose = TRUE)
-  # )
+  list2env(
+    envir = globalenv(),
+    list(fix_path = "/Users/dipterix/Library/Application Support/org.R-project.R/R/rpyANTs/templates/mni_icbm152_nlin_asym_09a/T1.nii.gz", 
+      mov_paths = "/Users/dipterix/rave_data/raw_dir/K20/rave-imaging/inputs/anat/sub-K20_ses-preop_desc-preproc_T1w.nii.gz", 
+      working_path = "/Users/dipterix/rave_data/raw_dir/K20/rave-imaging/tmp/coregister_T1w_with_MNI152NLin2009aAsym", 
+      weights = 1.25, with_skull = FALSE, cost_function = "CC", 
+      affine_transform = NULL, verbose = TRUE)
+  )
 
   verbose <- isTRUE(verbose)
   with_skull <- isTRUE(with_skull)
@@ -1024,13 +1024,20 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
   native_mask0 <- NULL
   initial_native_mask <- function() {
     if (is.null(native_mask0)) {
-      native_mask0 <<- ravetools::apply_transform3d_volume(
+      initial_mask <- ravetools::apply_transform3d_volume(
         template_mask, res_abp, vox2ras = yael_native_vox2ras(template_mask, "template mask"),
         reference_dim = native_dim, reference_vox2ras = native_vox2ras,
         direction = "inverse", interpolation = "nearest")
+      native_mask0 <<- yael_native_brain_extraction(
+        image = t1,
+        mask = initial_mask,
+        vox2ras = native_vox2ras,
+        verbose = verbose
+      )
     }
     native_mask0
   }
+
 
   # ---- nu2: white matter normalized to 110, then N4 weighted by it ----
   nu2 <- stage("nu2", "image", "intensity normalization with the white matter", function() {
@@ -1161,8 +1168,11 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
   brain_mask <- stage("brain_mask_cleaned", "image", "brain mask without the white-matter artifacts", function() {
     mask <- brain_mask
     mask[wm_artifacts > 0 & atropos[[1]] == 3] <- 0
+    mask <- ravetools::morph_volume(mask, "fill_holes", radius = 3)
+    attr(mask, "vox2ras") <- attr(brain_mask, "vox2ras")
     mask
   })
+  
   brain <- nu2 * brain_mask
   attr(brain, "vox2ras") <- native_vox2ras
 
