@@ -813,19 +813,26 @@ yael_native_kmeans_wm <- function(t1, mask, vox2ras, verbose = TRUE) {
 #' @param cost_function \code{'CC'}; the deformable stage of 'ravetools' has no
 #' mutual information, other values give a warning
 #' @param affine_transform optional initial affine (\code{'ANTs'} \code{.mat}
-#' file, or a 4-by-4 template-to-native 'RAS' matrix); the initial registration
-#' then only runs its deformable stage, with the \code{'SyNOnly'} settings
+#' file, or a 4-by-4 template-to-native 'RAS' matrix) of the masked affine
+#' stage of the final registration
+#' @param extraction_affine optional initial affine of the registration of the
+#' brain extraction to \code{'mni_icbm152_nlin_asym_09a'}, in the same forms;
+#' that registration then only runs its deformable stage, with the
+#' \code{'SyNOnly'} settings
 #' @param verbose whether to log the stages and print the registration progress
 #' @details Stages (cached in \code{working_path}): \code{T1} (raw image),
-#' \code{nu} (\code{N4}), \code{SyNabp} (affine and deformable registration
-#' without masks, on a coarser grid for templates with more voxels per brain
-#' than a 1 mm human template), \code{nu2} (k-means white matter normalized to 110, then
+#' \code{brainmask} (\code{yael_brain_extract}: \code{N4}, the registration
+#' \code{SyNabp} of the head without masks to \code{'mni_icbm152_nlin_asym_09a'},
+#' whose brain mask is adjusted to the subject; its files \code{nu.nii.gz},
+#' \code{SyNabp.dcf} with the transform files and
+#' \code{SyNabp_warped_mov.nii.gz}, \code{initial_mask.nii.gz} and
+#' \code{brainmask.nii.gz} are reused only when all of them exist),
+#' \code{nu2} (k-means white matter inside the brain mask normalized to 110, then
 #' \code{N4} weighted by the white matter; see \code{yael_native_kmeans_wm}
-#' for the k-means of images with extreme intensities), \code{brainmask} (template mask on
-#' the native grid, adjusted to the subject by
-#' \code{yael_native_brain_extraction}; also writes \code{brain.nii.gz}),
-#' \code{atropos_prior}
-#' (template \code{atropos_2} to \code{atropos_7} on the native grid),
+#' for the k-means of images with extreme intensities; also writes
+#' \code{brain.nii.gz}), \code{atropos_prior}
+#' (\code{atropos_2} to \code{atropos_7} of \code{'mni_icbm152_nlin_asym_09a'}
+#' on the native grid, through \code{SyNabp}),
 #' \code{atropos} (segmentation and four tissue posteriors: \verb{CSF}, gray
 #' matter, white matter with deep gray matter and brain stem, cerebellum),
 #' \code{wm_artifacts} (white matter outside the gray-matter envelope, such as
@@ -836,8 +843,9 @@ yael_native_kmeans_wm <- function(t1, mask, vox2ras, verbose = TRUE) {
 #' stage), and
 #' \code{SyN_w_atropos} (masked affine, then a deformable stage with the brain,
 #' the additional images, and the \verb{CSF} and deep-structure posteriors, the
-#' latter zero on the artifacts; also writes \code{brain2.nii.gz}
-#' and \code{brainmask2.nii.gz}). The classes keep the order of their priors;
+#' latter zero on the artifacts; also writes its brain mask as
+#' \code{brainmask2.nii.gz}, and the raw image within it as
+#' \code{brain2.nii.gz}). The classes keep the order of their priors;
 #' when the median intensities of the \verb{CSF}, gray-matter and white-matter
 #' labels do not increase, a warning is given and no artifact is left out (see
 #' \code{yael_native_segmentation_class_order}). A tissue prior
@@ -846,8 +854,7 @@ yael_native_kmeans_wm <- function(t1, mask, vox2ras, verbose = TRUE) {
 #' that is not 3D, or covers less than 95 percent of the brain mask, is left
 #' out with a warning. The smoothing of the deformable update fields
 #' (\code{syn_sigma}) is multiplied by \code{yael_native_syn_scale} of the
-#' template brain voxels (2 for the 0.5 mm templates), which also gives how
-#' much coarser the grid of \code{SyNabp} is. The final deformation is
+#' template brain voxels (2 for the 0.5 mm templates). The final deformation is
 #' checked with \code{yael_native_folding}: the share of the template brain
 #' mask where it folds is logged, and above 1 percent a warning is given.
 #' @returns A list with \code{registration} (the final 'ravetools'
@@ -862,17 +869,16 @@ yael_native_kmeans_wm <- function(t1, mask, vox2ras, verbose = TRUE) {
 yael_native_normalize <- function(fix_path, mov_paths, working_path,
                                   weights = 1, with_skull = FALSE,
                                   cost_function = "CC", affine_transform = NULL,
-                                  verbose = TRUE) {
-  
+                                  extraction_affine = NULL, verbose = TRUE) {
   # DIPSAUS DEBUG START
-  list2env(
-    envir = globalenv(),
-    list(fix_path = "/Users/dipterix/Library/Application Support/org.R-project.R/R/rpyANTs/templates/mni_icbm152_nlin_asym_09a/T1.nii.gz", 
-      mov_paths = "/Users/dipterix/rave_data/raw_dir/K20/rave-imaging/inputs/anat/sub-K20_ses-preop_desc-preproc_T1w.nii.gz", 
-      working_path = "/Users/dipterix/rave_data/raw_dir/K20/rave-imaging/tmp/coregister_T1w_with_MNI152NLin2009aAsym", 
-      weights = 1.25, with_skull = FALSE, cost_function = "CC", 
-      affine_transform = NULL, verbose = TRUE)
-  )
+  # list2env(
+  #   envir = globalenv(),
+  #   list(fix_path = "/Users/dipterix/Library/Application Support/org.R-project.R/R/rpyANTs/templates/mni_icbm152_nlin_asym_09a/T1.nii.gz", 
+  #     mov_paths = "/Users/dipterix/rave_data/raw_dir/K20/rave-imaging/inputs/anat/sub-K20_ses-preop_desc-preproc_T1w.nii.gz", 
+  #     working_path = "/Users/dipterix/rave_data/raw_dir/K20/rave-imaging/tmp/coregister_T1w_with_MNI152NLin2009aAsym", 
+  #     weights = 1.25, with_skull = FALSE, cost_function = "CC", 
+  #     affine_transform = NULL, verbose = TRUE)
+  # )
 
   verbose <- isTRUE(verbose)
   with_skull <- isTRUE(with_skull)
@@ -933,11 +939,6 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
   native_dim <- dim(t1)
   native_vox2ras <- yael_native_vox2ras(t1, "native image")
 
-  # ---- nu: N4 bias field correction (`abp_n4`) ----
-  nu <- stage("nu", "image", "N4 bias field correction", function() {
-    ravetools::bias_correction_n4(t1, vox2ras = native_vox2ras)
-  })
-
   # template image and its brain mask (binarized), on the template T1 grid
   template <- stage("fixing", "image", "Template fixing image", function() {
     yael_native_read_volume(fix_paths[[1]])
@@ -948,101 +949,31 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
     yael_native_read_mask(template_files$mask),
     template_dim, template_vox2ras, interpolation = "nearest")
   # the update fields of the deformable stages are smoothed relative to the
-  # template brain (the settings were validated on 1 mm templates), and the
-  # first registration runs on a grid as coarse as a 1 mm template
+  # template brain (the settings were validated on 1 mm templates)
   syn_scale <- yael_native_syn_scale(sum(template_mask > 0))
   if (syn_scale != 1) {
     yael_native_log(verbose, sprintf(
-      "The template brain spans more voxels than at 1 mm: the first registration runs on a grid %g times as coarse, and the update fields of the deformable stages are smoothed %g times as many voxels",
-      syn_scale, syn_scale))
+      "The template brain spans more voxels than at 1 mm: the update fields of the final registration are smoothed %g times as many voxels",
+      syn_scale))
   }
 
-  # ---- SyNabp: initial registration of the whole head, without masks ----
-  # it only places the template mask, which the brain extraction then adjusts,
-  # and the tissue priors. The finest level of its deformable stage has no
-  # iterations, so a 0.5 mm grid would only cost time: on the coarser grid the
-  # deformable stage keeps its levels in millimeters
-  res_abp <- stage("SyNabp", "registration", "initial registration of the head (affine and deformable)", function() {
-    coarse <- yael_native_coarsen(template, syn_scale)
-    coarse_vox2ras <- attr(coarse, "vox2ras")
-    if (is.null(affine_transform)) {
-      linear <- ravetools::register_volume3d(
-        source = nu, target = coarse,
-        source_vox2ras = native_vox2ras, target_vox2ras = coarse_vox2ras,
-        type = "affine", metric = "mattes",
-        shrink_factors = c(8, 4, 2, 1), smoothing_sigmas = c(4, 2, 1, 0),
-        iterations = c(1000, 500, 250, 100), sampling_rate = 0.25,
-        verbose = verbose
-      )
-      init_transform <- linear$transform
-      rm(linear)
-      # 'ANTsPy' leaves the convergence of 'SyNabp' to the defaults of
-      # 'antsRegistration' (1e-6, window 10)
-      syn_settings <- list(syn_iterations = c(50, 10, 0), syn_grad_step = 0.1,
-                           syn_convergence = 1e-6, syn_convergence_window = 10L)
-    } else {
-      # 'SyNOnly' from the given affine, with the convergence of the 'ANTsPy'
-      # 'SyN' transforms (1e-7, window 8)
-      init_transform <- affine_transform
-      syn_settings <- list(syn_iterations = c(40, 20, 0), syn_grad_step = 0.2,
-                           syn_convergence = 1e-7, syn_convergence_window = 8L)
-    }
-    # `syn_sigma` takes the flow sigma of 'ANTsPy' (3), but 'ravetools' reads
-    # it as a Gaussian standard deviation in voxels, whereas 'ANTs' reads it
-    # as a variance (sigma about 1.7): the native update field is smoothed
-    # more (a documented deviation; the values are those validated on real
-    # data with a 1 mm template), and more again for templates with more
-    # voxels per brain (`syn_scale`)
-    registration <- ravetools::register_volume3d(
-      source = nu, target = coarse,
-      source_vox2ras = native_vox2ras, target_vox2ras = coarse_vox2ras,
-      type = "syn_only", metric = "mattes", init_transform = init_transform,
-      shrink_factors = pmax(1, round(c(4, 2, 1) / syn_scale)),
-      smoothing_sigmas = c(2, 1, 0),
-      syn_iterations = syn_settings$syn_iterations,
-      syn_grad_step = syn_settings$syn_grad_step, syn_sigma = 3 * syn_scale,
-      syn_total_sigma = 0, syn_cc_radius = 4L,
-      syn_convergence = syn_settings$syn_convergence,
-      syn_convergence_window = syn_settings$syn_convergence_window,
-      verbose = verbose
-    )
-    warped <- registration$image
-    attr(warped, "vox2ras") <- coarse_vox2ras
-    registration$image <- NULL
-    registration$images <- NULL
-    list(registration = registration, warpedmovout = warped, warpedfixout = NULL)
-  })$registration
-  # template images are brought onto the native grid with the inverse field only
-  res_abp$forward_field <- NULL
-  rm(nu)
+  # ---- brainmask: `yael_brain_extract` (N4, the registration `SyNabp` of the
+  # head without masks to `mni_icbm152_nlin_asym_09a`, whose brain mask is
+  # adjusted to the subject); its files are reused when all of them exist ----
+  extraction <- yael_native_brain_extract_cached(
+    mov_paths[[1]], working_path, affine_transform = extraction_affine,
+    registration = TRUE, verbose = verbose)
+  brain_mask <- extraction$mask
+  # the tissue priors of that template come onto the native grid through
+  # `SyNabp` (its inverse field)
+  res_abp <- extraction$registration
+  rm(extraction)
   free_memory()
-
-  # template mask on the native grid through the initial registration. A
-  # template image goes to the native grid with the inverse direction (the
-  # template is the target) and passes its own grid: without it, the geometry
-  # of the registration would be used silently
-  native_mask0 <- NULL
-  initial_native_mask <- function() {
-    if (is.null(native_mask0)) {
-      initial_mask <- ravetools::apply_transform3d_volume(
-        template_mask, res_abp, vox2ras = yael_native_vox2ras(template_mask, "template mask"),
-        reference_dim = native_dim, reference_vox2ras = native_vox2ras,
-        direction = "inverse", interpolation = "nearest")
-      native_mask0 <<- yael_native_brain_extraction(
-        image = t1,
-        mask = initial_mask,
-        vox2ras = native_vox2ras,
-        verbose = verbose
-      )
-    }
-    native_mask0
-  }
-
 
   # ---- nu2: white matter normalized to 110, then N4 weighted by it ----
   nu2 <- stage("nu2", "image", "intensity normalization with the white matter", function() {
     # quick 3-class k-means segmentation of the raw image inside the brain
-    wm <- yael_native_kmeans_wm(t1, mask = initial_native_mask(),
+    wm <- yael_native_kmeans_wm(t1, mask = brain_mask,
                                 vox2ras = native_vox2ras, verbose = verbose)
     scale <- 110 / ifelse(wm$mean > 0, wm$mean, 1)
     wm_prob <- wm$prob
@@ -1061,23 +992,18 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
   rm(t1)
   free_memory()
 
-  # ---- brainmask: template mask on the native grid, adjusted to the subject ----
-  brain_mask <- stage("brainmask", "image", "brain extraction from the template brain mask", function() {
-    mask <- yael_native_brain_extraction(nu2, initial_native_mask(), native_vox2ras,
-                                         verbose = verbose)
-    yael_native_write_volume(nu2 * mask, file.path(working_path, "brain.nii.gz"),
-                             vox2ras = native_vox2ras)
-    mask
-  })
-  native_mask0 <- NULL
   brain <- nu2 * brain_mask
   attr(brain, "vox2ras") <- native_vox2ras
+  yael_native_write_volume(brain, file.path(working_path, "brain.nii.gz"),
+                           vox2ras = native_vox2ras)
 
   # ---- atropos: prior-guided segmentation of the native brain ----
   atropos <- stage("atropos", "images", "tissue segmentation with the template priors", n = 5L, compute = function() {
     priors <- stage("atropos_prior", "images", "template tissue priors on the native image", n = 6L, compute = function() {
-      # one map at a time, each with its own grid (0.5 mm for some templates)
-      lapply(template_files$atropos[3:8], function(path) {
+      # the priors of the template of the brain extraction, one map at a time,
+      # each with its own grid
+      prior_paths <- yael_native_template("mni_icbm152_nlin_asym_09a")$atropos[3:8]
+      lapply(prior_paths, function(path) {
         prior <- yael_native_read_volume(path)
         prior <- ravetools::apply_transform3d_volume(
           prior, res_abp, vox2ras = yael_native_vox2ras(prior, "template prior"),
@@ -1349,20 +1275,17 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
       direction = "inverse", interpolation = "trilinear")
     rm(fixed_main)
 
-    # final brain mask, and the raw image restored from its stage
-    brain_mask2 <- ravetools::apply_transform3d_volume(
-      template_mask, registration, vox2ras = yael_native_vox2ras(template_mask, "template mask"),
-      reference_dim = native_dim, reference_vox2ras = native_vox2ras,
-      direction = "inverse", interpolation = "nearest")
+    # final brain mask: the brain mask of this registration, with the raw
+    # image restored from its stage
     raw <- tryCatch(yael_native_stage_read("T1", "image", working_path),
                     error = function(e) { NULL })
     if (!is.null(raw)) {
-      yael_native_write_volume(raw * brain_mask2, file.path(working_path, "brain2.nii.gz"),
+      yael_native_write_volume(raw * brain_mask, file.path(working_path, "brain2.nii.gz"),
                                vox2ras = native_vox2ras)
-      yael_native_write_volume(brain_mask2, file.path(working_path, "brainmask2.nii.gz"),
+      yael_native_write_volume(brain_mask, file.path(working_path, "brainmask2.nii.gz"),
                                vox2ras = native_vox2ras)
     }
-    rm(raw, brain_mask2)
+    rm(raw)
 
     list(registration = registration, warpedmovout = warpedmovout,
          warpedfixout = warpedfixout)
@@ -1401,8 +1324,9 @@ yael_native_normalize <- function(fix_path, mov_paths, working_path,
 #' \code{'mni_icbm152_nlin_asym_09c'} and \code{'fsaverage'} (also known as
 #' \verb{MNI305})
 #' @param normalize_affine optional path to an initial linear transform: the
-#' normalization then starts from this transform, and its first registration
-#' only runs the non-linear stage; for advanced users only
+#' normalization then starts from this transform, and for the \verb{MNI152}
+#' templates its first registration (of the brain extraction) only runs the
+#' non-linear stage; for advanced users only
 #' @param add_surfaces whether to add surfaces for the subject; default is
 #' \code{FALSE}. The surfaces are created by reversing the normalization from
 #' the template brain, hence the results will not be accurate. Enable this
@@ -1500,7 +1424,7 @@ yael_preprocess_native <- function(
   #   envir = globalenv(),
   #   list(
   #     subject = "YAEL/K20",
-  #     t1w_path = "/Users/dipterix/rave_data/raw_dir/K20/rave-imaging/inputs/MRI/MRI_RAW.nii.gz",
+  #     t1w_path = NULL, #"/Users/dipterix/rave_data/raw_dir/K20/rave-imaging/inputs/MRI/MRI_RAW.nii.gz",
   #     ct_path = NULL,
   #     t2w_path = NULL,
   #     fgatir_path = NULL,

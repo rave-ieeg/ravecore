@@ -4,7 +4,13 @@
 \alias{yael_brain_extract}
 \title{Extract the brain from a 'T1'-weighted image (without 'Python')}
 \usage{
-yael_brain_extract(image, mask = NULL, work_path = NULL, verbose = TRUE)
+yael_brain_extract(
+  image,
+  mask = NULL,
+  work_path = NULL,
+  affine_transform = NULL,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{image}{the 'T1'-weighted image: a file path, an \code{ieegio_volume},
@@ -18,6 +24,12 @@ as a 'FreeSurfer' \code{brainmask.mgz}, is resampled onto the grid of
 
 \item{work_path}{folder for the working files, which are kept; default
 \code{NULL} uses a temporary folder that is removed at the end}
+
+\item{affine_transform}{optional initial \verb{affine} transform from the
+template to the image (scanner 'RAS' to scanner 'RAS', the point map of
+\verb{'ANTs'}): an \verb{'ANTs'} \code{.mat} file or a 4-by-4 matrix; the
+registration then only runs its non-linear stage. Ignored when \code{mask}
+is given}
 
 \item{verbose}{whether to log the steps and print the registration progress}
 }
@@ -36,17 +48,20 @@ The steps, with the files they write into \code{work_path} (named after the
 stages of the native normalization):
 \enumerate{
 \item bias-field correction with the settings of \code{abp_n4} in
-'ANTsPy' (\code{nu.nii.gz});
+'ANTsPy' (\code{nu.nii.gz}), for the registration;
 \item unless \code{mask} is given, the registration of the whole head
-to the template image without masks, affine and then deformable, as the
-initial registration (\code{'SyNabp'}) of the native normalization; it is
-saved by \code{ravetools::save_registration} as \code{SyNabp.dcf} with its
+to the template image without masks, affine and then deformable (only
+deformable from \code{affine_transform}), as the initial registration
+(\code{'SyNabp'}) of the native normalization; it is saved by
+\code{ravetools::save_registration} as \code{SyNabp.dcf} with its
 \verb{'ANTs'} transform files, and the registered image as
 \code{SyNabp_warped_mov.nii.gz};
 \item the initial mask: the template brain mask through that registration,
 or \code{mask} (\code{initial_mask.nii.gz});
 \item the brain extraction of the native engine (see the item "Brain
-extraction" of \code{\link{YAELNativeProcess}}), which keeps the largest
+extraction" of \code{\link{YAELNativeProcess}}) on the image corrected by
+\verb{N4} again without the intensity truncation of \code{abp_n4} (which
+makes bright marrow look like the white matter), which keeps the largest
 connected gray and white matter, leaves out what dark voxels cut off from
 it (skull marrow, dura or scalp) and thin strands, and keeps the initial
 mask, with a warning, when the result differs from it by more than 20

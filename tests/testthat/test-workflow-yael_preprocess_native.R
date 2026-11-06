@@ -910,6 +910,8 @@ test_that("normalization aligns a toy head to a toy template", {
   local_yael_sandbox()
   template <- yael_toy_dataset("template")
   native <- yael_toy_dataset("native")
+  # the toy template is also the template of the brain extraction
+  local_yael_toy_template(template$root)
   work <- tempfile(pattern = "ravecore-yael-normalize-")
   on.exit({ unlink(work, recursive = TRUE) }, add = TRUE)
 
@@ -920,8 +922,9 @@ test_that("normalization aligns a toy head to a toy template", {
   elapsed <- as.numeric(difftime(Sys.time(), started, units = "secs"))
   expect_lt(elapsed, 120)
 
-  # registrations: SyNabp (affine, then deformable without masks), then the
-  # two stages of 'SyNAggro': the affine with both masks, the deformable
+  # registrations: SyNabp of the brain extraction (affine, then deformable
+  # without masks), then the two stages of 'SyNAggro': the affine with both
+  # masks, the deformable
   # stage with the moving mask only (with a target mask, 'ravetools' pushes
   # the edge of the brain outward). The deformable stage starts from the
   # masked affine and adds the CSF and deep-structure posteriors
@@ -966,8 +969,8 @@ test_that("normalization aligns a toy head to a toy template", {
   expect_equal(attr(res$warpedfixout, "vox2ras"), native$vox2ras, tolerance = 1e-6)
   expect_setequal(
     list.files(work),
-    c("T1.nii.gz", "nu.nii.gz", "fixing.nii.gz", "nu2.nii.gz", "brainmask.nii.gz",
-      "brain.nii.gz", "wm_artifacts.nii.gz", "brain_mask_cleaned.nii.gz",
+    c("T1.nii.gz", "nu.nii.gz", "fixing.nii.gz", "nu2.nii.gz", "initial_mask.nii.gz",
+      "brainmask.nii.gz", "brain.nii.gz", "wm_artifacts.nii.gz", "brain_mask_cleaned.nii.gz",
       sprintf("atropos_prior_%d.nii.gz", 0:5), sprintf("atropos_%d.nii.gz", 0:4),
       "brain2.nii.gz", "brainmask2.nii.gz",
       "SyNabp.dcf", "SyNabp0GenericAffine.mat", "SyNabp1Warp.nii.gz",
@@ -1029,6 +1032,13 @@ test_that("normalization aligns a toy head to a toy template", {
   brain_mask2 <- yael_native_read_volume(file.path(work, "brainmask2.nii.gz"))
   expect_gt(2 * sum(brain_mask2 > 0 & native$truth > 0) /
               (sum(brain_mask2 > 0) + sum(native$truth > 0)), 0.9)
+  # ... which are the brain mask of the final registration (the brain
+  # extraction without the white-matter artifacts) and the raw image within it
+  cleaned <- yael_native_read_volume(file.path(work, "brain_mask_cleaned.nii.gz"))
+  expect_equal(as.vector(brain_mask2 > 0), as.vector(cleaned > 0))
+  expect_equal(as.vector(yael_native_read_volume(file.path(work, "brain2.nii.gz"))),
+               as.vector(yael_native_read_volume(file.path(work, "T1.nii.gz")) * (cleaned > 0)),
+               tolerance = 1e-6)
 
   # the brain mask of the stages is the warped template mask adjusted to the
   # subject, at least as close to the true brain
@@ -1059,14 +1069,17 @@ test_that("white matter outside the gray matter leaves the white-matter channel"
   local_yael_sandbox()
   template <- yael_toy_dataset("template")
   native <- yael_toy_dataset("native")
+  local_yael_toy_template(template$root)
   work <- tempfile(pattern = "ravecore-yael-normalize-")
   dir.create(work)
   on.exit({ unlink(work, recursive = TRUE) }, add = TRUE)
 
   # a brain mask that took in the skull and the inner half of the scalp on top
   # of the head (the toy scalp is brighter than the white matter, like a thick
-  # skull marrow; the edge of the mask cuts through it); the `brainmask`
-  # stage reads it from its cache
+  # skull marrow; the edge of the mask cuts through it); the brain extraction
+  # reads it from its cache, whose other files come from `yael_brain_extract`
+  spy <- local_yael_registration_spy(keep_sources = TRUE)
+  yael_brain_extract(native$t1, work_path = work, verbose = FALSE)
   points <- yael_toy_grid(native$dim, native$vox2ras)
   head <- yael_toy_native_to_template(points)
   codes <- array(yael_toy_codes(head), native$dim)
@@ -1076,7 +1089,6 @@ test_that("white matter outside the gray matter leaves the white-matter channel"
   yael_native_write_volume(mask, file.path(work, "brainmask.nii.gz"),
                            vox2ras = native$vox2ras)
 
-  spy <- local_yael_registration_spy(keep_sources = TRUE)
   res <- yael_native_normalize(template$t1, native$t1, work, verbose = FALSE)
 
   # the scalp segmented as white matter is left out of the white-matter
@@ -1143,6 +1155,7 @@ test_that("normalization uses additional images that cover the brain", {
   local_yael_sandbox()
   template <- yael_toy_dataset("template")
   native <- yael_toy_dataset("native")
+  local_yael_toy_template(template$root)
   work <- tempfile(pattern = "ravecore-yael-normalize-")
   # not a 3D volume
   frames <- tempfile(fileext = ".nii.gz")
@@ -1196,9 +1209,11 @@ test_that("normalization handles priors on the template grid and an empty tissue
   skip_if_no_native_yael()
   local_yael_sandbox()
   # tissue priors on the 'T1' grid, an empty cerebellum prior, and a brain
-  # mask that holds intensities (like the mask of `fsaverage`)
+  # mask that holds intensities (like the mask of `fsaverage`), also for the
+  # brain extraction and the tissue priors
   template <- yael_toy_dataset("template_shared")
   native <- yael_toy_dataset("native")
+  local_yael_toy_template(template$root)
   work <- tempfile(pattern = "ravecore-yael-normalize-")
   on.exit({ unlink(work, recursive = TRUE) }, add = TRUE)
   expect_gt(max(yael_native_read_volume(template$mask)), 1)
@@ -1232,6 +1247,25 @@ test_that("normalization handles priors on the template grid and an empty tissue
   expect_gte(mean(dice), 0.85, label = label)
 })
 
+test_that("normalization takes the tissue priors of the 2009a asymmetric template", {
+  skip_on_cran()
+  skip_if_no_native_yael()
+  local_yael_sandbox()
+  template <- yael_toy_dataset("template")
+  native <- yael_toy_dataset("native")
+  # the template of the brain extraction has an empty cerebellum prior, the
+  # target template does not
+  local_yael_toy_template(yael_toy_dataset("template_shared")$root)
+  work <- tempfile(pattern = "ravecore-yael-normalize-")
+  on.exit({ unlink(work, recursive = TRUE) }, add = TRUE)
+  expect_gt(sum(yael_native_read_volume(template$atropos[[8]])), 0)
+
+  expect_warning(
+    yael_native_normalize(template$t1, native$t1, work, verbose = FALSE),
+    "class 4 is zero inside the brain mask")
+  expect_equal(sum(yael_native_read_volume(file.path(work, "atropos_4.nii.gz"))), 0)
+})
+
 test_that("normalization completes when a voxel inside the brain is extremely bright", {
   skip_on_cran()
   skip_if_no_native_yael()
@@ -1239,6 +1273,7 @@ test_that("normalization completes when a voxel inside the brain is extremely br
   local_yael_sandbox()
   template <- yael_toy_dataset("template")
   native <- yael_toy_dataset("native")
+  local_yael_toy_template(template$root)
   root <- tempfile(pattern = "ravecore-yael-bright-")
   dir.create(root)
   on.exit({ unlink(root, recursive = TRUE) }, add = TRUE)
@@ -1251,7 +1286,7 @@ test_that("normalization completes when a voxel inside the brain is extremely br
   t1[spot[[1]], spot[[2]], spot[[3]]] <- 20 * max(t1)
   path <- yael_native_write_volume(t1, file.path(root, "bright.nii.gz"))
 
-  # the k-means of the raw image and the one of the brain extraction fail and
+  # the k-means of the brain extraction and the one of the raw image fail and
   # are run again with clipped intensities; then the segmentation with the
   # template priors runs
   outcomes <- character(0L)
@@ -1281,6 +1316,7 @@ test_that("normalization starts from a given affine and can keep the skull", {
   local_yael_sandbox()
   template <- yael_toy_dataset("template")
   native <- yael_toy_dataset("native")
+  local_yael_toy_template(template$root)
   work <- tempfile(pattern = "ravecore-yael-normalize-")
   on.exit({ unlink(work, recursive = TRUE) }, add = TRUE)
 
@@ -1294,9 +1330,11 @@ test_that("normalization starts from a given affine and can keep the skull", {
 
   spy <- local_yael_registration_spy()
   res <- yael_native_normalize(template$t1, native$t1, file.path(work, "with_affine"),
-                               affine_transform = affine_path, verbose = FALSE)
+                               affine_transform = affine_path,
+                               extraction_affine = affine_path, verbose = FALSE)
   calls <- spy()
-  # 'SyNOnly' from the affine, then the masked affine starts from it as well
+  # 'SyNOnly' of the brain extraction from the affine, then the masked affine
+  # starts from it as well
   expect_equal(vapply(calls, `[[`, "", "type"), c("syn_only", "affine", "syn_only"))
   expect_equal(calls[[1]]$init_transform, affine, tolerance = 1e-10)
   expect_equal(calls[[1]]$syn_iterations, c(40, 20, 0))

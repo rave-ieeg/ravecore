@@ -883,6 +883,9 @@ test_that("map_to_template passes its tuning arguments and keeps old results whe
   expect_equal(recorded$working_path, file.path(
     work_path, "tmp", sprintf("coregister_T1w_with_%s", info$camel)))
   expect_equal(recorded$affine_transform, "/path/to/affine.mat")
+  # the brain extraction registers to `mni_icbm152_nlin_asym_09a`, which the
+  # affine of an MNI152 template also starts
+  expect_equal(recorded$extraction_affine, "/path/to/affine.mat")
   expect_true(recorded$with_skull)
   expect_equal(recorded$cost_function, "MI")
   expect_false(recorded$verbose)
@@ -892,8 +895,17 @@ test_that("map_to_template passes its tuning arguments and keeps old results whe
     process$map_to_template("mni_icbm152_nlin_asym_09a", use_images = "T1w", verbose = FALSE),
     "the engine failed")
   expect_null(recorded$affine_transform)
+  expect_null(recorded$extraction_affine)
   expect_false(recorded$with_skull)
   expect_equal(recorded$cost_function, "CC")
+  # the affine of a template in another space only starts the final registration
+  local_yael_toy_template(template$root, name = "fsaverage")
+  expect_error(
+    process$map_to_template("fsaverage", use_images = "T1w", verbose = FALSE,
+                            affine_transform = "/path/to/affine.mat"),
+    "the engine failed")
+  expect_equal(recorded$affine_transform, "/path/to/affine.mat")
+  expect_null(recorded$extraction_affine)
 
   # the earlier results are untouched
   expect_setequal(list.files(transform_dir), previous)

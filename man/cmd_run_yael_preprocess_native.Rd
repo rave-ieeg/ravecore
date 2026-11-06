@@ -89,8 +89,9 @@ which template is to be used to generate native brain mask and transform
 matrices}
 
 \item{normalize_affine}{optional path to an initial linear transform: the
-normalization then starts from this transform, and its first registration
-only runs the non-linear stage; for advanced users only}
+normalization then starts from this transform, and for the \verb{MNI152}
+templates its first registration (of the brain extraction) only runs the
+non-linear stage; for advanced users only}
 
 \item{atlases}{a named list: the names must be template names from
 \code{normalize_template} and the values must be directories of atlases of
