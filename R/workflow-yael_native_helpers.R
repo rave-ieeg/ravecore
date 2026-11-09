@@ -175,3 +175,134 @@ yael_native_clean_wm_mask <- function(labels, vox2ras, dgwbs,
   index <- index[!yael_native_brainstem_cone(to_ras(index), center)]
   result(index, length(artifacts))
 }
+
+#' Radii in voxels of a distance given on an adult human brain
+#' @param mm distance in millimeters on a brain of 1.9 liters
+#' @param brain_ml volume of the brain mask in milliliters
+#' @param voxel_mm voxel size in millimeters, one per axis
+#' @returns The distance scaled by the cube root of the ratio of the brain
+#' volumes, in voxels along each axis of \code{voxel_mm}; at least one voxel
+#' unless \code{mm} is zero
+#' @noRd
+yael_native_extraction_radius <- function(mm, brain_ml, voxel_mm) {
+  if (mm <= 0) { return(rep(0L, length(voxel_mm))) }
+  pmax(1L, as.integer(round(mm * (brain_ml / 1900)^(1 / 3) / voxel_mm)))
+}
+
+#' Brain extraction: the warped template mask adjusted to the subject
+#' @param image bias-corrected native image
+#' @param mask warped template brain mask on the grid of \code{image}
+#' @param vox2ras voxel-to-'RAS' matrix of \code{image}
+#' @param verbose whether to log the change of the mask
+#' @returns A 0/1 array on the grid of \code{mask} with attribute
+#' \code{vox2ras}
+#' @details The local half of \verb{antsBrainExtraction.sh}, since a warp only
+#' places the mask to a few millimeters: a 3-class \verb{k-means} segmentation
+#' of the subject in the mask grown by 2 mm; the largest connected white and
+#' gray matter; an erosion by 2 mm that cuts thin bridges to dura or marrow,
+#' the largest component, a dilation by 4 mm and the holes filled; the warped
+#' mask added back, and a closing by 5 mm. \verb{antsBrainExtraction.sh} also
+#' adds the \verb{CSF} eroded by 10 voxels, which never touches the brain and
+#' is dropped by the largest component, so it is left out here.
+#'
+#' These steps keep all of the warped mask and grow through any intensity,
+#' so the mask can still hold skull marrow, dura or scalp. As in the watershed
+#' of 'FreeSurfer', the gray and white matter that dark voxels (\verb{CSF} or
+#' bone, which a 'T1' image cannot tell apart) cut off from the largest
+#' connected white and gray matter then leaves the mask, also where the warped
+#' mask held it; beyond the segmented band, the voxels are classed by the
+#' midpoints between the class means. The largest component stays, with its
+#' holes filled. What the cut-off tissue leaves behind, such as marrow as dark
+#' as gray matter that touches the cortex, can hang on the brain in thin
+#' strands: the part of the mask that survives an erosion by 2 mm, grown back
+#' by 3 mm and kept inside the mask, holds the brain but not the strands
+#' thinner than about 4 mm that reach more than about 1 mm out; the holes are
+#' filled again. Thicker marrow as dark as gray matter that touches the brain
+#' stays.
+#'
+#' Distances are millimeters on an adult brain, scaled by its volume and
+#' converted to voxels along each axis (see
+#' \code{yael_native_extraction_radius}), so that they hold on thick slices.
+#' The warped mask is kept, with a warning, when a tissue class is empty, the
+#' segmentation fails, or the brain differs from the mask by more than 20
+#' percent in volume
+#' @noRd
+yael_native_brain_extraction <- function(image, mask, vox2ras, verbose = TRUE) {
+  rough <- array(mask > 0, dim(mask))
+  as_mask <- function(brain) {
+    brain <- array(brain * 1, dim(mask))
+    attr(brain, "vox2ras") <- vox2ras
+    brain
+  }
+  keep_warped <- function(reason) {
+    warning(sprintf(
+      "yael_native_brain_extraction: %s; using the warped template mask.", reason),
+      call. = FALSE)
+    as_mask(rough)
+  }
+  voxel_ml <- abs(det(vox2ras[1:3, 1:3])) / 1000
+  # the voxel size along each axis
+  voxel_mm <- sqrt(colSums(vox2ras[1:3, 1:3]^2))
+  radius <- function(mm) {
+    yael_native_extraction_radius(mm, sum(rough) * voxel_ml, voxel_mm)
+  }
+  grow <- function(x, mm) { ravetools::morph_volume(x, "dilate", radius(mm)) > 0 }
+  shrink <- function(x, mm) { ravetools::morph_volume(x, "erode", radius(mm)) > 0 }
+  largest <- function(x) { ravetools::morph_volume(x, "largest_component") > 0 }
+
+  # the subject's tissues around the edge of the warped mask
+  band <- largest(grow(rough, 2))
+  seg3 <- tryCatch({
+    yael_native_kmeans3(image, band * 1, vox2ras, iterations = 3L,
+                        stage = "brainmask", verbose = verbose)
+  }, error = function(e) { e })
+  if (inherits(seg3, "error")) {
+    return(keep_warped(sprintf("the segmentation failed (%s)", conditionMessage(seg3))))
+  }
+  labels <- seg3$segmentation
+  means <- vapply(1:3, function(k) { mean(image[labels == k]) }, 0.0)
+  if (anyNA(means)) {
+    return(keep_warped("a tissue class is empty"))
+  }
+  classes <- order(means)
+
+  # white and gray matter, without what hangs on them by a thread
+  brain <- largest(labels == classes[[3]]) | largest(labels == classes[[2]])
+  brain <- grow(largest(shrink(brain, 2)), 4)
+  brain <- ravetools::morph_volume(brain, "fill_holes") > 0
+  # the warped mask comes back, closed
+  brain <- shrink(grow(brain | rough, 5), 5)
+
+  # what stays is dark or part of the brain: as in the watershed of
+  # 'FreeSurfer', gray and white matter that dark voxels (CSF, bone) cut off
+  # from the largest components is marrow, dura or scalp, also inside the
+  # warped mask. Beyond the band, voxels are classed by the midpoints of the
+  # class means, so that the cortex the warped mask missed stays
+  tissue <- array(match(labels, classes, nomatch = 0L), dim(mask))
+  outside <- brain & !band
+  sorted <- means[classes]
+  tissue[outside] <- 1L + (image[outside] > (sorted[[1]] + sorted[[2]]) / 2) +
+    (image[outside] > (sorted[[2]] + sorted[[3]]) / 2)
+  attached <- largest(tissue == 3L) | largest(tissue == 2L)
+  cut_off <- brain & tissue >= 2L & !attached
+  brain <- ravetools::morph_volume(largest(brain & !cut_off), "fill_holes") > 0
+
+  # what the cut-off tissue leaves behind is spiky, the brain is not: the brain
+  # survives an erosion by 2 mm, and grown back by 3 mm it covers all of itself
+  # but not the strands, thinner than about 4 mm, that reach farther out. The
+  # holes are filled first, or the erosion around them would cut off brain
+  stranded <- brain
+  brain <- grow(largest(shrink(brain, 2)), 3) & brain
+  brain <- ravetools::morph_volume(brain, "fill_holes") > 0
+
+  ratio <- sum(brain) / sum(rough)
+  if (!isTRUE(abs(ratio - 1) <= 0.2)) {
+    return(keep_warped(sprintf(
+      "the extracted brain is %.0f%% of the volume of the mask", ratio * 100)))
+  }
+  yael_native_log(verbose, sprintf(
+    "Brain extraction: %.1f mL added to the warped template mask, %.1f mL removed; %.1f mL of tissue cut off from the brain (marrow, dura, scalp) and %.1f mL of thin strands left out",
+    sum(brain & !rough) * voxel_ml, sum(rough & !brain) * voxel_ml,
+    sum(cut_off & !brain) * voxel_ml, sum(stranded & !brain) * voxel_ml))
+  as_mask(brain)
+}

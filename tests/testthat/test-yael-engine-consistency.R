@@ -24,7 +24,27 @@ local_yael_engines <- function(env = parent.frame()) {
   local_yael_sandbox(env = env)
   local_yael_no_jobs(env = env)
   Sys.unsetenv("IEEGIO_NO_PYTHON")
+  local_yael_python_tempdir(env = env)
   invisible()
+}
+
+# Points the temporary folder of 'Python' (`tempfile.tempdir`) to an empty
+# folder for the rest of the calling frame and removes it on exit:
+# `ants.atropos` writes its posteriors there (`antsr*prob*.nii.gz`) and leaves
+# them, which `R CMD check` reports as detritus in the temporary directory
+local_yael_python_tempdir <- function(env = parent.frame()) {
+  py_tempfile <- rpymat::import("tempfile")
+  # a 'Python' object: `None`, or the folder already in use
+  old <- rpymat::py_get_attr(py_tempfile, "tempdir")
+  root <- tempfile(pattern = "ravecore-yael-python-")
+  dir.create(root)
+  rpymat::py_set_attr(py_tempfile, "tempdir", root)
+  restore <- function() {
+    rpymat::py_set_attr(py_tempfile, "tempdir", old)
+    unlink(root, recursive = TRUE)
+  }
+  do.call(base::on.exit, list(as.call(list(restore)), TRUE, FALSE), envir = env)
+  invisible(root)
 }
 
 # Uses a copy of `files` as the template for the rest of the calling frame:

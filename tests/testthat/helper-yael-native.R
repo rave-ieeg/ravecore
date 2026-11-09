@@ -5,14 +5,17 @@
 
 # ---- Sandbox and mocks ---------------------------------------------------------
 
-# Skips unless 'ravetools' has every function and argument of the native
-# pipeline ('ravetools' 0.3.3 or later; released 0.3.2 and the development
-# builds before 0.3.2.3 lack some of them)
+# Skips unless 'ravetools' exports every function the native pipeline calls
+# (the package calls them directly, so an older 'ravetools' would fail)
 skip_if_no_native_yael <- function() {
-  testthat::skip_if_not(
-    yael_native_ravetools_ok(),
-    message = "ravetools lacks the native YAEL functions (needs ravetools >= 0.3.3)"
-  )
+  needed <- c("register_volume3d", "apply_transform3d_volume", "apply_transform3d_points",
+              "read_ants_transform", "write_ants_transform", "write_ants_warp",
+              "save_registration", "load_registration", "bias_correction_n4",
+              "segment_volume_tissue_gmm", "morph_volume", "grow_volume",
+              "mris_outer_surface", "vcg_convex_hull", "vcg_raycaster", "vcg_isosurface")
+  missing <- setdiff(needed, getNamespaceExports("ravetools"))
+  testthat::skip_if(length(missing) > 0, message = sprintf(
+    "ravetools lacks %s", paste(missing, collapse = ", ")))
 }
 
 # Skips with 'testthat' older than 3.1.7, which has no
@@ -179,6 +182,7 @@ local_yael_registration_spy <- function(keep_sources = FALSE, env = parent.frame
     calls$list[[length(calls$list) + 1]] <- list(
       type = args$type,
       channels = if (is.list(source)) length(source) else 1L,
+      target_dim = dim(if (is.list(target)) target[[1]] else target),
       weights = args$weights,
       masked = !is.null(args$target_mask) && !is.null(args$source_mask),
       source_masked = !is.null(args$source_mask),
@@ -289,6 +293,35 @@ yael_toy_blur <- function(x, sigma) {
 yael_toy_write <- function(x, vox2ras, path) {
   ieegio::write_volume(ieegio::as_ieegio_volume(x, vox2ras = vox2ras), path)
   path
+}
+
+# A round head of adult size on a 2 mm grid: a ventricle (r < 20 mm), white
+# matter (r < 60), gray matter (r < 70), CSF (r < 73), skull (r < 76) and a
+# bright marrow (r < 82). With `bridge`, a rod one voxel wide and as bright as
+# white matter runs from the white matter through the gray matter, the CSF and
+# the skull into the marrow. Returns the image, `r` (distance from the center
+# in mm, an array), `x` (the first 'RAS' coordinate, an array) and `vox2ras`
+yael_toy_round_head <- function(bridge = FALSE, seed = 3L) {
+  set.seed(seed)
+  n <- 88L
+  axis <- seq(-(n - 1), n - 1, by = 2)
+  vox2ras <- diag(c(2, 2, 2, 1))
+  vox2ras[1:3, 4] <- -(n - 1)
+  r <- sqrt(outer(outer(axis^2, axis^2, "+"), axis^2, "+"))
+  image <- array(0, dim(r))
+  image[r < 82] <- 130
+  image[r < 76] <- 8
+  image[r < 73] <- 25
+  image[r < 70] <- 70
+  image[r < 60] <- 110
+  image[r < 20] <- 25
+  if (bridge) {
+    middle <- n %/% 2L
+    rod <- which(axis > 50 & axis < 82)
+    image[rod, middle, middle] <- 110
+  }
+  image <- abs(image + stats::rnorm(length(image), sd = 3))
+  list(image = image, r = r, x = array(axis, dim(r)), vox2ras = vox2ras)
 }
 
 # Writes a toy template folder: `T1.nii.gz` (2 mm, 52 x 62 x 50 voxels), a

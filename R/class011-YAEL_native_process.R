@@ -174,8 +174,8 @@ yael_native_fs_tkr_to_scanner <- function(fs_dir) {
 #' \code{\link{YAELProcess}} and writes the same files (names, folders,
 #' \verb{'ANTs'}-compatible \code{.mat} and warp files, \verb{'JSON'} logs), so
 #' the results of one class can be read by the other. The registrations,
-#' bias-field correction and tissue segmentation come from \pkg{ravetools}
-#' (version 0.3.3 or later). See examples at \code{\link{as_yael_process}}
+#' bias-field correction and tissue segmentation come from \pkg{ravetools}.
+#' See examples at \code{\link{as_yael_process}}
 #' (with \code{engine = "native"}) and \code{\link{yael_preprocess_native}}.
 #' @details
 #' Differences from \code{\link{YAELProcess}} and the \pkg{rpyANTs} pipeline
@@ -202,16 +202,49 @@ yael_native_fs_tkr_to_scanner <- function(fs_dir) {
 #' with the 1 mm values, the greedy update folded the deformation in about
 #' 1.5 percent of the brain on \code{'mni_icbm152_nlin_asym_09b'}. The share
 #' of the template brain mask where the final deformation folds (is not
-#' one-to-one) is logged, with a warning above 1 percent.
+#' one-to-one) is logged, with a warning above 1 percent. The initial
+#' registration, which places the template brain mask and the tissue priors,
+#' always goes to the 1 mm \code{'mni_icbm152_nlin_asym_09a'} (see the brain
+#' extraction below), whereas \pkg{rpyANTs} registers to the template of the
+#' normalization.
 #' \item The quick three-class segmentation that finds the white matter for
 #' the intensity normalization runs on the raw image, as in \pkg{rpyANTs};
 #' when a few extreme intensities inside the brain leave one of its classes
 #' empty (\verb{Atropos} keeps going, \pkg{ravetools} stops), it is run again
 #' with the intensities clipped at their 99.9 percent quantile inside the
 #' brain (then at the 99 percent quantile).
-#' \item White-matter artifacts: the template brain mask can take in a thick,
-#' bright skull marrow, which the tissue segmentation labels as white matter
-#' and the final registration would pull into the brain. Each white-matter
+#' \item Brain extraction (\code{\link{yael_brain_extract}}): the brain mask of
+#' \code{'mni_icbm152_nlin_asym_09a'}, mapped to the native image by the
+#' initial registration whatever the template of the normalization, is
+#' adjusted to the subject, as in \verb{antsBrainExtraction.sh}, on the image
+#' corrected by \verb{N4} without intensity truncation. A
+#' three-class segmentation of the mask grown by 2 mm finds the largest
+#' connected white and gray matter; an erosion, the largest component, a
+#' dilation, hole filling and a closing cut what hangs on the brain by a
+#' thread, and the mapped mask is added back. Then, as in the watershed of
+#' 'FreeSurfer', the gray and white matter that dark voxels (\verb{CSF} or
+#' bone) cut off from the brain, such as skull marrow, dura or scalp, leaves
+#' the mask, also where the mapped mask held it, which
+#' \verb{antsBrainExtraction.sh} keeps whole. The thin strands this can leave
+#' (such as marrow as dark as gray matter) go too: the part of the mask that
+#' survives an erosion by 2 mm, grown back by 3 mm and kept inside the mask,
+#' holds the brain but not what is thinner than about 4 mm and reaches more
+#' than about 1 mm out. The distances are millimeters along each axis of the
+#' image, so they hold on thick slices.
+#' The result replaces the mapped mask in the tissue segmentation (whose
+#' priors also come from that template), in the final registration and its
+#' final brain mask and image (\code{brainmask2.nii.gz},
+#' \code{brain2.nii.gz}), and in \code{construct_ants_folder_from_template};
+#' the files of the extraction in the stage folder of the normalization are
+#' reused when all of them are there. The
+#' \pkg{rpyANTs} engine uses a network mask from \code{deep_atropos} for the
+#' registration when \code{'antspynet'} is available, and always saves the
+#' mapped mask. The mapped mask is kept, with a warning, when the segmentation
+#' fails or the volume changes by more than 20 percent.
+#' \item White-matter artifacts: the brain mask can still hold skull marrow
+#' that touches the brain with no dark voxel between, which the tissue
+#' segmentation labels as white matter and the final registration would pull
+#' into the brain. Each white-matter
 #' voxel casts one ray away from the center of the white matter; when the ray
 #' misses the smoothed outer surface of the gray matter and the cerebellum
 #' (\code{ravetools::mris_outer_surface}), the voxel is taken to lie outside
@@ -405,7 +438,6 @@ YAELNativeProcess <- R6::R6Class(
       if (is.null(native_path)) {
         stop(sprintf("Missing image for type `%s`. Please set the image first via `set_input_image`.", native_type))
       }
-      yael_native_require_ravetools()
       reference <- yael_native_read_header(native_path)
       volume <- yael_native_read_volume(path, allow_4d = TRUE)
       interpolation <- yael_native_interpolation(interpolator, volume)
@@ -440,7 +472,6 @@ YAELNativeProcess <- R6::R6Class(
           "Missing mapping from %s to %s. Please register the image to the template first.",
           native_type, camel_template_name(template_name)))
       }
-      yael_native_require_ravetools()
       if (to_template) {
         transforms <- mapping$template_to_native$transformlist
       } else {
@@ -815,8 +846,10 @@ YAELNativeProcess <- R6::R6Class(
     #' @param verbose whether to print out the process; default is true
     #' @param ... additional tuning parameters: \code{affine_transform}
     #' (optional initial \verb{affine} transform, an \verb{'ANTs'} \code{.mat} file
-    #' from the template to the native image as point map; the initial
-    #' registration then only runs its non-linear stage), \code{with_skull}
+    #' from the template to the native image as point map; the final
+    #' registration starts from it, and for the \verb{MNI152} templates the
+    #' registration of the brain extraction too, which then only runs its
+    #' non-linear stage), \code{with_skull}
     #' (whether to register the images with skull; default is false), and
     #' \code{cost_function} (only \code{'CC'}, the local cross-correlation, is
     #' available; other values give a warning); other arguments are ignored
@@ -829,11 +862,8 @@ YAELNativeProcess <- R6::R6Class(
                                verbose = TRUE, ...) {
       template_name <- match.arg(template_name)
       verbose <- isTRUE(verbose)
-      # before the template is located (or downloaded), other images are
-      # registered, or the stage folder is removed
-      yael_native_require_ravetools()
       template <- yael_native_template(template_name)
-      # the full template resolution takes a lot of memory
+      # the final registration on the full template grid takes a lot of memory
       yael_native_check_memory(template$t1)
       # camel version for BIDS
       template_name2 <- template$camel
@@ -923,6 +953,11 @@ YAELNativeProcess <- R6::R6Class(
         with_skull = isTRUE(args[["with_skull"]]),
         cost_function = cost_function,
         affine_transform = args[["affine_transform"]],
+        # the brain extraction registers to `mni_icbm152_nlin_asym_09a`, which
+        # the affine of an MNI152 template also starts
+        extraction_affine = if (identical(template$coord_sys, "MNI152")) {
+          args[["affine_transform"]]
+        },
         verbose = verbose
       )
 
@@ -1182,7 +1217,6 @@ YAELNativeProcess <- R6::R6Class(
           "Missing mapping from %s to %s. Please register the image to the template first.",
           native_type, camel_template_name(template_name)))
       }
-      yael_native_require_ravetools()
       reference <- yael_native_read_header(yael_native_template(template_name)$t1)
       volume <- yael_native_read_volume(native_roi_path, allow_4d = TRUE)
       interpolation <- yael_native_interpolation(interpolator, volume)
@@ -1260,7 +1294,6 @@ YAELNativeProcess <- R6::R6Class(
             "Missing mapping from %s to %s. Please register the image to the template first.",
             "T1w", camel_template_name(template_name)))
         }
-        yael_native_require_ravetools()
       }
       for (folder in folders) {
         dir_create2(if (nzchar(folder)) file.path(atlas_root, folder) else atlas_root)
@@ -1374,7 +1407,6 @@ YAELNativeProcess <- R6::R6Class(
       if (!length(streamline_files)) {
         return(invisible(streamline_files))
       }
-      yael_native_require_ravetools()
 
       # 'ieegio' must not start (or install) 'Python' from here on
       no_python <- Sys.getenv("IEEGIO_NO_PYTHON", unset = NA)
@@ -1556,8 +1588,11 @@ YAELNativeProcess <- R6::R6Class(
     #' is generated from template brain to facilitate the three-dimensional
     #' viewer. Please make sure method \code{map_to_template} is called before
     #' using this method (or the program will fail). The folder holds the
-    #' conformed \code{'mri/T1.mgz'}, the template brain mask mapped to the
-    #' native image (\code{'mri/brainmask.nii.gz'}, binary), the bias-corrected
+    #' conformed \code{'mri/T1.mgz'}, the brain mask of the normalization
+    #' (\code{\link{yael_brain_extract}}, read from its stage folder
+    #' \code{'tmp/coregister_T1w_with_<template>'} when all of its files are
+    #' there, computed again otherwise; \code{'mri/brainmask.nii.gz'}, binary),
+    #' the bias-corrected
     #' image (\code{'mri/nu.nii.gz'}), its skull-stripped version scaled to
     #' 0 to 255 (\code{'mri/brain.finalsurfs.nii.gz'}), and the linear
     #' transform \code{'mri/transforms/talairach.xfm'} written by
@@ -1581,10 +1616,6 @@ YAELNativeProcess <- R6::R6Class(
       if (length(mr_path) != 1 || is.na(mr_path) || !file.exists(mr_path)) {
         stop("T1w image is not set. Please set the input image via\n\tself$set_input_image('/path/to/T1-weighted/MRI.nii.gz', type = 'T1w')")
       }
-      if (length(template_name)) {
-        # the brain mask and the bias correction below need it
-        yael_native_require_ravetools()
-      }
 
       dir_create2(mri_dir)
 
@@ -1597,12 +1628,12 @@ YAELNativeProcess <- R6::R6Class(
       template_name <- match.arg(template_name)
       template <- yael_native_template(template_name)
 
-      # brainmask: template mask on the native image, binarized
-      mask <- private$transform_from_template(
-        path = template$mask, template_name = template_name,
-        native_type = "T1w", interpolator = "nearestNeighbor", verbose = FALSE)
+      # brainmask: the brain extraction of the normalization, read from its
+      # stage folder when all of its files are there, extracted again otherwise
+      stage_path <- file.path(as.character(self$work_path), "tmp",
+                              sprintf("coregister_T1w_with_%s", template$camel))
+      mask <- yael_native_brain_extract_cached(mr_path, stage_path, verbose = FALSE)$mask
       vox2ras <- attr(mask, "vox2ras")
-      mask <- (mask > 0) * 1
       yael_native_write_volume(mask, file.path(mri_dir, "brainmask.nii.gz"),
                                vox2ras = vox2ras)
 
