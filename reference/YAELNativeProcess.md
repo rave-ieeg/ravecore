@@ -68,7 +68,7 @@ the rpyANTs pipeline behind it:
   hangs on the brain by a thread, and the mapped mask is added back.
   Then, as in the watershed of 'FreeSurfer', the gray and white matter
   that dark voxels (`CSF` or bone) cut off from the brain, such as skull
-  marrow, dura or scalp, leaves the mask, also where the mapped mask
+  marrow, `dura` or `scalp`, leaves the mask, also where the mapped mask
   held it, which `antsBrainExtraction.sh` keeps whole. The thin strands
   this can leave (such as marrow as dark as gray matter) go too: the
   part of the mask that survives an erosion by 2 mm, grown back by 3 mm

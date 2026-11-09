@@ -90,7 +90,7 @@
     and a closing cut what hangs on the brain by a thread, and the
     mapped mask is added back. Then, as in the watershed of
     `FreeSurfer`, the gray and white matter that dark voxels (`CSF` or
-    bone) cut off from the brain, such as skull marrow, dura or scalp,
+    bone) cut off from the brain, such as skull marrow, `dura` or scalp,
     leaves the mask, also where the mapped mask held it
     (`antsBrainExtraction.sh` keeps all of the mapped mask). The thin
     strands this can leave (such as marrow as dark as gray matter) go

@@ -100,10 +100,10 @@ is given</p></dd>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The steps, with the files they write into <code>work_path</code> (named after the
 stages of the native normalization):</p><ol><li><p>bias-field correction with the settings of <code>abp_n4</code> in
-'ANTsPy' (<code>nu.nii.gz</code>), for the registration;</p></li>
+<span class="pkg">ANTsPy</span> (<code>nu.nii.gz</code>), for the registration;</p></li>
 <li><p>unless <code>mask</code> is given, the registration of the whole head
-to the template image without masks, affine and then deformable (only
-deformable from <code>affine_transform</code>), as the initial registration
+to the template image without masks, affine and then deform, as
+the initial registration
 (<code>'SyNabp'</code>) of the native normalization; it is saved by
 <code><a href="https://dipterix.org/ravetools/reference/save_registration.html" class="external-link">ravetools::save_registration</a></code> as <code>SyNabp.dcf</code> with its
 <code>'ANTs'</code> transform files, and the registered image as
@@ -115,7 +115,7 @@ extraction" of <code><a href="YAELNativeProcess.html">YAELNativeProcess</a></cod
 <code>N4</code> again without the intensity truncation of <code>abp_n4</code> (which
 makes bright marrow look like the white matter), which keeps the largest
 connected gray and white matter, leaves out what dark voxels cut off from
-it (skull marrow, dura or scalp) and thin strands, and keeps the initial
+it (skull marrow or scalp) and thin strands, and keeps the initial
 mask, with a warning, when the result differs from it by more than 20
 percent in volume (<code>brainmask.nii.gz</code>).</p></li>
 </ol><p>Every call computes all the steps again; existing files in

@@ -59,13 +59,13 @@ A binary `ieegio_volume` (1 inside the brain) on the grid of `image`.
 The steps, with the files they write into `work_path` (named after the
 stages of the native normalization):
 
-1.  bias-field correction with the settings of `abp_n4` in 'ANTsPy'
+1.  bias-field correction with the settings of `abp_n4` in ANTsPy
     (`nu.nii.gz`), for the registration;
 
 2.  unless `mask` is given, the registration of the whole head to the
-    template image without masks, affine and then deformable (only
-    deformable from `affine_transform`), as the initial registration
-    (`'SyNabp'`) of the native normalization; it is saved by
+    template image without masks, affine and then deform, as the initial
+    registration (`'SyNabp'`) of the native normalization; it is saved
+    by
     [`ravetools::save_registration`](https://dipterix.org/ravetools/reference/save_registration.html)
     as `SyNabp.dcf` with its `'ANTs'` transform files, and the
     registered image as `SyNabp_warped_mov.nii.gz`;
@@ -79,10 +79,10 @@ stages of the native normalization):
     on the image corrected by `N4` again without the intensity
     truncation of `abp_n4` (which makes bright marrow look like the
     white matter), which keeps the largest connected gray and white
-    matter, leaves out what dark voxels cut off from it (skull marrow,
-    dura or scalp) and thin strands, and keeps the initial mask, with a
-    warning, when the result differs from it by more than 20 percent in
-    volume (`brainmask.nii.gz`).
+    matter, leaves out what dark voxels cut off from it (skull marrow or
+    scalp) and thin strands, and keeps the initial mask, with a warning,
+    when the result differs from it by more than 20 percent in volume
+    (`brainmask.nii.gz`).
 
 Every call computes all the steps again; existing files in `work_path`
 are replaced.

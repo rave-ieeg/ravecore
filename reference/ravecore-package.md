@@ -24,7 +24,9 @@ Useful links:
 
 - <https://rave.wiki>
 
-- <http://rave.wiki/ravecore/>
+- <https://rave.wiki/ravecore/>
+
+- <https://github.com/rave-ieeg/ravecore>
 
 - Report bugs at <https://github.com/rave-ieeg/ravecore/issues>
 
