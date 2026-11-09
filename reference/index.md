@@ -287,7 +287,7 @@
 - [`validate_condition_groupings()`](http://rave.wiki/ravecore/reference/validate_condition_groupings.md)
   : Validate and normalize a list of user-supplied condition groupings.
 
-- [`validate_subject`](http://rave.wiki/ravecore/reference/validate_subject.md)
+- [`validate_subject()`](http://rave.wiki/ravecore/reference/validate_subject.md)
   : Validate subject data integrity
 
 - [`validate_time_window()`](http://rave.wiki/ravecore/reference/validate_time_window.md)

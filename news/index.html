@@ -33,9 +33,9 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.1.2" id="ravecore-012">ravecore 0.1.2<a class="anchor" aria-label="anchor" href="#ravecore-012"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.0.0" id="ravecore-100">ravecore 1.0.0<a class="anchor" aria-label="anchor" href="#ravecore-100"></a></h2>
 <div class="section level4">
-<h4 id="new-features-0-1-2">New Features<a class="anchor" aria-label="anchor" href="#new-features-0-1-2"></a></h4>
+<h4 id="new-features-1-0-0">New Features<a class="anchor" aria-label="anchor" href="#new-features-1-0-0"></a></h4>
 <ul><li>Added <code><a href="../reference/yael_macaque.html">yael_macaque()</a></code> and macaque support in the YAEL preprocessing pipeline (<code>#32dcb87</code>, <code>#6c864e2</code>).</li>
 <li>Added <code><a href="../reference/generate_atlas_YBA.html">generate_atlas_YBA()</a></code> to morph <code>YBA690</code> / <code>YBA696</code> atlases from the <code>MNI152</code> symmetric template to the subject, with an atlas-overlay report (<code>#f45c574</code>).</li>
 <li>Added streamline support: <code><a href="../reference/rave_brain.html">rave_brain()</a></code> gains a <code>streamlines</code> argument, and the YAEL process can generate streamlines from a template (<code>#fbd913a</code>, <code>#f79c06e</code>, <code>#6adff48</code>).</li>
@@ -74,7 +74,7 @@
 <code>RAVESubject</code> gains <code><a href="https://rdrr.io/r/base/format.html" class="external-link">format()</a></code>, which <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> now shows: the subject’s blocks, its electrodes by signal type with sample rates and which ones are <code>Notch</code>-filtered or have <code>Wavelet</code> power, its epoch and reference names (with the subject’s defaults marked), and its imaging state (native <code>MRI</code>, <code>MNI</code> normalization templates, <code>CT</code>-<code>MRI</code> co-registration, <code>FreeSurfer</code>). Only metadata are read.</li>
 </ul></div>
 <div class="section level4">
-<h4 id="bug-fixes-0-1-2">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-2"></a></h4>
+<h4 id="bug-fixes-1-0-0">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-0-0"></a></h4>
 <ul><li>Without <code>Python</code>, <code>transform_point_to_template(volumetric_transform = "auto")</code> and <code><a href="../reference/transform_point_to_template.html">transform_thinfilm_to_mni152()</a></code> silently returned affine coordinates even when a non-linear deformation existed, because a failed lookup looked the same as a missing deformation. The deformation is now read without <code>Python</code>, and a failed lookup gives a warning before the affine is used. The <code>group_3d_viewer</code> module may have saved such coordinates in <code>electrodes_normalization_mni152.csv</code> as non-linear results; to regenerate this file for subjects viewed without <code>Python</code>, choose the non-linear volumetric mapping and enable “Clear existing cache and force re-calculating normalization” in the module.</li>
 <li>
 <code><a href="../reference/transform_point_to_template.html">transform_point_to_template()</a></code> treated the results of a normalization to <code>fsaverage</code> as <code>MNI152</code>. For subjects with no <code>MNI152</code> normalization, the <code>MNI152_*</code> columns held <code>MNI305</code> coordinates and the <code>MNI305_*</code> columns were converted a second time, which gave errors of about 2 mm. <code><a href="../reference/transform_point_to_template.html">transform_thinfilm_to_mni152()</a></code> used these columns.</li>
@@ -97,7 +97,7 @@
 <li>Fixed a syntax issue in the YAEL process (<code>#61016f5</code>).</li>
 </ul></div>
 <div class="section level4">
-<h4 id="other-changes-0-1-2">Other Changes<a class="anchor" aria-label="anchor" href="#other-changes-0-1-2"></a></h4>
+<h4 id="other-changes-1-0-0">Other Changes<a class="anchor" aria-label="anchor" href="#other-changes-1-0-0"></a></h4>
 <ul><li>Added tests that check function-call signatures through <code><a href="https://rdrr.io/r/base/ns-internal.html" class="external-link">asNamespace()</a></code> (<code>#633cde9</code>).</li>
 <li>Added tests that run each function that moved to the native engine on both engines and compare the outputs; they skip on <code>CRAN</code> and without <code>Python</code>.</li>
 <li>Importing <code>NEV</code>/<code>NSx</code> data hashes each <code>NEV</code> file once per session; validation and import used to hash the whole file again for every channel type (up to six times per file). The hash still names the cache folder, so existing caches are reused.</li>

@@ -2,6 +2,17 @@
 
 Check against existence, validity, and consistency
 
+## Usage
+
+``` r
+validate_subject(
+  subject,
+  method = c("normal", "basic", "all"),
+  verbose = TRUE,
+  version = 2
+)
+```
+
 ## Arguments
 
 - subject:
@@ -185,3 +196,13 @@ the following parts in order:
   pass the validation, the reference data must be valid. The
   inconsistencies, for example, missing file, wrong frequency size,
   invalid time-point lengths will result in failure
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+
+validate_subject("demo/DemoSubject")
+
+} # }
+```

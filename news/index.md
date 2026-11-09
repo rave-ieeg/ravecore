@@ -1,6 +1,6 @@
 # Changelog
 
-## ravecore 0.1.2
+## ravecore 1.0.0
 
 #### New Features
 
