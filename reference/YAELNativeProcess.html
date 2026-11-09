@@ -6,8 +6,8 @@ template atlases or regions of interest back to the native brain, without
 YAELProcess and writes the same files (names, folders,
 'ANTs'-compatible .mat and warp files, 'JSON' logs), so
 the results of one class can be read by the other. The registrations,
-bias-field correction and tissue segmentation come from ravetools
-(version 0.3.3 or later). See examples at as_yael_process
+bias-field correction and tissue segmentation come from ravetools.
+See examples at as_yael_process
 (with engine = &quot;native&quot;) and yael_preprocess_native."><meta property="og:description" content="Rigid registration across multiple types of images, non-linear
 normalization from the native brain to common templates, and mapping of
 template atlases or regions of interest back to the native brain, without
@@ -15,8 +15,8 @@ template atlases or regions of interest back to the native brain, without
 YAELProcess and writes the same files (names, folders,
 'ANTs'-compatible .mat and warp files, 'JSON' logs), so
 the results of one class can be read by the other. The registrations,
-bias-field correction and tissue segmentation come from ravetools
-(version 0.3.3 or later). See examples at as_yael_process
+bias-field correction and tissue segmentation come from ravetools.
+See examples at as_yael_process
 (with engine = &quot;native&quot;) and yael_preprocess_native."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
@@ -25,7 +25,7 @@ bias-field correction and tissue segmentation come from ravetools
 
     <a class="navbar-brand me-2" href="../index.html">ravecore</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.26</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1.27</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,8 +59,8 @@ template atlases or regions of interest back to the native brain, without
 <code><a href="YAELProcess.html">YAELProcess</a></code> and writes the same files (names, folders,
 <code>'ANTs'</code>-compatible <code>.mat</code> and warp files, <code>'JSON'</code> logs), so
 the results of one class can be read by the other. The registrations,
-bias-field correction and tissue segmentation come from <span class="pkg">ravetools</span>
-(version 0.3.3 or later). See examples at <code><a href="as_yael_process.html">as_yael_process</a></code>
+bias-field correction and tissue segmentation come from <span class="pkg">ravetools</span>.
+See examples at <code><a href="as_yael_process.html">as_yael_process</a></code>
 (with <code>engine = "native"</code>) and <code><a href="cmd_run_yael_preprocess_native.html">yael_preprocess_native</a></code>.</p>
     </div>
 
@@ -89,19 +89,52 @@ the cube root of the ratio of brain voxels, rounded to a half (2 for the
 with the 1 mm values, the greedy update folded the deformation in about
 1.5 percent of the brain on <code>'mni_icbm152_nlin_asym_09b'</code>. The share
 of the template brain mask where the final deformation folds (is not
-one-to-one) is logged, with a warning above 1 percent.</p></li>
+one-to-one) is logged, with a warning above 1 percent. The initial
+registration, which places the template brain mask and the tissue priors,
+always goes to the 1 mm <code>'mni_icbm152_nlin_asym_09a'</code> (see the brain
+extraction below), whereas <span class="pkg">rpyANTs</span> registers to the template of the
+normalization.</p></li>
 <li><p>The quick three-class segmentation that finds the white matter for
 the intensity normalization runs on the raw image, as in <span class="pkg">rpyANTs</span>;
 when a few extreme intensities inside the brain leave one of its classes
 empty (<code>Atropos</code> keeps going, <span class="pkg">ravetools</span> stops), it is run again
 with the intensities clipped at their 99.9 percent quantile inside the
 brain (then at the 99 percent quantile).</p></li>
-<li><p>White-matter artifacts: the template brain mask can take in a thick,
-bright skull marrow, which the tissue segmentation labels as white matter
-and the final registration would pull into the brain. Each white-matter
+<li><p>Brain extraction (<code><a href="yael_brain_extract.html">yael_brain_extract</a></code>): the brain mask of
+<code>'mni_icbm152_nlin_asym_09a'</code>, mapped to the native image by the
+initial registration whatever the template of the normalization, is
+adjusted to the subject, as in <code>antsBrainExtraction.sh</code>, on the image
+corrected by <code>N4</code> without intensity truncation. A
+three-class segmentation of the mask grown by 2 mm finds the largest
+connected white and gray matter; an erosion, the largest component, a
+dilation, hole filling and a closing cut what hangs on the brain by a
+thread, and the mapped mask is added back. Then, as in the watershed of
+'FreeSurfer', the gray and white matter that dark voxels (<code>CSF</code> or
+bone) cut off from the brain, such as skull marrow, dura or scalp, leaves
+the mask, also where the mapped mask held it, which
+<code>antsBrainExtraction.sh</code> keeps whole. The thin strands this can leave
+(such as marrow as dark as gray matter) go too: the part of the mask that
+survives an erosion by 2 mm, grown back by 3 mm and kept inside the mask,
+holds the brain but not what is thinner than about 4 mm and reaches more
+than about 1 mm out. The distances are millimeters along each axis of the
+image, so they hold on thick slices.
+The result replaces the mapped mask in the tissue segmentation (whose
+priors also come from that template), in the final registration and its
+final brain mask and image (<code>brainmask2.nii.gz</code>,
+<code>brain2.nii.gz</code>), and in <code>construct_ants_folder_from_template</code>;
+the files of the extraction in the stage folder of the normalization are
+reused when all of them are there. The
+<span class="pkg">rpyANTs</span> engine uses a network mask from <code>deep_atropos</code> for the
+registration when <code>'antspynet'</code> is available, and always saves the
+mapped mask. The mapped mask is kept, with a warning, when the segmentation
+fails or the volume changes by more than 20 percent.</p></li>
+<li><p>White-matter artifacts: the brain mask can still hold skull marrow
+that touches the brain with no dark voxel between, which the tissue
+segmentation labels as white matter and the final registration would pull
+into the brain. Each white-matter
 voxel casts one ray away from the center of the white matter; when the ray
 misses the smoothed outer surface of the gray matter and the cerebellum
-(<code>ravetools::mris_outer_surface</code>), the voxel is taken to lie outside
+(<code><a href="https://dipterix.org/ravetools/reference/mris_outer_surface.html" class="external-link">ravetools::mris_outer_surface</a></code>), the voxel is taken to lie outside
 the brain. These voxels, dilated by two voxels, are left out of the
 white-matter channel, and those labeled white matter also leave the brain
 mask and the brain image of the final registration; the cone below the
@@ -428,8 +461,10 @@ template priors</p></dd>
       <dt><code>...</code></dt>
 <dd><p>additional tuning parameters: <code>affine_transform</code>
 (optional initial <code>affine</code> transform, an <code>'ANTs'</code> <code>.mat</code> file
-from the template to the native image as point map; the initial
-registration then only runs its non-linear stage), <code>with_skull</code>
+from the template to the native image as point map; the final
+registration starts from it, and for the <code>MNI152</code> templates the
+registration of the brain extraction too, which then only runs its
+non-linear stage), <code>with_skull</code>
 (whether to register the images with skull; default is false), and
 <code>cost_function</code> (only <code>'CC'</code>, the local cross-correlation, is
 available; other values give a warning); other arguments are ignored</p></dd>
@@ -801,8 +836,11 @@ This method is called by <code>construct_ants_folder_from_template</code>.</p><d
 is generated from template brain to facilitate the three-dimensional
 viewer. Please make sure method <code>map_to_template</code> is called before
 using this method (or the program will fail). The folder holds the
-conformed <code>'mri/T1.mgz'</code>, the template brain mask mapped to the
-native image (<code>'mri/brainmask.nii.gz'</code>, binary), the bias-corrected
+conformed <code>'mri/T1.mgz'</code>, the brain mask of the normalization
+(<code><a href="yael_brain_extract.html">yael_brain_extract</a></code>, read from its stage folder
+<code>'tmp/coregister_T1w_with_&lt;template&gt;'</code> when all of its files are
+there, computed again otherwise; <code>'mri/brainmask.nii.gz'</code>, binary),
+the bias-corrected
 image (<code>'mri/nu.nii.gz'</code>), its skull-stripped version scaled to
 0 to 255 (<code>'mri/brain.finalsurfs.nii.gz'</code>), and the linear
 transform <code>'mri/transforms/talairach.xfm'</code> written by

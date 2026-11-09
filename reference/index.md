@@ -293,5 +293,8 @@
 - [`validate_time_window()`](http://rave.wiki/ravecore/reference/validate_time_window.md)
   : Validate time windows to be used
 
+- [`yael_brain_extract()`](http://rave.wiki/ravecore/reference/yael_brain_extract.md)
+  : Extract the brain from a 'T1'-weighted image (without 'Python')
+
 - [`yael_macaque()`](http://rave.wiki/ravecore/reference/yael_macaque.md)
   : Run YAEL-based FreeSurfer reconstruction for macaque brains

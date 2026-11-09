@@ -53,9 +53,8 @@
   template priors, affine and `SyN` registration). They take the same
   arguments and write the same files as `YAELProcess`, and either engine
   reads the results of the other (checked against `ANTs` on toy images);
-  `YAELProcess` stays the default. Requires `ravetools` 0.3.3 or later;
-  with an older version the native functions stop with an explanation.
-  Differences from `YAELProcess` (details in
+  `YAELProcess` stays the default. Differences from `YAELProcess`
+  (details in
   [`?YAELNativeProcess`](http://rave.wiki/ravecore/reference/YAELNativeProcess.md)):
   - No `deep_atropos` (`use_antspynet` is ignored): the tissue
     segmentation with the template priors always runs. A tissue class
@@ -74,15 +73,48 @@
     (the 0.5 mm `09b` templates), since the 1 mm values folded the
     deformation in about 1.5% of the brain on
     `mni_icbm152_nlin_asym_09b`. The share of the brain where the final
-    deformation folds is logged, with a warning above 1%.
+    deformation folds is logged, with a warning above 1%. The initial
+    registration, which places the template brain mask and the tissue
+    priors, always goes to the 1 mm `mni_icbm152_nlin_asym_09a` (see
+    [`yael_brain_extract()`](http://rave.wiki/ravecore/reference/yael_brain_extract.md)
+    below), whatever the template of the normalization; the final
+    registration stays on the grid of that template.
   - When the k-means segmentation that finds the white matter fails on a
     few extreme intensities, it is run again with the intensities
     clipped at their 99.9% (then 99%) quantile.
+  - Brain extraction: the template brain mask mapped to the native image
+    is adjusted to the subject, following `antsBrainExtraction.sh`,
+    instead of being used as it is. A three-class segmentation of the
+    mask grown by 2 mm finds the largest connected white and gray
+    matter, an erosion, the largest component, a dilation, hole filling
+    and a closing cut what hangs on the brain by a thread, and the
+    mapped mask is added back. Then, as in the watershed of
+    `FreeSurfer`, the gray and white matter that dark voxels (`CSF` or
+    bone) cut off from the brain, such as skull marrow, dura or scalp,
+    leaves the mask, also where the mapped mask held it
+    (`antsBrainExtraction.sh` keeps all of the mapped mask). The thin
+    strands this can leave (such as marrow as dark as gray matter) go
+    too: the part of the mask that survives an erosion by 2 mm, grown
+    back by 3 mm and kept inside the mask, holds the brain but not what
+    is thinner than about 4 mm and reaches more than about 1 mm out. The
+    distances are millimeters along each axis of the image, so they hold
+    on thick slices. The brain mask comes from
+    [`yael_brain_extract()`](http://rave.wiki/ravecore/reference/yael_brain_extract.md)
+    with the template `mni_icbm152_nlin_asym_09a`, whose tissue priors
+    the segmentation also takes, and replaces the mapped mask in the
+    tissue segmentation, in the final registration and its
+    `brainmask2.nii.gz` and `brain2.nii.gz` (which held the template
+    mask pulled back), and in `construct_ants_folder_from_template()`,
+    which reuses the files of the extraction from the stage folder of
+    the normalization when all of them are there. The mapped mask is
+    kept, with a warning, when the segmentation fails or the volume
+    changes by more than 20%.
   - White-matter voxels whose ray cast away from the center of the white
     matter misses the smoothed outer surface of the gray matter and the
-    cerebellum (`ravetools::mris_outer_surface()`), such as a thick,
-    bright skull marrow that the initial registration left inside the
-    template brain mask, are dilated by two voxels and left out of the
+    cerebellum
+    ([`ravetools::mris_outer_surface()`](https://dipterix.org/ravetools/reference/mris_outer_surface.html)),
+    such as skull marrow that touches the brain, which the brain
+    extraction keeps, are dilated by two voxels and left out of the
     white-matter channel; those labeled white matter also leave the
     brain mask and the brain image of the final registration. The cone
     below the center of the white matter, which holds the brain stem, is
@@ -114,6 +146,21 @@
     for
     [`cmd_run_yael_preprocess()`](http://rave.wiki/ravecore/reference/cmd_run_yael_preprocess.md)),
     and `map_to_template()` warns for such templates below 32 GB.
+- Added
+  [`yael_brain_extract()`](http://rave.wiki/ravecore/reference/yael_brain_extract.md),
+  the brain mask of a `T1`-weighted image without `Python`: the image is
+  corrected with `N4` and registered (affine, then `SyN`, without masks;
+  only `SyN` from a given `affine_transform`) to
+  `mni_icbm152_nlin_asym_09a`, whose brain mask, brought back to the
+  image, is adjusted to the subject by the brain extraction of the
+  native engine (see above) on the image corrected by `N4` without
+  intensity truncation (with the truncation of `abp_n4`, bright marrow
+  looks like white matter). A given initial mask, such as a `FreeSurfer`
+  `brainmask.mgz`, replaces the template mask and its registration. It
+  returns an `ieegio_volume`; `work_path` keeps the intermediate files
+  (`nu`, the `SyNabp` registration, the initial and the final mask). The
+  native normalization uses it (`map_to_template()` passes its
+  `affine_transform` for the `MNI152` templates).
 - [`get_available_morph_to_template()`](http://rave.wiki/ravecore/reference/get_available_morph_to_template.md),
   [`generate_atlases_from_template()`](http://rave.wiki/ravecore/reference/generate_atlases_from_template.md),
   [`generate_atlas_YBA()`](http://rave.wiki/ravecore/reference/generate_atlas_YBA.md),

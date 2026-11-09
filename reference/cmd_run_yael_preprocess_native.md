@@ -5,12 +5,12 @@ The image processing pipeline of
 ([doi:10.1523/ENEURO.0328-23.2023](https://doi.org/10.1523/ENEURO.0328-23.2023)
 ), with every step computed in 'R' by
 [`YAELNativeProcess`](http://rave.wiki/ravecore/reference/YAELNativeProcess.md)
-on top of ravetools (version 0.3.3 or later) instead of `ANTs` through
-'Python': cross-modality rigid registration, normalization of the
-'T1'-weighted 'MRI' to template brains, and subject-level atlases from
-the inverse normalization. The functions take the same arguments, run
-the same steps and write the same files as `yael_preprocess` and
-`cmd_run_yael_preprocess`, so the results can be read by either engine.
+on top of ravetools instead of `ANTs` through 'Python': cross-modality
+rigid registration, normalization of the 'T1'-weighted 'MRI' to template
+brains, and subject-level atlases from the inverse normalization. The
+functions take the same arguments, run the same steps and write the same
+files as `yael_preprocess` and `cmd_run_yael_preprocess`, so the results
+can be read by either engine.
 
 ## Usage
 
@@ -120,8 +120,9 @@ cmd_run_yael_preprocess_native(
 - normalize_affine:
 
   optional path to an initial linear transform: the normalization then
-  starts from this transform, and its first registration only runs the
-  non-linear stage; for advanced users only
+  starts from this transform, and for the `MNI152` templates its first
+  registration (of the brain extraction) only runs the non-linear stage;
+  for advanced users only
 
 - atlases:
 
@@ -186,15 +187,17 @@ with the script, its path, the log file, the image paths, and a function
 ## Details
 
 Templates are located (and downloaded when missing) by rpyANTs, whose
-template functions are pure 'R'; 'Python' is never started. The full
-template resolution is used, which takes a lot of memory. With a 1 mm
-'T1' image (256 by 204 by 256 voxels), the normalization to
-`'mni_icbm152_nlin_asym_09a'` (1 mm, with 0.5 mm tissue maps) took about
-2 minutes and peaked at about 8 gigabytes of resident memory; the
-normalization to `'mni_icbm152_nlin_asym_09b'` (0.5 mm) took about 7
-minutes and peaked at 15 gigabytes of resident memory, 22 gigabytes with
-the memory that the operating system compressed. Hence the script built
-by `cmd_run_yael_preprocess_native` switches from
+template functions are pure 'R'; 'Python' is never started. The final
+registration uses the full template resolution, which takes a lot of
+memory; the first one, which only places the template brain mask and
+tissue priors, runs at 1 mm. With a 1 mm 'T1' image (256 by 204 by 256
+voxels), the normalization to `'mni_icbm152_nlin_asym_09a'` (1 mm, with
+0.5 mm tissue maps) took about 2 minutes and peaked at about 8 gigabytes
+of resident memory; the normalization to `'mni_icbm152_nlin_asym_09b'`
+(0.5 mm) took about 4 minutes, less than one of them for the brain mask,
+and peaked at 15 gigabytes of resident memory, 22 gigabytes with the
+memory that the operating system compressed. Hence the script built by
+`cmd_run_yael_preprocess_native` switches from
 `'mni_icbm152_nlin_asym_09b'` to `'mni_icbm152_nlin_asym_09a'` when the
 memory recorded in the 'RAVE' settings (`max_mem`, the computer memory
 unless set otherwise) is below 32 gigabytes, where the script of
