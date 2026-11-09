@@ -1,68 +1,4 @@
-#' @name validate_subject
-#' @title Validate subject data integrity
-#' @description Check against existence, validity, and consistency
-#' @param subject subject ID (character), or \code{\link{RAVESubject}} instance
-#' @param method validation method, choices are \code{'normal'} (default) or
-#' \code{'basic'} for fast checks; if set to \code{'normal'}, four additional
-#' validation parts will be tested (see parts with \code{*} in Section 'Value').
-#' @param verbose whether to print out the validation messages
-#' @param version data version, choices are \code{1} for 'RAVE' 1.0 data format,
-#' and \code{2} ('RAVE' 2.0 data format); default is \code{2}
-#' @returns A list of nested validation results. The validation process
-#' consists of the following parts in order:
-#' \describe{
-#' \item{\strong{Data paths} (\code{paths})}{}
-#' \item{\code{path}}{the subject's root folder}
-#' \item{\code{path}}{the subject's 'RAVE' folder (the \code{'rave'} folder under the root directory)}
-#' \item{\code{raw_path}}{the subject's legacy raw data folder}
-#' \item{\code{raw_path}}{the subject's raw data folder based on format standard}
-#' \item{\code{data_path}}{a directory storing all the voltage, power, phase data (before reference)}
-#' \item{\code{meta_path}}{meta directory containing all the electrode coordinates, reference table, epoch information, etc.}
-#' \item{\code{reference_path}}{a directory storing calculated reference signals}
-#' \item{\code{preprocess_path}}{a directory storing all the preprocessing information}
-#' \item{\code{cache_path} (low priority)}{data caching path}
-#' \item{\code{freesurfer_path} (low priority)}{subject's 'FreeSurfer' directory}
-#' \item{\code{note_path} (low priority)}{subject's notes}
-#' \item{\code{pipeline_path} (low priority)}{a folder containing all saved pipelines for this subject}
-#'
-#' \item{\strong{Preprocessing information} (\code{preprocess})}{}
-#' \item{\code{electrodes_set}}{whether the subject has a non-empty electrode set}
-#' \item{\code{blocks_set}}{whether the session block length is non-zero}
-#' \item{\code{sample_rate_set}}{whether the raw sampling frequency is set to a valid, proper positive number}
-#' \item{\code{data_imported}}{whether all the assigning electrodes have been imported}
-#' \item{\code{notch_filtered}}{whether all the 'LFP' and 'EKG' signals have been 'Notch' filtered}
-#' \item{\code{has_wavelet}}{whether all the 'LFP' signals are wavelet-transformed}
-#' \item{\code{has_reference}}{at least one reference has been generated in the meta folder}
-#' \item{\code{has_epoch}}{at least one epoch file has been generated in the meta folder}
-#' \item{\code{has_electrode_file}}{meta folder has \code{electrodes.csv} file}
-#'
-#' \item{\strong{Meta information} (\code{meta})}{}
-#' \item{\code{meta_data_valid}}{this item only exists when the previous preprocess validation is failed or incomplete}
-#' \item{\code{meta_electrode_table}}{the \code{electrodes.csv} file in the meta folder has correct format and consistent electrodes numbers to the preprocess information}
-#' \item{\code{meta_reference_xxx}}{(\code{xxx} will be replaced with actual reference names) checks whether the reference table contains all electrodes and whether each reference data exists}
-#' \item{\code{meta_epoch_xxx}}{(\code{xxx} will be replaced with actual epoch names) checks whether the epoch table has the correct formats and whether there are missing blocks indicated in the epoch files}
-#'
-#' \item{\strong{Voltage data} (\code{voltage_data*})}{}
-#' \item{\code{voltage_preprocessing}}{whether the raw preprocessing voltage data are valid. This includes data lengths are the same within the same blocks for each signal type}
-#' \item{\code{voltage_data}}{whether the voltage data (after 'Notch' filters) exist and readable. Besides, the lengths of the data must be consistent with the raw signals}
-#'
-#' \item{\strong{Spectral power and phase} (\code{power_phase_data*})}{}
-#' \item{\code{power_data}}{whether the power data exists for all 'LFP' signals. Besides, to pass the validation process, the frequency and time-point lengths must be consistent with the preprocess record}
-#' \item{\code{power_data}}{same as \code{power_data} but for the phase data}
-#'
-#' \item{\strong{Epoch table} (\code{epoch_tables*})}{
-#' One or more sub-items depending on the number of epoch tables. To pass the validation, the event time for each session block must not exceed the actual signal duration. For example, if one session lasts for 200 seconds, it will invalidate the result if a trial onset time is later than 200 seconds.
-#' }
-#'
-#' \item{\strong{Reference table} (\code{reference_tables*})}{
-#' One or more sub-items depending on the number of reference tables. To pass the validation, the reference data must be valid. The inconsistencies, for example,
-#' missing file, wrong frequency size, invalid time-point lengths will result
-#' in failure
-#' }
-#' }
-#'
-#'
-NULL
+
 # A validate result is a list consisting of the following elements:
 # 1. name
 # 2. description
@@ -71,7 +7,8 @@ NULL
 
 validate_result_new <- function(
     name, valid, value = NULL, description = name, message = NULL,
-    ..., .verbose = FALSE, severity = c("major", "minor")) {
+    ..., .verbose = FALSE, severity = c("major", "minor")
+) {
 
   severity <- match.arg(severity)
   valid <- as.logical(valid)
@@ -136,7 +73,8 @@ validate_result_new <- function(
 
 validate_from_expression <- function(
     name, expr, env = parent.frame(), quoted = FALSE,
-    description = name, ..., .verbose = FALSE) {
+    description = name, ..., .verbose = FALSE
+) {
 
   if (!quoted) {
     expr <- substitute(expr)
@@ -1569,6 +1507,76 @@ validate_subject_reference <- function(subject, verbose = TRUE, other_checks = N
 
 # cache
 
+#' @name validate_subject
+#' @title Validate subject data integrity
+#' @description Check against existence, validity, and consistency
+#' @param subject subject ID (character), or \code{\link{RAVESubject}} instance
+#' @param method validation method, choices are \code{'normal'} (default) or
+#' \code{'basic'} for fast checks; if set to \code{'normal'}, four additional
+#' validation parts will be tested (see parts with \code{*} in Section 'Value').
+#' @param verbose whether to print out the validation messages
+#' @param version data version, choices are \code{1} for 'RAVE' 1.0 data format,
+#' and \code{2} ('RAVE' 2.0 data format); default is \code{2}
+#' @returns A list of nested validation results. The validation process
+#' consists of the following parts in order:
+#' \describe{
+#' \item{\strong{Data paths} (\code{paths})}{}
+#' \item{\code{path}}{the subject's root folder}
+#' \item{\code{path}}{the subject's 'RAVE' folder (the \code{'rave'} folder under the root directory)}
+#' \item{\code{raw_path}}{the subject's legacy raw data folder}
+#' \item{\code{raw_path}}{the subject's raw data folder based on format standard}
+#' \item{\code{data_path}}{a directory storing all the voltage, power, phase data (before reference)}
+#' \item{\code{meta_path}}{meta directory containing all the electrode coordinates, reference table, epoch information, etc.}
+#' \item{\code{reference_path}}{a directory storing calculated reference signals}
+#' \item{\code{preprocess_path}}{a directory storing all the preprocessing information}
+#' \item{\code{cache_path} (low priority)}{data caching path}
+#' \item{\code{freesurfer_path} (low priority)}{subject's 'FreeSurfer' directory}
+#' \item{\code{note_path} (low priority)}{subject's notes}
+#' \item{\code{pipeline_path} (low priority)}{a folder containing all saved pipelines for this subject}
+#'
+#' \item{\strong{Preprocessing information} (\code{preprocess})}{}
+#' \item{\code{electrodes_set}}{whether the subject has a non-empty electrode set}
+#' \item{\code{blocks_set}}{whether the session block length is non-zero}
+#' \item{\code{sample_rate_set}}{whether the raw sampling frequency is set to a valid, proper positive number}
+#' \item{\code{data_imported}}{whether all the assigning electrodes have been imported}
+#' \item{\code{notch_filtered}}{whether all the 'LFP' and 'EKG' signals have been 'Notch' filtered}
+#' \item{\code{has_wavelet}}{whether all the 'LFP' signals are wavelet-transformed}
+#' \item{\code{has_reference}}{at least one reference has been generated in the meta folder}
+#' \item{\code{has_epoch}}{at least one epoch file has been generated in the meta folder}
+#' \item{\code{has_electrode_file}}{meta folder has \code{electrodes.csv} file}
+#'
+#' \item{\strong{Meta information} (\code{meta})}{}
+#' \item{\code{meta_data_valid}}{this item only exists when the previous preprocess validation is failed or incomplete}
+#' \item{\code{meta_electrode_table}}{the \code{electrodes.csv} file in the meta folder has correct format and consistent electrodes numbers to the preprocess information}
+#' \item{\code{meta_reference_xxx}}{(\code{xxx} will be replaced with actual reference names) checks whether the reference table contains all electrodes and whether each reference data exists}
+#' \item{\code{meta_epoch_xxx}}{(\code{xxx} will be replaced with actual epoch names) checks whether the epoch table has the correct formats and whether there are missing blocks indicated in the epoch files}
+#'
+#' \item{\strong{Voltage data} (\code{voltage_data*})}{}
+#' \item{\code{voltage_preprocessing}}{whether the raw preprocessing voltage data are valid. This includes data lengths are the same within the same blocks for each signal type}
+#' \item{\code{voltage_data}}{whether the voltage data (after 'Notch' filters) exist and readable. Besides, the lengths of the data must be consistent with the raw signals}
+#'
+#' \item{\strong{Spectral power and phase} (\code{power_phase_data*})}{}
+#' \item{\code{power_data}}{whether the power data exists for all 'LFP' signals. Besides, to pass the validation process, the frequency and time-point lengths must be consistent with the preprocess record}
+#' \item{\code{power_data}}{same as \code{power_data} but for the phase data}
+#'
+#' \item{\strong{Epoch table} (\code{epoch_tables*})}{
+#' One or more sub-items depending on the number of epoch tables. To pass the validation, the event time for each session block must not exceed the actual signal duration. For example, if one session lasts for 200 seconds, it will invalidate the result if a trial onset time is later than 200 seconds.
+#' }
+#'
+#' \item{\strong{Reference table} (\code{reference_tables*})}{
+#' One or more sub-items depending on the number of reference tables. To pass the validation, the reference data must be valid. The inconsistencies, for example,
+#' missing file, wrong frequency size, invalid time-point lengths will result
+#' in failure
+#' }
+#' }
+#'
+#' @examples
+#' \dontrun{
+#' 
+#' validate_subject("demo/DemoSubject")
+#' 
+#' }
+#' 
 #' @export
 validate_subject <- function(
     subject, method = c("normal", "basic", "all"), verbose = TRUE, version = 2) {

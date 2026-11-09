@@ -3,6 +3,14 @@
 \name{validate_subject}
 \alias{validate_subject}
 \title{Validate subject data integrity}
+\usage{
+validate_subject(
+  subject,
+  method = c("normal", "basic", "all"),
+  verbose = TRUE,
+  version = 2
+)
+}
 \arguments{
 \item{subject}{subject ID (character), or \code{\link{RAVESubject}} instance}
 
@@ -71,4 +79,12 @@ in failure
 }
 \description{
 Check against existence, validity, and consistency
+}
+\examples{
+\dontrun{
+
+validate_subject("demo/DemoSubject")
+
+}
+
 }

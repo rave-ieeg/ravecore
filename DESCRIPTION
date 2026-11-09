@@ -30,7 +30,7 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Language: en-US
-URL: https://rave.wiki, http://rave.wiki/ravecore/
+URL: https://rave.wiki, https://rave.wiki/ravecore/, https://github.com/rave-ieeg/ravecore
 BugReports: https://github.com/rave-ieeg/ravecore/issues
 Imports: 
     tools,
