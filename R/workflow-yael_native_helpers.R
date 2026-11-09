@@ -199,14 +199,14 @@ yael_native_extraction_radius <- function(mm, brain_ml, voxel_mm) {
 #' @details The local half of \verb{antsBrainExtraction.sh}, since a warp only
 #' places the mask to a few millimeters: a 3-class \verb{k-means} segmentation
 #' of the subject in the mask grown by 2 mm; the largest connected white and
-#' gray matter; an erosion by 2 mm that cuts thin bridges to dura or marrow,
+#' gray matter; an erosion by 2 mm that cuts thin bridges to marrow,
 #' the largest component, a dilation by 4 mm and the holes filled; the warped
 #' mask added back, and a closing by 5 mm. \verb{antsBrainExtraction.sh} also
 #' adds the \verb{CSF} eroded by 10 voxels, which never touches the brain and
 #' is dropped by the largest component, so it is left out here.
 #'
 #' These steps keep all of the warped mask and grow through any intensity,
-#' so the mask can still hold skull marrow, dura or scalp. As in the watershed
+#' so the mask can still hold skull marrow or scalp. As in the watershed
 #' of 'FreeSurfer', the gray and white matter that dark voxels (\verb{CSF} or
 #' bone, which a 'T1' image cannot tell apart) cut off from the largest
 #' connected white and gray matter then leaves the mask, also where the warped

@@ -12,7 +12,8 @@ Defines storage standard for Read, process, and analyze intracranial electroence
 Useful links:
 \itemize{
   \item \url{https://rave.wiki}
-  \item \url{http://rave.wiki/ravecore/}
+  \item \url{https://rave.wiki/ravecore/}
+  \item \url{https://github.com/rave-ieeg/ravecore}
   \item Report bugs at \url{https://github.com/rave-ieeg/ravecore/issues}
 }
 

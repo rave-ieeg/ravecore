@@ -48,10 +48,10 @@ The steps, with the files they write into \code{work_path} (named after the
 stages of the native normalization):
 \enumerate{
 \item bias-field correction with the settings of \code{abp_n4} in
-'ANTsPy' (\code{nu.nii.gz}), for the registration;
+\pkg{ANTsPy} (\code{nu.nii.gz}), for the registration;
 \item unless \code{mask} is given, the registration of the whole head
-to the template image without masks, affine and then deformable (only
-deformable from \code{affine_transform}), as the initial registration
+to the template image without masks, affine and then deform, as
+the initial registration
 (\code{'SyNabp'}) of the native normalization; it is saved by
 \code{ravetools::save_registration} as \code{SyNabp.dcf} with its
 \verb{'ANTs'} transform files, and the registered image as
@@ -63,7 +63,7 @@ extraction" of \code{\link{YAELNativeProcess}}) on the image corrected by
 \verb{N4} again without the intensity truncation of \code{abp_n4} (which
 makes bright marrow look like the white matter), which keeps the largest
 connected gray and white matter, leaves out what dark voxels cut off from
-it (skull marrow, dura or scalp) and thin strands, and keeps the initial
+it (skull marrow or scalp) and thin strands, and keeps the initial
 mask, with a warning, when the result differs from it by more than 20
 percent in volume (\code{brainmask.nii.gz}).
 }

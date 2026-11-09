@@ -223,8 +223,8 @@ yael_native_fs_tkr_to_scanner <- function(fs_dir) {
 #' dilation, hole filling and a closing cut what hangs on the brain by a
 #' thread, and the mapped mask is added back. Then, as in the watershed of
 #' 'FreeSurfer', the gray and white matter that dark voxels (\verb{CSF} or
-#' bone) cut off from the brain, such as skull marrow, dura or scalp, leaves
-#' the mask, also where the mapped mask held it, which
+#' bone) cut off from the brain, such as skull marrow, \verb{dura} or \verb{scalp}, 
+#' leaves the mask, also where the mapped mask held it, which
 #' \verb{antsBrainExtraction.sh} keeps whole. The thin strands this can leave
 #' (such as marrow as dark as gray matter) go too: the part of the mask that
 #' survives an erosion by 2 mm, grown back by 3 mm and kept inside the mask,
