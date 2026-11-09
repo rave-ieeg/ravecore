@@ -205,6 +205,10 @@ test_that("generate_atlases_from_template accepts every form of `extra_transform
 test_that("generate_atlas_YBA maps the atlas without 'Python'", {
   skip_on_cran()
   skip_if_no_native_yael()
+  # the YBA colormap ships with 'threeBrain' newer than the CRAN release 1.2.0
+  skip_if(!nzchar(system.file("palettes", "datacube2", "YBA696ColorLUT.json",
+                              package = "threeBrain")),
+          message = "threeBrain lacks the YBA696 colormap")
   local_yael_sandbox()
   local_yael_rpyants_guard()
   local_yael_no_jobs()
