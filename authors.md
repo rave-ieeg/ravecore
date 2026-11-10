@@ -17,7 +17,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/rave-ieeg/ravecore/blob/main/inst/CITATION)
+[`inst/CITATION`](https://github.com/rave-ieeg/ravecore/blob/v1.0.0/inst/CITATION)
 
 Magnotti, J. F., Wang, Z., & Beauchamp, M. S. (2020). RAVE:
 Comprehensive open-source software for reproducible analysis and
